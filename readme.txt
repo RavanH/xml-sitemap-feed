@@ -298,6 +298,9 @@ New action hook xmlsf_news_tags_after, attempt to remove conflicting static site
 
 == Changelog ==
 
+= 4.6.1 =
+* Code cleanup
+
 = 4.6 =
 * NEW: xmlsf_news_tags_after action hook
 * Attempt to remove static sitemap files left over by other sitemap plugins
