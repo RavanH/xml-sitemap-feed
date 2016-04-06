@@ -300,6 +300,8 @@ New action hook xmlsf_news_tags_after, attempt to remove conflicting static site
 
 = 4.6.1 =
 * Code cleanup
+* POT file update
+* Dutch translation
 
 = 4.6 =
 * NEW: xmlsf_news_tags_after action hook
