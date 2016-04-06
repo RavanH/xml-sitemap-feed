@@ -5,6 +5,8 @@
  * @package XML Sitemap Feed plugin for WordPress
  */
 
+if ( ! defined( 'WPINC' ) ) die;
+
 status_header('200'); // force header('HTTP/1.1 200 OK') for sites without posts
 header('Content-Type: text/xml; charset=' . get_bloginfo('charset', 'UTF-8'), true);
 header('X-Robots-Tag: noindex, follow', true);
@@ -15,9 +17,9 @@ echo '<?xml version="1.0" encoding="'.get_bloginfo('charset', 'UTF-8').'"?>
 <!-- generator="XML & Google News Sitemap Feed plugin for WordPress" -->
 <!-- generator-url="http://status310.net/wordpress-plugins/xml-sitemap-feed/" -->
 <!-- generator-version="'.XMLSF_VERSION.'" -->
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
 		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 ';
 
@@ -34,20 +36,20 @@ $terms = get_terms( $taxonomy, array(
 					'pad_counts' => true, // count child term post count too...
 					'number' => 50000 ) );
 
-if ( $terms ) : 
+if ( $terms ) :
 
-    foreach ( $terms as $term ) : 
-    
+    foreach ( $terms as $term ) :
+
 	?>
 	<url>
 		<loc><?php echo get_term_link( $term ); ?></loc>
 	 	<priority><?php echo $xmlsf->get_priority('taxonomy',$term); ?></priority>
-		<?php echo $xmlsf->get_lastmod('taxonomy',$term); ?> 
+		<?php echo $xmlsf->get_lastmod('taxonomy',$term); ?>
 		<changefreq><?php echo $xmlsf->get_changefreq('taxonomy',$term); ?></changefreq>
 	</url>
-<?php 
+<?php
     endforeach;
-endif; 
+endif;
 
 ?></urlset>
 <?php $xmlsf->_e_usage();

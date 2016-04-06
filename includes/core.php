@@ -3,8 +3,6 @@
  *      XMLSitemapFeed CLASS
  * ------------------------------ */
 
-if ( !class_exists('XMLSitemapFeed') ) :
-
 class XMLSitemapFeed {
 
 	/**
@@ -176,7 +174,6 @@ class XMLSitemapFeed {
 							'password' => 'Subscription'
 							),
 						'genres' => array(
-							'active' => '1',
 							'default' => array('Blog')
 							),
 						'keywords' => array(
@@ -1299,6 +1296,7 @@ class XMLSitemapFeed {
 			'labels' => array(
 					'name' => __('Google News Genres','xml-sitemap-feed'),
 					'singular_name' => __('Google News Genre','xml-sitemap-feed'),
+					'all_items' => translate('All') // __('All Genres','xml-sitemap-feed')
 					//'menu_name' => __('GN Genres','xml-sitemap-feed'),
 				),
 			'public' => false,
@@ -1377,5 +1375,3 @@ class XMLSitemapFeed {
 
 	}
 }
-
-endif;

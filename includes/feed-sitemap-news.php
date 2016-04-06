@@ -5,6 +5,8 @@
  * @package XML Sitemap Feed plugin for WordPress
  */
 
+if ( ! defined( 'WPINC' ) ) die;
+
 global $xmlsf;
 $options = $xmlsf->get_option('news_tags');
 
@@ -18,26 +20,26 @@ echo '<?xml version="1.0" encoding="'.get_bloginfo('charset').'"?>
 <!-- generator="XML & Google News Sitemap Feed plugin for WordPress" -->
 <!-- generator-url="http://status301.net/wordpress-plugins/xml-sitemap-feed/" -->
 <!-- generator-version="'.XMLSF_VERSION.'" -->
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 	xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" ';
 
 echo !empty($options['image']) ? '
 	xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" ' : '';
 echo '
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 
-		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd 
-		http://www.google.com/schemas/sitemap-news/0.9 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd
+		http://www.google.com/schemas/sitemap-news/0.9
 		http://www.google.com/schemas/sitemap-news/0.9/sitemap-news.xsd' ;
 echo !empty($options['image']) ? '
-		http://www.google.com/schemas/sitemap-image/1.1 
+		http://www.google.com/schemas/sitemap-image/1.1
 		http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd' : '';
 echo '">
 ';
 
 // get site language for default language
 // bloginfo_rss('language') returns improper format so
-// we explode on hyphen and use only first part. 
+// we explode on hyphen and use only first part.
 // TODO this workaround breaks (simplified) chinese :(
 $language = explode('-', convert_chars(strip_tags(get_bloginfo('language'))));
 $language = empty($language) ? 'en' : reset($language);
@@ -46,8 +48,8 @@ $language = empty($language) ? 'en' : reset($language);
 $have_posts = false;
 
 // loop away!
-if ( have_posts() ) : 
-    while ( have_posts() ) : 
+if ( have_posts() ) :
+    while ( have_posts() ) :
 	the_post();
 
 	// check if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
@@ -62,14 +64,14 @@ if ( have_posts() ) :
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
 		<news:news>
 			<news:publication>
-				<news:name><?php 
+				<news:name><?php
 					if(!empty($options['name']))
 						echo apply_filters( 'the_title_xmlsitemap', $options['name'] );
-					elseif(defined('XMLSF_GOOGLE_NEWS_NAME')) 
-						echo apply_filters( 'the_title_xmlsitemap', XMLSF_GOOGLE_NEWS_NAME ); 
-					else 
+					elseif(defined('XMLSF_GOOGLE_NEWS_NAME'))
+						echo apply_filters( 'the_title_xmlsitemap', XMLSF_GOOGLE_NEWS_NAME );
+					else
 						echo apply_filters( 'the_title_xmlsitemap', get_bloginfo('name') ); ?></news:name>
-				<news:language><?php 
+				<news:language><?php
 					if ( taxonomy_exists('language') ) {
 						$lang = get_the_terms($post->ID,'language');
 						if ( is_array($lang) ) {
@@ -77,10 +79,10 @@ if ( have_posts() ) :
 							echo is_object($lang) ? $lang->slug : $language;
 						}
 					} else {
-						echo $language; 
+						echo $language;
 					}  ?></news:language>
 			</news:publication>
-			<news:publication_date><?php 
+			<news:publication_date><?php
 				echo mysql2date('Y-m-d\TH:i:s+00:00', $post->post_date_gmt, false); ?></news:publication_date>
 			<news:title><?php echo apply_filters( 'the_title_xmlsitemap', get_the_title() ); ?></news:title>
 <?php
@@ -96,7 +98,7 @@ if ( have_posts() ) :
 		}
 	  }
 	endif;
-		
+
 	if (!empty($access) && $access != 'Public' ) {
 	?>
 			<news:access><?php echo $access; ?></news:access>
@@ -106,19 +108,19 @@ if ( have_posts() ) :
 	// genres tag
 	$genres = '';
 	$terms = get_the_terms($post->ID,'gn-genre');
-	if ( is_array($terms) ) { 
-		$sep = ''; 
-		foreach($terms as $obj) { 
+	if ( is_array($terms) ) {
+		$sep = '';
+		foreach($terms as $obj) {
 			if (!empty($obj->name)) {
 				$genres .= $sep . $obj->name;
 				$sep = ', ';
 			}
-		} 			
-	} 
-	
+		}
+	}
+
 	$genres = trim(apply_filters('the_title_xmlsitemap', $genres));
-	
-	if ( empty($genres) && !empty($options['genres']) && !empty($options['genres']['default']) ) { 
+
+	if ( empty($genres) && !empty($options['genres']) && !empty($options['genres']['default']) ) {
 		$genres = implode( ', ', (array)$options['genres']['default'] );
 	}
 
@@ -135,42 +137,42 @@ if ( have_posts() ) :
 			$terms = get_the_terms( $post->ID, $options['keywords']['from'] );
 			if ( is_array($terms) ) {
 				$sep = '';
-				foreach($terms as $obj) { 
+				foreach($terms as $obj) {
 					if (!empty($obj->name)) {
 						$keywords .= $sep . $obj->name;
 						$sep = ', ';
 					}
-				} 
+				}
 			}
-		} 
-		
+		}
+
 		$keywords = trim(apply_filters('the_title_xmlsitemap', $keywords));
-		
+
 		if ( empty($keywords) && !empty($options['keywords']['default']) ) {
 			$keywords = trim(apply_filters('the_title_xmlsitemap', $options['keywords']['default']));
 		}
-		
+
 	}
-	
+
 	if ( !empty($keywords) ) {
 	?>
 			<news:keywords><?php echo $keywords; ?></news:keywords>
 <?php
-	}	
+	}
 
 	/* xmlsf_news_tags_after action hook */
 	do_action( 'xmlsf_news_tags_after' );
 	?>
 		</news:news>
 <?php
-	if ( !empty($options['image']) && $xmlsf->get_images('news') ) : 
-		foreach ( $xmlsf->get_images() as $image ) { 
+	if ( !empty($options['image']) && $xmlsf->get_images('news') ) :
+		foreach ( $xmlsf->get_images() as $image ) {
 			if ( empty($image['loc']) )
 				continue;
 	?>
 		<image:image>
 			<image:loc><?php echo utf8_uri_encode( $image['loc'] ); ?></image:loc>
-<?php 
+<?php
 		if ( !empty($image['title']) ) {
 		?>
 			<image:title><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $image['title']); ?>]]></image:title>
@@ -183,12 +185,12 @@ if ( have_posts() ) :
 		}
 		?>
 		</image:image>
-<?php 
+<?php
 		}
 	endif;
 	?>
 	</url>
-<?php 
+<?php
     endwhile;
 endif;
 
@@ -204,7 +206,7 @@ if ( !$have_posts ) :
 		<priority>1.0</priority>
 	</url>
 <?php
-endif; 
+endif;
 
 ?></urlset>
 <?php $xmlsf->_e_usage();
