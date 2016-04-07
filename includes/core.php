@@ -372,9 +372,13 @@ class XMLSitemapFeed {
 				$blogpage = get_option('page_for_posts');
 
 				if ( !empty($blogpage) ) {
-					global $polylang;
-					if ( isset($polylang) )
+					global $polylang, $sitepress;
+					if ( isset($polylang) ){
 						$this->blogpage = $polylang->get_translations('post', $blogpage);
+					}else if( isset($sitepress) 
+							&& function_exists('icl_xml_post_languages') ){
+						$this->blogpage = icl_xml_post_languages('post', $blogpage);
+					}	
 					else
 						$this->blogpage = array($blogpage);
 				} else {
@@ -615,13 +619,26 @@ class XMLSitemapFeed {
 	{
 		$urls = array();
 
-		global $polylang,$q_config;
+		global $polylang, $q_config, $sitepress;
 
-		if ( isset($polylang) )
-			foreach ($polylang->get_languages_list() as $term)
-		    		$urls[] = $polylang->get_home_url($term);
-		else
+		if ( isset($polylang) ) {
+			foreach ( $polylang->get_languages_list() as $term )
+				$urls[] = $polylang->get_home_url($term);
+		} else if ( isset($sitepress)
+				&& function_exists("icl_get_languages") ) {
+			$iclLanguages = icl_get_languages('skip_missing=1');
+			if ( !empty($iclLanguages) ) {
+				foreach ( $iclLanguages as $iclLang ) {
+					if ( $iclLang['active'] ) {
+						$urls[] = $iclLang['url'];
+					}
+				}
+			} else {
+				$urls[] = icl_get_home_url();
+			}
+		} else {
 			$urls[] = home_url();
+		}
 
 		return $urls;
 	}
@@ -631,11 +648,15 @@ class XMLSitemapFeed {
 		$exclude = array();
 
 		if ( $post_type == 'page' && $id = get_option('page_on_front') ) {
-			global $polylang;
-			if ( isset($polylang) )
+			global $polylang, $sitepress;
+			if (isset($polylang)) {
 				$exclude += $polylang->get_translations('post', $id);
-			else
+			} else if (isset($sitepress)
+					&& function_exists("icl_xml_post_languages")) {
+				$exclude += icl_xml_post_languages('post', $id);
+			} else {
 				$exclude[] = $id;
+			}
 		}
 
 		return $exclude;
