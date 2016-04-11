@@ -153,8 +153,6 @@ class XMLSitemapFeed {
 
 		// robots
 		$this->defaults['robots'] = "";
-		// Old rules "Disallow: */xmlrpc.php\nDisallow: */wp-*.php\nDisallow: */trackback/\nDisallow: *?wptheme=\nDisallow: *?comments=\nDisallow: *?replytocom\nDisallow: */comment-page-\nDisallow: *?s=\nDisallow: */wp-content/\nAllow: */wp-content/uploads/\n";
-		// Better is to set <meta name="robots" content="noindex, follow"> or send X-Robots-Tag header. TODO !!
 
 		// additional urls
 		$this->defaults['urls'] = array();
@@ -296,7 +294,8 @@ class XMLSitemapFeed {
 	{
 		$urls = $this->get_option('urls');
 		// make sure it's an array we are returning
-		return ( !is_array($urls) ) ? explode( "\n", $urls ) : $urls;
+		$return = ( !is_array($urls) ) ? explode( "\n", $urls ) : $urls;
+		return apply_filters( 'xmlsf_get_urls', $return );
 	}
 
 	public function get_domains()
