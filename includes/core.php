@@ -18,6 +18,9 @@ class XMLSitemapFeed {
 	// Database options prefix
 	private $prefix = 'xmlsf_';
 
+	// Timezone
+	private $timezone = null;
+
 	// Flushed flag
 	private $yes_mother = false;
 
@@ -187,7 +190,15 @@ class XMLSitemapFeed {
 	* QUERY FUNCTIONS
 	*/
 
-	public function defaults($key = false)
+	protected function timezone()
+	{
+		if ( $this->timezone === null ) {
+			$this->timezone = ( function_exists('date_default_timezone_set') && date_default_timezone_set('UTC') ) ? 'gmt' : 'blog';
+		}
+		return $this->timezone;
+	}
+
+	protected function defaults($key = false)
 	{
 		if (empty($this->defaults))
 			$this->set_defaults();
@@ -222,15 +233,14 @@ class XMLSitemapFeed {
 		return (!empty($return)) ? (array)$return : array();
 	}
 
-	public function disabled_post_types()
+	protected function disabled_post_types()
 	{
 		return $this->disabled_post_types;
 	}
 
-	public function disabled_taxonomies()
+	protected function disabled_taxonomies()
 	{
 		return $this->disabled_taxonomies;
-
 	}
 
 	public function get_post_types()
@@ -284,17 +294,9 @@ class XMLSitemapFeed {
 
 	public function get_urls()
 	{
-		$return = $this->get_option('urls');
-
+		$urls = $this->get_option('urls');
 		// make sure it's an array we are returning
-		if(!empty($return)) {
-			if(is_array($return))
-				return $return;
-			else
-				return explode("\n",$return);
-		} else {
-			return array();
-		}
+		return ( !is_array($urls) ) ? explode( "\n", $urls ) : $urls;
 	}
 
 	public function get_domains()
@@ -792,16 +794,10 @@ class XMLSitemapFeed {
 
 				// set up query filters
 				// TODO: test 'gmt' against 'blog' against 'server'
-
-				if ( function_exists('date_default_timezone_set') ) {
-					date_default_timezone_set ( 'UTC' );
-					$zone = 'gmt';
-				} else {
-					$zone = 'blog';
-				}
+				$zone = $this->timezone();
 				if ( get_lastdate($zone, $news_post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
 					add_filter('post_limits', array($this, 'filter_news_limits'));
-					add_filter('posts_where', array($this, 'filter_news_where'), 10, 1);
+					add_filter('posts_where', array($this, 'filter_news_where'));
 				} else {
 					add_filter('post_limits', array($this, 'filter_no_news_limits'));
 				}
@@ -913,7 +909,7 @@ class XMLSitemapFeed {
 	// only posts from the last 48 hours
 	public function filter_news_where( $where = '' )
 	{
-		$_gmt = ( function_exists('date_default_timezone_set') && date_default_timezone_set ('UTC') ) ? '_gmt' : '';
+		$_gmt = ( 'gmt' === $this->timezone() ) ? '_gmt' : '';
 		return $where . " AND post_date" . $_gmt . " > '" . date('Y-m-d H:i:s', strtotime('-48 hours')) . "'";
 	}
 
