@@ -298,10 +298,14 @@ Updated translation POT file, dutch translation and general code cleanup
 
 == Changelog ==
 
+= 4.6.2 =
+* NEW: filter xmlsf_get_urls
+* More cleanup
+
 = 4.6.1 =
 * Code cleanup
 * POT file update
-* Dutch translation
+* Dutch translation update
 
 = 4.6 =
 * NEW: xmlsf_news_tags_after action hook
