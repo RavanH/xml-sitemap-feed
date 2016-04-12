@@ -76,6 +76,30 @@ foreach ($custom_sitemaps as $url) {
 	</sitemap>
 <?php
 }
+// language specific sitemaps appear only in default language. 
+// Otherwise W3 Total Cache enters an infinite loop
 
+global $sitepress;
+if (isset($sitepress) && function_exists(icl_get_languages)):
+    if (icl_get_current_language() == icl_get_default_language()):
+        $iclLanguages = icl_get_languages('skip_missing=1');
+
+        if (!empty($iclLanguages)):
+            foreach ($iclLanguages as $iclLang):
+                if (!$iclLang['active']):
+?>
+        <sitemap>
+            <loc><?php echo $iclLang['url'] . 'sitemap.xml'; ?></loc>
+            <lastmod><?php echo mysql2date('Y-m-d\TH:i:s+00:00', get_lastdate('gmt'), false); ?></lastmod>
+        </sitemap>			
+<?php
+                endif;
+
+            endforeach;
+        else:
+            $urls[] = icl_get_home_url();
+        endif;
+    endif;
+endif;
 ?></sitemapindex>
 <?php $xmlsf->_e_usage();
