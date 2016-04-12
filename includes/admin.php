@@ -125,7 +125,7 @@ class XMLSF_Admin extends XMLSitemapFeed {
 			if (!empty($options[$key]['pong'])) {
 				if ( $tzstring = get_option('timezone_string') ) {
 					// use same timezoneformat as translatable examples in options-general.php
-					$timezone_format = _x('Y-m-d G:i:s', 'timezone date format');
+					$timezone_format = translate_with_gettext_context('Y-m-d G:i:s', 'timezone date format');
 					date_default_timezone_set($tzstring);
 				} else {
 					$timezone_format = 'Y-m-d G:i:s T';

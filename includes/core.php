@@ -190,8 +190,9 @@ class XMLSitemapFeed {
 
 	protected function timezone()
 	{
+		$gmt = date_default_timezone_set('UTC');
 		if ( $this->timezone === null ) {
-			$this->timezone = ( function_exists('date_default_timezone_set') && date_default_timezone_set('UTC') ) ? 'gmt' : 'blog';
+			$this->timezone = $gmt ? 'gmt' : 'blog';
 		}
 		return $this->timezone;
 	}
@@ -792,7 +793,6 @@ class XMLSitemapFeed {
 				define('DONOTCACHEDB', true);
 
 				// set up query filters
-				// TODO: test 'gmt' against 'blog' against 'server'
 				$zone = $this->timezone();
 				if ( get_lastdate($zone, $news_post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
 					add_filter('post_limits', array($this, 'filter_news_limits'));
