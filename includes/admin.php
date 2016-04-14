@@ -475,7 +475,7 @@ jQuery( document ).ready( function() {
 		echo '
 		<fieldset><legend class="screen-reader-text">'.__('Publication name','xml-sitemap-feed').'</legend>
 			<input type="text" name="'.parent::prefix().'news_tags[name]" id="xmlsf_news_name" value="'.$name.'" class="regular-text"> <span class="description">'.sprintf(__('By default, the general %s setting will be used.','xml-sitemap-feed'),'<a href="options-general.php">'.translate('Site Title').'</a>').'</span><p class="description">' .
-			__('The publication name should match the name submitted on the Google News Publisher Center. If you wish to change it, please read <a href="https://support.google.com/news/publisher/answer/40402" target="_blank">Updated publication name</a>.') . '</p>
+			__('The publication name should match the name submitted on the Google News Publisher Center. If you wish to change it, please read <a href="https://support.google.com/news/publisher/answer/40402" target="_blank">Updated publication name</a>.','xml-sitemap-feed') . '</p>
 		</fieldset>';
 	}
 
