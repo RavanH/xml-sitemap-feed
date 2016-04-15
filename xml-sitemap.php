@@ -32,7 +32,8 @@ Author URI: http://status301.net/
  *      xmlsf_allowed_domain	-> Filters the response when checking the url against allowed domains.
  *					Can be true or false.
  *	    the_title_xmlsitemap	-> Filters the Google News publication name, title and keywords
- *					and Image title and caption tags
+ *					plus the Image title and caption tags
+ *			xmlsf_get_urls				-> Filters the urls array
  *
  * ACTIONS
  *	    xmlsf_news_tags_after	-> Fired inside the Google News Sitemap loop at the end of the news
