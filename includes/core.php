@@ -374,7 +374,7 @@ class XMLSitemapFeed {
 				if ( !empty($blogpage) ) {
 					global $polylang;
 					if ( isset($polylang) )
-						$this->blogpage = $polylang->get_translations('post', $blogpage);
+						$this->blogpage = $polylang->model->get_translations('post', $blogpage);
 					else
 						$this->blogpage = array($blogpage);
 				} else {
@@ -633,7 +633,7 @@ class XMLSitemapFeed {
 		if ( $post_type == 'page' && $id = get_option('page_on_front') ) {
 			global $polylang;
 			if ( isset($polylang) )
-				$exclude += $polylang->get_translations('post', $id);
+				$exclude += $polylang->model->get_translations('post', $id);
 			else
 				$exclude[] = $id;
 		}
