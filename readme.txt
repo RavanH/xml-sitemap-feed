@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravan
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, , Yandex, Baidu, seo, feed, polylang, image sitemap
 Requires at least: 3.2
 Tested up to: 4.5
-Stable tag: 4.6.1
+Stable tag: 4.6.2
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache and Polylang compatible.
 
@@ -293,14 +293,15 @@ Thanks for sharing your translation :)
 
 == Upgrade Notice ==
 
-= 4.6.1 =
-Updated translation POT file, dutch translation and general code cleanup
+= 4.6.2 =
+New filter xmlsf_get_urls, more code cleanup and Polylang compat bugfix.
 
 == Changelog ==
 
 = 4.6.2 =
 * NEW: filter xmlsf_get_urls
 * More cleanup
+* FIX: broken Polylang compatibility reported by @zesseb
 
 = 4.6.1 =
 * Code cleanup
