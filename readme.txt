@@ -50,7 +50,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Configure <access>, <genres> and <keywords> tags both globally and post by post
 * Pings Google on new publications.
 
-** More **
+**More**
 
 * Compatible with multi-lingual sites using **Polylang** to allow all languages to be indexed equally.
 * Option to add new robots.txt rules. These can be used to further control (read: limit) the indexation of various parts of your site and subsequent spread of pagerank accross your sites pages.
