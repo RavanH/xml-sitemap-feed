@@ -62,6 +62,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 - **French** * R.A. van Hagen http://status301.net (version 4.2) (improved translation or suggestions needed!)
 - **Indonesian** * Nasrulhaq Muiz http://al-badar.net/ (version 4.2)
 - **Italian** * Raffaello Tesi http://www.raffaellotesi.com  (version 4.3.2)
+- **Japanese** * gblsm https://profiles.wordpress.org/gblsm/ (version 4.6)
 - **Serbian** * WPdiscounts http://wpdiscounts.com/ (version 4.1)
 - **Spanish** * Andrew Kurtis - WebHostingHub Support http://www.webhostinghub.com/ (version 4.3.2)
 - **Ukrainian** * Cmd Software http://www.cmd-soft.com/ (version 4.0)
