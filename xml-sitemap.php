@@ -50,7 +50,7 @@ if ( ! defined( 'WPINC' ) ) die;
  *      CONSTANTS
  * -------------------- */
 
-	define('XMLSF_VERSION', '4.6.1');
+	define('XMLSF_VERSION', '4.6.3');
 
 	define('XMLSF_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
