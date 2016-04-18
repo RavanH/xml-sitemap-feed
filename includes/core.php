@@ -278,25 +278,26 @@ class XMLSitemapFeed {
 
 	public function get_custom_sitemaps()
 	{
-		$return = $this->get_option('custom_sitemaps');
-
+		$urls = $this->get_option('custom_sitemaps');
 		// make sure it's an array we are returning
-		if(!empty($return)) {
-			if(is_array($return))
-				return $return;
-			else
-				return explode("\n",$return);
+		if(!empty($urls)) {
+			$return = ( !is_array($urls) ) ? explode( "\n", $urls ) : $urls;
 		} else {
-			return array();
+			$return = array();
 		}
+		return apply_filters( 'xmlsf_custom_sitemaps', $return );
 	}
 
 	public function get_urls()
 	{
 		$urls = $this->get_option('urls');
 		// make sure it's an array we are returning
-		$return = ( !is_array($urls) ) ? explode( "\n", $urls ) : $urls;
-		return apply_filters( 'xmlsf_get_urls', $return );
+		if(!empty($urls)) {
+			$return = ( !is_array($urls) ) ? explode( "\n", $urls ) : $urls;
+		} else {
+			$return = array();
+		}
+		return apply_filters( 'xmlsf_custom_urls', $return );
 	}
 
 	public function get_domains()

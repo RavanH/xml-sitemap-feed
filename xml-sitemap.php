@@ -4,7 +4,7 @@ Plugin Name: XML Sitemap & Google News feeds
 Plugin URI: http://status301.net/wordpress-plugins/xml-sitemap-feed/
 Description: Feed the  hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed&item_number=4%2e0&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us">tip</a></strong> for continued development and support. Thanks :)
 Text Domain: xml-sitemap-feed
-Version: 4.6.2
+Version: 4.6.3
 Author: RavanH
 Author URI: http://status301.net/
 */
@@ -33,7 +33,8 @@ Author URI: http://status301.net/
  *					Can be true or false.
  *	    the_title_xmlsitemap	-> Filters the Google News publication name, title and keywords
  *					plus the Image title and caption tags
- *			xmlsf_get_urls				-> Filters the urls array
+ *			xmlsf_custom_urls			-> Filters the custom urls array
+ *			xmlsf_custom_sitemaps -> Filters the custom sitemaps array
  *
  * ACTIONS
  *	    xmlsf_news_tags_after	-> Fired inside the Google News Sitemap loop at the end of the news
