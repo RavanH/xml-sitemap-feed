@@ -294,15 +294,19 @@ Thanks for sharing your translation :)
 
 == Upgrade Notice ==
 
-= 4.6.2 =
-New filter xmlsf_get_urls, more code cleanup and Polylang compat bugfix.
+= 4.6.3 =
+New filter xmlsf_custom_sitemaps, custom urls bugfix.
 
 == Changelog ==
 
+= 4.6.3 =
+* NEW: filter xmlsf_custom_sitemaps
+* BUGFIX: empty custom urls sitemap
+
 = 4.6.2 =
-* NEW: filter xmlsf_get_urls
+* NEW: filter xmlsf_custom_urls
 * More cleanup
-* FIX: broken Polylang compatibility reported by @zesseb
+* BUGFIX: broken Polylang compatibility reported by @zesseb
 
 = 4.6.1 =
 * Code cleanup
