@@ -663,7 +663,8 @@ class XMLSitemapFeed {
 
 	public function get_index_url( $sitemap = 'home', $type = false, $param = false )
 	{
-		$root =  esc_url( trailingslashit(home_url()) );
+		$split_url = explode('?', home_url());
+		$root = esc_url( trailingslashit($split_url[0]) );
 		$name = $this->base_name.'-'.$sitemap;
 
 		if ( $type )
@@ -672,9 +673,11 @@ class XMLSitemapFeed {
 		if ( '' == get_option('permalink_structure') || '1' != get_option('blog_public')) {
 			$name = '?feed='.$name;
 			$name .= $param ? '&m='.$param : '';
+			$name .= isset($split_url[1]) && !empty($split_url[1]) ? '&' . $split_url[1] : '';
 		} else {
 			$name .= $param ? '.'.$param : '';
 			$name .= '.'.$this->extension;
+			$name .= isset($split_url[1]) && !empty($split_url[1]) ? '?' . $split_url[1] : '';
 		}
 
 		return $root . $name;
