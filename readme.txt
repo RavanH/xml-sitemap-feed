@@ -294,10 +294,14 @@ Thanks for sharing your translation :)
 
 == Upgrade Notice ==
 
-= 4.6.3 =
-New filter xmlsf_custom_sitemaps, custom urls bugfix.
+= 4.7 =
+Basic WPML compatibility.
 
 == Changelog ==
+
+= 4.7 =
+* Basic WPML compatibility
+* ...
 
 = 4.6.3 =
 * NEW: filter xmlsf_custom_sitemaps
