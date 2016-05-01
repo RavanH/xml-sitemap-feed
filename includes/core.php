@@ -829,10 +829,12 @@ class XMLSitemapFeed {
 						$request['post_type'] = $post_type['name'];
 						$request['post_status'] = 'publish';
 						$request['orderby'] = 'modified';
-						$request['lang'] = '';
 						$request['no_found_rows'] = true;
 						$request['update_post_meta_cache'] = false;
 						$request['update_post_term_cache'] = false;
+						// Multi-language plugins
+						$request['lang'] = ''; // Polylang
+						add_action('wpml_switch_language', 'all'); // WPML
 
 						return $request;
 					}
@@ -844,12 +846,14 @@ class XMLSitemapFeed {
 					if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {
 						// modify request parameters
 						$request['taxonomy'] = $taxonomy;
-						$request['lang'] = '';
 						$request['no_found_rows'] = true;
 						$request['cache_results'] = false;
 						$request['update_post_term_cache'] = false;
 						$request['update_post_meta_cache'] = false;
 						$request['post_status'] = 'publish';
+						// Multi-language plugins
+						$request['lang'] = ''; // Polylang
+						add_action('wpml_switch_language', 'all'); // WPML
 
 						return $request;
 					}
