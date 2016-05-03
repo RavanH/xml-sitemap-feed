@@ -87,6 +87,13 @@ if ( have_posts() ) :
  	</url>
 <?php
     endwhile;
+else : // realy? not even one post? we shouldn't even be here but hey... let's present at least the homepage to prevent a GWT error
+	?>
+	<url>
+		<loc><?php echo home_url(); ?></loc>
+		<priority>1.0</priority>
+	</url>
+<?php
 endif;
 ?></urlset>
 <?php $xmlsf->_e_usage();
