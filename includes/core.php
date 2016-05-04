@@ -769,14 +769,6 @@ class XMLSitemapFeed {
 	/**
 	* REQUEST FILTER
 	*/
-	public function template( $theme ) {
-
-		if ( isset($request['feed']) && strpos($request['feed'],'sitemap') === 0 )
-			// clear get_template response to prevent themes functions.php (another source of blank line problems) from loading
-			return '';
-		else
-			return $theme;
-	}
 
 	public function filter_request( $request )
 	{
@@ -1312,9 +1304,6 @@ class XMLSitemapFeed {
 		add_filter('the_title_xmlsitemap', 'ent2ncr', 8);
 		add_filter('the_title_xmlsitemap', 'esc_html');
 		add_filter('bloginfo_xmlsitemap', 'ent2ncr', 8);
-
-		// TEMPLATE
-		add_filter('template', array($this, 'template'), 0);
 
 		// REQUEST main filtering function
 		add_filter('request', array($this, 'filter_request'), 1 );
