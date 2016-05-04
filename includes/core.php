@@ -522,11 +522,11 @@ class XMLSitemapFeed {
 
 	 	if ( ($lastactivityage/86400) < 1 ) { // last activity less than 1 day old
 	 		$changefreq = 'hourly';
-	 	} else if ( ($lastactivityage/86400) < 7 ) { // last activity less than 1 week old
+	 	} elseif ( ($lastactivityage/86400) < 7 ) { // last activity less than 1 week old
 	 		$changefreq = 'daily';
-	 	} else if ( ($lastactivityage/86400) < 30 ) { // last activity less than one month old
+	 	} elseif ( ($lastactivityage/86400) < 30 ) { // last activity less than one month old
 	 		$changefreq = 'weekly';
-	 	} else if ( ($lastactivityage/86400) < 365 ) { // last activity less than 1 year old
+	 	} elseif ( ($lastactivityage/86400) < 365 ) { // last activity less than 1 year old
 	 		$changefreq = 'monthly';
 	 	} else {
 	 		$changefreq = 'yearly'; // over a year old...
@@ -617,11 +617,14 @@ class XMLSitemapFeed {
 	{
 		$urls = array();
 
-		global $polylang,$q_config;
+		global $polylang,$sitepress;
 
-		if ( isset($polylang) )
+		if ( isset($polylang) && is_object($polylang) && method_exists($polylang, 'get_languages') && method_exists($polylang, 'get_home_url') )
 			foreach ($polylang->get_languages_list() as $term)
-		    		$urls[] = $polylang->get_home_url($term);
+		    $urls[] = $polylang->get_home_url($term);
+		elseif ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'language_url') )
+			foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term )
+				$urls[] = $sitepress->language_url($term);
 		else
 			$urls[] = home_url();
 
@@ -633,9 +636,12 @@ class XMLSitemapFeed {
 		$exclude = array();
 
 		if ( $post_type == 'page' && $id = get_option('page_on_front') ) {
-			global $polylang;
-			if ( isset($polylang) )
+			global $polylang,$sitepress;
+			if ( isset($polylang) && is_object($polylang) && isset($polylang->model) && is_object($polylang->model) && method_exists($polylang->model, 'get_translations') )
 				$exclude += $polylang->model->get_translations('post', $id);
+			if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'get_object_id') )
+				foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term )
+					$exclude[] = $sitepress->get_object_id($id,'page',false,$term);
 			else
 				$exclude[] = $id;
 		}
@@ -772,8 +778,43 @@ class XMLSitemapFeed {
 
 	public function filter_request( $request )
 	{
-		if ( ! isset($request['feed']) || strpos($request['feed'],'sitemap-') !== 0 )
+		if ( ! isset($request['feed']) || strpos($request['feed'],'sitemap') !== 0 )
 			return $request;
+
+		$request['post_status'] = 'publish';
+		$request['no_found_rows'] = true;
+		$request['cache_results'] = false;
+		$request['update_post_term_cache'] = false;
+		$request['update_post_meta_cache'] = false;
+		// Multi-language plugins
+		$request['lang'] = ''; // Polylang
+		$request['suppress_filters'] = true; // WPML magic bullet
+
+		if ( strpos($request['feed'],'sitemap-posttype') === 0 ) {
+			foreach ( $this->get_post_types() as $post_type ) {
+				if ( $request['feed'] == 'sitemap-posttype-'.$post_type['name'] ) {
+					// change default feed posts limit
+					add_filter( 'post_limits', array($this, 'filter_limits') );
+
+					// modify request parameters
+					$request['post_type'] = $post_type['name'];
+					$request['orderby'] = 'modified';
+
+					return $request;
+				}
+			}
+		}
+
+		if ( strpos($request['feed'],'sitemap-taxonomy') === 0 ) {
+			foreach ( $this->get_taxonomies() as $taxonomy ) {
+				if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {
+					// modify request parameters
+					$request['taxonomy'] = $taxonomy;
+
+					return $request;
+				}
+			}
+		}
 
 		if ( $request['feed'] === 'sitemap-news' ) {
 			// determine news post type
@@ -806,51 +847,6 @@ class XMLSitemapFeed {
 			if ( isset($options['categories']) && is_array($options['categories']) )
 						$request['cat'] = implode(',',$options['categories']);
 
-			$request['post_status'] = 'publish';
-			$request['no_found_rows'] = true;
-
-			return $request;
-		}
-
-		if ( strpos($request['feed'],'sitemap-posttype') === 0 ) {
-			foreach ( $this->get_post_types() as $post_type ) {
-				if ( $request['feed'] == 'sitemap-posttype-'.$post_type['name'] ) {
-					// change default feed posts limit
-					add_filter( 'post_limits', array($this, 'filter_limits') );
-
-					// modify request parameters
-					$request['post_type'] = $post_type['name'];
-					$request['post_status'] = 'publish';
-					$request['orderby'] = 'modified';
-					$request['no_found_rows'] = true;
-					$request['update_post_meta_cache'] = false;
-					$request['update_post_term_cache'] = false;
-					// Multi-language plugins
-					$request['lang'] = ''; // Polylang
-					do_action('wpml_switch_language', 'all'); // WPML - supposed to work but doesn't. Why?
-
-					return $request;
-				}
-			}
-		}
-
-		if ( strpos($request['feed'],'sitemap-taxonomy') === 0 ) {
-			foreach ( $this->get_taxonomies() as $taxonomy ) {
-				if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {
-					// modify request parameters
-					$request['taxonomy'] = $taxonomy;
-					$request['no_found_rows'] = true;
-					$request['cache_results'] = false;
-					$request['update_post_term_cache'] = false;
-					$request['update_post_meta_cache'] = false;
-					$request['post_status'] = 'publish';
-					// Multi-language plugins
-					$request['lang'] = ''; // Polylang
-					do_action('wpml_switch_language', 'all'); // WPML
-
-					return $request;
-				}
-			}
 		}
 
 		return $request;
