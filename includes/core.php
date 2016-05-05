@@ -782,83 +782,79 @@ class XMLSitemapFeed {
 
 	public function filter_request( $request )
 	{
-		if ( ! isset($request['feed']) || strpos($request['feed'],'sitemap') !== 0 )
-			return $request;
+		if ( isset($request['feed']) && strpos($request['feed'],'sitemap-') === 0 ) :
 
-		$request['post_status'] = 'publish';
-		$request['no_found_rows'] = true;
-		$request['cache_results'] = false;
-		$request['update_post_term_cache'] = false;
-		$request['update_post_meta_cache'] = false;
-		// Multi-language plugins
-		$request['lang'] = ''; // Polylang
-		$request['suppress_filters'] = true; // WPML magic bullet for posts/pages
-
-		if ( strpos($request['feed'],'sitemap-posttype') === 0 ) {
-			foreach ( $this->get_post_types() as $post_type ) {
-				if ( $request['feed'] == 'sitemap-posttype-'.$post_type['name'] ) {
-					// change default feed posts limit
-					add_filter( 'post_limits', array($this, 'filter_limits') );
-
-					// modify request parameters
-					$request['post_type'] = $post_type['name'];
-					$request['orderby'] = 'modified';
-
-					return $request;
-				}
-			}
-		}
-
-		if ( strpos($request['feed'],'sitemap-taxonomy') === 0 ) {
-			foreach ( $this->get_taxonomies() as $taxonomy ) {
-				if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {
-					// modify request parameters
-					$request['taxonomy'] = $taxonomy;
-
-					global $sitepress; // WMPL remove tax term filters
-					if ( isset($sitepress) && is_object($sitepress) ) {
-						remove_filter('get_terms_args', array($sitepress, 'get_terms_args_filter'));
-						remove_filter('get_term', array($sitepress,'get_term_adjust_id'));
-						remove_filter('terms_clauses', array($sitepress,'terms_clauses'));
-					}
-
-					return $request;
-				}
-			}
-		}
-
-		if ( $request['feed'] === 'sitemap-news' ) {
-			// determine news post type
-			$options = $this->get_option('news_tags');
-			if ( isset($options['post_type']) && !empty($options['post_type']) ) {
-				$news_post_type = $options['post_type'];
-			} else {
+			if ( $request['feed'] == 'sitemap-news' ) {
 				$defaults = $this->defaults('news_tags');
-				$news_post_type = $defaults['post_type'];
+				$options = $this->get_option('news_tags');
+				$news_post_type = isset($options['post_type']) && !empty($options['post_type']) ? $options['post_type'] : $defaults['post_type'];
+				if (empty($news_post_type)) $news_post_type = 'post';
+
+				// disable caching
+				define('DONOTCACHEPAGE', true);
+				define('DONOTCACHEDB', true);
+
+				// set up query filters
+				$zone = $this->timezone();
+				if ( get_lastdate($zone, $news_post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
+					add_filter('post_limits', array($this, 'filter_news_limits'));
+					add_filter('posts_where', array($this, 'filter_news_where'), 10, 1);
+				} else {
+					add_filter('post_limits', array($this, 'filter_no_news_limits'));
+				}
+
+				/* modify request parameters */
+				// post type
+				$request['post_type'] = $news_post_type;
+
+				// categories
+				if ( isset($options['categories']) && is_array($options['categories']) )
+							$request['cat'] = implode(',',$options['categories']);
+
+				$request['post_status'] = 'publish';
+				$request['no_found_rows'] = true;
+
+				return $request;
 			}
 
-			// disable caching
-			define('DONOTCACHEPAGE', true);
-			define('DONOTCACHEDB', true);
+			if ( strpos($request['feed'],'sitemap-posttype') === 0 ) {
+				foreach ( $this->get_post_types() as $post_type ) {
+					if ( $request['feed'] == 'sitemap-posttype-'.$post_type['name'] ) {
+						// setup filter
+						add_filter( 'post_limits', array($this, 'filter_limits') );
 
-			// set up query filters
-			$zone = $this->timezone();
-			if ( get_lastdate($zone, $news_post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
-				add_filter('post_limits', array($this, 'filter_news_limits'));
-				add_filter('posts_where', array($this, 'filter_news_where'));
-			} else {
-				add_filter('post_limits', array($this, 'filter_no_news_limits'));
+						// modify request parameters
+						$request['post_type'] = $post_type['name'];
+						$request['post_status'] = 'publish';
+						$request['orderby'] = 'modified';
+						$request['lang'] = '';
+						$request['no_found_rows'] = true;
+						$request['update_post_meta_cache'] = false;
+						$request['update_post_term_cache'] = false;
+
+						return $request;
+					}
+				}
 			}
 
-			/* modify request parameters */
-			// post type
-			$request['post_type'] = $news_post_type;
+			if ( strpos($request['feed'],'sitemap-taxonomy') === 0 ) {
+				foreach ( $this->get_taxonomies() as $taxonomy ) {
+					if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {
 
-			// categories
-			if ( isset($options['categories']) && is_array($options['categories']) )
-						$request['cat'] = implode(',',$options['categories']);
+						// modify request parameters
+						$request['taxonomy'] = $taxonomy;
+						$request['lang'] = '';
+						$request['no_found_rows'] = true;
+						$request['cache_results'] = false;
+						$request['update_post_term_cache'] = false;
+						$request['update_post_meta_cache'] = false;
+						$request['post_status'] = 'publish';
 
-		}
+						return $request;
+					}
+				}
+			}
+		endif;
 
 		return $request;
 	}
@@ -908,7 +904,7 @@ class XMLSitemapFeed {
 	*/
 
 	// override default feed limit
-	public function filter_limits( $limits )
+	public function filter_limits( $limit )
 	{
 		return 'LIMIT 0, 50000';
 	}
