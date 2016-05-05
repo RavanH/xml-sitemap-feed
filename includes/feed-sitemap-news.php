@@ -89,15 +89,14 @@ if ( have_posts() ) :
 	// access tag
 	$access = get_post_meta( $post->ID, '_xmlsf_news_access', true );
 
-	if (empty($access)) : // if not set per meta, let's get global settings
-	  if (!empty($options['access'])) {
-		if ( post_password_required() ) {
-			if (!empty($options['access']['password'])) $access = $options['access']['password'];
-		} else {
-			if (!empty($options['access']['default'])) $access = $options['access']['default'];
-		}
-	  }
-	endif;
+	if (empty($access)) // if not set per meta, let's get global settings
+	  if (!empty($options['access']))
+			if ( post_password_required() )
+				if (!empty($options['access']['password']))
+					$access = $options['access']['password'];
+			else
+				if (!empty($options['access']['default']))
+					$access = $options['access']['default'];
 
 	if (!empty($access) && $access != 'Public' ) {
 	?>
@@ -195,15 +194,10 @@ if ( have_posts() ) :
 endif;
 
 if ( !$have_posts ) :
-	// No posts done? Then do at least the homepage to prevent error message in WMT.
-
-	$lastmodified_gmt = get_lastmodified('GMT'); // last posts or page modified date
-?>
+	// No posts done? Then do at least the homepage to prevent error message in GWT.
+	?>
 	<url>
-		<loc><?php echo esc_url( trailingslashit(home_url()) ); ?></loc>
-		<lastmod><?php echo mysql2date('Y-m-d\TH:i:s+00:00', $lastmodified_gmt, false); ?></lastmod>
-		<changefreq>daily</changefreq>
-		<priority>1.0</priority>
+		<loc><?php echo esc_url( home_url() ); ?></loc>
 	</url>
 <?php
 endif;
