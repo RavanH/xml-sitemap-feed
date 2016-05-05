@@ -207,11 +207,12 @@ class XMLSF_Admin extends XMLSitemapFeed {
 	public function reset_settings_field() {
 		echo '
 		<fieldset><legend class="screen-reader-text">'.__('Reset XML sitemaps','xml-sitemap-feed').'</legend>
-			<label><input type="checkbox" name="'.parent::prefix().'sitemaps[reset]" value="1" /> '.
-				__('Clear all XML Sitemap Feed settings from the database.','xml-sitemap-feed').'</label>
+			<label><input type="checkbox" name="'.parent::prefix().'sitemaps[reset]" value="1" onchange="if(this.checked){if(!confirm(\''.
+				__('Selecting this will clear all XML Sitemap & Google News Sitemap settings after Save Changes. Are you sure?','xml-sitemap-feed').'\')){this.checked=false}}" /> '.
+				__('Clear all XML Sitemap & Google News Sitemap settings.','xml-sitemap-feed').'</label>
 		</fieldset>';
 		echo '
-		<p class="description">'.__('You can use this to start fresh with the default settings or to remove all XML Sitemap and Google News settings and taxonomy terms before uninstalling.','xml-sitemap-feed').'</p>';
+		<p class="description">'.__('Check this option and Save Changes to start fresh with the default settings.','xml-sitemap-feed').'</p>';
 	}
 
 	/**
@@ -986,6 +987,7 @@ jQuery( document ).ready( function() {
 		register_setting('reading', $prefix.'sitemaps', array($this,'sanitize_sitemaps_settings') );
 		add_settings_field($prefix.'sitemaps', __('Enable XML sitemaps','xml-sitemap-feed'), array($this,'sitemaps_settings_field'), 'reading');
 
+
 		// robots rules only when permalinks are set
 		$rules = get_option( 'rewrite_rules' );
 		if( get_option('permalink_structure') && isset( $rules['robots\.txt$'] ) ) {
@@ -993,17 +995,17 @@ jQuery( document ).ready( function() {
 			add_settings_field($prefix.'robots', __('Additional robots.txt rules','xml-sitemap-feed'), array($this,'robots_settings_field'), 'reading');
 		}
 
-    // ACTION LINK
+		// ACTION LINK
 		add_filter('plugin_action_links_' . XMLSF_PLUGIN_BASENAME, array($this, 'add_action_link') );
 
-    // stop here if blog is not public
-    if ( !get_option('blog_public') ) { return; }
+		// stop here if blog is not public
+		if ( !get_option('blog_public') ) { return; }
 
-		if ( is_multisite() && is_plugin_active_for_network(XMLSF_PLUGIN_BASENAME) ) {
+		if ( is_multisite() ) {
 			add_settings_field($prefix.'reset', __('Reset XML sitemaps','xml-sitemap-feed'), array($this,'reset_settings_field'), 'reading');
-    }
+		}
 
-    if ( isset($sitemaps['sitemap-news']) ) {
+		if ( isset($sitemaps['sitemap-news']) ) {
 			// XML SITEMAP SETTINGS
 			add_settings_section('news_sitemap_section', '<a name="xmlnf"></a>'.__('Google News Sitemap','xml-sitemap-feed'), array($this,'news_sitemap_settings'), 'reading');
 			// tags
