@@ -26,12 +26,11 @@ echo '<?xml version="1.0" encoding="'.get_bloginfo('charset', 'UTF-8').'"?>
 global $xmlsf;
 
 $taxonomy = get_query_var('taxonomy');
-$lang = get_query_var('lang');
 
 $terms = get_terms( $taxonomy, array(
 					'orderby' => 'count',
 					'order' => 'DESC',
-					'lang' => $lang,
+					'lang' => '',
 					'hierachical' => 0,
 					'pad_counts' => true, // count child term post count too...
 					'number' => 50000 ) );
