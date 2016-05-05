@@ -302,7 +302,7 @@ class XMLSF_Admin extends XMLSitemapFeed {
 				echo '
 					<li><label><input type="checkbox" name="'.$prefix.'post_types['.
 					$post_type->name.'][dynamic_priority]" value="1" '.
-					checked( !empty($options[$post_type->name]['dynamic_priority']), true, false).' /> '.__('Automatically adjusts Priority according to relative age and comment count.','xml-sitemap-feed').'</label> <span class="description">'.__('Sticky posts will not be subject to reduction by age. Individual posts with fixed Priority will always keep that value.','xml-sitemap-feed').'</span></li>';
+					checked( !empty($options[$post_type->name]['dynamic_priority']), true, false).' /> '.__('Automatic Priority calculation.','xml-sitemap-feed').'</label> <span class="description">'.__('Adjusts the Priority based on factors like age, comments, sticky post or blog page. Individual posts with fixed Priority will always keep that value.','xml-sitemap-feed').'</span></li>';
 
 				echo '
 					<li><label><input type="checkbox" name="'.$prefix.'post_types['.

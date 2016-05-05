@@ -374,9 +374,12 @@ class XMLSitemapFeed {
 				$blogpage = get_option('page_for_posts');
 
 				if ( !empty($blogpage) ) {
-					global $polylang;
-					if ( isset($polylang) )
+					global $polylang,$sitepress; // Polylang and WPML compat
+					if ( isset($polylang) && is_object($polylang) && isset($polylang->model) && is_object($polylang->model) && method_exists($polylang->model, 'get_translations') )
 						$this->blogpage = $polylang->model->get_translations('post', $blogpage);
+					if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'get_object_id') )
+						foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term )
+							$this->blogpage[] = $sitepress->get_object_id($id,'page',false,$term);
 					else
 						$this->blogpage = array($blogpage);
 				} else {
@@ -397,7 +400,7 @@ class XMLSitemapFeed {
 
 			global $post;
 
-			// if blog page look for last post date
+			// if blog page then look for last post date
 			if ( $post->post_type == 'page' && $this->is_home($post->ID) )
 				return get_lastmodified('GMT','post');
 
@@ -617,7 +620,7 @@ class XMLSitemapFeed {
 	{
 		$urls = array();
 
-		global $polylang,$sitepress;
+		global $polylang,$sitepress; // Polylang and WPML compat
 
 		if ( isset($polylang) && is_object($polylang) && method_exists($polylang, 'get_languages') && method_exists($polylang, 'get_home_url') )
 			foreach ($polylang->get_languages_list() as $term)
@@ -636,7 +639,7 @@ class XMLSitemapFeed {
 		$exclude = array();
 
 		if ( $post_type == 'page' && $id = get_option('page_on_front') ) {
-			global $polylang,$sitepress;
+			global $polylang,$sitepress; // Polylang and WPML compat
 			if ( isset($polylang) && is_object($polylang) && isset($polylang->model) && is_object($polylang->model) && method_exists($polylang->model, 'get_translations') )
 				$exclude += $polylang->model->get_translations('post', $id);
 			if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'get_object_id') )
@@ -788,7 +791,7 @@ class XMLSitemapFeed {
 		$request['update_post_meta_cache'] = false;
 		// Multi-language plugins
 		$request['lang'] = ''; // Polylang
-		$request['suppress_filters'] = true; // WPML magic bullet
+		$request['suppress_filters'] = true; // WPML magic bullet for posts/pages
 
 		if ( strpos($request['feed'],'sitemap-posttype') === 0 ) {
 			foreach ( $this->get_post_types() as $post_type ) {
@@ -810,6 +813,13 @@ class XMLSitemapFeed {
 				if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {
 					// modify request parameters
 					$request['taxonomy'] = $taxonomy;
+
+					global $sitepress; // WMPL remove tax term filters
+					if ( isset($sitepress) && is_object($sitepress) ) {
+						remove_filter('get_terms_args', array($sitepress, 'get_terms_args_filter'));
+						remove_filter('get_term', array($sitepress,'get_term_adjust_id'));
+						remove_filter('terms_clauses', array($sitepress,'terms_clauses'));
+					}
 
 					return $request;
 				}
