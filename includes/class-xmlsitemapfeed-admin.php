@@ -7,7 +7,7 @@ if ( ! defined( 'WPINC' ) ) die;
 
 if ( class_exists('XMLSitemapFeed') ) :
 
-class XMLSF_Admin extends XMLSitemapFeed {
+class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 
 	/**
 	* SETTINGS
@@ -1055,6 +1055,6 @@ jQuery( document ).ready( function() {
 *      INSTANTIATE
 * ---------------------- */
 
-$xmlsf_admin = new XMLSF_Admin();
+$xmlsf_admin = new XMLSitemapFeed_Admin();
 
 endif;

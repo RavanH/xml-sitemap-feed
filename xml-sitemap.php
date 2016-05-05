@@ -102,7 +102,7 @@ if ( file_exists ( $xmlsf_dir.'/xml-sitemap-feed' ) )
 	$xmlsf_dir .= '/xml-sitemap-feed';
 
 include_once( $xmlsf_dir.'/hacks.php' );
-include_once( $xmlsf_dir.'/includes/core.php' );
+include_once( $xmlsf_dir.'/includes/class-xmlsitemapfeed.php' );
 
 /* ----------------------
  *     INSTANTIATE

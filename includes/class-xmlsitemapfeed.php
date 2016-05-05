@@ -843,7 +843,6 @@ class XMLSitemapFeed {
 
 						// modify request parameters
 						$request['taxonomy'] = $taxonomy;
-						$request['lang'] = '';
 						$request['no_found_rows'] = true;
 						$request['cache_results'] = false;
 						$request['update_post_term_cache'] = false;
@@ -1238,7 +1237,7 @@ class XMLSitemapFeed {
 			$this->flush_rules();
 
 		// Include the admin class file
-		include_once( dirname(__FILE__) . '/admin.php' );
+		include_once( dirname(__FILE__) . '/class-xmlsitemapfeed-admin.php' );
 	}
 
 	public function flush_rules($hard = false)
