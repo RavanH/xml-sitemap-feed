@@ -112,6 +112,7 @@ class XMLSitemapFeed {
 		if ( isset($this->defaults['post_types']['page']) ) {
 			unset($this->defaults['post_types']['page']['archive']);
 			$this->defaults['post_types']['page']['priority'] = '0.3';
+			$this->defaults['post_types']['post']['dynamic_priority'] = '1';
 		}
 
 		// taxonomies
