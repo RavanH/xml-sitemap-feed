@@ -301,6 +301,8 @@ WPML compatibility.
 
 = 4.7 =
 * WPML compatibility
+* FIX: News Sitemap chinese language tag
+* FIX: flush rules on plugin re-activation
 
 = 4.6.3 =
 * NEW: filter xmlsf_custom_sitemaps
