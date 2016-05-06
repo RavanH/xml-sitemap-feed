@@ -18,8 +18,9 @@ class XMLSitemapFeed {
 	// Database options prefix
 	private $prefix = 'xmlsf_';
 
-	// Timezone
+	// Timezone and default language
 	private $timezone = null;
+	private $blog_language = null;
 
 	// Flushed flag
 	private $yes_mother = false;
@@ -700,7 +701,7 @@ class XMLSitemapFeed {
 		if ( empty($this->blog_language) ) {
 			// get site language for default language
 			$blog_language = convert_chars(strip_tags(get_bloginfo('language')));
-			$allowed = ['zh-cn','zh-tw'];
+			$allowed = array('zh-cn','zh-tw');
 			if ( !in_array($blog_language,$allowed) ) {
 				// bloginfo_rss('language') returns improper format so
 				// we explode on hyphen and use only first part.
