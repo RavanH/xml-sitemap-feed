@@ -1,16 +1,16 @@
 === XML Sitemap & Google News feeds ===
 Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed
-Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, , Yandex, Baidu, seo, feed, polylang, image sitemap
+Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, , Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 3.2
 Tested up to: 4.5
 Stable tag: 4.6.3
 
-XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache and Polylang compatible.
+XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
 == Description ==
 
-This plugin dynamically creates feeds that comply with the **XML Sitemap** and the **Google News Sitemap** protocol. **Multisite** and **Polylang** compatible and there are no files created. Options can be found on **Settings > Reading** to control which sitemaps, which post and taxonomy types are included, how priority is calculated, who to ping and set additional robots.txt rules.
+This plugin dynamically creates feeds that comply with the **XML Sitemap** and the **Google News Sitemap** protocol. **Multisite**, **Polylang** and **WPML** compatible and there are no files created. Options can be found on **Settings > Reading** to control which sitemaps, which post and taxonomy types are included, how priority is calculated, who to ping and set additional robots.txt rules.
 
 The main advantage of this plugin over other XML Sitemap plugins is **simplicity**. No need to change file or folder permissions, move files or spend time tweaking difficult plugin options.
 
@@ -52,7 +52,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 
 **More**
 
-* Compatible with multi-lingual sites using **Polylang** to allow all languages to be indexed equally.
+* Compatible with multi-lingual sites using **Polylang** or **WPML** to allow all languages to be indexed equally.
 * Option to add new robots.txt rules. These can be used to further control (read: limit) the indexation of various parts of your site and subsequent spread of pagerank accross your sites pages.
 * Includes XLS stylesheets for human readable sitemaps.
 
@@ -295,13 +295,12 @@ Thanks for sharing your translation :)
 == Upgrade Notice ==
 
 = 4.7 =
-Basic WPML compatibility.
+WPML compatibility.
 
 == Changelog ==
 
 = 4.7 =
-* Basic WPML compatibility
-* ...
+* WPML compatibility
 
 = 4.6.3 =
 * NEW: filter xmlsf_custom_sitemaps

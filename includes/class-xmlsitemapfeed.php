@@ -693,6 +693,44 @@ class XMLSitemapFeed {
 		return esc_url( trailingslashit($split_url[0]) . $name );
 	}
 
+	public function get_language( $id )
+	{
+		$language = null;
+
+		if ( empty($this->blog_language) ) {
+			// get site language for default language
+			$blog_language = convert_chars(strip_tags(get_bloginfo('language')));
+			$allowed = ['zh-cn','zh-tw'];
+			if ( !in_array($blog_language,$allowed) ) {
+				// bloginfo_rss('language') returns improper format so
+				// we explode on hyphen and use only first part.
+				$expl = explode('-', $blog_language);
+				$blog_language = $expl[0];
+			}
+
+			$this->blog_language = !empty($blog_language) ? $blog_language : 'en';
+		}
+
+		// WPML compat
+		global $sitepress;
+		if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_language_for_element') ) {
+			$post_type = get_query_var( 'post_type', 'post' );
+			$language = $sitepress->get_language_for_element( $id, 'post_'.$post_type[0] );
+			//apply_filters( 'wpml_element_language_code', null, array( 'element_id' => $id, 'element_type' => $post_type ) );
+		}
+
+		// Polylang
+		if ( taxonomy_exists('language') ) {
+			$lang = get_the_terms($id,'language');
+			if ( is_array($lang) ) {
+				$lang = reset($lang);
+				$language = is_object($lang) ? $lang->slug : $language;
+			}
+		}
+
+		return !empty($language) ? $language : $this->blog_language;
+	}
+
 
 	/**
 	* ROBOTSTXT
@@ -782,7 +820,14 @@ class XMLSitemapFeed {
 
 	public function filter_request( $request )
 	{
-		if ( isset($request['feed']) && strpos($request['feed'],'sitemap-') === 0 ) :
+		if ( isset($request['feed']) && strpos($request['feed'],'sitemap') === 0 ) :
+			// modify request parameters
+			$request['post_status'] = 'publish';
+			$request['no_found_rows'] = true;
+			$request['cache_results'] = false;
+			$request['update_post_term_cache'] = false;
+			$request['update_post_meta_cache'] = false;
+			$request['lang'] = ''; // Polylang
 
 			if ( $request['feed'] == 'sitemap-news' ) {
 				$defaults = $this->defaults('news_tags');
@@ -803,16 +848,18 @@ class XMLSitemapFeed {
 					add_filter('post_limits', array($this, 'filter_no_news_limits'));
 				}
 
-				/* modify request parameters */
+				global $wpml_query_filter; // WPML compat
+				if ( isset($wpml_query_filter) && is_object($wpml_query_filter) ) {
+					remove_filter( 'posts_join', array( $wpml_query_filter, 'posts_join_filter' ) );
+					remove_filter( 'posts_where', array( $wpml_query_filter, 'posts_where_filter' ) );
+				}
+
 				// post type
 				$request['post_type'] = $news_post_type;
 
 				// categories
 				if ( isset($options['categories']) && is_array($options['categories']) )
-							$request['cat'] = implode(',',$options['categories']);
-
-				$request['post_status'] = 'publish';
-				$request['no_found_rows'] = true;
+					$request['cat'] = implode(',',$options['categories']);
 
 				return $request;
 			}
@@ -823,14 +870,14 @@ class XMLSitemapFeed {
 						// setup filter
 						add_filter( 'post_limits', array($this, 'filter_limits') );
 
-						// modify request parameters
 						$request['post_type'] = $post_type['name'];
-						$request['post_status'] = 'publish';
 						$request['orderby'] = 'modified';
-						$request['lang'] = '';
-						$request['no_found_rows'] = true;
-						$request['update_post_meta_cache'] = false;
-						$request['update_post_term_cache'] = false;
+
+						global $wpml_query_filter; // WPML compat
+						if ( isset($wpml_query_filter) && is_object($wpml_query_filter) ) {
+							remove_filter('posts_join', array($wpml_query_filter, 'posts_join_filter'));
+							remove_filter('posts_where', array($wpml_query_filter, 'posts_where_filter'));
+						}
 
 						return $request;
 					}
@@ -841,13 +888,15 @@ class XMLSitemapFeed {
 				foreach ( $this->get_taxonomies() as $taxonomy ) {
 					if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {
 
-						// modify request parameters
 						$request['taxonomy'] = $taxonomy;
-						$request['no_found_rows'] = true;
-						$request['cache_results'] = false;
-						$request['update_post_term_cache'] = false;
-						$request['update_post_meta_cache'] = false;
-						$request['post_status'] = 'publish';
+
+						// WPML compat
+						global $sitepress;
+						if ( isset($sitepress) && is_object($sitepress) ) {
+							remove_filter('get_terms_args', array($sitepress, 'get_terms_args_filter'));
+							remove_filter('get_term', array($sitepress,'get_term_adjust_id'));
+							remove_filter('terms_clauses', array($sitepress,'terms_clauses'));
+						}
 
 						return $request;
 					}
