@@ -640,7 +640,7 @@ class XMLSitemapFeed {
 	{
 		$exclude = array();
 
-		if ( $post_type == 'page' && $id = get_option('page_on_front') ) {
+		if ( $post_type == 'page' and $id = get_option('page_on_front') ) { // use 'and' here for precedence of the assignement operator, thanks @kitchin
 			global $polylang,$sitepress; // Polylang and WPML compat
 			if ( isset($polylang) && is_object($polylang) && isset($polylang->model) && is_object($polylang->model) && method_exists($polylang->model, 'get_translations') )
 				$exclude += $polylang->model->get_translations('post', $id);
@@ -1186,7 +1186,7 @@ class XMLSitemapFeed {
 		}
 
 		// upgrade pings
-		if ( $pong = get_option( $this->prefix.'pong' ) && is_array($pong) ) {
+		if ( $pong = get_option( $this->prefix.'pong' ) and is_array($pong) ) { // use 'and' here for precedence of the assignement operator, thanks @kitchin
 			$ping = $this->get_ping();
 			foreach ( $pong as $se => $arr) {
 				if ( is_array( $arr ) ) {
