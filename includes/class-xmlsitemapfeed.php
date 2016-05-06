@@ -1215,23 +1215,25 @@ class XMLSitemapFeed {
 	{
 		// TEXT DOMAIN
 		if ( is_admin() ) { // text domain needed on admin only
-			load_plugin_textdomain('xml-sitemap-feed', false, dirname(dirname(plugin_basename( __FILE__ ))) . '/languages' );
+			load_plugin_textdomain('xml-sitemap-feed', false, dirname( dirname( __FILE__ ) ) . '/languages' );
 		}
 	}
 
-	public function unlink_static()
+	public function activate()
 	{
-		// return if this is a multisite and we're not network activating
-		if ( is_multisite() ) {
-			if ( !is_network_admin() ) return;
-		}
+		// flush permalink structure
+		$this->flush_rules();
 
-		// CHECK FOR STATIC SITEMAP FILES, DELETE IF EXIST
-		$home_path = trailingslashit( get_home_path() );
-		$sitemaps = $this->get_sitemaps();
-		foreach ( $sitemaps as $name => $pretty ) {
-			if ( file_exists( $home_path . $pretty ) )
-				unlink( $home_path . $pretty );
+		// try to remove static sitemap files, but only if
+		// this is not a multisite or we're on the main site or network activating
+		if ( !is_multisite() || is_main_site() || is_network_admin() ) {
+			// CHECK FOR STATIC SITEMAP FILES, DELETE IF EXIST
+			$home_path = trailingslashit( get_home_path() );
+			$sitemaps = $this->get_sitemaps();
+			foreach ( $sitemaps as $name => $pretty ) {
+				if ( file_exists( $home_path . $pretty ) )
+					unlink( $home_path . $pretty );
+			}
 		}
 	}
 
@@ -1286,7 +1288,7 @@ class XMLSitemapFeed {
 			$this->flush_rules();
 
 		// Include the admin class file
-		include_once( dirname(__FILE__) . '/class-xmlsitemapfeed-admin.php' );
+		include_once( dirname( __FILE__ ) . '/class-xmlsitemapfeed-admin.php' );
 	}
 
 	public function flush_rules($hard = false)
@@ -1386,10 +1388,6 @@ class XMLSitemapFeed {
 		add_filter('rt_nginx_helper_purge_urls', array($this, 'nginx_helper_purge_urls'), 10, 2);
 
 		// ACTIVATION
-		register_activation_hook( XMLSF_PLUGIN_BASENAME, array($this, 'unlink_static') );
-
-		// DE-ACTIVATION
-		register_deactivation_hook( XMLSF_PLUGIN_BASENAME, array($this, 'flush_rules') );
-
+		register_activation_hook( XMLSF_PLUGIN_BASENAME, array($this, 'activate') );
 	}
 }

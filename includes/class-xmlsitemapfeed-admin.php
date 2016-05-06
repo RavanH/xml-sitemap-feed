@@ -707,23 +707,17 @@ jQuery( document ).ready( function() {
 		$old = parent::get_post_types();
 		$defaults = parent::defaults('post_types');
 		$sanitized = $new;
-		$flush = false;
-
+		
 		foreach ($new as $post_type => $settings) {
-
 			// when post types are (de)activated, set transient to flush rewrite rules
 			if ( ( !empty($old[$post_type]['active']) && empty($settings['active']) ) || ( empty($old[$post_type]['active']) && !empty($settings['active']) ) )
-				$flush = true;
+				set_transient('xmlsf_flush_rewrite_rules','');
 
-			if ( isset($settings['priority']) && is_numeric($settings['priority']) ) {
+			if ( isset($settings['priority']) && is_numeric($settings['priority']) )
 				$sanitized[$post_type]['priority'] = $this->sanitize_priority($settings['priority'],0.1,0.9);
-			} else {
+			else
 				$sanitized[$post_type]['priority'] = $defaults[$post_type]['priority'];
-			}
 		}
-
-		if ($flush)
-			set_transient('xmlsf_flush_rewrite_rules','');
 
 		return $sanitized;
 	}
