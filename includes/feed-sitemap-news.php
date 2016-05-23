@@ -37,13 +37,6 @@ echo !empty($options['image']) ? '
 echo '">
 ';
 
-// get site language for default language
-// bloginfo_rss('language') returns improper format so
-// we explode on hyphen and use only first part.
-// TODO this workaround breaks (simplified) chinese :(
-$language = explode('-', convert_chars(strip_tags(get_bloginfo('language'))));
-$language = empty($language) ? 'en' : reset($language);
-
 // set empty news sitemap flag
 $have_posts = false;
 
@@ -71,16 +64,7 @@ if ( have_posts() ) :
 						echo apply_filters( 'the_title_xmlsitemap', XMLSF_GOOGLE_NEWS_NAME );
 					else
 						echo apply_filters( 'the_title_xmlsitemap', get_bloginfo('name') ); ?></news:name>
-				<news:language><?php
-					if ( taxonomy_exists('language') ) {
-						$lang = get_the_terms($post->ID,'language');
-						if ( is_array($lang) ) {
-							$lang = reset($lang);
-							echo is_object($lang) ? $lang->slug : $language;
-						}
-					} else {
-						echo $language;
-					}  ?></news:language>
+				<news:language><?php echo $xmlsf->get_language($post->ID); ?></news:language>
 			</news:publication>
 			<news:publication_date><?php
 				echo mysql2date('Y-m-d\TH:i:s+00:00', $post->post_date_gmt, false); ?></news:publication_date>
@@ -89,15 +73,14 @@ if ( have_posts() ) :
 	// access tag
 	$access = get_post_meta( $post->ID, '_xmlsf_news_access', true );
 
-	if (empty($access)) : // if not set per meta, let's get global settings
-	  if (!empty($options['access'])) {
-		if ( post_password_required() ) {
-			if (!empty($options['access']['password'])) $access = $options['access']['password'];
-		} else {
-			if (!empty($options['access']['default'])) $access = $options['access']['default'];
-		}
-	  }
-	endif;
+	if (empty($access)) // if not set per meta, let's get global settings
+	  if (!empty($options['access']))
+			if ( post_password_required() )
+				if (!empty($options['access']['password']))
+					$access = $options['access']['password'];
+			else
+				if (!empty($options['access']['default']))
+					$access = $options['access']['default'];
 
 	if (!empty($access) && $access != 'Public' ) {
 	?>
@@ -195,15 +178,10 @@ if ( have_posts() ) :
 endif;
 
 if ( !$have_posts ) :
-	// No posts done? Then do at least the homepage to prevent error message in WMT.
-
-	$lastmodified_gmt = get_lastmodified('GMT'); // last posts or page modified date
-?>
+	// No posts done? Then do at least the homepage to prevent error message in GWT.
+	?>
 	<url>
-		<loc><?php echo esc_url( trailingslashit(home_url()) ); ?></loc>
-		<lastmod><?php echo mysql2date('Y-m-d\TH:i:s+00:00', $lastmodified_gmt, false); ?></lastmod>
-		<changefreq>daily</changefreq>
-		<priority>1.0</priority>
+		<loc><?php echo esc_url( home_url() ); ?></loc>
 	</url>
 <?php
 endif;

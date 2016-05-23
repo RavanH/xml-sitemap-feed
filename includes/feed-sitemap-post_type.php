@@ -40,6 +40,9 @@ echo '">
 // any ID's we need to exclude?
 $excluded = $xmlsf->get_excluded($post_type);
 
+// set empty sitemap flag
+$have_posts = false;
+
 // loop away!
 if ( have_posts() ) :
     while ( have_posts() ) :
@@ -51,6 +54,8 @@ if ( have_posts() ) :
 	$exclude = get_post_meta( $post->ID, '_xmlsf_exclude', true );
 	if ( !empty($exclude) || !$xmlsf->is_allowed_domain(get_permalink()) || in_array($post->ID, $excluded) )
 		continue;
+
+	$have_posts = true;
 
 	// TODO more image tags & video tags
 	?>
@@ -87,6 +92,16 @@ if ( have_posts() ) :
  	</url>
 <?php
     endwhile;
+endif;
+
+if ( !$have_posts ) :
+	// No posts done? Then do at least the homepage to prevent error message in GWT.
+	?>
+	<url>
+		<loc><?php echo esc_url( home_url() ); ?></loc>
+		<priority>1.0</priority>
+	</url>
+<?php
 endif;
 ?></urlset>
 <?php $xmlsf->_e_usage();

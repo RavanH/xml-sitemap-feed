@@ -7,7 +7,7 @@ if ( ! defined( 'WPINC' ) ) die;
 
 if ( class_exists('XMLSitemapFeed') ) :
 
-class XMLSF_Admin extends XMLSitemapFeed {
+class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 
 	/**
 	* SETTINGS
@@ -125,7 +125,7 @@ class XMLSF_Admin extends XMLSitemapFeed {
 			if (!empty($options[$key]['pong'])) {
 				if ( $tzstring = get_option('timezone_string') ) {
 					// use same timezoneformat as translatable examples in options-general.php
-					$timezone_format = _x('Y-m-d G:i:s', 'timezone date format');
+					$timezone_format = translate_with_gettext_context('Y-m-d G:i:s', 'timezone date format');
 					date_default_timezone_set($tzstring);
 				} else {
 					$timezone_format = 'Y-m-d G:i:s T';
@@ -207,11 +207,12 @@ class XMLSF_Admin extends XMLSitemapFeed {
 	public function reset_settings_field() {
 		echo '
 		<fieldset><legend class="screen-reader-text">'.__('Reset XML sitemaps','xml-sitemap-feed').'</legend>
-			<label><input type="checkbox" name="'.parent::prefix().'sitemaps[reset]" value="1" /> '.
-				__('Clear all XML Sitemap Feed settings from the database.','xml-sitemap-feed').'</label>
+			<label><input type="checkbox" name="'.parent::prefix().'sitemaps[reset]" value="1" onchange="if(this.checked){if(!confirm(\''.
+				__('Selecting this will clear all XML Sitemap & Google News Sitemap settings after Save Changes. Are you sure?','xml-sitemap-feed').'\')){this.checked=false}}" /> '.
+				__('Clear all XML Sitemap & Google News Sitemap settings.','xml-sitemap-feed').'</label>
 		</fieldset>';
 		echo '
-		<p class="description">'.__('You can use this to start fresh with the default settings or to remove all XML Sitemap and Google News settings and taxonomy terms before uninstalling.','xml-sitemap-feed').'</p>';
+		<p class="description">'.__('Check this option and Save Changes to start fresh with the default settings.','xml-sitemap-feed').'</p>';
 	}
 
 	/**
@@ -302,7 +303,7 @@ class XMLSF_Admin extends XMLSitemapFeed {
 				echo '
 					<li><label><input type="checkbox" name="'.$prefix.'post_types['.
 					$post_type->name.'][dynamic_priority]" value="1" '.
-					checked( !empty($options[$post_type->name]['dynamic_priority']), true, false).' /> '.__('Automatically adjusts Priority according to relative age and comment count.','xml-sitemap-feed').'</label> <span class="description">'.__('Sticky posts will not be subject to reduction by age. Individual posts with fixed Priority will always keep that value.','xml-sitemap-feed').'</span></li>';
+					checked( !empty($options[$post_type->name]['dynamic_priority']), true, false).' /> '.__('Automatic Priority calculation.','xml-sitemap-feed').'</label> <span class="description">'.__('Adjusts the Priority based on factors like age, comments, sticky post or blog page. Individual posts with fixed Priority will always keep that value.','xml-sitemap-feed').'</span></li>';
 
 				echo '
 					<li><label><input type="checkbox" name="'.$prefix.'post_types['.
@@ -475,7 +476,7 @@ jQuery( document ).ready( function() {
 		echo '
 		<fieldset><legend class="screen-reader-text">'.__('Publication name','xml-sitemap-feed').'</legend>
 			<input type="text" name="'.parent::prefix().'news_tags[name]" id="xmlsf_news_name" value="'.$name.'" class="regular-text"> <span class="description">'.sprintf(__('By default, the general %s setting will be used.','xml-sitemap-feed'),'<a href="options-general.php">'.translate('Site Title').'</a>').'</span><p class="description">' .
-			__('The publication name should match the name submitted on the Google News Publisher Center. If you wish to change it, please read <a href="https://support.google.com/news/publisher/answer/40402" target="_blank">Updated publication name</a>.') . '</p>
+			__('The publication name should match the name submitted on the Google News Publisher Center. If you wish to change it, please read <a href="https://support.google.com/news/publisher/answer/40402" target="_blank">Updated publication name</a>.','xml-sitemap-feed') . '</p>
 		</fieldset>';
 	}
 
@@ -706,23 +707,17 @@ jQuery( document ).ready( function() {
 		$old = parent::get_post_types();
 		$defaults = parent::defaults('post_types');
 		$sanitized = $new;
-		$flush = false;
-
+		
 		foreach ($new as $post_type => $settings) {
-
 			// when post types are (de)activated, set transient to flush rewrite rules
 			if ( ( !empty($old[$post_type]['active']) && empty($settings['active']) ) || ( empty($old[$post_type]['active']) && !empty($settings['active']) ) )
-				$flush = true;
+				set_transient('xmlsf_flush_rewrite_rules','');
 
-			if ( isset($settings['priority']) && is_numeric($settings['priority']) ) {
+			if ( isset($settings['priority']) && is_numeric($settings['priority']) )
 				$sanitized[$post_type]['priority'] = $this->sanitize_priority($settings['priority'],0.1,0.9);
-			} else {
+			else
 				$sanitized[$post_type]['priority'] = $defaults[$post_type]['priority'];
-			}
 		}
-
-		if ($flush)
-			set_transient('xmlsf_flush_rewrite_rules','');
 
 		return $sanitized;
 	}
@@ -986,6 +981,7 @@ jQuery( document ).ready( function() {
 		register_setting('reading', $prefix.'sitemaps', array($this,'sanitize_sitemaps_settings') );
 		add_settings_field($prefix.'sitemaps', __('Enable XML sitemaps','xml-sitemap-feed'), array($this,'sitemaps_settings_field'), 'reading');
 
+
 		// robots rules only when permalinks are set
 		$rules = get_option( 'rewrite_rules' );
 		if( get_option('permalink_structure') && isset( $rules['robots\.txt$'] ) ) {
@@ -993,17 +989,17 @@ jQuery( document ).ready( function() {
 			add_settings_field($prefix.'robots', __('Additional robots.txt rules','xml-sitemap-feed'), array($this,'robots_settings_field'), 'reading');
 		}
 
-    // ACTION LINK
+		// ACTION LINK
 		add_filter('plugin_action_links_' . XMLSF_PLUGIN_BASENAME, array($this, 'add_action_link') );
 
-    // stop here if blog is not public
-    if ( !get_option('blog_public') ) { return; }
+		// stop here if blog is not public
+		if ( !get_option('blog_public') ) { return; }
 
-		if ( is_multisite() && is_plugin_active_for_network(XMLSF_PLUGIN_BASENAME) ) {
+		if ( is_multisite() ) {
 			add_settings_field($prefix.'reset', __('Reset XML sitemaps','xml-sitemap-feed'), array($this,'reset_settings_field'), 'reading');
-    }
+		}
 
-    if ( isset($sitemaps['sitemap-news']) ) {
+		if ( isset($sitemaps['sitemap-news']) ) {
 			// XML SITEMAP SETTINGS
 			add_settings_section('news_sitemap_section', '<a name="xmlnf"></a>'.__('Google News Sitemap','xml-sitemap-feed'), array($this,'news_sitemap_settings'), 'reading');
 			// tags
@@ -1053,6 +1049,6 @@ jQuery( document ).ready( function() {
 *      INSTANTIATE
 * ---------------------- */
 
-$xmlsf_admin = new XMLSF_Admin();
+$xmlsf_admin = new XMLSitemapFeed_Admin();
 
 endif;

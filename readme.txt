@@ -1,16 +1,16 @@
 === XML Sitemap & Google News feeds ===
 Contributors: RavanH
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed&item_number=3%2e8&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us
-Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, , Yandex, Baidu, seo, feed, polylang, image sitemap
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed
+Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, , Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 3.2
 Tested up to: 4.5
-Stable tag: 4.6.1
+Stable tag: 4.7.1
 
-XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache and Polylang compatible.
+XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
 == Description ==
 
-This plugin dynamically creates feeds that comply with the **XML Sitemap** and the **Google News Sitemap** protocol. **Multisite** and **Polylang** compatible and there are no files created. Options can be found on **Settings > Reading** to control which sitemaps, which post and taxonomy types are included, how priority is calculated, who to ping and set additional robots.txt rules.
+This plugin dynamically creates feeds that comply with the **XML Sitemap** and the **Google News Sitemap** protocol. **Multisite**, **Polylang** and **WPML** compatible and there are no files created. Options can be found on **Settings > Reading** to control which sitemaps, which post and taxonomy types are included, how priority is calculated, who to ping and set additional robots.txt rules.
 
 The main advantage of this plugin over other XML Sitemap plugins is **simplicity**. No need to change file or folder permissions, move files or spend time tweaking difficult plugin options.
 
@@ -50,9 +50,9 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Configure <access>, <genres> and <keywords> tags both globally and post by post
 * Pings Google on new publications.
 
-** More **
+**More**
 
-* Compatible with multi-lingual sites using **Polylang** to allow all languages to be indexed equally.
+* Compatible with multi-lingual sites using **Polylang** or **WPML** to allow all languages to be indexed equally.
 * Option to add new robots.txt rules. These can be used to further control (read: limit) the indexation of various parts of your site and subsequent spread of pagerank accross your sites pages.
 * Includes XLS stylesheets for human readable sitemaps.
 
@@ -62,6 +62,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 - **French** * R.A. van Hagen http://status301.net (version 4.2) (improved translation or suggestions needed!)
 - **Indonesian** * Nasrulhaq Muiz http://al-badar.net/ (version 4.2)
 - **Italian** * Raffaello Tesi http://www.raffaellotesi.com  (version 4.3.2)
+- **Japanese** * gblsm https://profiles.wordpress.org/gblsm/ (version 4.6)
 - **Serbian** * WPdiscounts http://wpdiscounts.com/ (version 4.1)
 - **Spanish** * Andrew Kurtis - WebHostingHub Support http://www.webhostinghub.com/ (version 4.3.2)
 - **Ukrainian** * Cmd Software http://www.cmd-soft.com/ (version 4.0)
@@ -293,15 +294,32 @@ Thanks for sharing your translation :)
 
 == Upgrade Notice ==
 
-= 4.6.1 =
-Updated translation POT file, dutch translation and general code cleanup
+= 4.7.1 =
+WPML and PHP 5.3 compatibility.
 
 == Changelog ==
+
+= 4.7.1 =
+* PHP 5.3 compatibility fix
+
+= 4.7 =
+* WPML compatibility
+* FIX: News Sitemap chinese language tag
+* FIX: flush rules on plugin re-activation
+
+= 4.6.3 =
+* NEW: filter xmlsf_custom_sitemaps
+* BUGFIX: empty custom urls sitemap
+
+= 4.6.2 =
+* NEW: filter xmlsf_custom_urls
+* More cleanup
+* BUGFIX: broken Polylang compatibility reported by @zesseb
 
 = 4.6.1 =
 * Code cleanup
 * POT file update
-* Dutch translation
+* Dutch translation update
 
 = 4.6 =
 * NEW: xmlsf_news_tags_after action hook
