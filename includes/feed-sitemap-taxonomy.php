@@ -23,10 +23,13 @@ echo '<?xml version="1.0" encoding="'.get_bloginfo('charset', 'UTF-8').'"?>
 		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 ';
 
-global $xmlsf;
+global $xmlsf, $sitepress;
 
 $taxonomy = get_query_var('taxonomy');
-
+// WPML compat
+if( isset($sitepress) ){
+    $sitepress->switch_lang('all');
+}
 $terms = get_terms( $taxonomy, array(
 					'orderby' => 'count',
 					'order' => 'DESC',
