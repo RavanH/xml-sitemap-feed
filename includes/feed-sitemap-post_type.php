@@ -19,7 +19,7 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 <!-- generator-version="' . XMLSF_VERSION . '" -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" ';
 
-global $xmlsf;
+global $xmlsf, $sitepress;
 $post_type = get_query_var('post_type');
 
 foreach ( $xmlsf->do_tags($post_type) as $tag => $setting )
@@ -47,7 +47,12 @@ $have_posts = false;
 if ( have_posts() ) :
     while ( have_posts() ) :
 	the_post();
-
+	// WPML Compat
+        // @see https://wpml.org/wpml-hook/wpml_post_language_details/
+        if( isset($sitepress) ){
+            $post_language = apply_filters( 'wpml_post_language_details', NULL, $post->ID );
+            $sitepress->switch_lang($post_language['language_code']);
+        }
 	// check if page is in the exclusion list (like front page)
 	// or if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
 	// or if post meta says "exclude me please"
