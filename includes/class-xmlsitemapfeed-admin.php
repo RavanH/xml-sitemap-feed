@@ -707,7 +707,7 @@ jQuery( document ).ready( function() {
 		$old = parent::get_post_types();
 		$defaults = parent::defaults('post_types');
 		$sanitized = $new;
-		
+
 		foreach ($new as $post_type => $settings) {
 			// when post types are (de)activated, set transient to flush rewrite rules
 			if ( ( !empty($old[$post_type]['active']) && empty($settings['active']) ) || ( empty($old[$post_type]['active']) && !empty($settings['active']) ) )
@@ -744,10 +744,16 @@ jQuery( document ).ready( function() {
 	public function sanitize_custom_sitemaps_settings($new) {
 		$old = parent::get_custom_sitemaps();
 		$callback = create_function('$a','return filter_var($a,FILTER_VALIDATE_URL);');
-		if(is_array($new)) $new = array_shift(array_filter($new));
-		$input_arr = explode("\n",trim(strip_tags($new)));
-		$sanitized = array();
 
+		// clean up input
+		if(is_array($new)) {
+			$new = array_filter($new);
+			$new = reset($new);
+		}
+		$input_arr = $new ? explode("\n",trim(strip_tags($new))) : array();
+
+		// build sanitized output
+		$sanitized = array();
 		foreach ($input_arr as $line) {
 			$line = filter_var(esc_url(trim($line)),FILTER_VALIDATE_URL,FILTER_FLAG_PATH_REQUIRED);
 			if(!empty($line))
