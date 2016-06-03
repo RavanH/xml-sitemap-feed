@@ -678,7 +678,11 @@ jQuery( document ).ready( function() {
 	//sanitize callback functions
 
 	public function sanitize_robots_settings($new) {
-		if(is_array($new)) $new = array_shift(array_filter($new));
+		// clean up input
+		if(is_array($new)) {
+		  $new = array_filter($new);
+		  $new = reset($new);
+		}
 		return trim(strip_tags($new));
 	}
 
@@ -750,11 +754,11 @@ jQuery( document ).ready( function() {
 			$new = array_filter($new);
 			$new = reset($new);
 		}
-		$input_arr = $new ? explode("\n",trim(strip_tags($new))) : array();
+		$input = $new ? explode("\n",trim(strip_tags($new))) : array();
 
 		// build sanitized output
 		$sanitized = array();
-		foreach ($input_arr as $line) {
+		foreach ($input as $line) {
 			$line = filter_var(esc_url(trim($line)),FILTER_VALIDATE_URL,FILTER_FLAG_PATH_REQUIRED);
 			if(!empty($line))
 				$sanitized[] = $line;
@@ -765,12 +769,19 @@ jQuery( document ).ready( function() {
 
 	public function sanitize_urls_settings($new) {
 		$old = parent::get_urls();
-		if(is_array($new)) $new = array_shift(array_filter($new));
-		$input_arr = explode("\n",trim(strip_tags($new)));
+
+		// clean up input
+		if(is_array($new)) {
+		  $new = array_filter($new);
+		  $new = reset($new);
+		}
+		$input = $new ? explode("\n",trim(strip_tags($new))) : array();
+
+		// build sanitized output
 		$sanitized = array();
 		$callback = create_function('$a','return filter_var($a,FILTER_VALIDATE_URL) || is_numeric($a);');
 
-		foreach ($input_arr as $line) {
+		foreach ($input as $line) {
 			if(empty($line))
 				continue;
 
@@ -798,10 +809,16 @@ jQuery( document ).ready( function() {
 
 	public function sanitize_domains_settings($new) {
 		$default = parent::domain();
-		if(is_array($new)) $new = array_shift(array_filter($new));
-		$input = explode("\n",trim(strip_tags($new)));
-		$sanitized = array();
 
+		// clean up input
+		if(is_array($new)) {
+		  $new = array_filter($new);
+		  $new = reset($new);
+		}
+		$input = $new ? explode("\n",trim(strip_tags($new))) : array();
+
+		// build sanitized output
+		$sanitized = array();
 		foreach ($input as $line) {
 			$line = trim($line);
 			$parsed_url = parse_url(trim(filter_var($line,FILTER_SANITIZE_URL)));

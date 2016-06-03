@@ -294,12 +294,13 @@ Thanks for sharing your translation :)
 
 == Upgrade Notice ==
 
-= 4.7.1 =
-WPML and PHP 5.3 compatibility.
+= 4.7.2 =
+WPML and PHP 5.3 compatibility. Strict warning fix.
 
 == Changelog ==
 
-= 4.7.1 =
+= 4.7.2 =
+* Fix "Only variables should be passed by reference" strict warning
 * PHP 5.3 compatibility fix
 
 = 4.7 =
