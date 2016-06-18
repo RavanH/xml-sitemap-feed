@@ -7,7 +7,7 @@
 
 if ( ! defined( 'WPINC' ) ) die;
 
-global $xmlsf;
+global $xmlsf, $sitepress;
 $options = $xmlsf->get_option('news_tags');
 
 status_header('200'); // force header('HTTP/1.1 200 OK') for sites without posts
@@ -44,7 +44,12 @@ $have_posts = false;
 if ( have_posts() ) :
     while ( have_posts() ) :
 	the_post();
-
+	// WPML: switch language 
+        // @see https://wpml.org/wpml-hook/wpml_post_language_details/
+        if( isset($sitepress) ){
+            $post_language = apply_filters( 'wpml_post_language_details', NULL, $post->ID );
+            $sitepress->switch_lang($post_language['language_code']);
+        }
 	// check if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
 	// or if post meta says "exclude me please"
 	$exclude = get_post_meta( $post->ID, '_xmlsf_news_exclude', true );
