@@ -43,7 +43,8 @@ class XMLSitemapFeed {
 	private $lastmodified; // unused at the moment
 	private $postmodified = array();
 	private $termmodified = array();
-	private $blogpage;
+	private $frontpages = null;
+	private $blogpages = null;
 	private $images = array();
 
 	// make some private parts public ;)
@@ -370,33 +371,67 @@ class XMLSitemapFeed {
 				) ? (array)$return[$type]['tags'] : array();
 	}
 
-	public function is_home($id)
+	private function get_translations( $post_id )
 	{
-			if ( empty($this->blogpage) ) {
-				$blogpage = get_option('page_for_posts');
+		$translation_ids = array();
+		// Polylang compat
+		if ( function_exists('pll_get_post_translations') ) {
+			$translations = pll_get_post_translations($post_id);
+			foreach ( $translations as $slug => $id )
+				if ( $post_id != $id ) $translation_ids[] = $id;
+		}
+		// WPML compat
+		global $sitepress;
+		if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'get_object_id') ) {
+			foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term ) {
+				$id = $sitepress->get_object_id($post_id,'page',false,$term);
+				if ( $post_id != $id ) $translation_ids[] = $id;
+			}
+		}
 
+		return $translation_ids;
+	}
+
+	private function get_blogpages()
+	{
+		if ( null === $this->blogpages ) :
+			$blogpages = array();
+			if ( 'page' == get_option('show_on_front') ) {
+				$blogpage = (int)get_option('page_for_posts');
 				if ( !empty($blogpage) ) {
-					global $polylang,$sitepress; // Polylang and WPML compat
-					if ( isset($polylang) && is_object($polylang) && isset($polylang->model) && is_object($polylang->model) && method_exists($polylang->model, 'get_translations') )
-						$this->blogpage = $polylang->model->get_translations('post', $blogpage);
-					if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'get_object_id') )
-						foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term )
-							$this->blogpage[] = $sitepress->get_object_id($id,'page',false,$term);
-					else
-						$this->blogpage = array($blogpage);
-				} else {
-					$this->blogpage = array('-1');
+					$blogpages = array_merge( (array)$blogpage, $this->get_translations($blogpage) );
 				}
 			}
+			$this->blogpages = $blogpages;
+		endif;
 
-			return in_array($id,$this->blogpage);
+		return $this->blogpages;
+	}
+
+	private function get_frontpages()
+	{
+		if ( null === $this->frontpages ) :
+			$frontpages = array();
+			if ( 'page' == get_option('show_on_front') ) {
+				$frontpage = (int)get_option('page_on_front');
+				$frontpages = array_merge( (array)$frontpage, $this->get_translations($frontpage) );
+			}
+			$this->frontpages = $frontpages;
+		endif;
+
+		return $this->frontpages;
+	}
+
+	private function is_home( $id )
+	{
+			return in_array( $id, $this->get_blogpages() );
 	}
 
 	/**
 	* TEMPLATE FUNCTIONS
 	*/
 
-	public function modified($sitemap = 'post_type', $term = '')
+	public function modified( $sitemap = 'post_type', $term = '' )
 	{
 		if ('post_type' == $sitemap) :
 
@@ -471,7 +506,7 @@ class XMLSitemapFeed {
 		endif;
 	}
 
-	public function get_images($sitemap = '')
+	public function get_images( $sitemap = '' )
 	{
 		global $post;
 		if ( empty($this->images[$post->ID]) ) {
@@ -510,13 +545,13 @@ class XMLSitemapFeed {
 		return ( isset($this->images[$post->ID]) ) ? $this->images[$post->ID] : false;
 	}
 
-	public function get_lastmod($sitemap = 'post_type', $term = '')
+	public function get_lastmod( $sitemap = 'post_type', $term = '' )
 	{
 		$return = trim(mysql2date('Y-m-d\TH:i:s+00:00', $this->modified($sitemap,$term), false));
 		return !empty($return) ? "\t<lastmod>".$return."</lastmod>\r\n\t" : '';
 	}
 
-	public function get_changefreq($sitemap = 'post_type', $term = '')
+	public function get_changefreq( $sitemap = 'post_type', $term = '' )
 	{
 		$modified = trim($this->modified($sitemap,$term));
 
@@ -540,7 +575,7 @@ class XMLSitemapFeed {
 	 	return $changefreq;
 	}
 
-	public function get_priority($sitemap = 'post_type', $term = '')
+	public function get_priority( $sitemap = 'post_type', $term = '' )
 	{
 		if ( 'post_type' == $sitemap ) :
 			global $post;
@@ -571,7 +606,7 @@ class XMLSitemapFeed {
 					$priority_value = floatval($defaults[$post->post_type]['priority']);
 
 				// reduce by age
-				// NOTE : home/blog page gets same treatment as sticky post
+				// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
 				if ( is_sticky($post->ID) || $this->is_home($post->ID) )
 					$priority = $priority_value;
 				else
@@ -622,39 +657,41 @@ class XMLSitemapFeed {
 	{
 		$urls = array();
 
-		global $polylang,$sitepress; // Polylang and WPML compat
-
-		if ( isset($polylang) && is_object($polylang) && method_exists($polylang, 'get_languages') && method_exists($polylang, 'get_home_url') )
-			foreach ($polylang->get_languages_list() as $term)
-		    $urls[] = $polylang->get_home_url($term);
-		elseif ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'language_url') )
+		global $sitepress; // Polylang and WPML compat
+		if ( function_exists('pll_the_languages') ) {
+			$languages = pll_the_languages( array( 'raw' => 1 ) );
+			if ( is_array($languages) )
+				foreach ( $languages as $language )
+					$urls[] = pll_home_url( $language['slug'] );
+			else
+				$urls[] = home_url();
+		} elseif ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'language_url') ) {
 			foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term )
 				$urls[] = $sitepress->language_url($term);
-		else
+		} else {
 			$urls[] = home_url();
+		}
 
 		return $urls;
 	}
 
-	public function get_excluded($post_type)
+	public function is_excluded( $post_id = null )
 	{
-		$exclude = array();
-
-		if ( $post_type == 'page' and $id = get_option('page_on_front') ) { // use 'and' here for precedence of the assignement operator, thanks @kitchin
-			global $polylang,$sitepress; // Polylang and WPML compat
-			if ( isset($polylang) && is_object($polylang) && isset($polylang->model) && is_object($polylang->model) && method_exists($polylang->model, 'get_translations') )
-				$exclude += $polylang->model->get_translations('post', $id);
-			if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'get_object_id') )
-				foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term )
-					$exclude[] = $sitepress->get_object_id($id,'page',false,$term);
+		// no ID, try and get it from global post object
+		if ( null == $post_id ) {
+			global $post;
+			if ( is_object($post) && isset($post->ID))
+				$post_id = $post->ID;
 			else
-				$exclude[] = $id;
+				return false;
 		}
 
-		return $exclude;
+		$excluded = get_post_meta($post_id,'_xmlsf_exclude',true) || in_array($post_id,$this->get_frontpages()) ? true : false;
+
+		return apply_filters( 'xmlsf_excluded', $excluded, $post_id );
 	}
 
-	public function is_allowed_domain($url)
+	public function is_allowed_domain( $url )
 	{
 		$domains = $this->get_domains();
 		$return = false;
@@ -669,7 +706,7 @@ class XMLSitemapFeed {
 			}
 		}
 
-		return apply_filters( 'xmlsf_allowed_domain', $return );
+		return apply_filters( 'xmlsf_allowed_domain', $return, $url );
 	}
 
 	public function get_index_url( $sitemap = 'home', $type = false, $param = false )
@@ -715,18 +752,15 @@ class XMLSitemapFeed {
 		// WPML compat
 		global $sitepress;
 		if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_language_for_element') ) {
-			$post_type = get_query_var( 'post_type', 'post' );
+			$post_type = get_query_var( 'post_type', 'post' ); // is $post_type always an array here??
 			$language = $sitepress->get_language_for_element( $id, 'post_'.$post_type[0] );
 			//apply_filters( 'wpml_element_language_code', null, array( 'element_id' => $id, 'element_type' => $post_type ) );
 		}
 
 		// Polylang
-		if ( taxonomy_exists('language') ) {
-			$lang = get_the_terms($id,'language');
-			if ( is_array($lang) ) {
-				$lang = reset($lang);
-				$language = is_object($lang) ? $lang->slug : $language;
-			}
+		if ( function_exists('pll_get_post_language') ) {
+			$lang = pll_get_post_language( $id, 'slug' );
+			$language = !empty($lang) ? $lang : $language;
 		}
 
 		return !empty($language) ? $language : $this->blog_language;
@@ -828,7 +862,19 @@ class XMLSitemapFeed {
 			$request['cache_results'] = false;
 			$request['update_post_term_cache'] = false;
 			$request['update_post_meta_cache'] = false;
-			$request['lang'] = ''; // Polylang
+
+			// Polylang compat
+			$request['lang'] = '';
+			// WPML compat
+			global $wpml_query_filter,$wpml_url_filters;
+			if ( isset($wpml_query_filter) && isset($wpml_url_filters) && is_object($wpml_query_filter) && is_object($wpml_url_filters) ) {
+				remove_filter( 'posts_join', array( $wpml_query_filter, 'posts_join_filter' ) );
+				remove_filter( 'posts_where', array( $wpml_query_filter, 'posts_where_filter' ) );
+				remove_filter( 'post_link', array( $wpml_url_filters, 'permalink_filter' ), 1 );
+				remove_filter( 'post_type_link', array( $wpml_url_filters, 'permalink_filter' ), 1 );
+				remove_filter( 'page_link', array( $wpml_url_filters, 'permalink_filter_root' ), 1 );
+				remove_filter( 'page_link', array( $wpml_url_filters, 'permalink_filter' ), 1 );
+			}
 
 			if ( $request['feed'] == 'sitemap-news' ) {
 				$defaults = $this->defaults('news_tags');
@@ -847,12 +893,6 @@ class XMLSitemapFeed {
 					add_filter('posts_where', array($this, 'filter_news_where'), 10, 1);
 				} else {
 					add_filter('post_limits', array($this, 'filter_no_news_limits'));
-				}
-
-				global $wpml_query_filter; // WPML compat
-				if ( isset($wpml_query_filter) && is_object($wpml_query_filter) ) {
-					remove_filter( 'posts_join', array( $wpml_query_filter, 'posts_join_filter' ) );
-					remove_filter( 'posts_where', array( $wpml_query_filter, 'posts_where_filter' ) );
 				}
 
 				// post type
@@ -874,12 +914,6 @@ class XMLSitemapFeed {
 						$request['post_type'] = $post_type['name'];
 						$request['orderby'] = 'modified';
 
-						global $wpml_query_filter; // WPML compat
-						if ( isset($wpml_query_filter) && is_object($wpml_query_filter) ) {
-							remove_filter('posts_join', array($wpml_query_filter, 'posts_join_filter'));
-							remove_filter('posts_where', array($wpml_query_filter, 'posts_where_filter'));
-						}
-
 						return $request;
 					}
 				}
@@ -892,11 +926,13 @@ class XMLSitemapFeed {
 						$request['taxonomy'] = $taxonomy;
 
 						// WPML compat
-						global $sitepress;
-						if ( isset($sitepress) && is_object($sitepress) ) {
-							remove_filter('get_terms_args', array($sitepress, 'get_terms_args_filter'));
-							remove_filter('get_term', array($sitepress,'get_term_adjust_id'));
-							remove_filter('terms_clauses', array($sitepress,'terms_clauses'));
+						global $sitepress,$wpml_url_converter;
+						if ( isset($sitepress) && isset($wpml_url_converter) && is_object($sitepress) && is_object($wpml_url_converter) ) {
+							remove_filter( 'get_terms_args', array($sitepress, 'get_terms_args_filter') );
+							remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
+							remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
+							remove_filter( 'category_link', array($sitepress, 'category_link_adjust_id'), 1 );
+							remove_filter( 'term_link', array($wpml_url_converter, 'tax_permalink_filter'), 1 );
 						}
 
 						return $request;
@@ -942,7 +978,7 @@ class XMLSitemapFeed {
 		load_template( dirname( __FILE__ ) . '/feed-sitemap-news.php' );
 	}
 
-	// set up the news sitemap template
+	// set up the custom sitemap template
 	public function load_template_custom()
 	{
 		load_template( dirname( __FILE__ ) . '/feed-sitemap-custom.php' );
@@ -1075,7 +1111,7 @@ class XMLSitemapFeed {
 		}
 	}
 
-	function cache_flush($new_status, $old_status)
+	function cache_flush( $new_status, $old_status )
 	{
 		// are we moving the post in or out of published status?
 		if ( $new_status == 'publish' || $old_status == 'publish' ) {
@@ -1142,7 +1178,7 @@ class XMLSitemapFeed {
 	* INITIALISATION
 	*/
 
-	public function upgrade($old_version)
+	public function upgrade( $old_version )
 	{
 		// rewrite rules not available on plugins_loaded
 		// and don't flush rules from init as Polylang chokes on that
@@ -1292,7 +1328,7 @@ class XMLSitemapFeed {
 		include_once( dirname( __FILE__ ) . '/class-xmlsitemapfeed-admin.php' );
 	}
 
-	public function flush_rules($hard = false)
+	public function flush_rules( $hard = false )
 	{
 		// did you flush already?
 		if ($this->yes_mother)

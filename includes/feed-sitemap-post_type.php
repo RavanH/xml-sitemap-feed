@@ -20,9 +20,8 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" ';
 
 global $xmlsf;
-$post_type = get_query_var('post_type');
 
-foreach ( $xmlsf->do_tags($post_type) as $tag => $setting )
+foreach ( $xmlsf->do_tags( get_query_var('post_type') ) as $tag => $setting )
 	$$tag = $setting;
 
 echo !empty($image) ? '
@@ -37,9 +36,6 @@ echo !empty($image) ? '
 echo '">
 ';
 
-// any ID's we need to exclude?
-$excluded = $xmlsf->get_excluded($post_type);
-
 // set empty sitemap flag
 $have_posts = false;
 
@@ -48,11 +44,9 @@ if ( have_posts() ) :
     while ( have_posts() ) :
 	the_post();
 
-	// check if page is in the exclusion list (like front page)
+	// check if page is in the exclusion list (like front page or post meta)
 	// or if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
-	// or if post meta says "exclude me please"
-	$exclude = get_post_meta( $post->ID, '_xmlsf_exclude', true );
-	if ( !empty($exclude) || !$xmlsf->is_allowed_domain(get_permalink()) || in_array($post->ID, $excluded) )
+	if ( $xmlsf->is_excluded($post->ID) || !$xmlsf->is_allowed_domain(get_permalink()) )
 		continue;
 
 	$have_posts = true;
