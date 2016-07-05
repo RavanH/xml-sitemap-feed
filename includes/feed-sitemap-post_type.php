@@ -46,7 +46,7 @@ if ( have_posts() ) :
 
 	// check if page is in the exclusion list (like front page or post meta)
 	// or if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
-	if ( $xmlsf->is_excluded($post->ID)) || !$xmlsf->is_allowed_domain(get_permalink()) )
+	if ( $xmlsf->is_excluded($post->ID) || !$xmlsf->is_allowed_domain(get_permalink()) )
 		continue;
 
 	$have_posts = true;
