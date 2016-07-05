@@ -377,9 +377,8 @@ class XMLSitemapFeed {
 		// Polylang compat
 		if ( function_exists('pll_get_post_translations') ) {
 			$translations = pll_get_post_translations($post_id);
-			if ( is_array($translations) )
-				foreach ( $translations as $slug => $id )
-					$translation_ids[] = $id;
+			foreach ( $translations as $slug => $id )
+				if ( $post_id != $id ) $translation_ids[] = $id;
 		}
 		// WPML compat
 		global $sitepress;
@@ -398,10 +397,9 @@ class XMLSitemapFeed {
 		if ( null === $this->blogpages ) :
 			$blogpages = array();
 			if ( 'page' == get_option('show_on_front') ) {
-				$blogpage = get_option('page_for_posts');
+				$blogpage = (int)get_option('page_for_posts');
 				if ( !empty($blogpage) ) {
-					$blogpages[] = $blogpage;
-					$blogpages += $this->get_translations($blogpage);
+					$blogpages = array_merge( (array)$blogpage, $this->get_translations($blogpage) );
 				}
 			}
 			$this->blogpages = $blogpages;
@@ -415,9 +413,8 @@ class XMLSitemapFeed {
 		if ( null === $this->frontpages ) :
 			$frontpages = array();
 			if ( 'page' == get_option('show_on_front') ) {
-				$frontpage = get_option('page_on_front');
-				$frontpages[] = $frontpage;
-				$frontpages += $this->get_translations($frontpage);
+				$frontpage = (int)get_option('page_on_front');
+				$frontpages = array_merge( (array)$frontpage, $this->get_translations($frontpage) );
 			}
 			$this->frontpages = $frontpages;
 		endif;
@@ -865,7 +862,19 @@ class XMLSitemapFeed {
 			$request['cache_results'] = false;
 			$request['update_post_term_cache'] = false;
 			$request['update_post_meta_cache'] = false;
-			$request['lang'] = ''; // Polylang
+
+			// Polylang compat
+			$request['lang'] = '';
+			// WPML compat
+			global $wpml_query_filter,$wpml_url_filters;
+			if ( isset($wpml_query_filter) && isset($wpml_url_filters) && is_object($wpml_query_filter) && is_object($wpml_url_filters) ) {
+				remove_filter( 'posts_join', array( $wpml_query_filter, 'posts_join_filter' ) );
+				remove_filter( 'posts_where', array( $wpml_query_filter, 'posts_where_filter' ) );
+				remove_filter( 'post_link', array( $wpml_url_filters, 'permalink_filter' ), 1 );
+				remove_filter( 'post_type_link', array( $wpml_url_filters, 'permalink_filter' ), 1 );
+				remove_filter( 'page_link', array( $wpml_url_filters, 'permalink_filter_root' ), 1 );
+				remove_filter( 'page_link', array( $wpml_url_filters, 'permalink_filter' ), 1 );
+			}
 
 			if ( $request['feed'] == 'sitemap-news' ) {
 				$defaults = $this->defaults('news_tags');
@@ -884,12 +893,6 @@ class XMLSitemapFeed {
 					add_filter('posts_where', array($this, 'filter_news_where'), 10, 1);
 				} else {
 					add_filter('post_limits', array($this, 'filter_no_news_limits'));
-				}
-
-				global $wpml_query_filter; // WPML compat
-				if ( isset($wpml_query_filter) && is_object($wpml_query_filter) ) {
-					remove_filter( 'posts_join', array( $wpml_query_filter, 'posts_join_filter' ) );
-					remove_filter( 'posts_where', array( $wpml_query_filter, 'posts_where_filter' ) );
 				}
 
 				// post type
@@ -911,12 +914,6 @@ class XMLSitemapFeed {
 						$request['post_type'] = $post_type['name'];
 						$request['orderby'] = 'modified';
 
-						global $wpml_query_filter; // WPML compat
-						if ( isset($wpml_query_filter) && is_object($wpml_query_filter) ) {
-							remove_filter('posts_join', array($wpml_query_filter, 'posts_join_filter'));
-							remove_filter('posts_where', array($wpml_query_filter, 'posts_where_filter'));
-						}
-
 						return $request;
 					}
 				}
@@ -929,11 +926,13 @@ class XMLSitemapFeed {
 						$request['taxonomy'] = $taxonomy;
 
 						// WPML compat
-						global $sitepress;
-						if ( isset($sitepress) && is_object($sitepress) ) {
-							remove_filter('get_terms_args', array($sitepress, 'get_terms_args_filter'));
-							remove_filter('get_term', array($sitepress,'get_term_adjust_id'));
-							remove_filter('terms_clauses', array($sitepress,'terms_clauses'));
+						global $sitepress,$wpml_url_converter;
+						if ( isset($sitepress) && isset($wpml_url_converter) && is_object($sitepress) && is_object($wpml_url_converter) ) {
+							remove_filter( 'get_terms_args', array($sitepress, 'get_terms_args_filter') );
+							remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
+							remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
+							remove_filter( 'category_link', array($sitepress, 'category_link_adjust_id'), 1 );
+							remove_filter( 'term_link', array($wpml_url_converter, 'tax_permalink_filter'), 1 );
 						}
 
 						return $request;
