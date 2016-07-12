@@ -849,6 +849,17 @@ class XMLSitemapFeed {
 		$wp_rewrite->rules = $xmlsf_rules + $wp_rewrite->rules;
 	}
 
+	public function wpml_language_switcher() {
+		// WPML: switch language
+		// @see https://wpml.org/wpml-hook/wpml_post_language_details/
+		global $sitepress,$post;
+        if( isset($sitepress) ) {
+            $post_language = apply_filters( 'wpml_post_language_details', NULL, $post->ID );
+            $sitepress->switch_lang($post_language['language_code']);
+        }
+
+	}
+
 	/**
 	* REQUEST FILTER
 	*/
@@ -866,14 +877,11 @@ class XMLSitemapFeed {
 			// Polylang compat
 			$request['lang'] = '';
 			// WPML compat
-			global $wpml_query_filter,$wpml_url_filters;
-			if ( isset($wpml_query_filter) && isset($wpml_url_filters) && is_object($wpml_query_filter) && is_object($wpml_url_filters) ) {
+			global $wpml_query_filter;
+			if ( isset($wpml_query_filter) && is_object($wpml_query_filter) ) {
 				remove_filter( 'posts_join', array( $wpml_query_filter, 'posts_join_filter' ) );
 				remove_filter( 'posts_where', array( $wpml_query_filter, 'posts_where_filter' ) );
-				remove_filter( 'post_link', array( $wpml_url_filters, 'permalink_filter' ), 1 );
-				remove_filter( 'post_type_link', array( $wpml_url_filters, 'permalink_filter' ), 1 );
-				remove_filter( 'page_link', array( $wpml_url_filters, 'permalink_filter_root' ), 1 );
-				remove_filter( 'page_link', array( $wpml_url_filters, 'permalink_filter' ), 1 );
+				add_action( 'the_post', array( $this, 'wpml_language_switcher' ) );
 			}
 
 			if ( $request['feed'] == 'sitemap-news' ) {
@@ -926,13 +934,12 @@ class XMLSitemapFeed {
 						$request['taxonomy'] = $taxonomy;
 
 						// WPML compat
-						global $sitepress,$wpml_url_converter;
-						if ( isset($sitepress) && isset($wpml_url_converter) && is_object($sitepress) && is_object($wpml_url_converter) ) {
+						global $sitepress;
+						if ( isset($sitepress) && is_object($sitepress) ) {
 							remove_filter( 'get_terms_args', array($sitepress, 'get_terms_args_filter') );
 							remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
 							remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
-							remove_filter( 'category_link', array($sitepress, 'category_link_adjust_id'), 1 );
-							remove_filter( 'term_link', array($wpml_url_converter, 'tax_permalink_filter'), 1 );
+							$sitepress->switch_lang('all');
 						}
 
 						return $request;
