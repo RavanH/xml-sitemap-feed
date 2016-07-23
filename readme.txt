@@ -3,8 +3,8 @@ Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, , Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 3.2
-Tested up to: 4.5
-Stable tag: 4.7.4
+Tested up to: 4.6
+Stable tag: 4.7.5
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -298,6 +298,9 @@ Thanks for sharing your translation :)
 WPML compatibility bug fix.
 
 == Changelog ==
+
+= 4.7.5 =
+* FIX: Variable variable php 7 compat
 
 = 4.7.4 =
 * Another WPML compat issue fixed, special thanks to hermes3por3
