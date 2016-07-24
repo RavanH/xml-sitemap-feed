@@ -431,6 +431,46 @@ class XMLSitemapFeed {
 	* TEMPLATE FUNCTIONS
 	*/
 
+	public function headers( $style = '' )
+	{
+		// maybe output buffering is on, then just make sure we start with a clean buffer
+		if ( ob_get_level() ) ob_clean();
+
+		// check if headers are already sent (bad) and set up a warning in admin (how?)
+		if ( !headers_sent($filename, $linenum) ) {
+			status_header('200'); // force header('HTTP/1.1 200 OK') for sites without posts
+			header('Content-Type: text/xml; charset=' . get_bloginfo('charset'), true);
+			header('X-Robots-Tag: noindex, follow', true);
+			$output = '';
+		} else {
+			// output warning in sitemap for now, TODO admin message
+			$output = "<!-- WARNING: Headers already sent by $filename on line $linenum. Please fix! -->\n";
+		}
+
+		// which style sheet
+		switch ($style) {
+			case 'index':
+				$style_sheet = plugins_url('xsl/sitemap-index.xsl',__FILE__);
+				break;
+			case 'news':
+				$style_sheet = plugins_url('xsl/sitemap-news.xsl',__FILE__);
+				break;
+			default:
+				$style_sheet = plugins_url('xsl/sitemap.xsl',__FILE__);
+				break;
+		}
+
+		$output .= '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>'.PHP_EOL;
+		$output .= '<?xml-stylesheet type="text/xsl" href="' . $style_sheet . '?ver=' . XMLSF_VERSION .'"?>'.PHP_EOL;
+		$output .= '<!-- generated-on="'.date('Y-m-d\TH:i:s+00:00').'" -->'.PHP_EOL;
+		$output .= '<!-- generator="XML & Google News Sitemap Feed plugin for WordPress" -->'.PHP_EOL;
+		$output .= '<!-- generator-url="http://status301.net/wordpress-plugins/xml-sitemap-feed/" -->'.PHP_EOL;
+		$output .= '<!-- generator-version="'.XMLSF_VERSION.'" -->'.PHP_EOL;
+
+		// return output
+		return $output;
+	}
+
 	public function modified( $sitemap = 'post_type', $term = '' )
 	{
 		if ('post_type' == $sitemap) :
@@ -809,7 +849,7 @@ class XMLSitemapFeed {
 		if (pathinfo($request, PATHINFO_EXTENSION)) {
 			return untrailingslashit($request);
 		}
-		return $request; // trailingslashit($request);
+		return $request;
 	}
 
 	/**
@@ -1405,14 +1445,14 @@ class XMLSitemapFeed {
 		// REQUEST main filtering function
 		add_filter('request', array($this, 'filter_request'), 1 );
 
-		// TEXT DOMAIN, UPGRADE PROCESS ...
+		// TEXT DOMAIN...
 		add_action('plugins_loaded', array($this,'plugins_loaded'), 11 );
 
 		// REWRITES
 		add_action('generate_rewrite_rules', array($this, 'rewrite_rules') );
 		add_filter('user_trailingslashit', array($this, 'trailingslash') );
 
-		// TAXONOMY
+		// TAXONOMIES, ACTIONS, UPGRADE...
 		add_action('init', array($this,'init'), 0 );
 
 		// REGISTER SETTINGS, SETTINGS FIELDS...
