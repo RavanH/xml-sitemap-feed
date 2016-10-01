@@ -64,6 +64,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 - **Italian** * Raffaello Tesi http://www.raffaellotesi.com  (version 4.3.2)
 - **Japanese** * gblsm https://profiles.wordpress.org/gblsm/ (version 4.6)
 - **Serbian** * WPdiscounts http://wpdiscounts.com/ (version 4.1)
+- **Simplified Chinese** - 漠伦 https://molun.net (version 4.7.4)
 - **Spanish** * Andrew Kurtis - WebHostingHub Support http://www.webhostinghub.com/ (version 4.3.2)
 - **Ukrainian** * Cmd Software http://www.cmd-soft.com/ (version 4.0)
 
