@@ -1158,13 +1158,33 @@ class XMLSitemapFeed {
 		}
 	}
 
-	function cache_flush( $new_status, $old_status )
+	function cache_flush( $new_status, $old_status, $post )
 	{
 		// are we moving the post in or out of published status?
 		if ( $new_status == 'publish' || $old_status == 'publish' ) {
 			// Use cache_delete to remove single key instead of complete cache_flush. Thanks Jeremy Clarke!
 			wp_cache_delete('xmlsf_get_archives', 'general');
+
+			// we cannot delete by cache-group 'timeinfo', therefore we have to re-calculate the cache-key
+			wp_cache_delete($this->get_time_key($post), 'timeinfo');
 		}
+	}
+
+	/**
+	 * This method mimics triggers the cache-key calculation used within _get_time().
+	 * The passed parameters mimic the behavior of get_lastmodified.
+	 *
+	 * @param \WP_Post $post
+	 * @return string
+	 */
+	private function get_time_key($post)
+	{
+		$timezone = 'gmt';
+		$which = 'last';
+		$field = 'modified';
+		$m = 0;
+
+		return _get_time_key($timezone, $field, $post->post_type, $which, $m);
 	}
 
 	public function nginx_helper_purge_urls( $urls = array(), $redis = false )
@@ -1466,7 +1486,7 @@ class XMLSitemapFeed {
 		add_action('transition_post_status', array($this, 'do_pings'), 10, 3);
 
 		// CLEAR OBJECT CACHE
-		add_action('transition_post_status', array($this, 'cache_flush'), 99, 2);
+		add_action('transition_post_status', array($this, 'cache_flush'), 99, 3);
 
 		// NGINX HELPER PURGE URLS
 		add_filter('rt_nginx_helper_purge_urls', array($this, 'nginx_helper_purge_urls'), 10, 2);

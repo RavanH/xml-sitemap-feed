@@ -90,7 +90,7 @@ if( !function_exists('_get_time') ) {
 	
 	$order = ( $which == 'last' ) ? 'DESC' : 'ASC';
 
-	$key = ( $post_type == 'any' ) ? "{$which}post{$field}{$m}:$timezone" : "{$which}posttype{$post_type}{$field}{$m}:$timezone";
+	$key = _get_time_key( $timezone, $field, $post_type, $which, $m );
 
 	$date = wp_cache_get( $key, 'timeinfo' );
 
@@ -141,5 +141,17 @@ if( !function_exists('_get_time') ) {
 	}
 
 	return $date;
+ }
+}
+
+if( !function_exists('_get_time_key') ) {
+ function _get_time_key( $timezone, $field, $post_type = 'any', $which = 'last', $m = 0 ) {
+	$timezone = strtolower( $timezone );
+
+	if ( $post_type == 'any' ) {
+		return "{$which}post{$field}{$m}:$timezone";
+	}
+
+	return "{$which}posttype{$post_type}{$field}{$m}:$timezone";
  }
 }
