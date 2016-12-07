@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravan
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, , Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 3.2
 Tested up to: 4.7
-Stable tag: 4.7.4
+Stable tag: 4.7.5
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -295,12 +295,14 @@ Thanks for sharing your translation :)
 
 == Upgrade Notice ==
 
-= 4.7.4 =
-WPML compatibility bug fix.
+= 4.7.5 =
+PHP7 compatibility, cache flush fix contributed by @e2robert, headers already sent detection.
 
 == Changelog ==
 
 = 4.7.5 =
+* FIX: On cache_flush purge also the respective time_key cache entry,
+props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-in-outdated-last-modified-values-on-index-sitemap/
 * FIX: Variable variable php 7 compat
 * Detect if headers are already sent and print warning in source
 

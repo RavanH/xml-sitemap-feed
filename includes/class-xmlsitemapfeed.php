@@ -1174,6 +1174,8 @@ class XMLSitemapFeed {
 	 * This method mimics triggers the cache-key calculation used within _get_time().
 	 * The passed parameters mimic the behavior of get_lastmodified.
 	 *
+	 * Contributed by https://github.com/shaula https://wordpress.org/support/users/e2robert/
+	 *
 	 * @param \WP_Post $post
 	 * @return string
 	 */

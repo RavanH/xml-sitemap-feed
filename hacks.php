@@ -37,17 +37,16 @@ if( !function_exists('get_firstdate') ) {
  */
 if( !function_exists('get_lastdate') ) {
  function get_lastdate($timezone = 'server', $post_types = 'any', $m = false) {
+  if (!is_array($post_types))
+    $post_types = array($post_types);
 
- 	if (!is_array($post_types))
- 		$post_types = array($post_types);
- 	
- 	$lastmodified = array();
-	foreach ($post_types as $post_type)
-		$lastmodified[] = _get_time( $timezone, 'date', $post_type, 'last', $m );
+  $lastmodified = array();
+  foreach ($post_types as $post_type)
+    $lastmodified[] = _get_time( $timezone, 'date', $post_type, 'last', $m );
 
-	sort($lastmodified);
-	$lastmodified = array_filter($lastmodified);	
-	return apply_filters( 'get_lastdate', end($lastmodified), $timezone );
+  sort($lastmodified);
+  $lastmodified = array_filter($lastmodified);
+  return apply_filters( 'get_lastdate', end($lastmodified), $timezone );
  }
 }
 
@@ -87,7 +86,7 @@ if( !function_exists('_get_time') ) {
 		return false;
 
 	$timezone = strtolower( $timezone );
-	
+
 	$order = ( $which == 'last' ) ? 'DESC' : 'ASC';
 
 	$key = _get_time_key( $timezone, $field, $post_type, $which, $m );
@@ -114,8 +113,8 @@ if( !function_exists('_get_time') ) {
 			$post_types = "'" . addslashes($post_type) . "'";
 		}
 
-                $where = "$wpdb->posts.post_status='publish' AND $wpdb->posts.post_type IN ({$post_types}) AND $wpdb->posts.post_date_gmt ";
-                // If a month is specified in the querystring, load that month
+    $where = "$wpdb->posts.post_status='publish' AND $wpdb->posts.post_type IN ({$post_types}) AND $wpdb->posts.post_date_gmt ";
+    // If a month is specified in the querystring, load that month
 		$m = preg_replace('|[^0-9]|', '', $m);
 		if ( !empty($m) ) {
 			$where .= " AND YEAR($wpdb->posts.post_date)=" . substr($m, 0, 4);
@@ -144,6 +143,17 @@ if( !function_exists('_get_time') ) {
  }
 }
 
+/**
+ * Build transient key based on input parameters.
+ * Contributed by https://github.com/shaula https://wordpress.org/support/users/e2robert/
+ *
+ * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
+ * @param string $field Field to check. Can be 'date' or 'modified'.
+ * @param string $post_type Post type to check. Defaults to 'any'.
+ * @param string $which Which to check. Can be 'first' or 'last'. Defaults to 'last'.
+ * @param string $m month to check.
+ * @return string.
+ */
 if( !function_exists('_get_time_key') ) {
  function _get_time_key( $timezone, $field, $post_type = 'any', $which = 'last', $m = 0 ) {
 	$timezone = strtolower( $timezone );
