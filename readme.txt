@@ -300,6 +300,9 @@ PHP7 compatibility, cache flush fix contributed by @e2robert, headers already se
 
 == Changelog ==
 
+= 4.7.6 =
+* FIX Open_BaseDir issue on IIS server
+
 = 4.7.5 =
 * FIX: On cache_flush purge also the respective time_key cache entry,
 props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-in-outdated-last-modified-values-on-index-sitemap/
