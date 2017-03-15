@@ -1321,7 +1321,7 @@ class XMLSitemapFeed {
 	{
 		// TEXT DOMAIN
 		if ( is_admin() ) { // text domain needed on admin only
-			load_plugin_textdomain('xml-sitemap-feed', false, dirname( dirname( __FILE__ ) ) . '/languages' );
+			load_plugin_textdomain('xml-sitemap-feed', false, dirname( XMLSF_PLUGIN_BASENAME ) . '/languages' );
 		}
 	}
 
