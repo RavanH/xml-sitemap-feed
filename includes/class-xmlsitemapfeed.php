@@ -546,6 +546,15 @@ class XMLSitemapFeed {
 		endif;
 	}
 
+	private function add_domain_if_needed($url)
+	{
+		if (stripos($url, 'http') === false)
+		{
+			$url = get_site_url().$url;
+		}
+		return $url;
+	}
+
 	public function get_images( $sitemap = '' )
 	{
 		global $post;
@@ -564,7 +573,7 @@ class XMLSitemapFeed {
 					foreach ( $attachments as $attachment ) {
 						$url = wp_get_attachment_image_src( $attachment->ID, 'full' );
 						$this->images[$post->ID][] = array(
-										'loc' => esc_attr( esc_url_raw( $url[0] ) ), // use esc_attr() to entity escape & here ?? esc_url() creates &#038; which is not what we want...
+										'loc' => esc_attr( esc_url_raw( $this->add_domain_if_needed( $url[0] ) ) ), // use esc_attr() to entity escape & here ?? esc_url() creates &#038; which is not what we want...
 										'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
 										'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
 										);
@@ -575,7 +584,7 @@ class XMLSitemapFeed {
 					$attachment = get_post(get_post_thumbnail_id( $post->ID ));
 					$url = wp_get_attachment_image_src( $attachment->ID, 'full' );
 					$this->images[$post->ID][] =  array(
-										'loc' => esc_attr( esc_url_raw( $url[0] ) ),
+										'loc' => esc_attr( esc_url_raw( $this->add_domain_if_needed( $url[0] ) ) ),
 										'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
 										'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
 										);
