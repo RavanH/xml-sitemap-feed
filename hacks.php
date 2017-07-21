@@ -37,16 +37,17 @@ if( !function_exists('get_firstdate') ) {
  */
 if( !function_exists('get_lastdate') ) {
  function get_lastdate($timezone = 'server', $post_types = 'any', $m = false) {
-  if (!is_array($post_types))
-    $post_types = array($post_types);
+	if (!is_array($post_types))
+		$post_types = array($post_types);
 
-  $lastmodified = array();
-  foreach ($post_types as $post_type)
-    $lastmodified[] = _get_time( $timezone, 'date', $post_type, 'last', $m );
+	$lastmodified = array();
+	foreach ($post_types as $post_type)
+		$lastmodified[] = _get_time( $timezone, 'date', $post_type, 'last', $m );
 
-  sort($lastmodified);
-  $lastmodified = array_filter($lastmodified);
-  return apply_filters( 'get_lastdate', end($lastmodified), $timezone );
+	sort($lastmodified);
+	$lastmodified = array_filter($lastmodified);
+
+	return apply_filters( 'get_lastdate', end($lastmodified), $timezone );
  }
 }
 
@@ -113,8 +114,8 @@ if( !function_exists('_get_time') ) {
 			$post_types = "'" . addslashes($post_type) . "'";
 		}
 
-    $where = "$wpdb->posts.post_status='publish' AND $wpdb->posts.post_type IN ({$post_types}) AND $wpdb->posts.post_date_gmt ";
-    // If a month is specified in the querystring, load that month
+    	$where = "$wpdb->posts.post_status='publish' AND $wpdb->posts.post_type IN ({$post_types}) AND $wpdb->posts.post_date_gmt ";
+    	// If a month is specified in the querystring, load that month
 		$m = preg_replace('|[^0-9]|', '', $m);
 		if ( !empty($m) ) {
 			$where .= " AND YEAR($wpdb->posts.post_date)=" . substr($m, 0, 4);
@@ -133,7 +134,6 @@ if( !function_exists('_get_time') ) {
 				$date = $wpdb->get_var("SELECT DATE_ADD(post_{$field}_gmt, INTERVAL '$add_seconds_server' SECOND) FROM $wpdb->posts WHERE $where ORDER BY $wpdb->posts.post_{$field}_gmt {$order} LIMIT 1");
 				break;
 		}
-
 
 		if ( $date )
 			wp_cache_set( $key, $date, 'timeinfo' );

@@ -3,18 +3,18 @@
  *      XMLSF Admin CLASS
  * ------------------------------ */
 
-if ( ! defined( 'WPINC' ) ) die;
-
-if ( class_exists('XMLSitemapFeed') ) :
-
 class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 
 	/**
 	* SETTINGS
 	*/
 
-	// TODO refer to support forum !
+	// TODO refer to support forum + invite plugin rating !
 
+	/**
+	 * Sitemaps
+	 * settings field
+	 */
 	public function sitemaps_settings_field() {
 		$options = parent::get_sitemaps();
 		$disabled = ('1' == get_option('blog_public')) ? false : true;
@@ -642,7 +642,7 @@ jQuery( document ).ready( function() {
 		foreach ( $gn_genres as $name) {
 			echo '
 						<option value="'.$name.'" '.selected( in_array($name,$genres_default), true, false ).'>'.$name.'</option>';
-    }
+    	}
 		echo '
 				</select></label></li>
 			</ul>
@@ -651,7 +651,7 @@ jQuery( document ).ready( function() {
 		</fieldset>';
 
 
-    // keywords
+    	// keywords
 		$keywords = !empty($options['keywords']) ? $options['keywords'] : array();
 		$keywords_from = !empty($keywords['from']) ? $keywords['from'] : '';
 		echo '
@@ -857,9 +857,8 @@ jQuery( document ).ready( function() {
 	* META BOXES
 	*/
 
-  /* Adds a XML Sitemap box to the side column */
-  public function add_meta_box ()
-  {
+	/* Adds a XML Sitemap box to the side column */
+	public function add_meta_box () {
 		foreach ( parent::get_post_types() as $post_type ) {
 			// Only include metaboxes on post types that are included
 			if (isset($post_type["active"]))
@@ -874,8 +873,7 @@ jQuery( document ).ready( function() {
 		}
 	}
 
-	public function meta_box($post)
-	{
+	public function meta_box($post) {
 		// Use nonce for verification
 		wp_nonce_field( plugin_basename( __FILE__ ), 'xmlsf_sitemap_nonce' );
 
@@ -908,9 +906,8 @@ jQuery( document ).ready( function() {
 		echo '</label></p>';
 	}
 
-  /* Adds a News Sitemap box to the side column */
-	public function add_meta_box_news ()
-	{
+	/* Adds a News Sitemap box to the side column */
+	public function add_meta_box_news () {
 		$news_tags = parent::get_option('news_tags');
 		foreach ( (array)$news_tags['post_type'] as $post_type ) {
       // Only include metabox on post types that are included
@@ -922,10 +919,9 @@ jQuery( document ).ready( function() {
 				'side'
 			);
 		}
-  }
+	}
 
-	public function meta_box_news($post)
-	{
+	public function meta_box_news($post) {
 		// Use nonce for verification
 		wp_nonce_field( plugin_basename( __FILE__ ), 'xmlsf_sitemap_nonce' );
 
@@ -955,8 +951,7 @@ jQuery( document ).ready( function() {
 	}
 
 	/* When the post is saved, save our meta data */
-	function save_metadata( $post_id )
-	{
+	function save_metadata( $post_id ) {
 		if ( !isset($post_id) )
 			$post_id = (int)$_REQUEST['post_ID'];
 
@@ -1032,8 +1027,8 @@ jQuery( document ).ready( function() {
 			add_settings_field($prefix.'news_categories', translate('Categories'), array($this,'news_categories_field'), 'reading', 'news_sitemap_section');
 			add_settings_field($prefix.'news_image', translate('Images'), array($this,'news_image_field'), 'reading', 'news_sitemap_section');
 			add_settings_field($prefix.'news_labels', __('Source labels','xml-sitemap-feed'), array($this,'news_labels_field'), 'reading', 'news_sitemap_section');
-      // post meta box
-      add_action( 'add_meta_boxes', array($this,'add_meta_box_news') );
+      		// post meta box
+      		add_action( 'add_meta_boxes', array($this,'add_meta_box_news') );
 		}
 
 		if ( isset($sitemaps['sitemap']) ) {
@@ -1059,10 +1054,10 @@ jQuery( document ).ready( function() {
 		}
 
 		if ( isset($sitemaps['sitemap']) || isset($sitemaps['sitemap-news']) ) {
-				register_setting('writing', $prefix.'ping', array($this,'sanitize_ping_settings') );
-				add_settings_field($prefix.'ping', translate('Update Services'), array($this,'ping_settings_field'), 'writing');
-        // save post meta box settings
-        add_action( 'save_post', array($this,'save_metadata') );
+			register_setting('writing', $prefix.'ping', array($this,'sanitize_ping_settings') );
+			add_settings_field($prefix.'ping', translate('Update Services'), array($this,'ping_settings_field'), 'writing');
+	        // save post meta box settings
+	        add_action( 'save_post', array($this,'save_metadata') );
 		}
 	}
 
@@ -1073,5 +1068,3 @@ jQuery( document ).ready( function() {
 * ---------------------- */
 
 $xmlsf_admin = new XMLSitemapFeed_Admin();
-
-endif;
