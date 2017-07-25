@@ -24,12 +24,6 @@ class XMLSitemapFeed {
 	private $prefix = 'xmlsf_';
 
 	/**
-	 * Timezone
-	 * @var null $timezone
-	 */
-	private $timezone = null;
-
-	/**
 	 * Default language
 	 * @var null $blog_language
 	 */
@@ -240,18 +234,6 @@ class XMLSitemapFeed {
 	}
 
 	/**
-	 * Get timezone
-	 * @return string
-	 */
-	protected function timezone() {
-		$gmt = date_default_timezone_set('UTC');
-		if ( $this->timezone === null ) {
-			$this->timezone = $gmt ? 'gmt' : 'blog';
-		}
-		return $this->timezone;
-	}
-
-	/**
 	 * Get defaults
 	 *
 	 * @param bool|false $key
@@ -369,7 +351,7 @@ class XMLSitemapFeed {
 
 	/**
 	 * Get custom sitemaps
-	 * @return mixed
+	 * @return array
 	 */
 	public function get_custom_sitemaps() {
 		$urls = $this->get_option('custom_sitemaps');
@@ -384,12 +366,12 @@ class XMLSitemapFeed {
 
 	/**
 	 * Get urls
-	 * @return mixed
+	 * @return array
 	 */
 	public function get_urls() {
 		$urls = $this->get_option('urls');
 		// make sure it's an array we are returning
-		if(!empty($urls)) {
+		if( !empty($urls) ) {
 			$return = ( !is_array($urls) ) ? explode( "\n", $urls ) : $urls;
 		} else {
 			$return = array();
@@ -460,7 +442,7 @@ class XMLSitemapFeed {
 
 	/**
 	 * Get robots
-	 * @return mixed|string
+	 * @return string
 	 */
 	public function get_robots() {
 		return ( $robots = $this->get_option('robots') ) ? $robots : '';
@@ -513,7 +495,7 @@ class XMLSitemapFeed {
 
 	/**
 	 * Get blog_pages
-	 * @return array|null
+	 * @return array
 	 */
 	private function get_blogpages() {
 		if ( null === $this->blogpages ) :
@@ -531,8 +513,8 @@ class XMLSitemapFeed {
 	}
 
 	/**
-	 * Get front_pages
-	 * @return array|null
+	 * Get front pages
+	 * @return array
 	 */
 	private function get_frontpages() {
 		if ( null === $this->frontpages ) :
@@ -1144,7 +1126,6 @@ class XMLSitemapFeed {
 				define('DONOTCACHEDB', true);
 
 				// set up query filters
-				$zone = $this->timezone();
 				if ( get_lastdate($zone, $news_post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
 					add_filter('post_limits', array($this, 'filter_news_limits'));
 					add_filter('posts_where', array($this, 'filter_news_where'), 10, 1);
@@ -1268,8 +1249,7 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function filter_news_where( $where = '' ) {
-		$_gmt = ( 'gmt' === $this->timezone() ) ? '_gmt' : '';
-		return $where . " AND post_date" . $_gmt . " > '" . date('Y-m-d H:i:s', strtotime('-48 hours')) . "'";
+		return $where . " AND post_date_gmt > '" . date('Y-m-d H:i:s', strtotime('-48 hours')) . "'";
 	}
 
 	/**
@@ -1399,12 +1379,7 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	private function get_time_key($post) {
-		$timezone = 'gmt';
-		$which = 'last';
-		$field = 'modified';
-		$m = 0;
-
-		return _get_time_key($timezone, $field, $post->post_type, $which, $m);
+		return _get_time_key('gmt', 'modified', $post->post_type, 'last', 0);
 	}
 
 	/**
