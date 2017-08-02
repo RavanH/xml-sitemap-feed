@@ -173,7 +173,7 @@ class XMLSitemapFeed {
 		$this->defaults['ping'] = array(
 					'google' => array (
 						'active' => '1',
-						'uri' => 'http://www.google.com/webmasters/tools/ping?sitemap=',
+						'uri' => 'http://www.google.com/ping?sitemap=',
 						'type' => 'GET',
 						'news' => '1'
 						),

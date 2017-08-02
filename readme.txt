@@ -348,7 +348,7 @@ props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-i
 * Set Google News access tag per post
 * Exclude posts from Google News sitemap
 * News Sitemap stylesheet text/links update
-* FIX: delete cached key as suggested by Jeremy Clarke https://wordpress.org/support/topic/please-stop-running-wp_cache_flush-whenever-posts-are-edited
+* FIX: cache_delete cached key instead of cache_flush as suggested by Jeremy Clarke https://wordpress.org/support/topic/please-stop-running-wp_cache_flush-whenever-posts-are-edited
 * NEW: Nginx Helper compatibility to purge cache sitemap URLs from FastCGI Cache or Redis
 
 = 4.4.1 =
