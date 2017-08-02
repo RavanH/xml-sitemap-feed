@@ -56,19 +56,12 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Option to add new robots.txt rules. These can be used to further control (read: limit) the indexation of various parts of your site and subsequent spread of pagerank accross your sites pages.
 * Includes XLS stylesheets for human readable sitemaps.
 
-= Translations =
+= Contribute =
 
-- **Dutch** * R.A. van Hagen http://status301.net (version 4.4)
-- **French** * R.A. van Hagen http://status301.net (version 4.2) (improved translation or suggestions needed!)
-- **Indonesian** * Nasrulhaq Muiz http://al-badar.net/ (version 4.2)
-- **Italian** * Raffaello Tesi http://www.raffaellotesi.com  (version 4.3.2)
-- **Japanese** * gblsm https://profiles.wordpress.org/gblsm/ (version 4.6)
-- **Serbian** * WPdiscounts http://wpdiscounts.com/ (version 4.1)
-- **Simplified Chinese** - 漠伦 https://molun.net (version 4.7.4)
-- **Spanish** * Andrew Kurtis - WebHostingHub Support http://www.webhostinghub.com/ (version 4.3.2)
-- **Ukrainian** * Cmd Software http://www.cmd-soft.com/ (version 4.0)
+If you're happy with this plugin as it is, please consider writing a quick [rating](https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/#new-post) or helping other users out on the [support forum](https://wordpress.org/support/plugin/easy-fancybox).
 
-New transtations will be accepted and listed here. See translation instructions under [Other Notes](http://wordpress.org/plugins/xml-sitemap-feed/other_notes/).
+If you wish to help build this plugin, you're very welcome to [translate Easy FancyBox into your language](https://translate.wordpress.org/projects/wp-plugins/xml-sitemap-feed/) or contribute code on [Github](https://github.com/RavanH/xml-sitemap-feed/).
+
 
 = Credits =
 
@@ -268,23 +261,6 @@ Read more on [Increasing memory allocated to PHP](http://codex.wordpress.org/Edi
 = Can I run this on a WPMU / WP3+ Multi-Site setup? =
 
 Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both with normal activation and with Network Activate / Site Wide Activate.
-
-
-== Translation ==
-
-1. Install PoEdit on your computer.
-1. Go to this plugins /languages/ directory.
-1. If there is no .po file that corresponds with your language yet, rename the template translation database xml-sitemap-feed-xx_XX.po by replacing the xx with your language code and XX with your country code.
-1. Open the .po file of your language with PoEdit.
-1. Go to Edit > Preferences and on the tab Editor check the option to compile a .mo database on save automatically. Close with OK.
-1. Go to Catalog > Settings and set your name, e-mail address, language and country. Close with OK.
-1. Go to Catalog > Update from POT-file and select the main xml-sitemap-feed.pot file. Then accept all new and removed translation strings with OK.
-1. Now go ahead and start translating all the texts listed in PoEdit.
-1. When done, go to File > Save to Save.
-1. Upload the automatically created xml-sitemap-feed-xx_XX.mo database file (where xx_XX should now be your language and country code) to the plugins /languages/ directory on your WordPress site.
-1. After verifying the translations work on your site, send the .mo file and, if you're willing to share it, your original .po file to ravanhagen@gmail.com and don't forget to tell me how and with what link you would like to be mentioned in the credits!
-
-Thanks for sharing your translation :)
 
 
 == Screenshots ==

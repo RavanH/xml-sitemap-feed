@@ -596,15 +596,14 @@ class XMLSitemapFeed {
 	 *
 	 * @return string
 	 */
-	public function modified( $sitemap = 'post_type', $term = '' )
-	{
+	public function modified( $sitemap = 'post_type', $term = '' ) {
 		if ('post_type' == $sitemap) :
 
 			global $post;
 
 			// if blog page then look for last post date
 			if ( $post->post_type == 'page' && $this->is_home($post->ID) )
-				return get_lastmodified('GMT','post');
+				return get_lastpostmodified('gmt'); // TODO limit to sitemap included post types...
 
 			if ( empty($this->postmodified[$post->ID]) ) {
 				$postmodified = get_post_modified_time( 'Y-m-d H:i:s', true, $post->ID );
@@ -656,12 +655,17 @@ class XMLSitemapFeed {
 				return $this->termmodified[$term->term_id];
 			} else {
 				$obj = get_taxonomy($term);
-				return get_lastdate( 'gmt', $obj->object_type );
-				// uses get_lastdate() function defined in xml-sitemap/hacks.php !
-				// which is a shortcut: returns last post date, not last modified date...
-				// TODO find the long way home: take tax type, get all terms,
-				// do tax_query with all terms for one post and get its lastmod date
-				// ... or can 'terms' in tax_query be empty?
+
+				$lastmodified = array();
+				foreach ( (array)$obj->object_type as $object_type ) {
+					$lastmodified[] = get_lastpostdate( 'gmt', $object_type );
+					// returns last post date, not last modified date... (TODO consider making this an opion)
+				}
+
+				sort($lastmodified);
+				$lastmodified = array_filter($lastmodified);
+
+				return end($lastmodified);
 			}
 
 		else :
@@ -725,7 +729,7 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function get_lastmod( $sitemap = 'post_type', $term = '' ) {
-		$return = trim(mysql2date('Y-m-d\TH:i:s+00:00', $this->modified($sitemap,$term), false));
+		$return = trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $this->modified( $sitemap, $term ), false ) );
 		return !empty($return) ? "\t<lastmod>".$return."</lastmod>\r\n\t" : '';
 	}
 
@@ -784,13 +788,12 @@ class XMLSitemapFeed {
 				$post_modified = mysql2date('U',$post->post_modified_gmt, false);
 
 				if ( empty($this->lastmodified) )
-					$this->lastmodified = mysql2date('U',get_lastmodified('GMT',$post->post_type),false);
+					$this->lastmodified = mysql2date('U',get_lastpostmodified('gmt',$post->post_type),false);
 					// last posts or page modified date in Unix seconds
-					// uses get_lastmodified() function defined in xml-sitemap/hacks.php !
 
 				if ( empty($this->firstdate) )
-					$this->firstdate = mysql2date('U',get_firstdate('GMT',$post->post_type),false);
-					// uses get_firstdate() function defined in xml-sitemap/hacks.php !
+					$this->firstdate = mysql2date('U',get_firstpostdate('gmt',$post->post_type),false);
+					// uses get_firstpostdate() function defined in xml-sitemap/hacks.php !
 
 				if ( isset($options[$post->post_type]['priority']) )
 					$priority_value = floatval(str_replace(",",".",$options[$post->post_type]['priority']));
@@ -1126,7 +1129,7 @@ class XMLSitemapFeed {
 				define('DONOTCACHEDB', true);
 
 				// set up query filters
-				if ( get_lastdate($zone, $news_post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
+				if ( get_lastpostdate('gmt', $news_post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
 					add_filter('post_limits', array($this, 'filter_news_limits'));
 					add_filter('posts_where', array($this, 'filter_news_where'), 10, 1);
 				} else {
@@ -1367,22 +1370,6 @@ class XMLSitemapFeed {
 	}
 
 	/**
-	 * Get time key
-	 * Used by cache_flush
-	 *
-	 * This method mimics the cache-key calculation used within _get_time().
-	 * The passed parameters mimic the behavior of get_lastmodified.
-	 *
-	 * Contributed by https://github.com/shaula https://wordpress.org/support/users/e2robert/
-	 *
-	 * @param \WP_Post $post
-	 * @return string
-	 */
-	private function get_time_key($post) {
-		return _get_time_key('gmt', 'modified', $post->post_type, 'last', 0);
-	}
-
-	/**
 	* CLEARING & PURGING
 	*/
 
@@ -1401,21 +1388,33 @@ class XMLSitemapFeed {
 	}
 
 	/**
-	 * Cache flush
+	 * Cache delete on clean_post_cache
 	 *
-	 * @param $new_status
-	 * @param $old_status
+	 * @param $post_ID
 	 * @param $post
 	 */
-	public function cache_flush( $new_status, $old_status, $post ) {
+	public function clean_post_cache( $post_ID, $post ) {
 		// are we moving the post in or out of published status?
-		if ( $new_status == 'publish' || $old_status == 'publish' ) {
-			// Use cache_delete to remove single key instead of complete cache_flush. Thanks Jeremy Clarke!
-			wp_cache_delete('xmlsf_get_archives', 'general');
+		wp_cache_delete('xmlsf_get_archives', 'general');
 
-			// we cannot delete by cache-group 'timeinfo', therefore we have to re-calculate the cache-key
-			wp_cache_delete($this->get_time_key($post), 'timeinfo');
-		}
+		// TODO get year / month here to delete specific keys too !!!!
+		$m = mysql2date('Ym',$post->post_date_gmt, false);
+		$y = substr($m, 0, 4);
+
+		// clear possible last post modified cache keys
+		wp_cache_delete( "lastpostmodified:gmt", 'timeinfo' ); // should be handled by WP core?
+		wp_cache_delete( "lastpostmodified{$y}:gmt", 'timeinfo' );
+		wp_cache_delete( "lastpostmodified{$m}:gmt", 'timeinfo' );
+		wp_cache_delete( "lastpostmodified{$y}:gmt:{$post->post_type}", 'timeinfo' );
+		wp_cache_delete( "lastpostmodified{$m}:gmt:{$post->post_type}", 'timeinfo' );
+
+		// clear possible last post date cache keys
+		wp_cache_delete( "lastpostdate:gmt", 'timeinfo' );
+		wp_cache_delete( "lastpostdate:gmt:{$post->post_type}", 'timeinfo' );
+
+		// clear possible fist post date cache keys
+		wp_cache_delete( "firstpostdate:gmt", 'timeinfo' );
+		wp_cache_delete( "firstpostdate:gmt:{$post->post_type}", 'timeinfo' );
 	}
 
 	/**
@@ -1743,8 +1742,8 @@ class XMLSitemapFeed {
 		// PINGING
 		add_action('transition_post_status', array($this, 'do_pings'), 10, 3);
 
-		// CLEAR OBJECT CACHE
-		add_action('transition_post_status', array($this, 'cache_flush'), 99, 3);
+		// CLEAR OBJECT CACHE KEYS
+		add_action('clean_post_cache', array($this, 'clean_post_cache'), 99, 2);
 
 		// NGINX HELPER PURGE URLS
 		add_filter('rt_nginx_helper_purge_urls', array($this, 'nginx_helper_purge_urls'), 10, 2);

@@ -18,7 +18,7 @@ echo $xmlsf->headers('index');
 		http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
 	<sitemap>
 		<loc><?php echo $xmlsf->get_index_url('home'); ?></loc>
-		<lastmod><?php echo mysql2date('Y-m-d\TH:i:s+00:00', get_lastdate( 'gmt' ), false); ?></lastmod>
+		<lastmod><?php echo mysql2date('Y-m-d\TH:i:s+00:00', get_lastpostdate( 'gmt' ), false); ?></lastmod>
 	</sitemap>
 <?php
 // add rules for public post types

@@ -18,7 +18,7 @@ echo $xmlsf->headers();
 		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 <?php
 
-$lastmodified = get_lastdate( 'gmt' ); // TODO take language into account !! Dont't use get_lastdate but pull one post for each language instead?
+$lastmodified = get_lastpostdate( 'gmt' ); // TODO take language into account !! Dont't use get_lastpostdate but pull one post for each language instead?
 $lastactivityage = ( gmdate('U') - mysql2date( 'U', $lastmodified ) );
 foreach ( $xmlsf->get_home_urls() as $url ) {
 ?>
