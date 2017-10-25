@@ -271,10 +271,17 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 4.7.5 =
-PHP7 compatibility, cache flush fix contributed by @e2robert, headers already sent detection.
+= 4.8 =
+... and several bug fixes.
 
 == Changelog ==
+
+= 4.8 =
+* code cleanup and annotation
+* new google ping URL
+* revisit get first/last date/modified functions and cache key set/delete
+* FIX: cache key missing timezone
+* FIX: wp_rewrite init before flush_rules
 
 = 4.7.6 =
 * FIX Open_BaseDir issue on IIS server

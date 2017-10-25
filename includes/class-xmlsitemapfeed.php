@@ -878,7 +878,7 @@ class XMLSitemapFeed {
 	 *
 	 * @param null $post_id
 	 *
-	 * @return bool|mixed|void
+	 * @return bool
 	 */
 	public function is_excluded( $post_id = null ) {
 		// no ID, try and get it from global post object
@@ -1654,7 +1654,7 @@ class XMLSitemapFeed {
 			return; // yes, mother!
 
 		global $wp_rewrite;
-		// don't need hard flush by default
+		$wp_rewrite->init();
 		$wp_rewrite->flush_rules($hard);
 
 		if ( defined('WP_DEBUG') && WP_DEBUG )

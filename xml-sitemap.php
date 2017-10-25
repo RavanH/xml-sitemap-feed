@@ -9,7 +9,7 @@ Author: RavanH
 Author URI: http://status301.net/
 */
 
-/*  Copyright 2016 RavanH
+/*  Copyright 2017 RavanH
     http://status301.net/
     mailto: ravanhagen@gmail.com
 
