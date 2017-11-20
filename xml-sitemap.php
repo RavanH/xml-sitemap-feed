@@ -28,20 +28,26 @@ Author URI: http://status301.net/
  * --------------------
  *
  * FILTERS
- * 		xmlsf_defaults				-> Filters the default array values for different option groups.
- * 		xmlsf_allowed_domain	-> Filters the response when checking the url against allowed domains.
- *					Passes variable $url; must return true or false.
- * 		xmlsf_excluded				-> Filters the response when checking the post for exclusion flags.
- *					Passes variable $post_id; must return true or false.
- * 		the_title_xmlsitemap	-> Filters the Google News publication name, title and keywords
- *					plus the Image title and caption tags
- * 		xmlsf_custom_urls			-> Filters the custom urls array
- * 		xmlsf_custom_sitemaps	-> Filters the custom sitemaps array
+ *  xmlsf_defaults        -> Filters the default array values for different option groups.
+ * 	xmlsf_allowed_domain  -> Filters the response when checking the url against allowed domains.
+ *                           Passes variable $url; must return true or false.
+ *  xmlsf_excluded        -> Filters the response when checking the post for exclusion flags.
+ *                           Passes variable $post_id; must return true or false.
+ *  the_title_xmlsitemap  -> Filters the Google News publication name, title and keywords
+ *                           plus the Image title and caption tags
+ *  xmlsf_custom_urls     -> Filters the custom urls array
+ *  xmlsf_custom_sitemaps -> Filters the custom sitemaps array
  *
  * ACTIONS
- * 		xmlsf_news_tags_after	-> Fired inside the Google News Sitemap loop at the end of the news
- * 					tags, just before each closing </news:news> is generated. Can be used to
- * 					echo custom tags or trigger another action in the background.
+ *  xmlsf_news_tags_after -> Fired inside the Google News Sitemap loop at the end of the news
+ *                           tags, just before each closing </news:news> is generated. Can be used to
+ *                           echo custom tags or trigger another action in the background.
+ *
+ * --------------------
+ *  AVAILABLE FUNCTIONS
+ * --------------------
+ *  is_sitemap() -> conditional, returns bolean, true if the request is for an xml sitemap
+ *  is_news()    -> conditional, returns bolean, true if the request is for an xml news sitemap
  *
  * Feel free to request, suggest or submit more :)
  */
@@ -52,7 +58,7 @@ if ( ! defined( 'WPINC' ) ) die;
  *      CONSTANTS
  * -------------------- */
 
-	define('XMLSF_VERSION', '4.7.5');
+	define('XMLSF_VERSION', '4.8');
 
 	define('XMLSF_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
@@ -103,7 +109,7 @@ $xmlsf_dir = dirname(__FILE__);
 if ( file_exists ( $xmlsf_dir.'/xml-sitemap-feed' ) )
 	$xmlsf_dir .= '/xml-sitemap-feed';
 
-include_once( $xmlsf_dir.'/hacks.php' );
+include_once( $xmlsf_dir.'/includes/functions.php' );
 include_once( $xmlsf_dir.'/includes/class-xmlsitemapfeed.php' );
 
 /* ----------------------

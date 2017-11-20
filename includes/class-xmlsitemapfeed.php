@@ -18,6 +18,18 @@ class XMLSitemapFeed {
 	public $extension = 'xml';
 
 	/**
+	* Signifies whether the current query is for a sitemap feed.
+	* @var bool
+	*/
+	public $is_sitemap = false;
+
+	/**
+	* Signifies whether the current query is for a news feed.
+	* @var bool
+	*/
+	public $is_news = false;
+
+	/**
 	* Database options prefix
 	* @var string
 	*/
@@ -71,6 +83,7 @@ class XMLSitemapFeed {
 		'UserGenerated'
 	);
 
+
 	/**
 	 * Global values used for priority and changefreq calculation
 	 */
@@ -82,6 +95,22 @@ class XMLSitemapFeed {
 	private $frontpages = null;
 	private $blogpages = null;
 	private $images = array();
+
+	/**
+	 * Get sitemap feed conditional
+	 * @return bool
+	 */
+	public function is_sitemap() {
+		return (bool) $this->is_sitemap;
+	}
+
+	/**
+	 * Get news feed conditional
+	 * @return bool
+	 */
+	public function is_news() {
+		return (bool) $this->is_news;
+	}
 
 	/**
 	 * Get prefix
@@ -1118,6 +1147,7 @@ class XMLSitemapFeed {
 				add_action( 'the_post', array( $this, 'wpml_language_switcher' ) );
 			}
 
+			// prepare for news and return modified request
 			if ( $request['feed'] == 'sitemap-news' ) {
 				$defaults = $this->defaults('news_tags');
 				$options = $this->get_option('news_tags');
@@ -1143,9 +1173,16 @@ class XMLSitemapFeed {
 				if ( isset($options['categories']) && is_array($options['categories']) )
 					$request['cat'] = implode(',',$options['categories']);
 
+				// set the news sitemap conditional tag
+				$this->is_news = true;
+
 				return $request;
 			}
 
+			// not returned yet? then set the normal sitemap conditional tag
+			$this->is_sitemap = true;
+
+			// prepare for post types and return modified request
 			if ( strpos($request['feed'],'sitemap-posttype') === 0 ) {
 				foreach ( $this->get_post_types() as $post_type ) {
 					if ( $request['feed'] == 'sitemap-posttype-'.$post_type['name'] ) {
@@ -1160,6 +1197,7 @@ class XMLSitemapFeed {
 				}
 			}
 
+			// prepare for taxonomies and return modified request
 			if ( strpos($request['feed'],'sitemap-taxonomy') === 0 ) {
 				foreach ( $this->get_taxonomies() as $taxonomy ) {
 					if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {

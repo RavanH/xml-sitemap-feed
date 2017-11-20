@@ -277,6 +277,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 == Changelog ==
 
 = 4.8 =
+* NEW: Conditional functions is_sitemap() and is_news()
 * code cleanup and annotation
 * new google ping URL
 * revisit get first/last date/modified functions and cache key set/delete

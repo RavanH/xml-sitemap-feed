@@ -1,5 +1,47 @@
 <?php
 /* -------------------------------------
+ *     CONDITIONAL FUNCTIONS
+ * ------------------------------------- */
+
+ /**
+ * Is the query for a sitemap?
+ *
+ * @since 4.8
+ *
+ * @global XMLSitemapFeed $xmlsf Global XML Sitemap Feed instance.
+ * @return bool
+ */
+ function is_sitemap() {
+	global $xmlsf;
+
+	if ( ! isset( $xmlsf ) ) {
+		_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.' ), '4.8' );
+		return false;
+	}
+
+	return $xmlsf->is_sitemap();
+}
+
+/**
+* Is the query for a news sitemap?
+*
+* @since 4.8
+*
+* @global XMLSitemapFeed $xmlsf Global XML Sitemap Feed instance.
+* @return bool
+*/
+function is_news() {
+	global $xmlsf;
+
+	if ( ! isset( $xmlsf ) ) {
+		_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.' ), '4.8' );
+		return false;
+	}
+
+	return $xmlsf->is_news();
+}
+
+/* -------------------------------------
  *      MISSING WORDPRESS FUNCTIONS
  * ------------------------------------- */
 
