@@ -654,15 +654,40 @@ jQuery( document ).ready( function() {
     	// keywords
 		$keywords = !empty($options['keywords']) ? $options['keywords'] : array();
 		$keywords_from = !empty($keywords['from']) ? $keywords['from'] : '';
+		$default_taxonomies = [
+			'category' => translate('Categories'),
+			'post_tag' => translate('Tags')
+		];
+
+		$custom_taxonomies_raw = !empty($keywords['custom_taxonomies'])
+			? explode("\n", $keywords['custom_taxonomies'])
+			: array();
+
+		$custom_taxonomies = array_map(function ($raw_taxonomy) {
+			$taxonomy = explode('|', $raw_taxonomy);
+			return array(trim($taxonomy[0]) => trim($taxonomy[1]));
+		}, $custom_taxonomies_raw);
+
+		$taxonomies = count($custom_taxonomies) > 0
+			? array_merge($default_taxonomies, call_user_func_array('array_merge', $custom_taxonomies))
+			: $default_taxonomies;
+		$taxonomy_options = '';
+
+		foreach($taxonomies as $id => $label) {
+			$taxonomy_options .= '<option value="'.$id.'" '.selected( $id == $keywords_from, true, false).'>'.$label.'</option>';
+		}
+
 		echo '
 		<fieldset id="xmlsf_news_keywords"><legend class="screen-reader-text">&lt;keywords&gt;</legend>
 			'.sprintf(__('The %s tag is used to help classify the articles you submit to Google News by <strong>topic</strong>.','xml-sitemap-feed'),'<strong>&lt;keywords&gt;</strong>').'
 			<ul>
 			<li><label>'.sprintf(__('Use %s for topics.','xml-sitemap-feed'),' <select name="'.$prefix.'news_tags[keywords][from]" id="xmlsf_news_tags_keywords_from">
-						<option value="">'.translate('None').'</option>
-						<option value="category" '.selected( "category" == $keywords_from, true, false).'>'.translate('Categories').'</option>
-						<option value="post_tag" '.selected( "post_tag" == $keywords_from, true, false).'>'.translate('Tags').'</option>
-			</select>').'</label></li>';
+						<option value="">'.translate('None').'</option>' . $taxonomy_options . '
+			</select>').'</label></li>';echo '
+			<li><label>'.__('Custom taxonomies:','xml-sitemap-feed').' <br><textarea rows="3" cols="40" name="'.$prefix.'news_tags[keywords][custom_taxonomies]" placeholder="custom_key|Custom label" id="xmlsf_news_tags_keywords_custom_taxonomies">';
+			echo !empty($keywords['custom_taxonomies']) ? $keywords['custom_taxonomies'] : '';
+			echo '</textarea></label> <p class="description">'.__('Provide key name and label for a custom taxonomy you\'d like to add into "Topics" field above. Use pipe sign to separate taxonomy key and label. The custom taxonomies will be available to choose after saving changes.'.
+				'Put each custom taxonomy in a new line.','xml-sitemap-feed').'<br></p></li>';
 		if ("category" != $keywords_from) {
 			echo '
 			<li><label>'.__('Default topic(s):','xml-sitemap-feed').' <input type="text" name="'.$prefix.'news_tags[keywords][default]" id="xmlsf_news_tags_keywords_default" value="';
