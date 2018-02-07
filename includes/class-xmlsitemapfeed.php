@@ -83,11 +83,12 @@ class XMLSitemapFeed {
 		'UserGenerated'
 	);
 
-
 	/**
-	 * Global values used for priority and changefreq calculation
+	 * Global values used for allowed urls, priority and changefreq calculation
 	 */
 	private $domain;
+	private $scheme;
+	private $home_url;
 	private $firstdate;
 	private $lastmodified; // unused at the moment
 	private $postmodified = array();
@@ -134,12 +135,39 @@ class XMLSitemapFeed {
 	 */
 	public function domain() {
 		// allowed domain
-		if (empty($this->domain)) {
-			$url_parsed = parse_url(home_url()); // second parameter PHP_URL_HOST for only PHP5 + ...
+		if ( empty($this->domain) ) {
+			$url_parsed = parse_url( $this->home_url(), PHP_URL_HOST );
 			$this->domain = str_replace("www.","",$url_parsed['host']);
 		}
 
 		return $this->domain;
+	}
+
+	/**
+	 * Get scheme
+	 * @return string
+	 */
+	public function scheme() {
+		// scheme to use
+		if ( empty($this->scheme) ) {
+			$scheme = parse_url( $this->home_url(), PHP_URL_SCHEME );
+			$this->scheme = $scheme ? $scheme : 'http';
+		}
+
+		return $this->scheme;
+	}
+
+	/**
+	 * Get home URL
+	 * @return string
+	 */
+	public function home_url() {
+		// home url
+		if ( empty($this->home_url) ) {
+			$this->home_url = home_url();
+		}
+
+		return $this->home_url;
 	}
 
 	/**
@@ -705,6 +733,32 @@ class XMLSitemapFeed {
 	}
 
 	/**
+	 * Get absolute URL
+	 * Converts path or protocol relative URLs to absolute ones.
+	 *
+	 * @param string $url
+	 *
+	 * @return string|bool
+	 */
+	public function get_absolute_url( $url = false ) {
+		// have a string or return false
+		if ( empty( $url ) || ! is_string( $url ) ) {
+			return false;
+		}
+
+		// check for scheme
+		if ( strpos( $url, 'http' ) !== 0 ) {
+			// check for relative url path
+			if ( strpos( $url, '//' ) !== 0 ) {
+				return $this->home_url() . $url;
+			}
+			return $this->scheme() . ':' . $url;
+		}
+
+		return $url;
+	}
+
+	/**
 	 * Get images
 	 *
 	 * @param string $sitemap
@@ -714,35 +768,41 @@ class XMLSitemapFeed {
 	public function get_images( $sitemap = '' ) {
 		global $post;
 		if ( empty($this->images[$post->ID]) ) {
-			if ('news' == $sitemap) {
+			if ( 'news' == $sitemap ) {
 				$options = $this->get_option('news_tags');
 				$which = isset($options['image']) ? $options['image'] : '';
 			} else {
 				$options = $this->get_post_types();
 				$which = isset($options[$post->post_type]['tags']['image']) ? $options[$post->post_type]['tags']['image'] : '';
 			}
-			if('attached' == $which) {
+			if ( 'attached' == $which ) {
 				$args = array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => -1, 'post_status' =>'inherit', 'post_parent' => $post->ID );
 				$attachments = get_posts($args);
-				if ($attachments) {
+				if ( $attachments ) {
 					foreach ( $attachments as $attachment ) {
-						$url = wp_get_attachment_image_src( $attachment->ID, 'full' );
-						$this->images[$post->ID][] = array(
-										'loc' => esc_attr( esc_url_raw( $url[0] ) ), // use esc_attr() to entity escape & here ?? esc_url() creates &#038; which is not what we want...
-										'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
-										'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
-										);
+						$url = wp_get_attachment_image_url( $attachment->ID, 'full' );
+						$url = $this->get_absolute_url( $url );
+						if ( !empty($url) )
+							$this->images[$post->ID][] = array(
+									'loc' => esc_attr( esc_url_raw( $url ) ),
+									'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
+									'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
+									// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
+								);
 					}
 				}
-			} elseif ('featured' == $which) {
-				if (has_post_thumbnail( $post->ID ) ) {
-					$attachment = get_post(get_post_thumbnail_id( $post->ID ));
-					$url = wp_get_attachment_image_src( $attachment->ID, 'full' );
-					$this->images[$post->ID][] =  array(
-										'loc' => esc_attr( esc_url_raw( $url[0] ) ),
-										'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
-										'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
-										);
+			} elseif ( 'featured' == $which ) {
+				if ( has_post_thumbnail( $post->ID ) ) {
+					//$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
+					$url = wp_get_attachment_image_url( get_post_thumbnail_id( $post->ID ), 'full' );
+					$url = $this->get_absolute_url( $url );
+					if ( !empty($url) )
+						$this->images[$post->ID][] =  array(
+								'loc' => esc_attr( esc_url_raw( $url ) ),
+								'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
+								'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
+								// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
+							);
 				}
 			}
 		}
@@ -891,12 +951,12 @@ class XMLSitemapFeed {
 				foreach ( $languages as $language )
 					$urls[] = pll_home_url( $language['slug'] );
 			else
-				$urls[] = home_url();
+				$urls[] = $this->home_url();
 		} elseif ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'language_url') ) {
 			foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term )
 				$urls[] = $sitepress->language_url($term);
 		} else {
-			$urls[] = home_url();
+			$urls[] = $this->home_url();
 		}
 
 		return $urls;
@@ -958,7 +1018,7 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function get_index_url( $sitemap = 'home', $type = false, $param = false ) {
-		$split_url = explode('?', home_url());
+		$split_url = explode('?', $this->home_url());
 
 		$name = $this->base_name.'-'.$sitemap;
 
