@@ -1191,6 +1191,7 @@ class XMLSitemapFeed {
 
 						$request['post_type'] = $post_type['name'];
 						$request['orderby'] = 'modified';
+						$request['is_date'] = false;
 
 						return $request;
 					}
