@@ -136,8 +136,8 @@ class XMLSitemapFeed {
 	public function domain() {
 		// allowed domain
 		if ( empty($this->domain) ) {
-			$url_parsed = parse_url( $this->home_url(), PHP_URL_HOST );
-			$this->domain = str_replace("www.","",$url_parsed['host']);
+			$host = parse_url( $this->home_url(), PHP_URL_HOST );
+			$this->domain = str_replace( "www.", "", $host );
 		}
 
 		return $this->domain;
