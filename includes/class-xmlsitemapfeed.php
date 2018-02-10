@@ -137,7 +137,7 @@ class XMLSitemapFeed {
 		// allowed domain
 		if ( empty($this->domain) ) {
 			$host = parse_url( $this->home_url(), PHP_URL_HOST );
-			$this->domain = str_replace( "www.", "", $host );
+			$this->domain = str_replace( 'www.', '', $host );
 		}
 
 		return $this->domain;
@@ -258,7 +258,7 @@ class XMLSitemapFeed {
 					);
 
 		// robots
-		$this->defaults['robots'] = "";
+		$this->defaults['robots'] = '';
 
 		// additional urls
 		$this->defaults['urls'] = array();
@@ -414,7 +414,7 @@ class XMLSitemapFeed {
 		$urls = $this->get_option('custom_sitemaps');
 		// make sure it's an array we are returning
 		if(!empty($urls)) {
-			$return = ( !is_array($urls) ) ? explode( "\n", $urls ) : $urls;
+			$return = ( !is_array($urls) ) ? explode( PHP_EOL, $urls ) : $urls;
 		} else {
 			$return = array();
 		}
@@ -429,7 +429,7 @@ class XMLSitemapFeed {
 		$urls = $this->get_option('urls');
 		// make sure it's an array we are returning
 		if( !empty($urls) ) {
-			$return = ( !is_array($urls) ) ? explode( "\n", $urls ) : $urls;
+			$return = ( !is_array($urls) ) ? explode( PHP_EOL, $urls ) : $urls;
 		} else {
 			$return = array();
 		}
@@ -460,7 +460,7 @@ class XMLSitemapFeed {
 		global $wpdb;
 		$return = array();
 		if ( 'monthly' == $type ) {
-			$query = "SELECT YEAR(post_date) AS `year`, LPAD(MONTH(post_date),2,'0') AS `month`, count(ID) as posts FROM $wpdb->posts WHERE post_type = '$post_type' AND post_status = 'publish' GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY post_date DESC";
+			$query = 'SELECT YEAR(post_date) AS `year`, LPAD(MONTH(post_date),2,\'0\') AS `month`, count(ID) as posts FROM ' . $wpdb->posts . ' WHERE post_type = \'' . $post_type . '\' AND post_status = \'publish\' GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY post_date DESC';
 			$key = md5($query);
 			$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
 			if ( !isset( $cache[ $key ] ) ) {
@@ -476,7 +476,7 @@ class XMLSitemapFeed {
 				}
 			}
 		} elseif ('yearly' == $type) {
-			$query = "SELECT YEAR(post_date) AS `year`, count(ID) as posts FROM $wpdb->posts WHERE post_type = '$post_type' AND post_status = 'publish' GROUP BY YEAR(post_date) ORDER BY post_date DESC";
+			$query = 'SELECT YEAR(post_date) AS `year`, count(ID) as posts FROM ' . $wpdb->posts . ' WHERE post_type = \'' . $post_type . '\' AND post_status = \'publish\' GROUP BY YEAR(post_date) ORDER BY post_date DESC';
 			$key = md5($query);
 			$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
 			if ( !isset( $cache[ $key ] ) ) {
@@ -634,12 +634,12 @@ class XMLSitemapFeed {
 				break;
 		}
 
-		$output .= '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>'.PHP_EOL;
-		$output .= '<?xml-stylesheet type="text/xsl" href="' . $style_sheet . '?ver=' . XMLSF_VERSION .'"?>'.PHP_EOL;
-		$output .= '<!-- generated-on="'.date('Y-m-d\TH:i:s+00:00').'" -->'.PHP_EOL;
-		$output .= '<!-- generator="XML & Google News Sitemap Feed plugin for WordPress" -->'.PHP_EOL;
-		$output .= '<!-- generator-url="http://status301.net/wordpress-plugins/xml-sitemap-feed/" -->'.PHP_EOL;
-		$output .= '<!-- generator-version="'.XMLSF_VERSION.'" -->'.PHP_EOL;
+		$output .= '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>' . PHP_EOL;
+		$output .= '<?xml-stylesheet type="text/xsl" href="' . $style_sheet . '?ver=' . XMLSF_VERSION .'"?>' . PHP_EOL;
+		$output .= '<!-- generated-on="' . date('Y-m-d\TH:i:s+00:00') . '" -->' . PHP_EOL;
+		$output .= '<!-- generator="XML & Google News Sitemap Feed plugin for WordPress" -->' . PHP_EOL;
+		$output .= '<!-- generator-url="http://status301.net/wordpress-plugins/xml-sitemap-feed/" -->' . PHP_EOL;
+		$output .= '<!-- generator-version="' . XMLSF_VERSION . '" -->' . PHP_EOL;
 
 		// return output
 		return $output;
@@ -819,7 +819,8 @@ class XMLSitemapFeed {
 	 */
 	public function get_lastmod( $sitemap = 'post_type', $term = '' ) {
 		$return = trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $this->modified( $sitemap, $term ), false ) );
-		return !empty($return) ? "\t<lastmod>".$return."</lastmod>\r\n\t" : '';
+		return !empty($return) ? '	<lastmod>'.$return.'</lastmod>
+	' : '';
 	}
 
 	/**
@@ -870,7 +871,7 @@ class XMLSitemapFeed {
 
 			if ( !empty($priority_meta) || $priority_meta == '0' ) {
 
-				$priority = floatval(str_replace(",",".",$priority_meta));
+				$priority = floatval(str_replace(',','.',$priority_meta));
 
 			} elseif ( !empty($options[$post->post_type]['dynamic_priority']) ) {
 
@@ -885,7 +886,7 @@ class XMLSitemapFeed {
 					// uses get_firstpostdate() function defined in xml-sitemap/hacks.php !
 
 				if ( isset($options[$post->post_type]['priority']) )
-					$priority_value = floatval(str_replace(",",".",$options[$post->post_type]['priority']));
+					$priority_value = floatval(str_replace(',','.',$options[$post->post_type]['priority']));
 				else
 					$priority_value = floatval($defaults[$post->post_type]['priority']);
 
@@ -998,7 +999,7 @@ class XMLSitemapFeed {
 
 		if (isset($parsed_url['host'])) {
 			foreach( $domains as $domain ) {
-				if( $parsed_url['host'] == $domain || strpos($parsed_url['host'],".".$domain) !== false ) {
+				if( $parsed_url['host'] == $domain || strpos($parsed_url['host'],'.'.$domain) !== false ) {
 					$return = true;
 					break;
 				}
@@ -1087,18 +1088,18 @@ class XMLSitemapFeed {
 	// add sitemap location in robots.txt generated by WP
 	public function robots($output)
 	{
-		echo "\n# XML Sitemap & Google News Feeds version ".XMLSF_VERSION." - http://status301.net/wordpress-plugins/xml-sitemap-feed/";
+		echo '# XML Sitemap & Google News Feeds version ' . XMLSF_VERSION . ' - http://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
 
 		if ( '1' != get_option('blog_public') ) {
-			echo "\n# XML Sitemaps are disabled. Please see Site Visibility on Settings > Reading.";
+			echo '# XML Sitemaps are disabled. Please see Site Visibility on Settings > Reading.';
 		} else {
 			foreach ( $this->get_sitemaps() as $pretty )
-				echo "\nSitemap: " . trailingslashit(get_bloginfo('url')) . $pretty;
+				echo 'Sitemap: ' . trailingslashit(get_bloginfo('url')) . $pretty . PHP_EOL;
 
 			if ( empty($pretty) )
-				echo "\n# No XML Sitemaps are enabled. Please see XML Sitemaps on Settings > Reading.";
+				echo '# No XML Sitemaps are enabled. Please see XML Sitemaps on Settings > Reading.' . PHP_EOL;
 		}
-		echo "\n\n";
+		echo PHP_EOL;
 	}
 
 	/**
@@ -1109,7 +1110,7 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function robots_txt($output) {
-		return $output . $this->get_option('robots') . "\n\n";
+		return $output . $this->get_option('robots');
 	}
 
 	/**
@@ -1351,7 +1352,7 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function filter_news_where( $where = '' ) {
-		return $where . " AND post_date_gmt > '" . date('Y-m-d H:i:s', strtotime('-48 hours')) . "'";
+		return $where . ' AND post_date_gmt > \'' . date('Y-m-d H:i:s', strtotime('-48 hours')) . '\'';
 	}
 
 	/**
@@ -1501,19 +1502,19 @@ class XMLSitemapFeed {
 		$y = substr($m, 0, 4);
 
 		// clear possible last post modified cache keys
-		wp_cache_delete( "lastpostmodified:gmt", 'timeinfo' ); // should be handled by WP core?
-		wp_cache_delete( "lastpostmodified{$y}:gmt", 'timeinfo' );
-		wp_cache_delete( "lastpostmodified{$m}:gmt", 'timeinfo' );
-		wp_cache_delete( "lastpostmodified{$y}:gmt:{$post->post_type}", 'timeinfo' );
-		wp_cache_delete( "lastpostmodified{$m}:gmt:{$post->post_type}", 'timeinfo' );
+		wp_cache_delete( 'lastpostmodified:gmt', 'timeinfo' ); // should be handled by WP core?
+		wp_cache_delete( 'lastpostmodified'.$y.':gmt', 'timeinfo' );
+		wp_cache_delete( 'lastpostmodified'.$m.':gmt', 'timeinfo' );
+		wp_cache_delete( 'lastpostmodified'.$y.':gmt:'.$post->post_type, 'timeinfo' );
+		wp_cache_delete( 'lastpostmodified'.$m.':gmt:'.$post->post_type, 'timeinfo' );
 
 		// clear possible last post date cache keys
-		wp_cache_delete( "lastpostdate:gmt", 'timeinfo' );
-		wp_cache_delete( "lastpostdate:gmt:{$post->post_type}", 'timeinfo' );
+		wp_cache_delete( 'lastpostdate:gmt', 'timeinfo' );
+		wp_cache_delete( 'lastpostdate:gmt:'.$post->post_type, 'timeinfo' );
 
 		// clear possible fist post date cache keys
-		wp_cache_delete( "firstpostdate:gmt", 'timeinfo' );
-		wp_cache_delete( "firstpostdate:gmt:{$post->post_type}", 'timeinfo' );
+		wp_cache_delete( 'firstpostdate:gmt', 'timeinfo' );
+		wp_cache_delete( 'firstpostdate:gmt:'.$post->post_type, 'timeinfo' );
 	}
 
 	/**
@@ -1595,7 +1596,7 @@ class XMLSitemapFeed {
 
 		// remove robots.txt rule blocking stylesheets, but only one time!
 		if ( version_compare('4.4', $old_version, '>') && $robot_rules = get_option($this->prefix.'robots')) {
-			$robot_rules = str_replace(array("Disallow: */wp-content/","Allow: */wp-content/uploads/"),"",$robot_rules);
+			$robot_rules = str_replace(array('Disallow: */wp-content/','Allow: */wp-content/uploads/'),'',$robot_rules);
 			delete_option($this->prefix.'robots');
 			add_option($this->prefix.'robots', $robot_rules, '', 'no');
 		}
@@ -1836,7 +1837,7 @@ class XMLSitemapFeed {
 
 		// ROBOTSTXT
 		add_action('do_robotstxt', array($this, 'robots'), 0 );
-		add_filter('robots_txt', array($this, 'robots_txt'), 0 );
+		add_filter('robots_txt', array($this, 'robots_txt'), 9 );
 
 		// PINGING
 		add_action('transition_post_status', array($this, 'do_pings'), 10, 3);
