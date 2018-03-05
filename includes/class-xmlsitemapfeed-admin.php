@@ -629,8 +629,8 @@ jQuery( document ).ready( function() {
 
 		// genres tag
 		$gn_genres = parent::gn_genres();
-		$genres = !empty($options['genres']) ? $options['genres'] : array();
-		$genres_default = !empty($genres['default']) ? (array)$genres['default'] : array();
+		$genres = !empty($options['genres']) ? $options['genres'] : [];
+		$genres_default = !empty($genres['default']) ? (array)$genres['default'] : [];
 
 		echo '
 		  <fieldset id="xmlsf_news_labels_genres"><legend class="screen-reader-text">&lt;genres&gt;</legend>
@@ -652,7 +652,7 @@ jQuery( document ).ready( function() {
 
 
     	// keywords
-		$keywords = !empty($options['keywords']) ? $options['keywords'] : array();
+		$keywords = !empty($options['keywords']) ? $options['keywords'] : [];
 		$keywords_from = !empty($keywords['from']) ? $keywords['from'] : '';
 		echo '
 		<fieldset id="xmlsf_news_keywords"><legend class="screen-reader-text">&lt;keywords&gt;</legend>

@@ -272,7 +272,7 @@ class XMLSitemapFeed {
 		// news sitemap tags settings
 		$this->defaults['news_tags'] = array(
 						'name' => '',
-						'post_type' => array('post'),
+						'post_type' => ['post'],
 						'categories' => '',
 						'image' => 'featured',
 						'access' => array(
@@ -281,7 +281,7 @@ class XMLSitemapFeed {
 							'password' => 'Subscription'
 							),
 						'genres' => array(
-							'default' => array('Blog')
+							'default' => ''
 							),
 						'keywords' => array(
 							'from' => 'category',
