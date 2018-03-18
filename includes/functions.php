@@ -66,6 +66,31 @@ if( !function_exists('get_firstpostdate') ) {
 }
 
 /**
+ * Retrieve the date that the last post/page was published.
+ *
+ * The server timezone is the default and is the difference between GMT and
+ * server time. The 'blog' value is the date when the last post was posted. The
+ * 'gmt' is when the last post was posted in GMT formatted date.
+ *
+ * @uses apply_filters() Calls 'get_lastdate' filter
+ *
+ * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
+ * @param $post_types The post type(s). Can be string or array.
+ * @return string The date of the last post.
+ */
+if( !function_exists('get_lastdate') ) {
+ function get_lastdate( $timezone = 'server', $post_types = 'any' ) {
+  $lastpostdates = array();
+  foreach ( (array)$post_types as $post_type )
+    $lastpostdates[] = get_lastpostdate( $timezone, $post_type );
+
+  sort($lastpostdates);
+  $lastpostdates = array_filter($lastpostdates);
+  return end($lastpostdates);
+ }
+}
+
+/**
  * Retrieve last post/page modified date depending on timezone.
  * Variation of function get_lastpostmodified, uses _get_post_time
  *

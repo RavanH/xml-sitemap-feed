@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravan
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, , Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 3.2
 Tested up to: 4.9
-Stable tag: 4.8
+Stable tag: 4.8.1
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -271,10 +271,14 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 4.8 =
-New conditional functions, ping URL, and several bug fixes.
+= 4.8.1 =
+Fix get_lastpostdate array/string and restore pre PHP 5.4 compatibility (popular request)
 
 == Changelog ==
+
+= 4.8.1 =
+* fix get_lastpostdate array/string
+* restore pre PHP 5.4 compatibility (popular request)
 
 = 4.8 =
 * NEW: Conditional functions is_sitemap() and is_news()
