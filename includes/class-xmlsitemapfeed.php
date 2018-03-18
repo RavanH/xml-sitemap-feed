@@ -712,7 +712,17 @@ class XMLSitemapFeed {
 				return $this->termmodified[$term->term_id];
 			} else {
 				$obj = get_taxonomy($term);
-				return get_lastdate( 'gmt', $obj->object_type );
+
+				$lastmodified = array();
+				foreach ( (array)$obj->object_type as $object_type ) {
+					$lastmodified[] = get_lastpostdate( 'gmt', $object_type );
+					// returns last post date, not last modified date... (TODO consider making this an opion)
+				}
+
+				sort($lastmodified);
+				$lastmodified = array_filter($lastmodified);
+
+				return end($lastmodified);
 			}
 
 		else :
@@ -1210,12 +1220,8 @@ class XMLSitemapFeed {
 				define('DONOTCACHEDB', true);
 
 				// set up query filters
-				if ( get_lastdate('gmt', $news_post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
-					add_filter('post_limits', array($this, 'filter_news_limits'));
-					add_filter('posts_where', array($this, 'filter_news_where'), 10, 1);
-				} else {
-					add_filter('post_limits', array($this, 'filter_no_news_limits'));
-				}
+				add_filter('post_limits', array($this, 'filter_news_limits'));
+				add_filter('posts_where', array($this, 'filter_news_where'), 10, 1);
 
 				// post type
 				$request['post_type'] = $news_post_type;
