@@ -485,7 +485,7 @@ jQuery( document ).ready( function() {
 		$options = parent::get_option('news_tags');
 		$prefix = parent::prefix();
 
-		$news_post_type = !empty($options['post_type']) ? $options['post_type'] : $defaults['post_type'];
+		$news_post_type = isset($options['post_type']) && !empty($options['post_type']) ? $options['post_type'] : $defaults['post_type'];
 
 		$post_types = get_post_types(array('publicly_queryable' =>true),'objects');
 
@@ -841,6 +841,7 @@ jQuery( document ).ready( function() {
 	}
 
 	public function sanitize_news_tags_settings($new) {
+		// TODO default post type : to 'post' when none are selected
 		return $new;
 	}
 
@@ -909,7 +910,10 @@ jQuery( document ).ready( function() {
 	/* Adds a News Sitemap box to the side column */
 	public function add_meta_box_news () {
 		$news_tags = parent::get_option('news_tags');
-		foreach ( (array)$news_tags['post_type'] as $post_type ) {
+		$defaults = parent::defaults('news_tags');
+		$news_post_type = isset($news_tags['post_type']) && !empty($news_tags['post_type']) ? $news_tags['post_type'] : $defaults['post_type'];
+
+		foreach ( (array)$news_post_type as $post_type ) {
       // Only include metabox on post types that are included
 			add_meta_box(
 				'xmlsf_news_section',
