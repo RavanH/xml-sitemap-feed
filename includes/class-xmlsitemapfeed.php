@@ -1590,7 +1590,7 @@ class XMLSitemapFeed {
 		// ... but make sure rules are regenerated when admin is visited.
 		set_transient('xmlsf_flush_rewrite_rules','');
 
-		// remove robots.txt rule blocking stylesheets, but only one time!
+		// remove robots.txt rules blocking stylesheets, but only one time!
 		if ( version_compare('4.4', $old_version, '>') && $robot_rules = get_option($this->prefix.'robots')) {
 			$robot_rules = str_replace(array('Disallow: */wp-content/','Allow: */wp-content/uploads/'),'',$robot_rules);
 			delete_option($this->prefix.'robots');
@@ -1749,9 +1749,7 @@ class XMLSitemapFeed {
 		if ($this->yes_mother)
 			return; // yes, mother!
 
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->flush_rules($hard);
+		flush_rewrite_rules($hard);
 
 		if ( defined('WP_DEBUG') && WP_DEBUG )
 			error_log('XML Sitemap Feeds rewrite rules flushed');
