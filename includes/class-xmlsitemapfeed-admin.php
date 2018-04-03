@@ -308,7 +308,7 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 				echo '
 					<li><label><input type="checkbox" name="'.$prefix.'post_types['.
 					$post_type->name.'][update_lastmod_on_comments]" value="1" '.
-					checked( !empty($options[$post_type->name]["update_lastmod_on_comments"]), true, false).' /> '.__('Update Lastmod and Changefreq on comments.','xml-sitemap-feed').'</label> <span class="description">'.__('Set this if discussion on your site warrants reindexation upon each new comment.','xml-sitemap-feed').'</li>';
+					checked( !empty($options[$post_type->name]["update_lastmod_on_comments"]), true, false).' /> '.__('Update Lastmod on comments.','xml-sitemap-feed').'</label> <span class="description">'.__('Set this if discussion on your site warrants reindexation upon each new comment.','xml-sitemap-feed').'</li>';
 
 				$image = isset($options[$post_type->name]['tags']['image']) ? $options[$post_type->name]['tags']['image'] : $defaults[$post_type->name]['tags']['image'];
 				$context = ( $post_type->name === 'page' ) ? 'page' : 'post';
