@@ -34,7 +34,6 @@ if ( $terms ) :
 		<loc><?php echo get_term_link( $term ); ?></loc>
 	 	<priority><?php echo $xmlsf->get_priority('taxonomy',$term); ?></priority>
 		<?php echo $xmlsf->get_lastmod('taxonomy',$term); ?>
-		<changefreq><?php echo $xmlsf->get_changefreq('taxonomy',$term); ?></changefreq>
 	</url>
 <?php
     endforeach;

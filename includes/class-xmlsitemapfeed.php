@@ -80,7 +80,8 @@ class XMLSitemapFeed {
 		'Blog',
 		'OpEd',
 		'Opinion',
-		'UserGenerated'
+		'UserGenerated',
+		'FactCheck'
 	);
 
 	/**
@@ -823,37 +824,6 @@ class XMLSitemapFeed {
 		$return = trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $this->modified( $sitemap, $term ), false ) );
 		return !empty($return) ? '	<lastmod>'.$return.'</lastmod>
 	' : '';
-	}
-
-	/**
-	 * Get change frequency
-	 *
-	 * @param string $sitemap
-	 * @param string $term
-	 *
-	 * @return string
-	 */
-	public function get_changefreq( $sitemap = 'post_type', $term = '' ) {
-		$modified = trim($this->modified($sitemap,$term));
-
-		if (empty($modified))
-			return 'weekly';
-
-		$lastactivityage = ( gmdate('U') - mysql2date( 'U', $modified, false ) ); // post age
-
-	 	if ( ($lastactivityage/86400) < 1 ) { // last activity less than 1 day old
-	 		$changefreq = 'hourly';
-	 	} elseif ( ($lastactivityage/86400) < 7 ) { // last activity less than 1 week old
-	 		$changefreq = 'daily';
-	 	} elseif ( ($lastactivityage/86400) < 30 ) { // last activity less than one month old
-	 		$changefreq = 'weekly';
-	 	} elseif ( ($lastactivityage/86400) < 365 ) { // last activity less than 1 year old
-	 		$changefreq = 'monthly';
-	 	} else {
-	 		$changefreq = 'yearly'; // over a year old...
-	 	}
-
-	 	return $changefreq;
 	}
 
 	/**

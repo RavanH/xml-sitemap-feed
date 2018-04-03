@@ -311,13 +311,14 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 					checked( !empty($options[$post_type->name]["update_lastmod_on_comments"]), true, false).' /> '.__('Update Lastmod and Changefreq on comments.','xml-sitemap-feed').'</label> <span class="description">'.__('Set this if discussion on your site warrants reindexation upon each new comment.','xml-sitemap-feed').'</li>';
 
 				$image = isset($options[$post_type->name]['tags']['image']) ? $options[$post_type->name]['tags']['image'] : $defaults[$post_type->name]['tags']['image'];
+				$context = ( $post_type->name === 'page' ) ? 'page' : 'post';
 				echo '
 					<li><label>'.__('Add image tags for','xml-sitemap-feed').' <select name="'.$prefix.'post_types['.
 						$post_type->name.'][tags][image]">
 						<option value="">'.translate('None').'</option>
 						<option value="featured" '.
 						selected( $image == "featured", true, false).
-						'>'.translate('Featured Image').'</option>
+						'>'.translate_with_gettext_context('Featured Image',$context).'</option>
 						<option value="attached" '.
 						selected( $image == "attached", true, false).
 						'>'.__('Attached images','xml-sitemap-feed').'</option>
@@ -330,7 +331,7 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		}
 
 		echo '
-		<p class="description">* '.__('Priority settings do not affect ranking in search results in any way. They are only meant to suggest search engines which URLs to index first. Once a URL has been indexed, its Priority becomes meaningless until its Lastmod is updated.','xml-sitemap-feed').' <a href="#xmlsf_post_types_note_1_more" id="xmlsf_post_types_note_1_link">'.translate('[more]').'</a>
+		<p class="description">* '.__('Priority settings do not affect ranking in search results in any way. They are only meant to suggest search engines which URLs to index first. Once a URL has been indexed, its Priority becomes meaningless until its Lastmod is updated.','xml-sitemap-feed').' <a href="#xmlsf_post_types_note_1_more" id="xmlsf_post_types_note_1_link">'.translate('Read more...').'</a>
 		<span id="xmlsf_post_types_note_1_more">'.__('Maximum Priority (1.0) is reserved for the front page, individual posts and, when allowed, posts with high comment count.','xml-sitemap-feed').' '.__('Priority values are taken as relative values. Setting all to the same (high) value is pointless.','xml-sitemap-feed').'</span></p>
 <script type="text/javascript">
 jQuery( document ).ready( function() {
@@ -387,7 +388,7 @@ jQuery( document ).ready( function() {
 			echo $output;
 
 			echo '
-			<p class="description">'.__('It is generally not recommended to include taxonomy pages, unless their content brings added value.','xml-sitemap-feed').' <a href="#xmlsf_taxonomies_note_1_more" id="xmlsf_taxonomies_note_1_link">'.translate('[more]').'</a>
+			<p class="description">'.__('It is generally not recommended to include taxonomy pages, unless their content brings added value.','xml-sitemap-feed').' <a href="#xmlsf_taxonomies_note_1_more" id="xmlsf_taxonomies_note_1_link">'.translate('Read more...').'</a>
 			<span id="xmlsf_taxonomies_note_1_more">'.__('For example, when you use category descriptions with information that is not present elsewhere on your site or if taxonomy pages list posts with an excerpt that is different from, but complementary to the post content. In these cases you might consider including certain taxonomies. Otherwise, if you fear <a href="http://moz.com/learn/seo/duplicate-content">negative affects of duplicate content</a> or PageRank spread, you might even consider disallowing indexation of taxonomies.','xml-sitemap-feed').' '.
 			sprintf(__('You can do this by adding specific robots.txt rules in the %s field above.','xml-sitemap-feed'),'<strong>'.__('Additional robots.txt rules','xml-sitemap-feed').'</strong>');
 			echo '</span></p>
@@ -583,21 +584,20 @@ jQuery( document ).ready( function() {
 				<option value="">'.translate('None').'</option>
 				<option value="featured" '.
 				selected( $image == "featured", true, false).
-				'>'.translate('Featured Image').'</option>
+				'>'.translate_with_gettext_context('Featured Image','post').'</option>
 				<option value="attached" '.
 				selected( $image == "attached", true, false).
 				'>'.__('Attached images','xml-sitemap-feed').'</option>
 				';
 		echo '</select></label>
-			<p class="description">'.__('Note: Google News prefers at most one image per article in the News Sitemap. If multiple valid images are specified, the crawler will have to pick one arbitrarily. Images in News Sitemaps should be in jpeg or png format.','xml-sitemap-feed').' <a href="https://support.google.com/news/publisher/answer/13369" target="_blank">'.__('More information&hellip;','xml-sitemap-feed').'</a></p>
+			<p class="description">'.__('Note: Google News prefers at most one image per article in the News Sitemap. If multiple valid images are specified, the crawler will have to pick one arbitrarily. Images in News Sitemaps should be in jpeg or png format.','xml-sitemap-feed').' <a href="https://support.google.com/news/publisher/answer/13369" target="_blank">'.translate('Read more...').'</a></p>
 		</fieldset>';
 	}
 
 	public function news_labels_field() {
 		echo '
-		<fieldset id="xmlsf_news_labels"><legend class="screen-reader-text">'.__('Source labels','xml-sitemap-feed').'</legend>' .
-			sprintf(__('You can use the %1$s and %2$s tags to provide Google more information about the content of your articles.','xml-sitemap-feed'),'&lt;access&gt;','&lt;genres&gt;') . ' <a href="https://support.google.com/news/publisher/answer/93992" target="_blank">'.__('More information&hellip;','xml-sitemap-feed').'</a>
-			<br><br>';
+		<fieldset id="xmlsf_news_labels"><legend class="screen-reader-text">' . __('Source labels','xml-sitemap-feed') . '</legend>
+			<p>' . __('Source labels provide more information about the content of your articles.','xml-sitemap-feed') . '</p>';
 
 		$options = parent::get_option('news_tags');
 		$prefix = parent::prefix();
@@ -608,8 +608,8 @@ jQuery( document ).ready( function() {
 		$access_password = !empty($access['password']) ? $access['password'] : '';
 		echo '
 		  <fieldset id="xmlsf_news_labels_access"><legend class="screen-reader-text">&lt;access&gt;</legend>
-			'.sprintf(__('The %4$s tag specifies whether an article is available to all readers (%1$s), or only to those with a free (%2$s) or paid membership (%3$s) to your site.','xml-sitemap-feed'),translate('Public'),__('Registration','xml-sitemap-feed'),__('Subscription','xml-sitemap-feed'),'<strong>&lt;access&gt;</strong>').'
-			'.__('You can assign a different access level when writing a post.','xml-sitemap-feed') . '
+			<p>'.sprintf(__('The %4$s tag specifies whether an article is available to all readers (%1$s), or only to those with a free (%2$s) or paid membership (%3$s) to your site.','xml-sitemap-feed'),translate('Public'),__('Registration','xml-sitemap-feed'),__('Subscription','xml-sitemap-feed'),'<strong>&lt;access&gt;</strong>').'
+			'.__('You can assign a different access level when writing a post.','xml-sitemap-feed') . '</p>
 		    <ul>';
 
 		echo '
@@ -629,41 +629,47 @@ jQuery( document ).ready( function() {
 
 		// genres tag
 		$gn_genres = parent::gn_genres();
+		$gn_translations = $gn_genres = array(
+			'PressRelease' => __('PressRelease','xml-sitemap-feed'),
+			'Satire' => __('Satire','xml-sitemap-feed'),
+			'Blog' => __('Blog','xml-sitemap-feed'),
+			'OpEd' => __('OpEd','xml-sitemap-feed'),
+			'Opinion' => __('Opinion','xml-sitemap-feed'),
+			'UserGenerated' => __('UserGenerated','xml-sitemap-feed'),
+			'FactCheck' => __('FactCheck','xml-sitemap-feed')
+		);
 		$genres = !empty($options['genres']) ? $options['genres'] : array();
 		$genres_default = !empty($genres['default']) ? (array)$genres['default'] : array();
 
 		echo '
 		  <fieldset id="xmlsf_news_labels_genres"><legend class="screen-reader-text">&lt;genres&gt;</legend>
-			'.sprintf(__('The %s tag specifies one or more properties for an article, namely, whether it is a press release, a blog post, an opinion, an op-ed piece, user-generated content, or satire.','xml-sitemap-feed'),'<strong>&lt;genres&gt;</strong>').' '.__('You can assign different genres when writing a post.','xml-sitemap-feed');
+			<p>'.sprintf(__('The %s tag specifies one or more properties for an article, namely, whether it is a press release, a blog post, an opinion, an op-ed piece, user-generated content, or satire.','xml-sitemap-feed'),'<strong>&lt;genres&gt;</strong>').' '.__('You can assign different genres when writing a post.','xml-sitemap-feed');
 
-		echo '
+		echo '</p>
+			<p class="description">'.__('Use Ctrl plus click to select more than one or to deselect.','xml-sitemap-feed').' '.__('The FactCheck label may be applied if you publish stories with fact-checking content that\'s indicated by schema.org ClaimReview markup.','xml-sitemap-feed').' '.sprintf(__('Read more about source labels on %s','xml-sitemap-feed'),'<a href="https://support.google.com/news/publisher/answer/4582731" target="_blank">'.__('What does each source label mean?','xml-sitemap-feed').'</a>').'</p>
 			<ul>
 				<li><label>'.__('Default genre:','xml-sitemap-feed').'<br><select multiple name="'.$prefix.'news_tags[genres][default][]" id="xmlsf_news_tags_genres_default" size="'.count($gn_genres).'">';
-		foreach ( $gn_genres as $name) {
-			echo '
-						<option value="'.$name.'" '.selected( in_array($name,$genres_default), true, false ).'>'.$name.'</option>';
+		foreach ( $gn_genres as $name ) {
+			echo '<option value="'.$name.'" '.selected( in_array($name,$genres_default), true, false ).'>' . ( isset($gn_translations[$name]) && !empty($gn_translations[$name]) ? $gn_translations[$name] : $name ) . '&nbsp;</option>';
     	}
 		echo '
 				</select></label></li>
 			</ul>
-		  </fieldset>
-		  <p class="description">'.__('Use the Ctrl/Cmd key plus click to select more than one or to deselect.','xml-sitemap-feed').' '.sprintf(__('Read more about source labels on %s','xml-sitemap-feed'),'<a href="https://support.google.com/news/publisher/answer/4582731" target="_blank">'.__('What does each source label mean?','xml-sitemap-feed').'</a>').'</p>
 		</fieldset>';
-
 
     	// keywords
 		$keywords = !empty($options['keywords']) ? $options['keywords'] : array();
 		$keywords_from = !empty($keywords['from']) ? $keywords['from'] : '';
 		echo '
 		<fieldset id="xmlsf_news_keywords"><legend class="screen-reader-text">&lt;keywords&gt;</legend>
-			'.sprintf(__('The %s tag is used to help classify the articles you submit to Google News by <strong>topic</strong>.','xml-sitemap-feed'),'<strong>&lt;keywords&gt;</strong>').'
+			<p>'.sprintf(__('The %s tag is used to help classify the articles you submit to Google News by <strong>topic</strong>.','xml-sitemap-feed'),'<strong>&lt;keywords&gt;</strong>').'</p>
 			<ul>
 			<li><label>'.sprintf(__('Use %s for topics.','xml-sitemap-feed'),' <select name="'.$prefix.'news_tags[keywords][from]" id="xmlsf_news_tags_keywords_from">
 						<option value="">'.translate('None').'</option>
 						<option value="category" '.selected( "category" == $keywords_from, true, false).'>'.translate('Categories').'</option>
 						<option value="post_tag" '.selected( "post_tag" == $keywords_from, true, false).'>'.translate('Tags').'</option>
 			</select>').'</label></li>';
-		if ("category" != $keywords_from) {
+		if ("category" !== $keywords_from) {
 			echo '
 			<li><label>'.__('Default topic(s):','xml-sitemap-feed').' <input type="text" name="'.$prefix.'news_tags[keywords][default]" id="xmlsf_news_tags_keywords_default" value="';
 			echo !empty($keywords['default']) ? $keywords['default'] : '';

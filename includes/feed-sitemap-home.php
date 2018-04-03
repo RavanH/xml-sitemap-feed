@@ -25,15 +25,6 @@ foreach ( $xmlsf->get_home_urls() as $url ) {
 	<url>
 		<loc><?php echo esc_url( $url ); ?></loc>
 		<lastmod><?php echo mysql2date('Y-m-d\TH:i:s+00:00', $lastmodified, false); ?></lastmod>
-		<changefreq><?php
-	 	if ( ($lastactivityage/86400) < 1 ) { // last activity less than 1 day old
-	 		echo 'hourly';
-	 	} else if ( ($lastactivityage/86400) < 7 ) { // last activity less than 1 week old
-	 		echo 'daily';
-	 	} else { // over a week old
-	 		echo 'weekly';
-	 	}
-		?></changefreq>
 		<priority>1.0</priority>
 	</url>
 <?php

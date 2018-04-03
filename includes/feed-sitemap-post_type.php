@@ -52,7 +52,6 @@ if ( have_posts() ) :
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
 		<?php echo $xmlsf->get_lastmod(); ?>
-		<changefreq><?php echo $xmlsf->get_changefreq(); ?></changefreq>
 	 	<priority><?php echo $xmlsf->get_priority(); ?></priority>
 <?php
 	if ( !empty($image) && $xmlsf->get_images() ) :
