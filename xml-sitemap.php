@@ -105,13 +105,13 @@ if ( !defined('XMLSF_NEWS_NAME') )
  *      INCLUDE HACKS & CLASS
  * ------------------------------------- */
 
-$xmlsf_dir = dirname(__FILE__);
+$xmlsf_dir = plugin_dir_path( __FILE__ );
 
-if ( file_exists ( $xmlsf_dir.'/xml-sitemap-feed' ) )
-	$xmlsf_dir .= '/xml-sitemap-feed';
+if ( file_exists ( $xmlsf_dir . 'xml-sitemap-feed' ) )
+	$xmlsf_dir .= 'xml-sitemap-feed/';
 
-include_once( $xmlsf_dir.'/includes/functions.php' );
-include_once( $xmlsf_dir.'/includes/class-xmlsitemapfeed.php' );
+include_once( $xmlsf_dir . 'includes/functions.php' );
+include_once( $xmlsf_dir . 'includes/class-xmlsitemapfeed.php' );
 
 /* ----------------------
  *     INSTANTIATE

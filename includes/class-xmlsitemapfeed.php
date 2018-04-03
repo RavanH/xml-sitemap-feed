@@ -230,14 +230,16 @@ class XMLSitemapFeed {
 		$this->defaults['ping'] = array(
 					'google' => array (
 						'active' => '1',
-						'uri' => 'http://www.google.com/ping?sitemap=',
+						'uri' => 'http://www.google.com/ping',
 						'type' => 'GET',
+						'req' => 'sitemap',
 						'news' => '1'
 						),
 					'bing' => array (
 						'active' => '1',
-						'uri' => 'http://www.bing.com/ping?sitemap=',
+						'uri' => 'http://www.bing.com/ping',
 						'type' => 'GET',
+						'req' => 'sitemap',
 						'news' => '1'
 						),
 					'yandex' => array (
@@ -1365,8 +1367,7 @@ class XMLSitemapFeed {
 	 * in case there is no news, just take the latest post
 	 * @return string
 	 */
-	public function filter_no_news_limits( $limits )
-	{
+	public function filter_no_news_limits( $limits ) {
 		return 'LIMIT 0, 1';
 	}
 
@@ -1383,17 +1384,9 @@ class XMLSitemapFeed {
 	 * @return bool
 	 */
 	public function ping($uri, $timeout = 3) {
-		$options = array();
-		$options['timeout'] = $timeout;
+		$response = wp_remote_request( $uri, array('timeout'=>$timeout) );
 
-		$response = wp_remote_request( $uri, $options );
-
-		if ( '200' == wp_remote_retrieve_response_code($response) )
-			$succes = true;
-		else
-			$succes = false;
-
-		return $succes;
+		return ( '200' == wp_remote_retrieve_response_code($response) ) ? true : false;
 	}
 
 	/**
@@ -1425,9 +1418,9 @@ class XMLSitemapFeed {
 							continue;
 						// and if we did not ping already within the last 5 minutes
 						if( !empty($data['pong']) && is_array($data['pong']) && !empty($data['pong'][$sitemaps['sitemap-news']]) && (int)$data['pong'][$sitemaps['sitemap-news']] + 300 > time() )
-								 continue;
+							continue;
 						// ping !
-						if ( $this->ping( $data['uri'].urlencode(trailingslashit(get_bloginfo('url')) . $sitemaps['sitemap-news']) ) ) {
+						if ( $this->ping( add_query_arg( $data['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap-news']), $data['uri'] ) ) ) {
 							$to_ping[$se]['pong'][$sitemaps['sitemap-news']] = time();
 							$update = true;
 						}
@@ -1450,9 +1443,9 @@ class XMLSitemapFeed {
 								continue;
 							// and if we did not ping already within the last hour
 							if( !empty($data['pong']) && is_array($data['pong']) && !empty($data['pong'][$sitemaps['sitemap']]) && (int)$data['pong'][$sitemaps['sitemap']] + 3600 > time() )
-									 continue;
+								continue;
 							// ping !
-							if ( $this->ping( $data['uri'].urlencode(trailingslashit(get_bloginfo('url')) . $sitemaps['sitemap']) ) ) {
+							if ( $this->ping( add_query_arg( $data['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap']), $data['uri'] ) ) ) {
 								$to_ping[$se]['pong'][$sitemaps['sitemap']] = time();
 								$update = true;
 							}

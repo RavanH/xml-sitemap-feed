@@ -1,7 +1,7 @@
 === XML Sitemap & Google News feeds ===
 Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed
-Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, , Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
+Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 3.2
 Tested up to: 4.9
 Stable tag: 4.8.3
@@ -26,13 +26,13 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 
 1. If you _do not use fancy URL's_ or you have WordPress installed in a _subdirectory_, a dynamic **robots.txt will NOT be generated**. You'll have to create your own and upload it to your site root! See FAQ's.
 
-2. On large sites, it is advised to use a good caching plugin like **WP Super Cache**, **Quick Cache** or **W3 Total Cache** to improve your site _and_ sitemap performance.
+2. On large sites, it is advised to use a good caching plugin like **WP Super Cache**, **Quick Cache**, **W3 Total Cache** or another to improve your site _and_ sitemap performance.
 
 = Features =
 
 **XML Sitemap**
 
-* Sitemap Index with optional inclusion of sitemaps for post types, categories and tags.
+* Sitemap Index with optional inclusion of sitemaps for custom post types, categories and tags.
 * Sitemap with custom URLs optional.
 * Custom/static sitemaps can be added to the index.
 * Completely **automatic** post URL _priority_ and _change frequency_ calculation based on post age and comment and trackback activity.
@@ -48,19 +48,19 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Optionally include Image tags with caption and title for featured images or attached images.
 * Options to: set a different News Publication Name, include custom post types or limit inclusion to certain post categories.
 * Configure <access>, <genres> and <keywords> tags both globally and post by post
-* Pings Google on new publications.
+* Pings both Google and Bing on new publications.
 
 **More**
 
 * Compatible with multi-lingual sites using **Polylang** or **WPML** to allow all languages to be indexed equally.
-* Option to add new robots.txt rules. These can be used to further control (read: limit) the indexation of various parts of your site and subsequent spread of pagerank accross your sites pages.
+* Option to add new robots.txt rules. These can be used to further control (read: limit) the indexation of various parts of your site and subsequent spread of pagerank across your sites pages.
 * Includes XLS stylesheets for human readable sitemaps.
 
 = Contribute =
 
-If you're happy with this plugin as it is, please consider writing a quick [rating](https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/#new-post) or helping other users out on the [support forum](https://wordpress.org/support/plugin/easy-fancybox).
+If you're happy with this plugin as it is, please consider writing a quick [rating](https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/#new-post) or helping other users out on the [support forum](https://wordpress.org/support/plugin/xml-sitemap-feed).
 
-If you wish to help build this plugin, you're very welcome to [translate Easy FancyBox into your language](https://translate.wordpress.org/projects/wp-plugins/xml-sitemap-feed/) or contribute code on [Github](https://github.com/RavanH/xml-sitemap-feed/).
+If you wish to help build this plugin, you're very welcome to [translate it into your language](https://translate.wordpress.org/projects/wp-plugins/xml-sitemap-feed/) or contribute code on [Github](https://github.com/RavanH/xml-sitemap-feed/).
 
 
 = Credits =
@@ -271,10 +271,13 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 4.8.3 =
-Admin pre PHP 5.4 compatibility
+= 4.8.4 =
+Fix permalink issue with Woocommerce account page endpoints
 
 == Changelog ==
+
+= 4.8.4 =
+* fix permalink issue with Woocommerce account page endpoints
 
 = 4.8.3 =
 * fix get_lastpostdate array/string
