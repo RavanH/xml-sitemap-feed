@@ -24,7 +24,6 @@
 				<th>URL</th>
 				<th># Images</th>
 				<th>Priority</th>
-				<th>Change Frequency</th>
 				<th>Last Changed</th>
 			</tr>
 <xsl:variable name="lower" select="'abcdefghijklmnopqrstuvwxyz'"/>

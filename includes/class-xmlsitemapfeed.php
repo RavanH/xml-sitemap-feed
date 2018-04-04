@@ -1578,7 +1578,7 @@ class XMLSitemapFeed {
 				wp_delete_term(	$term->term_id, 'gn-location-1' );
 		}
 
-		if ( version_compare('4.5', $old_version, '>') ) {
+		if ( version_compare('4.9', $old_version, '>') ) {
 			// purge genres taxonomy terms
 			$this->register_gn_taxonomies();
 			$terms = get_terms('gn-genre',array('hide_empty' => false));
