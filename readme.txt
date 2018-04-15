@@ -271,15 +271,20 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 4.8.4 =
-New FactCheck genre. Remove changefreq tag. Fix permalink issue with Woocommerce account page endpoints
+= 4.9 =
+New FactCheck genre. Remove changefreq tag. Fix permalink issue with Woocommerce account page endpoints.
 
 == Changelog ==
 
-= 4.8.4 =
-* fix permalink issue with Woocommerce account page endpoints
-* new genre: FactCheck
-* remove changefreq tag
+= 4.9 =
+* Code cleanup
+* NEW: FactCheck genre
+* Changefreq tag dropped
+* NEW: translation strings for genres
+* FIX: permalink issue with Woocommerce account page endpoints
+* FIX: undefined index in news post types
+* TODO make priority optional
+* TODO dedicated keywords taxonomy
 
 = 4.8.3 =
 * fix get_lastpostdate array/string
