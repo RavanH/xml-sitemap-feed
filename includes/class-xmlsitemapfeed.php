@@ -1442,13 +1442,13 @@ class XMLSitemapFeed {
 	 * Clear settings
 	 */
 	public function clear_settings() {
-		delete_option('xmlsf_version');
+		delete_option( 'xmlsf_version' );
 		foreach ( $this->defaults() as $option => $settings ) {
-			delete_option('xmlsf_'.$option);
+			delete_option( 'xmlsf_' . $option );
 		}
 
 		if ( defined('WP_DEBUG') && WP_DEBUG ) {
-			error_log('XML Sitemap Feeds settings cleared');
+			error_log( 'XML Sitemap Feeds settings cleared' );
 		}
 	}
 
@@ -1615,8 +1615,7 @@ class XMLSitemapFeed {
 			add_option( $this->prefix.'ping', array_merge( $this->defaults('ping'), $ping ), '', 'no' );
 		}
 
-		delete_option( 'xmlsf_version' );
-		add_option( $this->prefix.'version', XMLSF_VERSION, '', 'no' );
+		update_option( $this->prefix.'version', XMLSF_VERSION, );
 
 		if ( defined('WP_DEBUG') && WP_DEBUG ) {
 			error_log('XML Sitemap Feeds upgraded from '.$old_version.' to '.XMLSF_VERSION);
