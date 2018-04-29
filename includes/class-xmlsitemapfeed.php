@@ -470,10 +470,13 @@ class XMLSitemapFeed {
 	public function get_archives($post_type = 'post', $type = '') {
 		global $wpdb;
 		$return = array();
-		if ( 'monthly' == $type ) {
-			$query = 'SELECT YEAR(post_date) AS `year`, LPAD(MONTH(post_date),2,\'0\') AS `month`, count(ID) as posts FROM ' . $wpdb->posts . ' WHERE post_type = \'' . $post_type . '\' AND post_status = \'publish\' GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY post_date DESC';
+
+		if ( 'monthly' == $type ) :
+
+			$query = "SELECT YEAR(post_date) AS `year`, LPAD(MONTH(post_date),2,'0') AS `month`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY post_date DESC";
 			$key = md5($query);
 			$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
+
 			if ( !isset( $cache[ $key ] ) ) {
 				$arcresults = $wpdb->get_results($query);
 				$cache[ $key ] = $arcresults;
@@ -481,15 +484,19 @@ class XMLSitemapFeed {
 			} else {
 				$arcresults = $cache[ $key ];
 			}
+
 			if ( $arcresults ) {
 				foreach ( (array) $arcresults as $arcresult ) {
 					$return[$arcresult->year.$arcresult->month] = $this->get_index_url( 'posttype', $post_type, $arcresult->year . $arcresult->month );
 				}
 			}
-		} elseif ('yearly' == $type) {
-			$query = 'SELECT YEAR(post_date) AS `year`, count(ID) as posts FROM ' . $wpdb->posts . ' WHERE post_type = \'' . $post_type . '\' AND post_status = \'publish\' GROUP BY YEAR(post_date) ORDER BY post_date DESC';
+
+		elseif ('yearly' == $type) :
+
+			$query = "SELECT YEAR(post_date) AS `year`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date) ORDER BY post_date DESC";
 			$key = md5($query);
 			$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
+
 			if ( !isset( $cache[ $key ] ) ) {
 				$arcresults = $wpdb->get_results($query);
 				$cache[ $key ] = $arcresults;
@@ -497,14 +504,19 @@ class XMLSitemapFeed {
 			} else {
 				$arcresults = $cache[ $key ];
 			}
+
 			if ($arcresults) {
 				foreach ( (array) $arcresults as $arcresult) {
 					$return[$arcresult->year] = $this->get_index_url( 'posttype', $post_type, $arcresult->year );
 				}
 			}
-		} else {
+
+		else :
+
 			$return[0] = $this->get_index_url('posttype', $post_type); // $sitemap = 'home', $type = false, $param = false
-		}
+
+		endif;
+
 		return $return;
 	}
 
@@ -671,7 +683,8 @@ class XMLSitemapFeed {
 	public function modified( $sitemap = 'post_type', $term = '' ) {
 		global $post;
 
-		if ('post_type' == $sitemap) :
+		if ( 'post_type' == $sitemap ) :
+
 			// if blog page then look for last post date
 			if ( $post->post_type == 'page' && $this->is_home($post->ID) )
 				return get_lastpostmodified('gmt'); // TODO limit to sitemap included post types...
@@ -699,7 +712,9 @@ class XMLSitemapFeed {
 			}
 
 			return $this->postmodified[$post->ID];
+
 		elseif ( !empty($term) ) :
+
 			if ( is_object($term) ) {
 				if ( !isset($this->termmodified[$term->term_id]) ) {
 				// get the latest post in this taxonomy item, to use its post_date as lastmod
@@ -737,9 +752,10 @@ class XMLSitemapFeed {
 
 				return end($lastmodified);
 			}
-		else :
-			return '';
+
 		endif;
+
+		return '';
 	}
 
 	/**
@@ -777,7 +793,9 @@ class XMLSitemapFeed {
 	 */
 	public function get_images( $sitemap = '' ) {
 		global $post;
-		if ( empty($this->images[$post->ID]) ) {
+
+		if ( empty($this->images[$post->ID]) ) :
+
 			if ( 'news' == $sitemap ) {
 				$options = $this->get_option('news_tags');
 				$which = isset($options['image']) ? $options['image'] : '';
@@ -785,6 +803,7 @@ class XMLSitemapFeed {
 				$options = $this->get_post_types();
 				$which = isset($options[$post->post_type]['tags']['image']) ? $options[$post->post_type]['tags']['image'] : '';
 			}
+
 			if ( 'attached' == $which ) {
 				$args = array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => -1, 'post_status' =>'inherit', 'post_parent' => $post->ID );
 				$attachments = get_posts($args);
@@ -817,7 +836,9 @@ class XMLSitemapFeed {
 					}
 				}
 			}
-		}
+
+		endif;
+
 		return ( isset($this->images[$post->ID]) ) ? $this->images[$post->ID] : false;
 	}
 
@@ -887,6 +908,7 @@ class XMLSitemapFeed {
 			}
 
 		elseif ( ! empty($term) ) :
+
 			$max_priority = 0.4;
 			$min_priority = 0.0;
 			// TODO make these values optional?
@@ -899,8 +921,11 @@ class XMLSitemapFeed {
 			}
 
 			$priority = ( $postcount > 0 ) ? $min_priority + ( $max_priority * $term->count / $postcount ) : $min_priority;
+
 		else :
+
 			$priority = 0.5;
+
 		endif;
 
 		// make sure we're not below zero or cases where we ended up above 1 (sticky posts with many comments)
@@ -913,7 +938,7 @@ class XMLSitemapFeed {
 			)
 		);
 
-		return number_format($priority,1);
+		return number_format( $priority, 1 );
 	}
 
 	/**
@@ -1065,8 +1090,7 @@ class XMLSitemapFeed {
 	*/
 
 	// add sitemap location in robots.txt generated by WP
-	public function robots($output)
-	{
+	public function robots($output) {
 		echo '# XML Sitemap & Google News Feeds version ' . XMLSF_VERSION . ' - http://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
 
 		if ( '1' != get_option('blog_public') ) {
@@ -1078,6 +1102,7 @@ class XMLSitemapFeed {
 			if ( empty($pretty) )
 				echo '# No XML Sitemaps are enabled. Please see XML Sitemaps on Settings > Reading.' . PHP_EOL;
 		}
+
 		echo PHP_EOL;
 	}
 
@@ -1119,8 +1144,9 @@ class XMLSitemapFeed {
 		$xmlsf_rules = array();
 		$sitemaps = $this->get_sitemaps();
 
-		foreach ( $sitemaps as $name => $pretty )
+		foreach ( $sitemaps as $name => $pretty ) {
 			$xmlsf_rules[ preg_quote($pretty) . '$' ] = $wp_rewrite->index . '?feed=' . $name;
+		}
 
 		if (!empty($sitemaps['sitemap'])) {
 			// home urls
@@ -1168,7 +1194,9 @@ class XMLSitemapFeed {
 	 * @return mixed
 	 */
 	public function filter_request( $request ) {
+
 		if ( isset($request['feed']) && strpos($request['feed'],'sitemap') === 0 ) :
+
 			// modify request parameters
 			$request['post_status'] = 'publish';
 			$request['no_found_rows'] = true;
@@ -1192,8 +1220,8 @@ class XMLSitemapFeed {
 				$options = $this->get_option('news_tags');
 				$news_post_type = isset($options['post_type']) && !empty($options['post_type']) ? $options['post_type'] : $defaults['post_type'];
 				if (empty($news_post_type)) {
-					$news_post_type = 'post'
-				};
+					$news_post_type = 'post';
+				}
 
 				// disable caching
 				define('DONOTCACHEPAGE', true);
@@ -1256,6 +1284,7 @@ class XMLSitemapFeed {
 					}
 				}
 			}
+
 		endif;
 
 		return $request;
