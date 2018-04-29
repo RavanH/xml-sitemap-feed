@@ -1018,7 +1018,7 @@ jQuery( document ).ready( function() {
 		}
 
 		// ACTION LINK
-		add_filter('plugin_action_links_' . XMLSF_PLUGIN_BASENAME, array($this, 'add_action_link') );
+		add_filter('plugin_action_links_' . $parent->plugin_basename, array($this, 'add_action_link') );
 
 		// stop here if blog is not public
 		if ( !get_option('blog_public') ) { return; }

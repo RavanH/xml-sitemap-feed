@@ -6,6 +6,12 @@
 class XMLSitemapFeed {
 
 	/**
+	* Plugin base name
+	* @var string
+	*/
+	public $plugin_basename;
+
+	/**
 	* Pretty permalinks base name
 	* @var string
 	*/
@@ -183,7 +189,7 @@ class XMLSitemapFeed {
 
 		// post_types
 		$this->defaults['post_types'] = array();
-		
+
 		foreach ( get_post_types(array('public'=>true),'names') as $name ) { // want 'publicly_queryable' but that excludes pages for some weird reason
 			// skip unallowed post types
 			if (in_array($name,$this->disabled_post_types)) {
@@ -634,11 +640,11 @@ class XMLSitemapFeed {
 			case 'index':
 			$style_sheet = plugins_url('xsl/sitemap-index.xsl',__FILE__);
 			break;
-			
+
 			case 'news':
 			$style_sheet = plugins_url('xsl/sitemap-news.xsl',__FILE__);
 			break;
-			
+
 			default:
 			$style_sheet = plugins_url('xsl/sitemap.xsl',__FILE__);
 		}
@@ -664,7 +670,7 @@ class XMLSitemapFeed {
 	 */
 	public function modified( $sitemap = 'post_type', $term = '' ) {
 		global $post;
-		
+
 		if ('post_type' == $sitemap) :
 			// if blog page then look for last post date
 			if ( $post->post_type == 'page' && $this->is_home($post->ID) )
@@ -697,7 +703,7 @@ class XMLSitemapFeed {
 			if ( is_object($term) ) {
 				if ( !isset($this->termmodified[$term->term_id]) ) {
 				// get the latest post in this taxonomy item, to use its post_date as lastmod
-					$posts = get_posts ( 
+					$posts = get_posts (
 						array(
 							'post_type' => 'any',
 					 		'numberposts' => 1,
@@ -1628,7 +1634,7 @@ class XMLSitemapFeed {
 	public function plugins_loaded() {
 		// TEXT DOMAIN
 		if ( is_admin() ) { // text domain needed on admin only
-			load_plugin_textdomain('xml-sitemap-feed', false, dirname( XMLSF_PLUGIN_BASENAME ) . '/languages' );
+			load_plugin_textdomain('xml-sitemap-feed', false, dirname( $this->plugin_basename ) . '/languages' );
 		}
 	}
 
@@ -1781,7 +1787,9 @@ class XMLSitemapFeed {
 	* CONSTRUCTOR
 	*/
 
-	function __construct() {
+	function __construct( $basename = 'xml-sitemap-feed/xml-sitemap.php') {
+		$this->plugin_basename = $basename;
+
 		// sitemap element filters
 		add_filter( 'the_title_xmlsitemap', 'strip_tags' );
 		add_filter( 'the_title_xmlsitemap', 'ent2ncr', 8 );
@@ -1818,6 +1826,6 @@ class XMLSitemapFeed {
 		add_filter( 'rt_nginx_helper_purge_urls', array($this, 'nginx_helper_purge_urls'), 10, 2 );
 
 		// ACTIVATION
-		register_activation_hook( XMLSF_PLUGIN_BASENAME, array($this, 'activate') );
+		register_activation_hook( $basename, array($this, 'activate') );
 	}
 }

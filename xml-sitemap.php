@@ -59,9 +59,7 @@ if ( ! defined( 'WPINC' ) ) die;
  *      CONSTANTS
  * -------------------- */
 
-	define('XMLSF_VERSION', '4.8.3');
-
-	define('XMLSF_PLUGIN_BASENAME', plugin_basename(__FILE__));
+define('XMLSF_VERSION', '4.8.3');
 
 /*
  * The following constants can be used to change plugin defaults
@@ -75,7 +73,6 @@ if ( ! defined( 'WPINC' ) ) die;
  */
 
 if ( !defined('XMLSF_NAME') )
-
 	define('XMLSF_NAME', 'sitemap.xml');
 
 /*
@@ -85,7 +82,6 @@ if ( !defined('XMLSF_NAME') )
  */
 
 if ( !defined('XMLSF_NEWS_NAME') )
-
 	define('XMLSF_NEWS_NAME', 'sitemap-news.xml');
 
 /*
@@ -117,4 +113,4 @@ include_once( $xmlsf_dir . 'includes/class-xmlsitemapfeed.php' );
  *     INSTANTIATE
  * ---------------------- */
 
-$xmlsf = new XMLSitemapFeed();
+$xmlsf = new XMLSitemapFeed( plugin_basename(__FILE__) );
