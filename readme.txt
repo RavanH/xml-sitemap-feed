@@ -281,6 +281,7 @@ New FactCheck genre. Remove changefreq tag. Fix permalink issue with Woocommerce
 * NEW: FactCheck genre
 * Changefreq tag dropped
 * NEW: translation strings for genres
+* FIX: zlib.output_compression compatibility
 * FIX: permalink issue with Woocommerce account page endpoints
 * FIX: undefined index in news post types
 * TODO make priority optional

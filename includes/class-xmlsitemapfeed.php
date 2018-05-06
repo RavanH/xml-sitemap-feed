@@ -467,7 +467,7 @@ class XMLSitemapFeed {
 	 *
 	 * @return array
 	 */
-	public function get_archives($post_type = 'post', $type = '') {
+	public function get_archives( $post_type = 'post', $type = '' ) {
 		global $wpdb;
 		$return = array();
 
@@ -489,9 +489,9 @@ class XMLSitemapFeed {
 				foreach ( (array) $arcresults as $arcresult ) {
 					$return[$arcresult->year.$arcresult->month] = $this->get_index_url( 'posttype', $post_type, $arcresult->year . $arcresult->month );
 				}
-			}
+			};
 
-		elseif ('yearly' == $type) :
+		elseif ( 'yearly' == $type ) :
 
 			$query = "SELECT YEAR(post_date) AS `year`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date) ORDER BY post_date DESC";
 			$key = md5($query);
@@ -509,7 +509,7 @@ class XMLSitemapFeed {
 				foreach ( (array) $arcresults as $arcresult) {
 					$return[$arcresult->year] = $this->get_index_url( 'posttype', $post_type, $arcresult->year );
 				}
-			}
+			};
 
 		else :
 
@@ -631,16 +631,12 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function headers( $style = '' ) {
-		// maybe output buffering is on, then just make sure we start with a clean buffer
-		if ( ob_get_level() ) {
-			ob_clean();
-		}
-
 		// check if headers are already sent (bad) and set up a warning in admin (how?)
 		if ( !headers_sent($filename, $linenum) ) {
 			status_header('200'); // force header('HTTP/1.1 200 OK') for sites without posts
 			header('Content-Type: text/xml; charset=' . get_bloginfo('charset'), true);
 			header('X-Robots-Tag: noindex, follow', true);
+			header_remove('link');
 			$output = '';
 		} else {
 			// output warning in sitemap for now, TODO admin message
@@ -865,7 +861,9 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function get_priority( $sitemap = 'post_type', $term = '' ) {
+
 		if ( 'post_type' == $sitemap ) :
+
 			global $post;
 			$options = $this->get_post_types();
 			$defaults = $this->defaults('post_types');
@@ -1650,7 +1648,7 @@ class XMLSitemapFeed {
 			add_option( $this->prefix.'ping', array_merge( $this->defaults('ping'), $ping ), '', 'no' );
 		}
 
-		update_option( $this->prefix.'version', XMLSF_VERSION, );
+		update_option( $this->prefix.'version', XMLSF_VERSION );
 
 		if ( defined('WP_DEBUG') && WP_DEBUG ) {
 			error_log('XML Sitemap Feeds upgraded from '.$old_version.' to '.XMLSF_VERSION);
