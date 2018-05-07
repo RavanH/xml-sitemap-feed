@@ -23,7 +23,7 @@ if ( !empty($image) ) {
 }
 
 // start output
-echo $xmlsf->headers();
+echo $xmlsf->head();
 ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 <?php echo $image_xmlns; ?>

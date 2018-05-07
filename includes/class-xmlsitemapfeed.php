@@ -622,17 +622,12 @@ class XMLSitemapFeed {
 	 *
 	 * @return string
 	 */
-	public function headers( $style = '' ) {
+	public function head( $style = '' ) {
+		$output = '';
+
 		// check if headers are already sent (bad) and set up a warning in admin (how?)
-		if ( !headers_sent($filename, $linenum) ) {
-			header('Content-Type: text/xml; charset=' . get_bloginfo('charset'), true);
-			header('X-Robots-Tag: noindex, follow', true);
-			header_remove('link');
-			$output = '';
-		} else {
-			// output warning in sitemap for now, TODO admin message
+		if ( headers_sent($filename, $linenum) )
 			$output = "<!-- WARNING: Headers already sent by $filename on line $linenum. Please fix! -->\n";
-		}
 
 		// which style sheet
 		switch ($style) {
@@ -1186,6 +1181,10 @@ class XMLSitemapFeed {
 
 		if ( isset($request['feed']) && strpos($request['feed'],'sitemap') === 0 ) :
 
+			// CONTENT_TYPE and REPSONSE HEADERS filtering function
+			add_filter( 'feed_content_type', array($this, 'content_type') );
+			add_filter( 'wp_headers', array($this, 'headers') );
+
 			// modify request parameters
 			$request['post_status'] = 'publish';
 			$request['no_found_rows'] = true;
@@ -1277,6 +1276,35 @@ class XMLSitemapFeed {
 		endif;
 
 		return $request;
+	}
+
+	/**
+	 * XML Sitemap content type filter
+	 *
+	 * @param $content_type
+	 * @param $type
+	 *
+	 * @return string
+	 */
+	function content_type( $content_type, $type = 'sitemap' ) {
+		if ( strpos($type,'sitemap') === 0 )
+			$content_type = 'text/xml';
+
+	    return $content_type;
+	}
+
+	/**
+	 * Response headers filter
+	 * Does not check if we are really in a sitemap feed.
+	 *
+	 * @param $headers
+	 *
+	 * @return array
+	 */
+	function headers( $headers ) {
+		// set noindex
+		$headers['X-Robots-Tag'] = 'noindex, follow';
+	    return $headers;
 	}
 
 	/**
@@ -1799,7 +1827,7 @@ class XMLSitemapFeed {
 		add_filter( 'the_title_xmlsitemap', 'esc_html' );
 		add_filter( 'bloginfo_xmlsitemap', 'ent2ncr', 8 );
 
-		// REQUEST main filtering function
+		// main REQUEST filtering function
 		add_filter( 'request', array($this, 'filter_request'), 1 );
 
 		// TEXT DOMAIN...
