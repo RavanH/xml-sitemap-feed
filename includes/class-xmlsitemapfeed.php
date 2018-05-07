@@ -625,7 +625,6 @@ class XMLSitemapFeed {
 	public function headers( $style = '' ) {
 		// check if headers are already sent (bad) and set up a warning in admin (how?)
 		if ( !headers_sent($filename, $linenum) ) {
-			status_header('200'); // force header('HTTP/1.1 200 OK') for sites without posts
 			header('Content-Type: text/xml; charset=' . get_bloginfo('charset'), true);
 			header('X-Robots-Tag: noindex, follow', true);
 			header_remove('link');
