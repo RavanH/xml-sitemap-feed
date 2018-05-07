@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravan
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 3.2
 Tested up to: 4.9
-Stable tag: 4.8.3
+Stable tag: 4.9
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -284,8 +284,6 @@ New FactCheck genre. Remove changefreq tag. Fix permalink issue with Woocommerce
 * FIX: zlib.output_compression compatibility, thanks @alicewondermiscreations
 * FIX: permalink issue with Woocommerce account page endpoints
 * FIX: undefined index in news post types
-* TODO make priority optional
-* TODO dedicated keywords taxonomy
 
 = 4.8.3 =
 * fix get_lastpostdate array/string
