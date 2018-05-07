@@ -39,7 +39,7 @@ class XMLSitemapFeed {
 	* Database options prefix
 	* @var string
 	*/
-	private $prefix = 'xmlsf_';
+	protected $prefix = 'xmlsf_';
 
 	/**
 	 * Default language
@@ -1626,7 +1626,9 @@ class XMLSitemapFeed {
 			foreach ( $terms as $term ) {
 				wp_delete_term(	$term->term_id, 'gn-genre' );
 			}
-			set_transient( 'xmlsf_create_genres', '', 10 ); // flag recreation
+			foreach ($this->gn_genres as $name) {
+				wp_insert_term(	$name, 'gn-genre' );
+			}
 		}
 
 		// upgrade pings
@@ -1700,7 +1702,7 @@ class XMLSitemapFeed {
 		$sitemaps = $this->get_sitemaps();
 
 		if (isset($sitemaps['sitemap'])) {
-			// load feed templates
+			// setup feed templates
 			add_action( 'do_feed_sitemap', array($this, 'load_template_index'), 10, 1 );
 			add_action( 'do_feed_sitemap-home', array($this, 'load_template_base'), 10, 1 );
 			add_action( 'do_feed_sitemap-custom', array($this, 'load_template_custom'), 10, 1 );
@@ -1713,18 +1715,11 @@ class XMLSitemapFeed {
 		}
 
 		if (isset($sitemaps['sitemap-news'])) {
-			// load feed template
+			// setup feed template
 			add_action('do_feed_sitemap-news', array($this, 'load_template_news'), 10, 1);
 
 			// register the taxonomies
 			$this->register_gn_taxonomies();
-
-			// create terms
-			if ( delete_transient('xmlsf_create_genres') ) {
-				foreach ($this->gn_genres as $name) {
-					wp_insert_term(	$name, 'gn-genre' );
-				}
-			}
 		}
 	}
 
@@ -1732,16 +1727,6 @@ class XMLSitemapFeed {
 	 * Admin init
 	 */
 	public function admin_init() {
-		// CATCH TRANSIENT for reset
-		if ( delete_transient('xmlsf_clear_settings') ) {
-			$this->clear_settings();
-		}
-
-		// CATCH TRANSIENT for flushing rewrite rules after the sitemaps setting has changed
-		if ( delete_transient('xmlsf_flush_rewrite_rules') ) {
-			$this->flush_rules();
-		}
-
 		// Include the admin class file
 		include_once( dirname( __FILE__ ) . '/class-xmlsitemapfeed-admin.php' );
 	}
