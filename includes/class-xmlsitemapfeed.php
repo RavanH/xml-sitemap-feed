@@ -121,14 +121,6 @@ class XMLSitemapFeed {
 	}
 
 	/**
-	 * Get prefix
-	 * @return string
-	 */
-	public function prefix() {
-		return $this->prefix;
-	}
-
-	/**
 	 * Get gn_genres
 	 * @return array
 	 */
