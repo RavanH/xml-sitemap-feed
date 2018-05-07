@@ -1755,6 +1755,8 @@ class XMLSitemapFeed {
 	public function admin_init() {
 		// Include the admin class file
 		include_once( dirname( __FILE__ ) . '/class-xmlsitemapfeed-admin.php' );
+
+		new XMLSitemapFeed_Admin( $this->plugin_basename );
 	}
 
 	/**
@@ -1825,7 +1827,7 @@ class XMLSitemapFeed {
 	* CONSTRUCTOR
 	*/
 
-	function __construct( $basename = 'xml-sitemap-feed/xml-sitemap.php') {
+	function __construct( $basename = 'xml-sitemap-feed/xml-sitemap.php' ) {
 		$this->plugin_basename = $basename;
 
 		// sitemap element filters

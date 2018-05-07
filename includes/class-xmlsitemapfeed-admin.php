@@ -879,7 +879,7 @@ jQuery( document ).ready( function() {
 
 	public function meta_box($post) {
 		// Use nonce for verification
-		wp_nonce_field( plugin_basename( __FILE__ ), 'xmlsf_sitemap_nonce' );
+		wp_nonce_field( $this->plugin_basename, 'xmlsf_sitemap_nonce' );
 
 		// The actual fields for data entry
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
@@ -930,7 +930,7 @@ jQuery( document ).ready( function() {
 
 	public function meta_box_news($post) {
 		// Use nonce for verification
-		wp_nonce_field( plugin_basename( __FILE__ ), 'xmlsf_sitemap_nonce' );
+		wp_nonce_field( $this->plugin_basename, 'xmlsf_sitemap_nonce' );
 
 		// The actual fields for data entry
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
@@ -962,7 +962,7 @@ jQuery( document ).ready( function() {
 		if ( !isset($post_id) )
 			$post_id = (int)$_REQUEST['post_ID'];
 
-		if ( !current_user_can( 'edit_post', $post_id ) || !isset($_POST['xmlsf_sitemap_nonce']) || !wp_verify_nonce($_POST['xmlsf_sitemap_nonce'], plugin_basename( __FILE__ )) )
+		if ( !current_user_can( 'edit_post', $post_id ) || !isset($_POST['xmlsf_sitemap_nonce']) || !wp_verify_nonce($_POST['xmlsf_sitemap_nonce'], $this->plugin_basename) )
 			return;
 
 		// _xmlsf_priority
@@ -1028,7 +1028,6 @@ jQuery( document ).ready( function() {
 		register_setting('reading', $this->prefix.'sitemaps', array($this,'sanitize_sitemaps_settings') );
 		add_settings_field($this->prefix.'sitemaps', __('Enable XML sitemaps','xml-sitemap-feed'), array($this,'sitemaps_settings_field'), 'reading');
 
-
 		// robots rules only when permalinks are set
 		$rules = get_option( 'rewrite_rules' );
 		if( get_option('permalink_structure') && isset( $rules['robots\.txt$'] ) ) {
@@ -1091,7 +1090,8 @@ jQuery( document ).ready( function() {
 	 * CONSTRUCTOR
 	 */
 
-	function __construct() {
+	function __construct( $basename = 'xml-sitemap-feed/xml-sitemap.php' ) {
+		$this->plugin_basename = $basename;
 
 		// ACTION LINK
 		add_filter('plugin_action_links_' . $this->plugin_basename, array($this, 'add_action_link') );
@@ -1101,9 +1101,3 @@ jQuery( document ).ready( function() {
 		$this->register_settings();
 	}
 }
-
-/* ----------------------
-*      INSTANTIATE
-* ---------------------- */
-
-$xmlsf_admin = new XMLSitemapFeed_Admin();

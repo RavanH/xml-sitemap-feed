@@ -96,7 +96,6 @@ if ( !defined('XMLSF_NEWS_NAME') )
  * define('XMLSF_MULTISITE_UNINSTALL', true);
  */
 
-
 /* -------------------------------------
  *      INCLUDE HACKS & CLASS
  * ------------------------------------- */
