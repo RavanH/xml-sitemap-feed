@@ -24,6 +24,12 @@ class XMLSitemapFeed {
 	public $extension = 'xml';
 
 	/**
+	* Signifies whether the request has been filtered.
+	* @var bool
+	*/
+	public $request_filtered = false;
+
+	/**
 	* Signifies whether the current query is for a sitemap feed.
 	* @var bool
 	*/
@@ -1178,6 +1184,7 @@ class XMLSitemapFeed {
 	 * @return mixed
 	 */
 	public function filter_request( $request ) {
+		$this->request_filtered = true;
 
 		if ( isset($request['feed']) && strpos($request['feed'],'sitemap') === 0 ) :
 

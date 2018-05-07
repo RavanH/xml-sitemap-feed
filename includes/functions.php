@@ -14,8 +14,8 @@
  function is_sitemap() {
 	global $xmlsf;
 
-	if ( ! isset( $xmlsf ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.' ), '4.8' );
+	if ( ! is_object( $xmlsf ) || $xmlsf->request_filtered === false ) {
+		_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
 		return false;
 	}
 
@@ -33,8 +33,8 @@
 function is_news() {
 	global $xmlsf;
 
-	if ( ! isset( $xmlsf ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.' ), '4.8' );
+	if ( ! is_object( $xmlsf ) || $xmlsf->request_filtered === false ) {
+		_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
 		return false;
 	}
 
