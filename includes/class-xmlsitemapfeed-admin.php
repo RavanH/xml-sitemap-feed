@@ -1008,6 +1008,13 @@ jQuery( document ).ready( function() {
 		if ( delete_transient('xmlsf_flush_rewrite_rules') ) {
 			$this->flush_rules();
 		}
+
+		// CATCH TRANSIENT for recreating terms
+		if ( delete_transient('xmlsf_create_genres') ) {
+			foreach ($this->gn_genres as $name) {
+				wp_insert_term(	$name, 'gn-genre' );
+			}
+		}
 	}
 
 	/**
