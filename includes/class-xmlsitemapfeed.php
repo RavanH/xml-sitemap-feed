@@ -541,7 +541,7 @@ class XMLSitemapFeed {
 			is_string($type) &&
 			isset($return[$type]) &&
 			!empty($return[$type]['tags'])
-		) ? (array)$return[$type]['tags'] : array();
+		) ? (array) $return[$type]['tags'] : array();
 	}
 
 	/**
@@ -683,10 +683,10 @@ class XMLSitemapFeed {
 
 				if( !empty($options[$post->post_type]['update_lastmod_on_comments']) )
 					$lastcomment = get_comments( array(
-								'status' => 'approve',
-								'number' => 1,
-								'post_id' => $post->ID,
-								) );
+						'status' => 'approve',
+						'number' => 1,
+						'post_id' => $post->ID,
+					) );
 
 				if ( isset($lastcomment[0]->comment_date_gmt) )
 					if ( mysql2date( 'U', $lastcomment[0]->comment_date_gmt, false ) > mysql2date( 'U', $postmodified, false ) )
@@ -1188,6 +1188,9 @@ class XMLSitemapFeed {
 
 		if ( isset($request['feed']) && strpos($request['feed'],'sitemap') === 0 ) :
 
+			// set the normal sitemap conditional tag
+			$this->is_sitemap = true;
+
 			// CONTENT_TYPE and REPSONSE HEADERS filtering function
 			add_filter( 'feed_content_type', array($this, 'content_type') );
 			add_filter( 'wp_headers', array($this, 'headers') );
@@ -1240,12 +1243,18 @@ class XMLSitemapFeed {
 				return $request;
 			}
 
-			// not returned yet? then set the normal sitemap conditional tag
-			$this->is_sitemap = true;
+			$options = $this->get_post_types();
+
+			foreach ( $options as $post_type ) {
+				if( !empty($post_type['update_lastmod_on_comments']) ) {
+					$request['withcomments'] = true;
+					break;
+				}
+			}
 
 			// prepare for post types and return modified request
 			if ( strpos($request['feed'],'sitemap-posttype') === 0 ) {
-				foreach ( $this->get_post_types() as $post_type ) {
+				foreach ( $options as $post_type ) {
 					if ( $request['feed'] == 'sitemap-posttype-'.$post_type['name'] ) {
 						// setup filter
 						add_filter( 'post_limits', array($this, 'filter_limits') );
@@ -1258,6 +1267,8 @@ class XMLSitemapFeed {
 					}
 				}
 			}
+
+			// for index and custom sitemap, nothing (else) to do (yet)
 
 			// prepare for taxonomies and return modified request
 			if ( strpos($request['feed'],'sitemap-taxonomy') === 0 ) {
@@ -1866,6 +1877,6 @@ class XMLSitemapFeed {
 		add_filter( 'rt_nginx_helper_purge_urls', array($this, 'nginx_helper_purge_urls'), 10, 2 );
 
 		// ACTIVATION
-		register_activation_hook( $basename, array($this, 'activate') );
+		register_activation_hook( $this->plugin_basename, array($this, 'activate') );
 	}
 }
