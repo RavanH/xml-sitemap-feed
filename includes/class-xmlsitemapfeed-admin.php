@@ -625,8 +625,7 @@ jQuery( document ).ready( function() {
 		  </fieldset>';
 
 		// genres tag
-		$gn_genres = parent::gn_genres();
-		$gn_translations = $gn_genres = array(
+		$gn_translations = array(
 			'PressRelease' => __('PressRelease','xml-sitemap-feed'),
 			'Satire' => __('Satire','xml-sitemap-feed'),
 			'Blog' => __('Blog','xml-sitemap-feed'),
@@ -645,8 +644,8 @@ jQuery( document ).ready( function() {
 		echo '</p>
 			<p class="description">'.__('Use Ctrl plus click to select more than one or to deselect.','xml-sitemap-feed').' '.__('The FactCheck label may be applied if you publish stories with fact-checking content that\'s indicated by schema.org ClaimReview markup.','xml-sitemap-feed').' '.sprintf(__('Read more about source labels on %s','xml-sitemap-feed'),'<a href="https://support.google.com/news/publisher/answer/4582731" target="_blank">'.__('What does each source label mean?','xml-sitemap-feed').'</a>').'</p>
 			<ul>
-				<li><label>'.__('Default genre:','xml-sitemap-feed').'<br><select multiple name="'.$this->prefix.'news_tags[genres][default][]" id="xmlsf_news_tags_genres_default" size="'.count($gn_genres).'">';
-		foreach ( $gn_genres as $name ) {
+				<li><label>'.__('Default genre:','xml-sitemap-feed').'<br><select multiple name="'.$this->prefix.'news_tags[genres][default][]" id="xmlsf_news_tags_genres_default" size="'.count($this->gn_genres).'">';
+		foreach ( $this->gn_genres as $name ) {
 			echo '<option value="'.$name.'" '.selected( in_array($name,$genres_default), true, false ).'>' . ( isset($gn_translations[$name]) && !empty($gn_translations[$name]) ? $gn_translations[$name] : $name ) . '&nbsp;</option>';
     	}
 		echo '
@@ -1010,10 +1009,32 @@ jQuery( document ).ready( function() {
 		}
 
 		// CATCH TRANSIENT for recreating terms
-		if ( delete_transient('xmlsf_create_genres') ) {
+		if ( delete_transient('xmlsf_create_genres') && taxonomy_exists('gn-genre') ) {
+
+			// check if terms already exist and if they have the old slug
+			$terms = get_terms( 'gn-genre', array('hide_empty' => false) );
+			if ( is_array($terms) && !empty($terms) ) {
+				foreach ( $terms as $term ) {
+					if ( in_array($term->name,$this->gn_genres) ) {
+						$slug = strtolower($term->name);
+						if ( $term->slug !== $slug )
+							wp_update_term( $term->term_id, 'gn-genre', array(
+								'slug' => $slug
+							) );
+					}
+				}
+			}
+
 			foreach ($this->gn_genres as $name) {
 				wp_insert_term(	$name, 'gn-genre' );
 			}
+		}
+
+		// CATCH TRANSIENT for static file warning
+		$files = get_transient('xmlsf_static_files_found');
+		if ( !empty($files) ) {
+			// TODO admin message about static files: explode(', ',$files);
+			// with option to ignore or delete files or check again...
 		}
 	}
 

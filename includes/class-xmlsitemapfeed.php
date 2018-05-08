@@ -1626,7 +1626,8 @@ class XMLSitemapFeed {
 		// ... but make sure rules are regenerated when admin is visited.
 		set_transient( 'xmlsf_flush_rewrite_rules', '' );
 
-		$this->check_static_files();
+		// set this up with a transient too !! get_home_path function not available on init !?!
+		//$this->check_static_files();
 
 		if ( $old_version !== 0 ) :
 
@@ -1680,9 +1681,8 @@ class XMLSitemapFeed {
 			}
 
 			if ( version_compare('4.9', $old_version, '>') ) {
-				// rebuild taxonomy terms
-				if ( taxonomy_exists('gn-genre') )
-					set_transient('xmlsf_create_genres','');
+				// flag to rebuild taxonomy terms
+				set_transient('xmlsf_create_genres','');
 			};
 
 		endif;
