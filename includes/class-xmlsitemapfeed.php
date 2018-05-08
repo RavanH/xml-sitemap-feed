@@ -213,7 +213,14 @@ class XMLSitemapFeed {
 		}
 
 		if ( isset($this->defaults['post_types']['post']) ) {
-			if (wp_count_posts('post')->publish > 500) {
+			$post_count = get_transient('xmlsf_post_count');
+
+			if (!is_object($post_count)) {
+				$post_count = wp_count_posts('post');
+				set_transient('xmlsf_post_count', $post_count, DAY_IN_SECONDS);
+			}
+			
+			if ($post_count->publish > 500) {
 				$this->defaults['post_types']['post']['archive'] = 'yearly';
 			}
 			$this->defaults['post_types']['post']['priority'] = '0.7';
