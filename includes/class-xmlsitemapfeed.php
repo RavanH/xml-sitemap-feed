@@ -86,7 +86,7 @@ class XMLSitemapFeed {
 	 * Google News genres
 	 * @var array
 	 */
-	private $gn_genres = array(
+	protected $gn_genres = array(
 		'PressRelease',
 		'Satire',
 		'Blog',
@@ -213,9 +213,7 @@ class XMLSitemapFeed {
 		}
 
 		if ( isset($this->defaults['post_types']['post']) ) {
-			if (wp_count_posts('post')->publish > 500) {
-				$this->defaults['post_types']['post']['archive'] = 'yearly';
-			}
+			$this->defaults['post_types']['post']['archive'] = 'yearly';
 			$this->defaults['post_types']['post']['priority'] = '0.7';
 			$this->defaults['post_types']['post']['dynamic_priority'] = '1';
 		}
@@ -1628,64 +1626,66 @@ class XMLSitemapFeed {
 		// ... but make sure rules are regenerated when admin is visited.
 		set_transient( 'xmlsf_flush_rewrite_rules', '' );
 
-		// remove robots.txt rules blocking stylesheets, but only one time!
-		if ( version_compare('4.4', $old_version, '>') && $robot_rules = get_option($this->prefix.'robots') ) {
-			$robot_rules = str_replace(array('Disallow: */wp-content/','Allow: */wp-content/uploads/'),'',$robot_rules);
-			delete_option( $this->prefix.'robots' );
-			add_option( $this->prefix.'robots', $robot_rules, '', 'no' );
-		}
+		$this->check_static_files();
 
-		if ( version_compare('4.4.1', $old_version, '>') ) {
-			// register location taxonomies then delete all terms
-			register_taxonomy( 'gn-location-3', null );
-			$terms = get_terms( 'gn-location-3', array('hide_empty' => false) );
-			foreach ( $terms as $term ) {
-				wp_delete_term(	$term->term_id, 'gn-location-3' );
-			}
+		if ( $old_version !== 0 ) :
 
-			register_taxonomy( 'gn-location-2', null );
-			$terms = get_terms( 'gn-location-2',array('hide_empty' => false) );
-			foreach ( $terms as $term ) {
-				wp_delete_term(	$term->term_id, 'gn-location-2' );
-			}
+			if ( version_compare('4.4', $old_version, '>') ) {
+				// remove robots.txt rules blocking stylesheets
+			 	if ( $robot_rules = get_option($this->prefix.'robots') ) {
+					$robot_rules = str_replace(array('Disallow: */wp-content/','Allow: */wp-content/uploads/'),'',$robot_rules);
+					delete_option( $this->prefix.'robots' );
+					add_option( $this->prefix.'robots', $robot_rules, '', 'no' );
+				}
 
-			register_taxonomy( 'gn-location-1', null );
-			$terms = get_terms( 'gn-location-1',array('hide_empty' => false) );
-			foreach ( $terms as $term ) {
-				wp_delete_term(	$term->term_id, 'gn-location-1' );
-			}
-		}
-
-		if ( version_compare('4.9', $old_version, '>') ) {
-			// purge genres taxonomy terms
-			$this->register_gn_taxonomies();
-			$terms = get_terms( 'gn-genre',array('hide_empty' => false) );
-			foreach ( $terms as $term ) {
-				wp_delete_term(	$term->term_id, 'gn-genre' );
-			}
-			foreach ($this->gn_genres as $name) {
-				wp_insert_term(	$name, 'gn-genre' );
-			}
-		}
-
-		// upgrade pings
-		if ( $pong = get_option( $this->prefix.'pong' ) and is_array($pong) ) { // use 'and' here for precedence of the assignement operator, thanks @kitchin
-			$ping = $this->get_ping();
-			foreach ( $pong as $se => $arr) {
-				if ( is_array( $arr ) ) {
-					// convert formatted time to unix time
-					foreach ( $arr as $pretty => $date ) {
-						$time = strtotime($date);
-						$arr[$pretty] = (int)$time < time() ? $time : '';
+				// upgrade pings
+				if ( $pong = get_option( $this->prefix.'pong' ) and is_array($pong) ) { // use 'and' here for precedence of the assignement operator, thanks @kitchin
+					$ping = $this->get_ping();
+					foreach ( $pong as $se => $arr) {
+						if ( is_array( $arr ) ) {
+							// convert formatted time to unix time
+							foreach ( $arr as $pretty => $date ) {
+								$time = strtotime($date);
+								$arr[$pretty] = (int)$time < time() ? $time : '';
+							}
+							// and set array
+							$ping[$se]['pong'] = $arr;
+						}
 					}
-					// and set array
-					$ping[$se]['pong'] = $arr;
+					delete_option( $this->prefix.'pong' );
+					delete_option( $this->prefix.'ping' );
+					add_option( $this->prefix.'ping', array_merge( $this->defaults('ping'), $ping ), '', 'no' );
 				}
 			}
-			delete_option( $this->prefix.'pong' );
-			delete_option( $this->prefix.'ping' );
-			add_option( $this->prefix.'ping', array_merge( $this->defaults('ping'), $ping ), '', 'no' );
-		}
+
+			if ( version_compare('4.4.1', $old_version, '>') ) {
+				// register location taxonomies then delete all terms
+				register_taxonomy( 'gn-location-3', null );
+				$terms = get_terms( 'gn-location-3', array('hide_empty' => false) );
+				foreach ( $terms as $term ) {
+					wp_delete_term(	$term->term_id, 'gn-location-3' );
+				}
+
+				register_taxonomy( 'gn-location-2', null );
+				$terms = get_terms( 'gn-location-2',array('hide_empty' => false) );
+				foreach ( $terms as $term ) {
+					wp_delete_term(	$term->term_id, 'gn-location-2' );
+				}
+
+				register_taxonomy( 'gn-location-1', null );
+				$terms = get_terms( 'gn-location-1',array('hide_empty' => false) );
+				foreach ( $terms as $term ) {
+					wp_delete_term(	$term->term_id, 'gn-location-1' );
+				}
+			}
+
+			if ( version_compare('4.9', $old_version, '>') ) {
+				// rebuild taxonomy terms
+				if ( taxonomy_exists('gn-genre') )
+					set_transient('xmlsf_create_genres','');
+			};
+
+		endif;
 
 		update_option( $this->prefix.'version', XMLSF_VERSION );
 
@@ -1705,25 +1705,26 @@ class XMLSitemapFeed {
 	}
 
 	/**
-	 * Activate
+	 * Check for static sitemap files
 	 */
-	public function activate() {
-		// flush permalink structure
-		$this->flush_rules();
+	public function check_static_files() {
+		$files = array();
 
-		// try to remove static sitemap files, but only if
-		// this is not a multisite or we're on the main site or network activating
 		if ( !is_multisite() || is_main_site() || is_network_admin() ) {
-			// CHECK FOR STATIC SITEMAP FILES, DELETE IF EXIST
 			$home_path = trailingslashit( get_home_path() );
 			$sitemaps = $this->get_sitemaps();
 			foreach ( $sitemaps as $name => $pretty ) {
 				if ( file_exists( $home_path . $pretty ) ) {
-					unlink( $home_path . $pretty );
+					$files[] = $home_path . $pretty;
 				}
 			}
 		}
+
+		if ( !empty($files) ) {
+			set_transient('xmlsf_static_files_found', $files);
+		}
 	}
+
 
 	/**
 	 * Init
@@ -1875,8 +1876,6 @@ class XMLSitemapFeed {
 
 		// NGINX HELPER PURGE URLS
 		add_filter( 'rt_nginx_helper_purge_urls', array($this, 'nginx_helper_purge_urls'), 10, 2 );
-
-		// ACTIVATION
-		register_activation_hook( $this->plugin_basename, array($this, 'activate') );
 	}
+
 }
