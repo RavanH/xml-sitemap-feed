@@ -1011,7 +1011,7 @@ jQuery( document ).ready( function() {
 		// CATCH TRANSIENT for recreating terms
 		if ( delete_transient('xmlsf_create_genres') && taxonomy_exists('gn-genre') ) {
 
-			// check if terms already exist and if they have the old slug
+			// check and update existing or delete not allowed terms
 			$terms = get_terms( 'gn-genre', array('hide_empty' => false) );
 			if ( is_array($terms) && !empty($terms) ) {
 				foreach ( $terms as $term ) {
@@ -1021,10 +1021,13 @@ jQuery( document ).ready( function() {
 							wp_update_term( $term->term_id, 'gn-genre', array(
 								'slug' => $slug
 							) );
+					} else {
+						wp_delete_term( $term->term_id, 'gn-genre' );
 					}
 				}
 			}
 
+			// add any new ones
 			foreach ($this->gn_genres as $name) {
 				wp_insert_term(	$name, 'gn-genre' );
 			}

@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravan
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 3.2
 Tested up to: 4.9
-Stable tag: 4.9.1
+Stable tag: 4.9.2
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -271,11 +271,14 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 4.9 =
+= 4.9.2 =
 Bugfix release.
 
 
 == Changelog ==
+
+= 4.9.2 =
+* FactCheck genre causes error in Search Console
 
 = 4.9.1 =
 * FIX: double genre terms on upgrade from 4.4,  thanks @mouhalves

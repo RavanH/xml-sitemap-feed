@@ -92,8 +92,8 @@ class XMLSitemapFeed {
 		'Blog',
 		'OpEd',
 		'Opinion',
-		'UserGenerated',
-		'FactCheck'
+		'UserGenerated'
+		//'FactCheck'
 	);
 
 	/**
@@ -1680,7 +1680,7 @@ class XMLSitemapFeed {
 				}
 			}
 
-			if ( version_compare('4.9', $old_version, '>') ) {
+			if ( version_compare('4.9', $old_version) || version_compare('4.9.1', $old_version) ) {
 				// flag to rebuild taxonomy terms
 				set_transient('xmlsf_create_genres','');
 			};
