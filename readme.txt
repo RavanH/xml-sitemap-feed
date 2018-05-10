@@ -279,6 +279,7 @@ Bugfix release.
 
 = 4.9.2 =
 * FactCheck genre causes error in Search Console
+* HTTPS schema URLs
 
 = 4.9.1 =
 * FIX: double genre terms on upgrade from 4.4,  thanks @mouhalves
