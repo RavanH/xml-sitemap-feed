@@ -12,10 +12,10 @@ global $xmlsf;
 $options = $xmlsf->get_option('news_tags');
 
 if ( !empty($options['image']) ) {
-	$image_xmlns = '	xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'.PHP_EOL;
+	$image_xmlns = '	xmlns:image="https://www.google.com/schemas/sitemap-image/1.1"'.PHP_EOL;
 	$image_schema = '
-		http://www.google.com/schemas/sitemap-image/1.1
-		http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd';
+		https://www.google.com/schemas/sitemap-image/1.1
+		https://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd';
 } else {
 	$image_xmlns = '';
 	$image_schema = '';
@@ -24,14 +24,14 @@ if ( !empty($options['image']) ) {
 // start output
 echo $xmlsf->head('news');
 ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-	xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
+	xmlns:news="https://www.google.com/schemas/sitemap-news/0.9"
 <?php echo $image_xmlns; ?>
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd
-		http://www.google.com/schemas/sitemap-news/0.9
-		http://www.google.com/schemas/sitemap-news/0.9/sitemap-news.xsd<?php echo $image_schema; ?>">
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://www.sitemaps.org/schemas/sitemap/0.9
+		https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd
+		https://www.google.com/schemas/sitemap-news/0.9
+		https://www.google.com/schemas/sitemap-news/0.9/sitemap-news.xsd<?php echo $image_schema; ?>">
 <?php
 
 // set empty news sitemap flag

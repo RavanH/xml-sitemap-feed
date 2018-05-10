@@ -651,7 +651,7 @@ class XMLSitemapFeed {
 		$output .= '<?xml-stylesheet type="text/xsl" href="' . $style_sheet . '?ver=' . XMLSF_VERSION .'"?>' . PHP_EOL;
 		$output .= '<!-- generated-on="' . date('Y-m-d\TH:i:s+00:00') . '" -->' . PHP_EOL;
 		$output .= '<!-- generator="XML & Google News Sitemap Feed plugin for WordPress" -->' . PHP_EOL;
-		$output .= '<!-- generator-url="http://status301.net/wordpress-plugins/xml-sitemap-feed/" -->' . PHP_EOL;
+		$output .= '<!-- generator-url="https://status301.net/wordpress-plugins/xml-sitemap-feed/" -->' . PHP_EOL;
 		$output .= '<!-- generator-version="' . XMLSF_VERSION . '" -->' . PHP_EOL;
 
 		// return output
