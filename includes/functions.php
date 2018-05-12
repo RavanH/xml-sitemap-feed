@@ -118,7 +118,7 @@ if( !function_exists('_get_post_time') ) {
         return $date;
     }
 
-	if ( $post_type == 'any' ) {
+	if ( $post_type === 'any' ) {
 		$post_types = get_post_types( array( 'public' => true ) );
 		array_walk( $post_types, array( &$wpdb, 'escape_by_ref' ) );
 		$post_types = "'" . implode( "', '", $post_types ) . "'";
