@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0"
-	xmlns:html="https://www.w3.org/TR/REC-html40"
-	xmlns:sitemap="https://www.sitemaps.org/schemas/sitemap/0.9"
-	sitemap:news="https://www.google.com/schemas/sitemap-news/0.9"
-	xmlns:xsl="https://www.w3.org/1999/XSL/Transform">
+	xmlns:html="http://www.w3.org/TR/REC-html40"
+	xmlns:sitemap="http://www.sitemaps.org/schemas/sitemap/0.9"
+	sitemap:news="http://www.google.com/schemas/sitemap-news/0.9"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes"/>
 <xsl:template match="/">
-<html xmlns="https://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>XML Sitemap Feed - Index</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />

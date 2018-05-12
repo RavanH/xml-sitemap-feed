@@ -12,10 +12,10 @@ global $xmlsf;
 // start output
 echo $xmlsf->head('index');
 ?>
-<sitemapindex xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
-	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://www.sitemaps.org/schemas/sitemap/0.9
-		https://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+		http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
 	<sitemap>
 		<loc><?php echo $xmlsf->get_index_url('home'); ?></loc>
 		<lastmod><?php echo mysql2date('Y-m-d\TH:i:s+00:00', get_lastpostdate( 'gmt' ), false); ?></lastmod>
