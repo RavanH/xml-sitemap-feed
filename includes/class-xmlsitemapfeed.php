@@ -1055,7 +1055,7 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function parse_language_string( $lang ) {
-		$lang = convert_chars( strip_tags( $lang ) );
+		$lang = convert_chars( strtolower( strip_tags( $lang ) ) );
 
 		// no underscores
 		if ( strpos( $lang, '_' ) ) {

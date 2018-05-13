@@ -279,7 +279,7 @@ Bugfix release.
 
 = 4.9.3 =
 * Reinstate filter_no_news_limits, allowing post type array
-* Improved language handling and new language filter
+* Improved language handling and new language filter xmlsf_post_language
 
 = 4.9.2 =
 * FactCheck genre causes error in Search Console
