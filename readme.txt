@@ -271,15 +271,18 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 4.9.2 =
+= 4.9.3 =
 Bugfix release.
 
 
 == Changelog ==
 
+= 4.9.3 =
+* Reinstate filter_no_news_limits, allowing post type array
+* Improved language handling and new language filter
+
 = 4.9.2 =
 * FactCheck genre causes error in Search Console
-* HTTPS schema URLs
 
 = 4.9.1 =
 * FIX: double genre terms on upgrade from 4.4,  thanks @mouhalves

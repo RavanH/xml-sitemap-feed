@@ -609,12 +609,12 @@ class XMLSitemapFeed {
 	/**
 	 * Is home?
 	 *
-	 * @param $id
+	 * @param $post_id
 	 *
 	 * @return bool
 	 */
-	private function is_home( $id ) {
-		return in_array( $id, $this->get_blogpages() );
+	private function is_home( $post_id ) {
+		return in_array( $post_id, $this->get_blogpages() );
 	}
 
 	/**
@@ -1032,44 +1032,75 @@ class XMLSitemapFeed {
 	}
 
 	/**
+	 * Get site language
+	 *
+	 * @return string
+	 */
+	public function get_blog_language() {
+		if ( empty($this->blog_language) ) {
+			// get site language for default language
+			$blog_language = $this->parse_language_string( get_bloginfo('language') );
+
+			$this->blog_language = !empty($blog_language) ? $blog_language : 'en';
+		}
+
+		return $this->blog_language;
+	}
+
+	/**
+	 * Get site language
+	 *
+	 * @param string $lang unformatted language string
+	 *
+	 * @return string
+	 */
+	public function parse_language_string( $lang ) {
+		$lang = convert_chars( strip_tags( $lang ) );
+
+		// no underscores
+		if ( strpos( $lang, '_' ) ) {
+			$expl = explode('_', $lang);
+			$lang = $expl[0];
+		}
+
+		// no hyphens except...
+		if ( strpos( $lang, '-' ) && !in_array( $lang, array('zh-cn','zh-tw') ) ) {
+			// explode on hyphen and use only first part
+			$expl = explode('-', $lang);
+			$lang = $expl[0];
+		}
+
+		return $lang;
+	}
+
+	/**
 	 * Get language
 	 *
-	 * @param $id
+	 * @param $post_id
 	 *
 	 * @return null|string
 	 */
-	public function get_language( $id ) {
-		$language = null;
+	public function get_language( $post_id ) {
+		$language = $this->get_blog_language();
 
-		if ( empty($this->blog_language) ) {
-			// get site language for default language
-			$blog_language = convert_chars(strip_tags(get_bloginfo('language')));
-			$allowed = array('zh-cn','zh-tw');
-			if ( !in_array($blog_language,$allowed) ) {
-				// bloginfo_rss('language') returns improper format so
-				// we explode on hyphen and use only first part.
-				$expl = explode('-', $blog_language);
-				$blog_language = $expl[0];
-			}
-
-			$this->blog_language = !empty($blog_language) ? $blog_language : 'en';
+		// Polylang
+		if ( function_exists('pll_get_post_language') ) {
+			$lang = pll_get_post_language( $post_id, 'slug' );
+			if ( !empty($lang) )
+				$language = $this->parse_language_string( $lang );
 		}
 
 		// WPML compat
 		global $sitepress;
 		if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_language_for_element') ) {
-			$post_type = get_query_var( 'post_type', 'post' ); // is $post_type always an array here??
-			$language = $sitepress->get_language_for_element( $id, 'post_'.$post_type[0] );
-			//apply_filters( 'wpml_element_language_code', null, array( 'element_id' => $id, 'element_type' => $post_type ) );
+			$post_type = (array) get_query_var( 'post_type', 'post' ); // is $post_type always an array here??
+			$lang = $sitepress->get_language_for_element( , 'post_'.$post_type[0] );
+			//apply_filters( 'wpml_element_language_code', null, array( 'element_id' => , 'element_type' => $post_type ) );
+			if ( !empty($lang) )
+				$language = $this->parse_language_string( $lang );
 		}
 
-		// Polylang
-		if ( function_exists('pll_get_post_language') ) {
-			$lang = pll_get_post_language( $id, 'slug' );
-			$language = !empty($lang) ? $lang : $language;
-		}
-
-		return !empty($language) ? $language : $this->blog_language;
+		return apply_filters( 'xmlsf_post_language', $language, $post_id );
 	}
 
 
