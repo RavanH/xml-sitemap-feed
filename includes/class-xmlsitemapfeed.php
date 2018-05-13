@@ -1093,9 +1093,9 @@ class XMLSitemapFeed {
 		// WPML compat
 		global $sitepress;
 		if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_language_for_element') ) {
-			$post_type = (array) get_query_var( 'post_type', 'post' ); // is $post_type always an array here??
-			$lang = $sitepress->get_language_for_element( , 'post_'.$post_type[0] );
-			//apply_filters( 'wpml_element_language_code', null, array( 'element_id' => , 'element_type' => $post_type ) );
+			$post_type = (array) get_query_var( 'post_type', 'post' );
+			$lang = $sitepress->get_language_for_element( $post_id, 'post_'.$post_type[0] );
+			//apply_filters( 'wpml_element_language_code', null, array( 'element_id' => $post_id, 'element_type' => $post_type ) );
 			if ( !empty($lang) )
 				$language = $this->parse_language_string( $lang );
 		}
