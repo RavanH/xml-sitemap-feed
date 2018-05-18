@@ -1359,6 +1359,7 @@ class XMLSitemapFeed {
 	function headers( $headers ) {
 		// set noindex
 		$headers['X-Robots-Tag'] = 'noindex, follow';
+		$headers['Content-Type'] = 'text/xml; charset=' . get_bloginfo('charset');
 	    return $headers;
 	}
 
