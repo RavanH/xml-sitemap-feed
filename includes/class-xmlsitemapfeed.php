@@ -809,7 +809,7 @@ class XMLSitemapFeed {
 				}
 			} elseif ( 'featured' == $which ) {
 				if ( has_post_thumbnail( $post->ID ) ) {
-					//$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
+					$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
 					$url = wp_get_attachment_image_url( get_post_thumbnail_id( $post->ID ), 'full' );
 					$url = $this->get_absolute_url( $url );
 					if ( !empty($url) ) {
