@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravan
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 3.2
 Tested up to: 4.9
-Stable tag: 4.9.3
+Stable tag: 4.9.4
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -271,11 +271,15 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 4.9.3 =
-Bugfix release.
+= 4.9.4 =
+Bugfixes: double content type filtering and missing featured images (thanks @flyerua)
 
 
 == Changelog ==
+
+= 4.9.4 =
+* FIX: missing featured images, thanks @flyerua
+* FIX: double content type response header filtering
 
 = 4.9.3 =
 * Reinstate filter_no_news_limits, allowing post type array
