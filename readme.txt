@@ -278,7 +278,7 @@ Bugfixes: double content type filtering and missing featured images (thanks @fly
 == Changelog ==
 
 = 4.9.4 =
-* FIX: missing featured images, thanks @flyerua
+* FIX: missing featured images, thanks @flyerua 
 * FIX: double content type response header filtering
 
 = 4.9.3 =
