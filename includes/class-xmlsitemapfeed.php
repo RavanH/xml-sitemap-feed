@@ -1220,8 +1220,7 @@ class XMLSitemapFeed {
 			// set the normal sitemap conditional tag
 			$this->is_sitemap = true;
 
-			// CONTENT_TYPE and REPSONSE HEADERS filtering function
-			add_filter( 'feed_content_type', array($this, 'content_type') );
+			// REPSONSE HEADERS filtering
 			add_filter( 'wp_headers', array($this, 'headers') );
 
 			// modify request parameters
@@ -1331,21 +1330,6 @@ class XMLSitemapFeed {
 		endif;
 
 		return $request;
-	}
-
-	/**
-	 * XML Sitemap content type filter
-	 *
-	 * @param $content_type
-	 * @param $type
-	 *
-	 * @return string
-	 */
-	function content_type( $content_type, $type = 'sitemap' ) {
-		if ( strpos($type,'sitemap') === 0 )
-			$content_type = 'text/xml';
-
-	    return $content_type;
 	}
 
 	/**
