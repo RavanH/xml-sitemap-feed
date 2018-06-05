@@ -560,7 +560,7 @@ class XMLSitemapFeed {
 		}
 		// WPML compat
 		global $sitepress;
-		if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'get_object_id') ) {
+		if ( is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'get_object_id') ) {
 			foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term ) {
 				$id = $sitepress->get_object_id($post_id,'page',false,$term);
 				if ( $post_id != $id ) $translation_ids[] = $id;
@@ -946,7 +946,7 @@ class XMLSitemapFeed {
 			} else {
 				$urls[] = $this->home_url();
 			}
-		} elseif ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'language_url') ) {
+		} elseif ( is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'language_url') ) {
 			foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term ) {
 				$urls[] = $sitepress->language_url($term);
 			}
@@ -1092,7 +1092,7 @@ class XMLSitemapFeed {
 
 		// WPML compat
 		global $sitepress;
-		if ( isset($sitepress) && is_object($sitepress) && method_exists($sitepress, 'get_language_for_element') ) {
+		if ( is_object($sitepress) && method_exists($sitepress, 'get_language_for_element') ) {
 			$post_type = (array) get_query_var( 'post_type', 'post' );
 			$lang = $sitepress->get_language_for_element( $post_id, 'post_'.$post_type[0] );
 			//apply_filters( 'wpml_element_language_code', null, array( 'element_id' => $post_id, 'element_type' => $post_type ) );
@@ -1234,7 +1234,7 @@ class XMLSitemapFeed {
 			$request['lang'] = '';
 			// WPML compat
 			global $wpml_query_filter;
-			if ( isset($wpml_query_filter) && is_object($wpml_query_filter) ) {
+			if ( is_object($wpml_query_filter) ) {
 				remove_filter( 'posts_join', array( $wpml_query_filter, 'posts_join_filter' ) );
 				remove_filter( 'posts_where', array( $wpml_query_filter, 'posts_where_filter' ) );
 				add_action( 'the_post', array( $this, 'wpml_language_switcher' ) );
@@ -1315,8 +1315,8 @@ class XMLSitemapFeed {
 
 						// WPML compat
 						global $sitepress;
-						if ( isset($sitepress) && is_object($sitepress) ) {
-							remove_filter( 'get_terms_args', array($sitepress, 'get_terms_args_filter') );
+						if ( is_object($sitepress) ) {
+							remove_filter( 'get_terms_args', array($sitepress,'get_terms_args_filter') );
 							remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
 							remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
 							$sitepress->switch_lang('all');
