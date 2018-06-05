@@ -97,7 +97,7 @@ class XMLSitemapFeed {
 	);
 
 	/**
-	 * Global values used for allowed urls, priority and changefreq calculation
+	 * Global values used for allowed urls and priority calculation
 	 */
 	private $domain;
 	private $scheme;
@@ -1288,8 +1288,13 @@ class XMLSitemapFeed {
 				}
 			}
 
+			// for index and custom sitemap, nothing (else) to do (yet)
+			if ( $request['feed'] === 'sitemap' ) {
+				return $request;
+			}
+
 			// prepare for post types and return modified request
-			if ( strpos($request['feed'],'sitemap-posttype') === 0 ) {
+			if ( strpos($request['feed'],'posttype') === 8 ) {
 				foreach ( $options as $post_type ) {
 					if ( $request['feed'] == 'sitemap-posttype-'.$post_type['name'] ) {
 						// setup filter
@@ -1304,10 +1309,8 @@ class XMLSitemapFeed {
 				}
 			}
 
-			// for index and custom sitemap, nothing (else) to do (yet)
-
 			// prepare for taxonomies and return modified request
-			if ( strpos($request['feed'],'sitemap-taxonomy') === 0 ) {
+			if ( strpos($request['feed'],'taxonomy') === 8 ) {
 				foreach ( $this->get_taxonomies() as $taxonomy ) {
 					if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {
 
@@ -1321,6 +1324,18 @@ class XMLSitemapFeed {
 							remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
 							$sitepress->switch_lang('all');
 						}
+
+						// $request['number'] = '5'; //$this->get_option();
+						// https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
+						// number > 1000
+						// order > DESC
+						// orderby > 'count' (+pad_counts!)
+						// pad_counts > true
+						// update_term_meta_cache > false
+						// fields > ???
+
+						// TODO consider optional "order by" : "post count" / "post update"
+						// with 'orderby' => 'meta_value_num' + update taxonomy term with timestamp on post update
 
 						return $request;
 					}
