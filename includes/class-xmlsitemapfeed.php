@@ -712,7 +712,10 @@ class XMLSitemapFeed {
 							)
 						)
 					);
-					$lastmod = isset($posts[0]->post_modified_gmt) ? $posts[0]->post_modified_gmt : '';
+					$lastmod = isset($posts[0]->post_date_gmt) ? $posts[0]->post_date_gmt : '';
+					// get post date here, not modified date because we're only
+					// concerned about new entries on the (first) taxonomy page
+
 					update_term_meta( $term->term_id, 'term_modified_gmt', $lastmod );
 				}
 			} else {
@@ -721,11 +724,14 @@ class XMLSitemapFeed {
 
 				$lastmodified = array();
 				foreach ( (array)$obj->object_type as $object_type ) {
-					$lastmodified[] = get_lastmodified( 'gmt', $object_type );
+					$lastmodified[] = get_lastpostdate( 'gmt', $object_type );
+					// get post date here, not modified date because we're only
+					// concerned about new entries on the (first) taxonomy page
 				}
 
 				sort($lastmodified);
-				$lastmod = end( array_filter($lastmodified) );
+				$lastmodified = array_filter($lastmodified);
+				$lastmod = end( $lastmodified );
 			};
 
 		endif;
