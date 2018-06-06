@@ -105,7 +105,6 @@ class XMLSitemapFeed {
 	private $firstdate;
 	private $lastmodified; // unused at the moment
 	private $postmodified = array();
-	private $termmodified = array();
 	private $frontpages = null;
 	private $blogpages = null;
 	private $images = array();
@@ -667,81 +666,64 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function modified( $sitemap = 'post_type', $term = '' ) {
-		global $post;
+		$lastmod = '';
 
 		if ( 'post_type' == $sitemap ) :
+			global $post;
 
 			// if blog page then look for last post date
 			if ( $post->post_type == 'page' && $this->is_home($post->ID) )
 				return get_lastpostmodified('gmt'); // TODO limit to sitemap included post types...
 
-			if ( empty($this->postmodified[$post->ID]) ) {
-				$postmodified = get_post_modified_time( 'Y-m-d H:i:s', true, $post->ID );
-				$options = $this->get_post_types();
+			$lastmod = get_post_modified_time( 'Y-m-d H:i:s', true, $post->ID );
 
-				if( !empty($options[$post->post_type]['update_lastmod_on_comments']) )
-					$lastcomment = get_comments( array(
-						'status' => 'approve',
-						'number' => 1,
-						'post_id' => $post->ID,
-					) );
+			$options = $this->get_post_types();
+			if( !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
+				$lastcomment = get_comments( array(
+					'status' => 'approve',
+					'number' => 1,
+					'post_id' => $post->ID,
+				) );
 
 				if ( isset($lastcomment[0]->comment_date_gmt) )
 					if ( mysql2date( 'U', $lastcomment[0]->comment_date_gmt, false ) > mysql2date( 'U', $postmodified, false ) )
-						$postmodified = $lastcomment[0]->comment_date_gmt;
-
-				// make sure lastmod is not older than publication date (happens on scheduled posts)
-				if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($postmodified) )
-					$postmodified = $post->post_date_gmt;
-
-				$this->postmodified[$post->ID] = $postmodified;
+						$lastmod = $lastcomment[0]->comment_date_gmt;
 			}
 
-			return $this->postmodified[$post->ID];
+			// make sure lastmod is not older than publication date (happens on scheduled posts)
+			if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($postmodified) )
+				$lastmod = $post->post_date_gmt;
 
-		elseif ( !empty($term) ) :
+		elseif ( is_object($term) ) :
 
-			if ( is_object($term) ) {
-				if ( !isset($this->termmodified[$term->term_id]) ) {
-				// get the latest post in this taxonomy item, to use its post_date as lastmod
-					$posts = get_posts (
-						array(
-							'post_type' => 'any',
-					 		'numberposts' => 1,
-							'no_found_rows' => true,
-							'update_post_meta_cache' => false,
-							'update_post_term_cache' => false,
-							'update_cache' => false,
-							'tax_query' => array(
-								array(
-									'taxonomy' => $term->taxonomy,
-									'field' => 'slug',
-									'terms' => $term->slug
-								)
+			$lastmod = get_term_meta( $term->term_id, 'term_modified_gmt', true );
+
+			if ( empty($lastmod) ) {
+			// get the latest post in this taxonomy item, to use its post_date as lastmod
+				$posts = get_posts (
+					array(
+						'post_type' => 'any',
+				 		'numberposts' => 1,
+						'no_found_rows' => true,
+						'update_post_meta_cache' => false,
+						'update_post_term_cache' => false,
+						'update_cache' => false,
+						'tax_query' => array(
+							array(
+								'taxonomy' => $term->taxonomy,
+								'field' => 'slug',
+								'terms' => $term->slug
 							)
 						)
-					);
-					$this->termmodified[$term->term_id] = isset($posts[0]->post_date_gmt) ? $posts[0]->post_date_gmt : '';
-				}
-				return $this->termmodified[$term->term_id];
-			} else {
-				$obj = get_taxonomy($term);
-
-				$lastmodified = array();
-				foreach ( (array)$obj->object_type as $object_type ) {
-					$lastmodified[] = get_lastpostdate( 'gmt', $object_type );
-					// returns last post date, not last modified date... (TODO consider making this an opion)
-				}
-
-				sort($lastmodified);
-				$lastmodified = array_filter($lastmodified);
-
-				return end($lastmodified);
+					)
+				);
+				$lastmod = isset($posts[0]->post_modified_gmt) ? $posts[0]->post_modified_gmt : '';
+				update_term_meta( $term->term_id, 'term_modified_gmt', $lastmod );
 			}
 
 		endif;
 
-		return '';
+		return $lastmod;
 	}
 
 	/**
@@ -1289,7 +1271,7 @@ class XMLSitemapFeed {
 			}
 
 			// for index and custom sitemap, nothing (else) to do (yet)
-			if ( $request['feed'] === 'sitemap' ) {
+			if ( $request['feed'] == 'sitemap' ) {
 				return $request;
 			}
 
@@ -1325,17 +1307,7 @@ class XMLSitemapFeed {
 							$sitepress->switch_lang('all');
 						}
 
-						// $request['number'] = '5'; //$this->get_option();
-						// https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
-						// number > 1000
-						// order > DESC
-						// orderby > 'count' (+pad_counts!)
-						// pad_counts > true
-						// update_term_meta_cache > false
-						// fields > ???
-
-						// TODO consider optional "order by" : "post count" / "post update"
-						// with 'orderby' => 'meta_value_num' + update taxonomy term with timestamp on post update
+						add_filter( 'get_terms_args', array($this,'set_terms_args') );
 
 						return $request;
 					}
@@ -1345,6 +1317,27 @@ class XMLSitemapFeed {
 		endif;
 
 		return $request;
+	}
+
+	/**
+	 * Terms arguments filter
+	 * Does not check if we are really in a sitemap feed.
+	 *
+	 * @param $args
+	 *
+	 * @return array
+	 */
+	function set_terms_args( $args ) {
+		// https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
+		$args['number'] = 10000;
+		$args['order'] = 'DESC';
+		$args['orderby'] = 'count';
+		$args['pad_counts'] = true;
+		$args['lang'] = '';
+		$args['hierachical'] = 0;
+		$args['suppress_filter'] = true;
+
+		return $args;
 	}
 
 	/**
