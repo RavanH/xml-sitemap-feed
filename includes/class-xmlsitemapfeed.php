@@ -914,16 +914,16 @@ class XMLSitemapFeed {
 		endif;
 
 		// make sure we're not below zero or cases where we ended up above 1 (sticky posts with many comments)
-		$priority = filter_var( $priority, FILTER_VALIDATE_INT, array(
+		$priority = filter_var( $priority, FILTER_VALIDATE_FLOAT, array(
 				'options' => array(
 					'default' => .5,
-					'min_range' => 0,
-					'max_range' => 1
+					'min_range' => 0.0,
+					'max_range' => 1.0
 				)
 			)
 		);
 
-		return number_format( $priority, 1 );
+		return round( $priority, 1 );
 	}
 
 	/**
