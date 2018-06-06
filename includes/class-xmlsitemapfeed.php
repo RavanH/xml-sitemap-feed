@@ -691,34 +691,49 @@ class XMLSitemapFeed {
 			}
 
 			// make sure lastmod is not older than publication date (happens on scheduled posts)
-			if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($postmodified) )
+			if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($postmodified) ) {
 				$lastmod = $post->post_date_gmt;
+			}
 
-		elseif ( is_object($term) ) :
+		elseif ( !empty($term) ) :
 
-			$lastmod = get_term_meta( $term->term_id, 'term_modified_gmt', true );
+			if ( is_object($term) ) {
+				$lastmod = get_term_meta( $term->term_id, 'term_modified_gmt', true );
 
-			if ( empty($lastmod) ) {
-			// get the latest post in this taxonomy item, to use its post_date as lastmod
-				$posts = get_posts (
-					array(
-						'post_type' => 'any',
-				 		'numberposts' => 1,
-						'no_found_rows' => true,
-						'update_post_meta_cache' => false,
-						'update_post_term_cache' => false,
-						'update_cache' => false,
-						'tax_query' => array(
-							array(
-								'taxonomy' => $term->taxonomy,
-								'field' => 'slug',
-								'terms' => $term->slug
+				if ( empty($lastmod) ) {
+				// get the latest post in this taxonomy item, to use its post_date as lastmod
+					$posts = get_posts (
+						array(
+							'post_type' => 'any',
+					 		'numberposts' => 1,
+							'no_found_rows' => true,
+							'update_post_meta_cache' => false,
+							'update_post_term_cache' => false,
+							'update_cache' => false,
+							'tax_query' => array(
+								array(
+									'taxonomy' => $term->taxonomy,
+									'field' => 'slug',
+									'terms' => $term->slug
+								)
 							)
 						)
-					)
-				);
-				$lastmod = isset($posts[0]->post_modified_gmt) ? $posts[0]->post_modified_gmt : '';
-				update_term_meta( $term->term_id, 'term_modified_gmt', $lastmod );
+					);
+					$lastmod = isset($posts[0]->post_modified_gmt) ? $posts[0]->post_modified_gmt : '';
+					update_term_meta( $term->term_id, 'term_modified_gmt', $lastmod );
+				}
+			} else {
+
+				$obj = get_taxonomy($term);
+
+				$lastmodified = array();
+				foreach ( (array)$obj->object_type as $object_type ) {
+					$lastmodified[] = get_lastpostdate( 'gmt', $object_type );
+					// get_lastmodified ? (TODO consider making this an opion)
+				}
+
+				sort($lastmodified);
+				$lastmod = array_filter($lastmodified);
 			}
 
 		endif;
