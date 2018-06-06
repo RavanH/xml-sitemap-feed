@@ -279,6 +279,7 @@ Bugfixes: double content type filtering and missing featured images (thanks @fly
 
 = 5.0 =
 * Taxonomy terms improvements
+TODO update term_modified_gmt on post AND term publication/modification
 
 = 4.9.4 =
 * FIX: missing featured images, thanks @flyerua
