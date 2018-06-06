@@ -672,13 +672,14 @@ class XMLSitemapFeed {
 			global $post;
 
 			// if blog page then look for last post date
-			if ( $post->post_type == 'page' && $this->is_home($post->ID) )
+			if ( $post->post_type == 'page' && $this->is_home($post->ID) ) {
 				return get_lastpostmodified('gmt'); // TODO limit to sitemap included post types...
+			}
 
 			$lastmod = get_post_modified_time( 'Y-m-d H:i:s', true, $post->ID );
 
 			$options = $this->get_post_types();
-			if( !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
+			if ( !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
 				$lastcomment = get_comments( array(
 					'status' => 'approve',
 					'number' => 1,
@@ -693,7 +694,7 @@ class XMLSitemapFeed {
 			// make sure lastmod is not older than publication date (happens on scheduled posts)
 			if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($postmodified) ) {
 				$lastmod = $post->post_date_gmt;
-			}
+			};
 
 		elseif ( !empty($term) ) :
 
@@ -728,13 +729,12 @@ class XMLSitemapFeed {
 
 				$lastmodified = array();
 				foreach ( (array)$obj->object_type as $object_type ) {
-					$lastmodified[] = get_lastpostdate( 'gmt', $object_type );
-					// get_lastmodified ? (TODO consider making this an opion)
+					$lastmodified[] = get_lastmodified( 'gmt', $object_type );
 				}
 
 				sort($lastmodified);
 				$lastmod = array_filter($lastmodified);
-			}
+			};
 
 		endif;
 
