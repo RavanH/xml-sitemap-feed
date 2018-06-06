@@ -186,7 +186,7 @@ class XMLSitemapFeed {
 		// post_types
 		$this->defaults['post_types'] = array();
 
-		foreach ( get_post_types(array('public'=>true),'names') as $name ) { // want 'publicly_queryable' but that excludes pages for some weird reason
+		foreach ( get_post_types(array('public'=>true),'names') as $name ) {
 			// skip unallowed post types
 			if (in_array($name,$this->disabled_post_types)) {
 				continue;
@@ -202,24 +202,17 @@ class XMLSitemapFeed {
 			);
 		}
 
-		$active_arr = array('post','page');
-
-		foreach ( $active_arr as $name ) {
-			if ( isset($this->defaults['post_types'][$name]) ) {
-				$this->defaults['post_types'][$name]['active'] = '1';
-			}
-		}
-
 		if ( isset($this->defaults['post_types']['post']) ) {
+			$this->defaults['post_types']['post']['active'] = '1';
 			$this->defaults['post_types']['post']['archive'] = 'yearly';
 			$this->defaults['post_types']['post']['priority'] = '0.7';
 			$this->defaults['post_types']['post']['dynamic_priority'] = '1';
 		}
 
 		if ( isset($this->defaults['post_types']['page']) ) {
+			$this->defaults['post_types']['page']['active'] = '1';
 			unset($this->defaults['post_types']['page']['archive']);
 			$this->defaults['post_types']['page']['priority'] = '0.3';
-			$this->defaults['post_types']['page']['dynamic_priority'] = '1';
 		}
 
 		// taxonomies
@@ -921,15 +914,13 @@ class XMLSitemapFeed {
 
 		endif;
 
-		// make sure we're not below zero or cases where we ended up above 1 (sticky posts with many comments)
-		$priority = filter_var( $priority, FILTER_VALIDATE_FLOAT, array(
-				'options' => array(
-					'default' => 0.5,
-					'min_range' => 0.1,
-					'max_range' => 1.0
-				)
-			)
-		);
+		// make sure we're not below 0.1 or above 1 (sticky posts with many comments)
+		if ( $priority < .1 ) {
+			$priority = .1;
+		}
+		if ( $priority > 1 ) {
+			$priority = 1;
+		}
 
 		return round( $priority, 1 );
 	}

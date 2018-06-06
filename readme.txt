@@ -280,6 +280,10 @@ Bugfixes: double content type filtering and missing featured images (thanks @fly
 = 5.0 =
 * Taxonomy terms improvements
 TODO update term_modified_gmt on post AND term publication/modification
+TODO revisit admin texts on priority calc
+TODO redo filter_request() with implode on req string (on -) and work from there...
+TODO on uninstall remove term meta lastmod dates
+TODO test uninstall and clean install defaults
 
 = 4.9.4 =
 * FIX: missing featured images, thanks @flyerua
