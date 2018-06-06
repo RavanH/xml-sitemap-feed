@@ -725,12 +725,25 @@ class XMLSitemapFeed {
 				}
 
 				sort($lastmodified);
-				$lastmod = array_filter($lastmodified);
+				$lastmod = end( array_filter($lastmodified) );
 			};
 
 		endif;
 
 		return $lastmod;
+	}
+
+	/**
+	 * Get last modified
+	 *
+	 * @param string $sitemap
+	 * @param string $term
+	 *
+	 * @return string
+	 */
+	public function get_lastmod( $sitemap = 'post_type', $term = '' ) {
+		$return = trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $this->modified( $sitemap, $term ), false ) );
+		return !empty($return) ? '<lastmod>'.$return.'</lastmod>' . PHP_EOL : '';
 	}
 
 	/**
@@ -815,19 +828,6 @@ class XMLSitemapFeed {
 	}
 
 	/**
-	 * Get last modified
-	 *
-	 * @param string $sitemap
-	 * @param string $term
-	 *
-	 * @return string
-	 */
-	public function get_lastmod( $sitemap = 'post_type', $term = '' ) {
-		$return = trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $this->modified( $sitemap, $term ), false ) );
-		return !empty($return) ? '<lastmod>'.$return.'</lastmod>' . PHP_EOL : '';
-	}
-
-	/**
 	 * Prepare priority calculation values
 	 *
 	 * @param $sitemap string
@@ -875,7 +875,7 @@ class XMLSitemapFeed {
 			$defaults = $this->defaults('post_types');
 			$priority_meta = get_metadata('post', $post->ID, '_xmlsf_priority' , true);
 
-			if ( !empty($priority_meta) || $priority_meta == '0' ) {
+			if ( '' !== $priority_meta ) {
 				$priority = floatval(str_replace(',','.',$priority_meta));
 			} elseif ( !empty($options[$post->post_type]['dynamic_priority']) ) {
 				$post_modified = mysql2date('U',$post->post_modified_gmt, false);
@@ -888,13 +888,18 @@ class XMLSitemapFeed {
 
 				// reduce by age
 				// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
-				if ( !is_sticky($post->ID) && !$this->is_home($post->ID) && 0 != $this->timespan ) {
+				if ( !is_sticky($post->ID) && !$this->is_home($post->ID) && $this->timespan > 0 ) {
 					$priority -= $priority * ( $this->lastmodified - $post_modified ) / $this->timespan;
 				}
 
 				// increase by relative comment count
 				if ( $post->comment_count > 0 && $priority <= 0.9 ) {
 					$priority += 0.1 + ( 0.9 - $priority ) * $post->comment_count / wp_count_comments($post->post_type)->approved;
+				}
+
+				// make sure we're not below 0.1 after automatic calculation
+				if ( $priority < .1 ) {
+					$priority = .1;
 				}
 			} else {
 				$priority = ( isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ) ? $options[$post->post_type]['priority'] : $defaults[$post->post_type]['priority'];
@@ -907,16 +912,21 @@ class XMLSitemapFeed {
 				$min_priority = 0.1;
 				// TODO make these values optional?
 
-				$priority = ( 0 != $this->taxonomy_postcount ) ? $min_priority + ( $max_priority * $term->count / $this->taxonomy_postcount ) : 0.2;
+				$priority = ( $this->taxonomy_postcount > 0 ) ? $min_priority + ( $max_priority * $term->count / $this->taxonomy_postcount ) : 0.2;
+
+				// make sure we're not below 0.1 after automatic calculation
+				if ( $priority < .1 ) {
+					$priority = .1;
+				}
 			} else {
 				$priority = 0.2;
 			}
 
 		endif;
 
-		// make sure we're not below 0.1 or above 1 (sticky posts with many comments)
-		if ( $priority < .1 ) {
-			$priority = .1;
+		// a final check for limits
+		if ( $priority < 0 ) {
+			$priority = 0;
 		}
 		if ( $priority > 1 ) {
 			$priority = 1;
