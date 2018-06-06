@@ -102,12 +102,11 @@ class XMLSitemapFeed {
 	private $domain;
 	private $scheme;
 	private $home_url;
-	private $firstdate;
-	private $lastmodified; // unused at the moment
-	private $postmodified = array();
+	private $lastmodified;
+	private $timespan;
+	private $taxonomy_postcount = 0;
 	private $frontpages = null;
 	private $blogpages = null;
-	private $images = array();
 
 	/**
 	 * Get sitemap feed conditional
@@ -687,16 +686,16 @@ class XMLSitemapFeed {
 				) );
 
 				if ( isset($lastcomment[0]->comment_date_gmt) )
-					if ( mysql2date( 'U', $lastcomment[0]->comment_date_gmt, false ) > mysql2date( 'U', $postmodified, false ) )
+					if ( mysql2date( 'U', $lastcomment[0]->comment_date_gmt, false ) > mysql2date( 'U', $lastmod, false ) )
 						$lastmod = $lastcomment[0]->comment_date_gmt;
 			}
 
 			// make sure lastmod is not older than publication date (happens on scheduled posts)
-			if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($postmodified) ) {
+			if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($lastmod) ) {
 				$lastmod = $post->post_date_gmt;
 			};
 
-		elseif ( !empty($term) ) :
+		elseif ( 'taxonomy' == $sitemap ) :
 
 			if ( is_object($term) ) {
 				$lastmod = get_term_meta( $term->term_id, 'term_modified_gmt', true );
@@ -776,41 +775,25 @@ class XMLSitemapFeed {
 	 */
 	public function get_images( $sitemap = '' ) {
 		global $post;
+		$images = array();
 
-		if ( empty($this->images[$post->ID]) ) :
+		if ( 'news' == $sitemap ) {
+			$options = $this->get_option('news_tags');
+			$which = isset($options['image']) ? $options['image'] : '';
+		} else {
+			$options = $this->get_post_types();
+			$which = isset($options[$post->post_type]['tags']['image']) ? $options[$post->post_type]['tags']['image'] : '';
+		}
 
-			if ( 'news' == $sitemap ) {
-				$options = $this->get_option('news_tags');
-				$which = isset($options['image']) ? $options['image'] : '';
-			} else {
-				$options = $this->get_post_types();
-				$which = isset($options[$post->post_type]['tags']['image']) ? $options[$post->post_type]['tags']['image'] : '';
-			}
-
-			if ( 'attached' == $which ) {
-				$args = array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => -1, 'post_status' =>'inherit', 'post_parent' => $post->ID );
-				$attachments = get_posts($args);
-				if ( $attachments ) {
-					foreach ( $attachments as $attachment ) {
-						$url = wp_get_attachment_image_url( $attachment->ID, 'full' );
-						$url = $this->get_absolute_url( $url );
-						if ( !empty($url) ) {
-							$this->images[$post->ID][] = array(
-								'loc' => esc_attr( esc_url_raw( $url ) ),
-								'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
-								'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
-								// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
-							);
-						}
-					}
-				}
-			} elseif ( 'featured' == $which ) {
-				if ( has_post_thumbnail( $post->ID ) ) {
-					$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
-					$url = wp_get_attachment_image_url( get_post_thumbnail_id( $post->ID ), 'full' );
+		if ( 'attached' == $which ) {
+			$args = array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => -1, 'post_status' =>'inherit', 'post_parent' => $post->ID );
+			$attachments = get_posts($args);
+			if ( $attachments ) {
+				foreach ( $attachments as $attachment ) {
+					$url = wp_get_attachment_image_url( $attachment->ID, 'full' );
 					$url = $this->get_absolute_url( $url );
 					if ( !empty($url) ) {
-						$this->images[$post->ID][] =  array(
+						$images[] = array(
 							'loc' => esc_attr( esc_url_raw( $url ) ),
 							'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
 							'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
@@ -819,10 +802,23 @@ class XMLSitemapFeed {
 					}
 				}
 			}
+		} elseif ( 'featured' == $which ) {
+			if ( has_post_thumbnail( $post->ID ) ) {
+				$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
+				$url = wp_get_attachment_image_url( get_post_thumbnail_id( $post->ID ), 'full' );
+				$url = $this->get_absolute_url( $url );
+				if ( !empty($url) ) {
+					$images[] =  array(
+						'loc' => esc_attr( esc_url_raw( $url ) ),
+						'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
+						'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
+						// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
+					);
+				}
+			}
+		}
 
-		endif;
-
-		return ( isset($this->images[$post->ID]) ) ? $this->images[$post->ID] : false;
+		return ( !empty($images) ) ? $images : false;
 	}
 
 	/**
@@ -835,8 +831,37 @@ class XMLSitemapFeed {
 	 */
 	public function get_lastmod( $sitemap = 'post_type', $term = '' ) {
 		$return = trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $this->modified( $sitemap, $term ), false ) );
-		return !empty($return) ? '	<lastmod>'.$return.'</lastmod>
-	' : '';
+		return !empty($return) ? '<lastmod>'.$return.'</lastmod>' . PHP_EOL : '';
+	}
+
+	/**
+	 * Prepare priority calculation values
+	 *
+	 * @param $sitemap string
+	 * @param $name string
+	 *
+	 * @return null
+	 */
+	public function priority_calc_values( $sitemap, $name ) {
+
+		if ( $sitemap === 'post_type' ) :
+
+			if ( empty($this->timespan) ) {
+				// last posts or page modified date in Unix seconds
+				$this->lastmodified = mysql2date('U',get_lastpostmodified('gmt',$name),false);
+				// uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
+				$this->timespan = $this->lastmodified - mysql2date('U',get_firstpostdate('gmt',$name),false);
+			};
+
+		elseif ( $sitemap === 'taxonomy' ) :
+
+			$tax_obj = get_taxonomy($name);
+			foreach ($tax_obj->object_type as $post_type) {
+				$_post_count = wp_count_posts($post_type);
+				$this->taxonomy_postcount += $_post_count->publish;
+			};
+
+		endif;
 	}
 
 	/**
@@ -848,6 +873,7 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function get_priority( $sitemap = 'post_type', $term = '' ) {
+		$priority = 0.5;
 
 		if ( 'post_type' == $sitemap ) :
 
@@ -861,63 +887,45 @@ class XMLSitemapFeed {
 			} elseif ( !empty($options[$post->post_type]['dynamic_priority']) ) {
 				$post_modified = mysql2date('U',$post->post_modified_gmt, false);
 
-				if ( empty($this->lastmodified) ) {
-					$this->lastmodified = mysql2date('U',get_lastpostmodified('gmt',$post->post_type),false);
-					// last posts or page modified date in Unix seconds
-				}
-
-				if ( empty($this->firstdate) ) {
-					$this->firstdate = mysql2date('U',get_firstpostdate('gmt',$post->post_type),false);
-					// uses get_firstpostdate() function defined in xml-sitemap/hacks.php !
-				}
-
 				if ( isset($options[$post->post_type]['priority']) ) {
-					$priority_value = floatval(str_replace(',','.',$options[$post->post_type]['priority']));
+					$priority = floatval(str_replace(',','.',$options[$post->post_type]['priority']));
 				} else {
-					$priority_value = floatval($defaults[$post->post_type]['priority']);
+					$priority = floatval($defaults[$post->post_type]['priority']);
 				}
 
 				// reduce by age
 				// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
-				if ( is_sticky($post->ID) || $this->is_home($post->ID) ) {
-					$priority = $priority_value;
-				} else {
-					$priority = ( $this->lastmodified > $this->firstdate ) ? $priority_value - $priority_value * ( $this->lastmodified - $post_modified ) / ( $this->lastmodified - $this->firstdate ) : $priority_value;
+				if ( !is_sticky($post->ID) && !$this->is_home($post->ID) && 0 != $this->timespan ) {
+					$priority -= $priority * ( $this->lastmodified - $post_modified ) / $this->timespan;
 				}
 
-				if ( $post->comment_count > 0 ) {
-					$priority = $priority + 0.1 + ( 0.9 - $priority ) * $post->comment_count / wp_count_comments($post->post_type)->approved;
+				// increase by relative comment count
+				if ( $post->comment_count > 0 && $priority <= 0.9 ) {
+					$priority += 0.1 + ( 0.9 - $priority ) * $post->comment_count / wp_count_comments($post->post_type)->approved;
 				}
 			} else {
 				$priority = ( isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ) ? $options[$post->post_type]['priority'] : $defaults[$post->post_type]['priority'];
 			}
 
-		elseif ( ! empty($term) ) :
+		elseif ( 'taxonomy' == $sitemap ) :
 
-			$max_priority = 0.4;
-			$min_priority = 0.0;
-			// TODO make these values optional?
+			if ( is_object($term) ) {
+				$max_priority = 0.3;
+				$min_priority = 0.1;
+				// TODO make these values optional?
 
-			$tax_obj = get_taxonomy($term->taxonomy);
-			$postcount = 0;
-			foreach ($tax_obj->object_type as $post_type) {
-				$_post_count = wp_count_posts($post_type);
-				$postcount += $_post_count->publish;
+				$priority = ( 0 != $this->taxonomy_postcount ) ? $min_priority + ( $max_priority * $term->count / $this->taxonomy_postcount ) : 0.2;
+			} else {
+				$priority = 0.2;
 			}
-
-			$priority = ( $postcount > 0 ) ? $min_priority + ( $max_priority * $term->count / $postcount ) : $min_priority;
-
-		else :
-
-			$priority = 0.5;
 
 		endif;
 
 		// make sure we're not below zero or cases where we ended up above 1 (sticky posts with many comments)
 		$priority = filter_var( $priority, FILTER_VALIDATE_FLOAT, array(
 				'options' => array(
-					'default' => .5,
-					'min_range' => 0.0,
+					'default' => 0.5,
+					'min_range' => 0.1,
 					'max_range' => 1.0
 				)
 			)
@@ -1276,15 +1284,6 @@ class XMLSitemapFeed {
 				return $request;
 			}
 
-			$options = $this->get_post_types();
-
-			foreach ( $options as $post_type ) {
-				if( !empty($post_type['update_lastmod_on_comments']) ) {
-					$request['withcomments'] = true;
-					break;
-				}
-			}
-
 			// for index and custom sitemap, nothing (else) to do (yet)
 			if ( $request['feed'] == 'sitemap' ) {
 				return $request;
@@ -1292,8 +1291,12 @@ class XMLSitemapFeed {
 
 			// prepare for post types and return modified request
 			if ( strpos($request['feed'],'posttype') === 8 ) {
-				foreach ( $options as $post_type ) {
+				foreach ( $this->get_post_types() as $post_type ) {
 					if ( $request['feed'] == 'sitemap-posttype-'.$post_type['name'] ) {
+						if ( !empty($post_type['dynamic_priority']) ) {
+							// prepare ptiority calculation
+							$this->priority_calc_values( 'post_type', $post_type['name'] );
+						}
 						// setup filter
 						add_filter( 'post_limits', array($this, 'filter_limits') );
 
@@ -1311,7 +1314,8 @@ class XMLSitemapFeed {
 				foreach ( $this->get_taxonomies() as $taxonomy ) {
 					if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {
 
-						$request['taxonomy'] = $taxonomy;
+						// prepare ptiority calculation
+						$this->priority_calc_values( 'taxonomy', $taxonomy );
 
 						// WPML compat
 						global $sitepress;
@@ -1323,6 +1327,9 @@ class XMLSitemapFeed {
 						}
 
 						add_filter( 'get_terms_args', array($this,'set_terms_args') );
+
+						// pass on taxonomy name via request
+						$request['taxonomy'] = $taxonomy;
 
 						return $request;
 					}
