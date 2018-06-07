@@ -279,6 +279,7 @@ Bugfixes: double content type filtering and missing featured images (thanks @fly
 
 = 4.9.5 =
 * Taxonomy terms improvements
+* Exclude Woocommerce product_shipping_class taxonomy
 TODO move automatic priority for terms to PRO extension ?
 TODO update term_modified_gmt on new post AND term modification
 TODO revisit admin texts on priority calc

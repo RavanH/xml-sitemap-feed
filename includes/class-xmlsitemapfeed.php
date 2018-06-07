@@ -80,7 +80,7 @@ class XMLSitemapFeed {
 	 * post format taxonomy is disabled
 	 * @var array
 	 */
-	private $disabled_taxonomies = array('post_format');
+	private $disabled_taxonomies = array('post_format','product_shipping_class');
 
 	/**
 	 * Google News genres
@@ -198,7 +198,7 @@ class XMLSitemapFeed {
 				'archive' => '',
 				'priority' => '0.5',
 				'dynamic_priority' => '',
-				'tags' => array('image' => 'attached'/*,'video' => ''*/)
+				'tags' => array( 'image' => 'attached' /*,'video' => ''*/)
 			);
 		}
 
