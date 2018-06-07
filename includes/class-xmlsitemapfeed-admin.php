@@ -486,8 +486,7 @@ jQuery( document ).ready( function() {
 
 		$news_post_type = isset($options['post_type']) && !empty($options['post_type']) ? $options['post_type'] : $defaults['post_type'];
 
-		$post_types = get_post_types(array('publicly_queryable' =>true),'objects');
-
+		$post_types = get_post_types(array('public' =>true),'objects');
 
 		// check for valid post types
 		if ( !is_array($post_types) || empty($post_types) || is_wp_error($post_types) ) {
