@@ -49,7 +49,7 @@ class XMLSitemapFeed {
 
 	/**
 	 * Default language
-	 * @var null $blog_language
+	 * @var null/string $blog_language
 	 */
 	private $blog_language = null;
 
@@ -618,28 +618,26 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function head( $style = '' ) {
-		$output = '';
-
-		// check if headers are already sent (bad) and set up a warning in admin (how?)
-		if ( headers_sent($filename, $linenum) )
-			$output = "<!-- WARNING: Headers already sent by $filename on line $linenum. Please fix! -->\n";
+		$output = '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>' . PHP_EOL;
 
 		// which style sheet
 		switch ($style) {
 			case 'index':
-			$style_sheet = plugins_url('xsl/sitemap-index.xsl',__FILE__);
+			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('xsl/sitemap-index.xsl',__FILE__) . '?ver=' . XMLSF_VERSION .'"?>' . PHP_EOL;
 			break;
 
 			case 'news':
-			$style_sheet = plugins_url('xsl/sitemap-news.xsl',__FILE__);
+			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('xsl/sitemap-news.xsl',__FILE__) . '?ver=' . XMLSF_VERSION .'"?>' . PHP_EOL;
 			break;
 
 			default:
-			$style_sheet = plugins_url('xsl/sitemap.xsl',__FILE__);
+			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('xsl/sitemap.xsl',__FILE__) . '?ver=' . XMLSF_VERSION .'"?>' . PHP_EOL;
 		}
 
-		$output .= '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>' . PHP_EOL;
-		$output .= '<?xml-stylesheet type="text/xsl" href="' . $style_sheet . '?ver=' . XMLSF_VERSION .'"?>' . PHP_EOL;
+		// check if headers are already sent (bad) and set up a warning in source TODO make this in admin too (how? transient?)
+		if ( headers_sent($filename, $linenum) )
+			$output .= "<!-- WARNING: Headers were already sent by $filename on line $linenum. Please fix! -->\n";
+
 		$output .= '<!-- generated-on="' . date('Y-m-d\TH:i:s+00:00') . '" -->' . PHP_EOL;
 		$output .= '<!-- generator="XML & Google News Sitemap Feed plugin for WordPress" -->' . PHP_EOL;
 		$output .= '<!-- generator-url="https://status301.net/wordpress-plugins/xml-sitemap-feed/" -->' . PHP_EOL;
