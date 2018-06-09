@@ -644,10 +644,6 @@ class XMLSitemapFeed {
 			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('xsl/sitemap.xsl',__FILE__) . '?ver=' . XMLSF_VERSION .'"?>' . PHP_EOL;
 		}
 
-		// check if headers are already sent (bad) and set up a warning in source TODO make this in admin too (how? transient?)
-		if ( headers_sent($filename, $linenum) )
-			$output .= "<!-- WARNING: Headers were already sent by $filename on line $linenum. Please fix! -->\n";
-
 		$output .= '<!-- generated-on="' . date('Y-m-d\TH:i:s+00:00') . '" -->' . PHP_EOL;
 		$output .= '<!-- generator="XML & Google News Sitemap Feed plugin for WordPress" -->' . PHP_EOL;
 		$output .= '<!-- generator-url="https://status301.net/wordpress-plugins/xml-sitemap-feed/" -->' . PHP_EOL;
@@ -926,7 +922,7 @@ class XMLSitemapFeed {
 
 			if ( is_object($term) && $this->taxonomy_postcount && $defaults['dynamic_priority'] ) {
 				$priority = $defaults['min_priority'] + ( $term->count - 1 ) / $this->taxonomy_postcount;
-				
+
 				if ( $priority > $defaults['max_priority'] ) $priority = $defaults['max_priority'];
 			} else {
 				$priority = ( $defaults['min_priority'] + $defaults['max_priority'] ) / 2;
@@ -1256,8 +1252,15 @@ class XMLSitemapFeed {
 				add_action( 'the_post', array( $this, 'wpml_language_switcher' ) );
 			}
 
-			// prepare for news and return modified request
-			if ( $request['feed'] == 'sitemap-news' ) {
+			$feed = explode( '-' , $request['feed'] );
+
+			if ( !isset( $feed[1] ) ) return $request;
+
+			switch( $feed[1] ) {
+
+				case 'news':
+
+				// prepare for news and return modified request
 				$defaults = $this->defaults('news_tags');
 				$options = $this->get_option('news_tags');
 				$news_post_types = isset($options['post_type']) && !empty($options['post_type']) ? (array)$options['post_type'] : $defaults['post_type'];
@@ -1292,59 +1295,50 @@ class XMLSitemapFeed {
 				// set the news sitemap conditional tag
 				$this->is_news = true;
 
-				return $request;
-			}
+				break;
 
-			// for index and custom sitemap, nothing (else) to do (yet)
-			if ( $request['feed'] == 'sitemap' ) {
-				return $request;
-			}
+				case 'posttype':
 
-			// prepare for post types and return modified request
-			if ( strpos($request['feed'],'posttype') === 8 ) {
-				foreach ( $this->get_post_types() as $post_type ) {
-					if ( $request['feed'] == 'sitemap-posttype-'.$post_type['name'] ) {
-						if ( !empty($post_type['dynamic_priority']) ) {
-							// prepare ptiority calculation
-							$this->priority_calc_values( 'post_type', $post_type['name'] );
-						}
-						// setup filter
-						add_filter( 'post_limits', array($this, 'filter_limits') );
+				$options = $this->get_post_types();
+				$post_type = isset( $feed[2] ) && array_key_exists( $feed[2], $options ) ? $feed[2] : 'post';
 
-						$request['post_type'] = $post_type['name'];
-						$request['orderby'] = 'modified';
-						$request['is_date'] = false;
+				// prepare ptiority calculation
+				if ( $options[$post_type]['dynamic_priority'] )  $this->priority_calc_values( 'post_type', $post_type );
 
-						return $request;
-					}
+				// setup filter
+				add_filter( 'post_limits', array( $this, 'filter_limits' ) );
+
+				$request['post_type'] = $post_type;
+				$request['orderby'] = 'modified';
+				$request['is_date'] = false;
+
+				break;
+
+				case 'taxonomy':
+
+				$taxonomy = isset( $feed[2] ) && array_key_exists( $feed[2], $options ) ? $feed[2] : 'category';
+
+				// prepare ptiority calculation
+				$this->priority_calc_values( 'taxonomy', $taxonomy );
+
+				// WPML compat
+				global $sitepress;
+				if ( is_object($sitepress) ) {
+					remove_filter( 'get_terms_args', array($sitepress,'get_terms_args_filter') );
+					remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
+					remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
+					$sitepress->switch_lang('all');
 				}
-			}
 
-			// prepare for taxonomies and return modified request
-			if ( strpos($request['feed'],'taxonomy') === 8 ) {
-				foreach ( $this->get_taxonomies() as $taxonomy ) {
-					if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {
+				add_filter( 'get_terms_args', array( $this, 'set_terms_args' ) );
 
-						// prepare ptiority calculation
-						$this->priority_calc_values( 'taxonomy', $taxonomy );
+				// pass on taxonomy name via request
+				$request['taxonomy'] = $taxonomy;
 
-						// WPML compat
-						global $sitepress;
-						if ( is_object($sitepress) ) {
-							remove_filter( 'get_terms_args', array($sitepress,'get_terms_args_filter') );
-							remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
-							remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
-							$sitepress->switch_lang('all');
-						}
+				break;
 
-						add_filter( 'get_terms_args', array($this,'set_terms_args') );
-
-						// pass on taxonomy name via request
-						$request['taxonomy'] = $taxonomy;
-
-						return $request;
-					}
-				}
+				default:
+				// do nothing
 			}
 
 		endif;
