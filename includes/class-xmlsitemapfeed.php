@@ -104,7 +104,9 @@ class XMLSitemapFeed {
 	private $home_url;
 	private $lastmodified;
 	private $timespan;
+
 	private $taxonomy_postcount = 0;
+
 	private $frontpages = null;
 	private $blogpages = null;
 
@@ -188,7 +190,7 @@ class XMLSitemapFeed {
 
 		foreach ( get_post_types(array('public'=>true),'names') as $name ) {
 			// skip unallowed post types
-			if (in_array($name,$this->disabled_post_types)) {
+			if ( in_array($name,$this->disabled_post_types) ) {
 				continue;
 			}
 
@@ -218,8 +220,13 @@ class XMLSitemapFeed {
 		// taxonomies
 		$this->defaults['taxonomies'] = array(); // by default do not include any taxonomies
 
-		// news sitemap settings
-		$this->defaults['news_sitemap'] = array();
+		// taxonomy settings
+		$this->defaults['taxonomy_settings'] = array(
+			'number' => '1000',
+			'dynamic_priority' => '1',
+			'min_priority' => '0.1',
+			'max_priority' => '0.3'
+		);
 
 		// search engines to ping
 		$this->defaults['ping'] = array(
@@ -265,6 +272,9 @@ class XMLSitemapFeed {
 
 		// additional allowed domains
 		$this->defaults['domains'] = array();
+
+		// news sitemap settings
+		$this->defaults['news_sitemap'] = array();
 
 		// news sitemap tags settings
 		$this->defaults['news_tags'] = array(
@@ -692,7 +702,7 @@ class XMLSitemapFeed {
 				$lastmod = get_term_meta( $term->term_id, 'term_modified_gmt', true );
 
 				if ( empty($lastmod) ) {
-				// get the latest post in this taxonomy item, to use its post_date as lastmod
+					// get the latest post in this taxonomy item, to use its post_date as lastmod
 					$posts = get_posts (
 						array(
 							'post_type' => 'any',
@@ -852,6 +862,7 @@ class XMLSitemapFeed {
 
 		elseif ( $sitemap === 'taxonomy' ) :
 
+			// count total posts in taxonomy
 			$tax_obj = get_taxonomy($name);
 			foreach ($tax_obj->object_type as $post_type) {
 				$_post_count = wp_count_posts($post_type);
@@ -911,19 +922,14 @@ class XMLSitemapFeed {
 
 		elseif ( 'taxonomy' == $sitemap ) :
 
-			if ( is_object($term) ) {
-				$max_priority = 0.3;
-				$min_priority = 0.1;
-				// TODO make these values optional?
+			$defaults = $this->defaults('taxonomy_settings');
 
-				$priority = ( $this->taxonomy_postcount > 0 ) ? $min_priority + ( $max_priority * $term->count / $this->taxonomy_postcount ) : 0.2;
-
-				// make sure we're not below 0.1 after automatic calculation
-				if ( $priority < .1 ) {
-					$priority = .1;
-				}
+			if ( is_object($term) && $this->taxonomy_postcount && $defaults['dynamic_priority'] ) {
+				$priority = $defaults['min_priority'] + ( $term->count - 1 ) / $this->taxonomy_postcount;
+				
+				if ( $priority > $defaults['max_priority'] ) $priority = $defaults['max_priority'];
 			} else {
-				$priority = 0.2;
+				$priority = ( $defaults['min_priority'] + $defaults['max_priority'] ) / 2;
 			}
 
 		endif;
@@ -1356,7 +1362,7 @@ class XMLSitemapFeed {
 	 */
 	function set_terms_args( $args ) {
 		// https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
-		$args['number'] = 10000;
+		$args['number'] = $this->defaults['taxonomy_settings']['number'];
 		$args['order'] = 'DESC';
 		$args['orderby'] = 'count';
 		$args['pad_counts'] = true;
@@ -1692,7 +1698,7 @@ class XMLSitemapFeed {
 
 			if ( version_compare('4.4', $old_version, '>') ) {
 				// remove robots.txt rules blocking stylesheets
-			 	if ( $robot_rules = get_option($this->prefix.'robots') ) {
+			 	if ( $robot_rules = get_option( $this->prefix.'robots' ) ) {
 					$robot_rules = str_replace(array('Disallow: */wp-content/','Allow: */wp-content/uploads/'),'',$robot_rules);
 					delete_option( $this->prefix.'robots' );
 					add_option( $this->prefix.'robots', $robot_rules, '', 'no' );
