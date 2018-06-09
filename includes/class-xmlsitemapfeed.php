@@ -1299,16 +1299,17 @@ class XMLSitemapFeed {
 
 				case 'posttype':
 
+				if ( !isset( $feed[2] ) ) break;
+
 				$options = $this->get_post_types();
-				$post_type = isset( $feed[2] ) && array_key_exists( $feed[2], $options ) ? $feed[2] : 'post';
 
 				// prepare ptiority calculation
-				if ( $options[$post_type]['dynamic_priority'] )  $this->priority_calc_values( 'post_type', $post_type );
+				if ( $options[$feed[2]]['dynamic_priority'] )  $this->priority_calc_values( 'post_type', $feed[2] );
 
 				// setup filter
 				add_filter( 'post_limits', array( $this, 'filter_limits' ) );
 
-				$request['post_type'] = $post_type;
+				$request['post_type'] = $feed[2];
 				$request['orderby'] = 'modified';
 				$request['is_date'] = false;
 
@@ -1316,10 +1317,10 @@ class XMLSitemapFeed {
 
 				case 'taxonomy':
 
-				$taxonomy = isset( $feed[2] ) && array_key_exists( $feed[2], $options ) ? $feed[2] : 'category';
+				if ( !isset( $feed[2] ) ) break;
 
 				// prepare ptiority calculation
-				$this->priority_calc_values( 'taxonomy', $taxonomy );
+				$this->priority_calc_values( 'taxonomy', $feed[2] );
 
 				// WPML compat
 				global $sitepress;
@@ -1333,7 +1334,7 @@ class XMLSitemapFeed {
 				add_filter( 'get_terms_args', array( $this, 'set_terms_args' ) );
 
 				// pass on taxonomy name via request
-				$request['taxonomy'] = $taxonomy;
+				$request['taxonomy'] = $feed[2];
 
 				break;
 
