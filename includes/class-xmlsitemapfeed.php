@@ -920,7 +920,7 @@ class XMLSitemapFeed {
 
 			$defaults = $this->defaults('taxonomy_settings');
 
-			if ( is_object($term) && $this->taxonomy_postcount && $defaults['dynamic_priority'] ) {
+			if ( is_object($term) && $this->taxonomy_postcount && !empty($defaults['dynamic_priority']) ) {
 				$priority = $defaults['min_priority'] + ( $term->count - 1 ) / $this->taxonomy_postcount;
 
 				if ( $priority > $defaults['max_priority'] ) $priority = $defaults['max_priority'];
@@ -1029,7 +1029,8 @@ class XMLSitemapFeed {
 		$split_url = explode('?', $this->home_url());
 
 		if ( '' == get_option('permalink_structure') || '1' != get_option('blog_public')) {
-			$name = '?feed='.$name;
+			$name = '?feed=sitemap-'.$sitemap;
+			$name .= $type ? '-'.$type : '';
 			$name .= $param ? '&m='.$param : '';
 			$name .= isset($split_url[1]) && !empty($split_url[1]) ? '&' . $split_url[1] : '';
 		} else {
@@ -1303,8 +1304,8 @@ class XMLSitemapFeed {
 
 				$options = $this->get_post_types();
 
-				// prepare ptiority calculation
-				if ( $options[$feed[2]]['dynamic_priority'] )  $this->priority_calc_values( 'post_type', $feed[2] );
+				// prepare priority calculation
+				if ( !empty($options[$feed[2]]['dynamic_priority']) ) $this->priority_calc_values( 'post_type', $feed[2] );
 
 				// setup filter
 				add_filter( 'post_limits', array( $this, 'filter_limits' ) );
