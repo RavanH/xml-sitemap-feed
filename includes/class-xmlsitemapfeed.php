@@ -102,6 +102,7 @@ class XMLSitemapFeed {
 	private $domain;
 	private $scheme;
 	private $home_url;
+	private $plain_permalinks;
 	private $lastmodified;
 	private $timespan;
 
@@ -146,6 +147,20 @@ class XMLSitemapFeed {
 		}
 
 		return $this->domain;
+	}
+
+	/**
+	 * Whether or not to use plain permalinks
+	 * Used for sitemap index and admin page
+	 *
+	 * @return bool
+	 */
+	public function plain_permalinks() {
+		if ( empty( $this->plain_permalinks ) ) {
+			$permalink_structure = get_option('permalink_structure');
+			$this->plain_permalinks = ('' == $permalink_structure || 0 === strpos($permalink_structure,'/index.php') ) ? true : false;
+		}
+		return $this->plain_permalinks;
 	}
 
 	/**
@@ -1028,7 +1043,7 @@ class XMLSitemapFeed {
 	public function get_index_url( $sitemap = 'home', $type = false, $param = false ) {
 		$split_url = explode('?', $this->home_url());
 
-		if ( '' == get_option('permalink_structure') || '1' != get_option('blog_public')) {
+		if ( $this->plain_permalinks() ) {
 			$name = '?feed=sitemap-'.$sitemap;
 			$name .= $type ? '-'.$type : '';
 			$name .= $param ? '&m='.$param : '';
@@ -1621,8 +1636,8 @@ class XMLSitemapFeed {
 	 * @return $urls array
 	 */
 	public function nginx_helper_purge_urls( $urls = array(), $redis = false ) {
-		// are permalinks set, blog public and $urls an array?
-		if ( '' == get_option('permalink_structure') || '1' != get_option('blog_public') || ! is_array( $urls ) ) {
+		// are permalinks set?
+		if ( $this->plain_permalinks() ) {
 			return $urls;
 		}
 
