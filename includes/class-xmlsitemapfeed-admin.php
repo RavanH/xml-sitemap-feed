@@ -17,15 +17,14 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 	 */
 	public function sitemaps_settings_field() {
 		$options = parent::get_sitemaps();
-		$disabled = ('1' == get_option('blog_public')) ? false : true;
 
 		echo '<fieldset id="xmlsf_sitemaps"><legend class="screen-reader-text">'.__('XML Sitemaps','xml-sitemap-feed').'</legend>
-			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="'.htmlspecialchars(XMLSF_NAME).'" '.checked(isset($options['sitemap']), true, false).' '.disabled($disabled, true, false).' /> '.__('XML Sitemap Index','xml-sitemap-feed').'</label>';//xmlsf
+			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="'.htmlspecialchars(XMLSF_NAME).'" '.checked(isset($options['sitemap']), true, false).' /> '.__('XML Sitemap Index','xml-sitemap-feed').'</label>';//xmlsf
 		if (isset($options['sitemap']))
 			echo '<span class="description"> &nbsp;&ndash;&nbsp; <a href="#xmlsf" id="xmlsf_link">'.translate('Settings').'</a> &nbsp;&ndash;&nbsp; <a href="'.trailingslashit(get_bloginfo('url')). ( $this->plain_permalinks() ? '?feed=sitemap' : $options['sitemap'] ) .'" target="_blank">'.translate('View').'</a></span>';
 
 		echo '<br>
-			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="'.htmlspecialchars(XMLSF_NEWS_NAME).'" '.checked(isset($options['sitemap-news']), true, false).' '.disabled($disabled, true, false).' /> '.__('Google News Sitemap','xml-sitemap-feed').'</label>';
+			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="'.htmlspecialchars(XMLSF_NEWS_NAME).'" '.checked(isset($options['sitemap-news']), true, false).' /> '.__('Google News Sitemap','xml-sitemap-feed').'</label>';
 		if (isset($options['sitemap-news']))
 			echo '<span class="description"> &nbsp;&ndash;&nbsp; <a href="#xmlnf" id="xmlnf_link">'.translate('Settings').'</a> &nbsp;&ndash;&nbsp; <a href="'.trailingslashit(get_bloginfo('url')). ( $this->plain_permalinks() ? '?feed=sitemap-news' : $options['sitemap-news'] ) .'" target="_blank">'.translate('View').'</a></span>';
 
@@ -34,16 +33,6 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		echo '
     <script type="text/javascript">
         jQuery( document ).ready( function() {
-            jQuery( "input[name=\'blog_public\']" ).on( \'change\', function() {
-			jQuery("#xmlsf_sitemaps input").each(function() {
-			  var $this = jQuery(this);
-			  $this.attr("disabled") ? $this.removeAttr("disabled") : $this.attr("disabled", "disabled");
-			});
-			jQuery("#xmlsf_ping input").each(function() {
-			  var $this = jQuery(this);
-			  $this.attr("disabled") ? $this.removeAttr("disabled") : $this.attr("disabled", "disabled");
-			});
-            });
             jQuery( "#xmlsf_link" ).click( function(event) {
 	     	        event.preventDefault();
 	     	        jQuery("html, body").animate({
@@ -515,8 +504,8 @@ jQuery( document ).ready( function() {
 				echo '
 				<label><input type="checkbox" name="'.$this->prefix.'news_tags[post_type][]" id="xmlsf_post_type_'.
 					$post_type->name.'" value="'.$post_type->name.'" '.
-					checked( $checked, true, false).' '.
-					disabled( $disabled, true, false).' /> '.
+					checked( $checked, true, false ).' '.
+					disabled( $disabled, true, false ).' /> '.
 					$post_type->label.'</label><br>';
 			}
 			echo '
@@ -690,22 +679,16 @@ jQuery( document ).ready( function() {
 	public function sanitize_sitemaps_settings($new) {
 		$old = parent::get_sitemaps();
 
-		if (isset($new['reset']) && $new['reset'] == '1') // if reset is checked, set transient to clear all settings
+		if ( isset($new['reset']) && $new['reset'] == '1' ) {// if reset is checked, set transient to clear all settings
 			set_transient('xmlsf_clear_settings','');
+		} elseif ( $old != $new ) {// when sitemaps are added or removed, set transient to flush rewrite rules
+			set_transient('xmlsf_flush_rewrite_rules','');
 
-		if( '1' == get_option('blog_public') ) {
-			if ($old != $new && !isset($new['reset'])) // when sitemaps are added or removed, set transient to flush rewrite rules
-				set_transient('xmlsf_flush_rewrite_rules','');
-
-			if (empty($old['sitemap-news']) && !empty($new['sitemap-news']))
+			if ( empty($old['sitemap-news']) && !empty($new['sitemap-news']) )
 				set_transient('xmlsf_create_genres','');
-
-			$sanitized = $new;
-		} else {
-			$sanitized = $old;
 		}
 
-		return $sanitized;
+		return $new;
 	}
 
 	public function sanitize_post_types_settings( $new = array() ) {
@@ -883,27 +866,27 @@ jQuery( document ).ready( function() {
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
 		$exclude = get_post_meta( $post->ID, '_xmlsf_exclude', true );
 		$priority = get_post_meta( $post->ID, '_xmlsf_priority', true );
-		$disabled = '';
+		$disabled = false;
 
 		// disable options and (visibly) set excluded to true for private posts
 		if ( 'private' == $post->post_status ) {
-			$disabled = ' disabled="disabled"';
+			$disabled = true;
 			$exclude = true;
 		}
 
 		// disable options and (visibly) set priority to 1 for front page
 		if ( $post->ID == get_option('page_on_front') ) {
-			$disabled = ' disabled="disabled"';
+			$disabled = true;
 			$priority = '1'; // force excluded to true for private posts
 		}
 
 		echo '<p><label>';
 		_e('Priority','xml-sitemap-feed');
-		echo ' <input type="number" step="0.1" min="0" max="1" name="xmlsf_priority" id="xmlsf_priority" value="'.$priority.'" class="small-text"'.$disabled.'></label> <span class="description">';
+		echo ' <input type="number" step="0.1" min="0" max="1" name="xmlsf_priority" id="xmlsf_priority" value="'.$priority.'" class="small-text" '.disabled( $disabled, true, false ).'></label> <span class="description">';
 		printf(__('Leave empty for automatic Priority as configured on %1$s > %2$s.','xml-sitemap-feed'),translate('Settings'),'<a href="' . admin_url('options-reading.php') . '#xmlsf">' . translate('Reading') . '</a>');
 		echo '</span></p>';
 
-		echo '<p><label><input type="checkbox" name="xmlsf_exclude" id="xmlsf_exclude" value="1"'.checked(!empty($exclude), true, false).$disabled.' > ';
+		echo '<p><label><input type="checkbox" name="xmlsf_exclude" id="xmlsf_exclude" value="1" '.checked(!empty($exclude), true, false).' '.disabled( $disabled, true, false ).'> ';
 		_e('Exclude from XML Sitemap','xml-sitemap-feed');
 		echo '</label></p>';
 	}
@@ -934,11 +917,11 @@ jQuery( document ).ready( function() {
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
 		$exclude = get_post_meta( $post->ID, '_xmlsf_news_exclude', true );
 		$access = get_post_meta( $post->ID, '_xmlsf_news_access', true );
-		$disabled = '';
+		$disabled = false;
 
 		// disable options and (visibly) set excluded to true for private posts
 		if ( 'private' == $post->post_status ) {
-			$disabled = ' disabled="disabled"';
+			$disabled = true;
 			$exclude = true;
 		}
 
@@ -950,7 +933,7 @@ jQuery( document ).ready( function() {
 				<option value="Subscription" '.selected( "Subscription" == $access, true, false).'>'.__('Subscription','xml-sitemap-feed').'</option>
 			</select></label></p>';
 
-		echo '<p><label><input type="checkbox" name="xmlsf_news_exclude" id="xmlsf_news_exclude" value="1"'.checked(!empty($exclude), true, false).$disabled.' > ';
+		echo '<p><label><input type="checkbox" name="xmlsf_news_exclude" id="xmlsf_news_exclude" value="1" '.checked(!empty($exclude), true, false).' '.disabled( $disabled, true, false ).'> ';
 		_e('Exclude from Google News Sitemap.','xml-sitemap-feed');
 		echo '</label></p>';
 	}
@@ -1057,9 +1040,6 @@ jQuery( document ).ready( function() {
 			register_setting('reading', $this->prefix.'robots', array($this,'sanitize_robots_settings') );
 			add_settings_field($this->prefix.'robots', __('Additional robots.txt rules','xml-sitemap-feed'), array($this,'robots_settings_field'), 'reading');
 		}
-
-		// stop here if blog is not public
-		if ( !get_option('blog_public') ) { return; }
 
 		if ( is_multisite() ) {
 			add_settings_field($this->prefix.'reset', __('Reset XML sitemaps','xml-sitemap-feed'), array($this,'reset_settings_field'), 'reading');

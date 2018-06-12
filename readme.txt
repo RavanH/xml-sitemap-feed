@@ -280,10 +280,11 @@ Bugfixes: double content type filtering and missing featured images (thanks @fly
 = 4.9.5 =
 * Taxonomy terms improvements
 * Exclude Woocommerce product_shipping_class taxonomy
-TODO add taxonomy term limit option
+* FIX: plain and /index.php/ permalink strucure
+TODO add taxonomy term limit as option
 TODO update term_modified_gmt on new post AND term modification
 TODO revisit admin texts on priority calc
-TODO on uninstall remove term meta lastmod dates
+TODO on uninstall remove term meta lastmod dates?
 TODO test uninstall and clean install defaults
 
 = 4.9.4 =
