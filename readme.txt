@@ -136,7 +136,7 @@ Besides that, Google and Bing are pinged upon each new publication.
 
 = Does this plugin ping search engines? =
 
-Yes, Google and Bing are pinged upon each new publication. Unless you disable this feature on **Settings > Reading**.
+Yes, Google and Bing are pinged upon each new publication. Unless you disable this feature on **Settings > Writing**.
 
 = Do I need to change my robots.txt? =
 
