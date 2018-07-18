@@ -1502,7 +1502,7 @@ class XMLSitemapFeed {
 							continue;
 						}
 						// ping !
-						if ( $this->ping( add_query_arg( $data['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap-news']), $data['uri'] ) ) ) {
+						if ( isset($data['req'], $data['uri']) && $this->ping( add_query_arg( $data['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap-news']), $data['uri'] ) ) ) {
 							$to_ping[$se]['pong'][$sitemaps['sitemap-news']] = time();
 							$update = true;
 						}
