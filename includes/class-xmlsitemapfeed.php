@@ -73,6 +73,7 @@ class XMLSitemapFeed {
 	 * @var array
 	 */
 	private $disabled_post_types = array('attachment');
+	private $disabled_post_types_news = array('attachment','page');
 
 	/**
 	 * Excluded taxonomies
@@ -205,7 +206,7 @@ class XMLSitemapFeed {
 
 		foreach ( get_post_types(array('public'=>true),'names') as $name ) {
 			// skip unallowed post types
-			if ( in_array($name,$this->disabled_post_types) ) {
+			if ( in_array($name,$this->disabled_post_types()) ) {
 				continue;
 			}
 
@@ -361,7 +362,10 @@ class XMLSitemapFeed {
 	 * Get disabled post types
 	 * @return array
 	 */
-	protected function disabled_post_types() {
+	protected function disabled_post_types( $sitemap = '' ) {
+		if ( 'news' == $sitemap )
+			return $this->disabled_post_types_news;
+
 		return $this->disabled_post_types;
 	}
 

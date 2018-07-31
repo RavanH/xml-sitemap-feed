@@ -487,7 +487,7 @@ jQuery( document ).ready( function() {
 
 			foreach ( $post_types as $post_type ) {
 				// skip unallowed post types
-				if ( !is_object($post_type) || in_array($post_type->name,parent::disabled_post_types()) )
+				if ( !is_object($post_type) || in_array($post_type->name,parent::disabled_post_types('news')) )
 					continue;
 
 				$checked = in_array($post_type->name,$news_post_type) ? true : false;
