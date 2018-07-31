@@ -41,7 +41,7 @@ foreach ( $xmlsf->get_taxonomies() as $taxonomy ) {
 ?>
 	<sitemap>
 		<loc><?php echo $xmlsf->get_index_url('taxonomy',$taxonomy); ?></loc>
-	<?php echo $xmlsf->get_lastmod('taxonomy',$taxonomy); ?></sitemap>
+		<?php echo $xmlsf->get_lastmod('taxonomy',$taxonomy); ?></sitemap>
 <?php
 	}
 }

@@ -2,7 +2,7 @@
 Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
-Requires at least: 3.2
+Requires at least: 4.4
 Tested up to: 4.9
 Stable tag: 4.9.4
 
@@ -10,11 +10,11 @@ XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cac
 
 == Description ==
 
-This plugin dynamically creates feeds that comply with the **XML Sitemap** and the **Google News Sitemap** protocol. **Multisite**, **Polylang** and **WPML** compatible and there are no files created. Options can be found on **Settings > Reading** to control which sitemaps, which post and taxonomy types are included, how priority is calculated, who to ping and set additional robots.txt rules.
+This plugin dynamically creates feeds that comply with the **XML Sitemap** and the **Google News Sitemap** protocol. **Multisite**, **Polylang** and **WPML** compatible and there are no files created. Options can be found on **Settings > Reading** to control which sitemaps, which Post and Taxonomy types are included, how Priority and Lastmod are calculated, who to ping and set additional robots.txt rules.
 
 The main advantage of this plugin over other XML Sitemap plugins is **simplicity**. No need to change file or folder permissions, move files or spend time tweaking difficult plugin options.
 
-You, or site owners on your Multisite network, will not be bothered with overly complicated settings like most other XML Sitemap plugins. The default settings will suffice in most cases and XML sitemap values like ChangeFreq and URL Priority are auto-calculated based on post age and comment activity.
+You, or site owners on your Multisite network, will not be bothered with overly complicated settings like most other XML Sitemap plugins. The default settings will suffice in most cases.
 
 An XML Sitemap Index becomes instantly available on **yourblog.url/sitemap.xml** (or yourblog.url/?feed=sitemap if you're not using a 'fancy' permalink structure) containing references to posts and pages by default, ready for indexing by search engines like Google, Bing, Yahoo, AOL and Ask. When the Google News Sitemap is activated, it will become available on **yourblog.url/sitemap-news.xml** (or yourblog.url/?feed=sitemap-news), ready for indexing by Google News. Both are automatically referenced in the dynamically created **robots.txt** on **yourblog.url/robots.txt** to tell search engines where to find your XML Sitemaps. Google and Bing can be pinged on each new publication.
 
@@ -30,18 +30,22 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 
 = Features =
 
+* Compatible with multi-lingual sites using **Polylang** or **WPML** to allow all languages to be indexed equally.
+* Option to add new robots.txt rules. These can be used to further control (read: limit) the indexation of various parts of your site and subsequent spread of pagerank across your sites pages.
+* Includes XLS stylesheets for human readable sitemaps.
+
 **XML Sitemap**
 
 * Sitemap Index with optional inclusion of sitemaps for custom post types, categories and tags.
 * Sitemap with custom URLs optional.
 * Custom/static sitemaps can be added to the index.
-* Completely **automatic** post URL _priority_ and _change frequency_ calculation based on post age and comment and trackback activity.
 * Works out-of-the-box, even on **Multisite** installations.
 * Optionally include Image tags with caption and title for featured images or attached images.
 * Pings Google, Bing & Yahoo, Yandex and Baidu on new post publication.
-* Options to define which post types and taxonomies get included in the sitemap and automatic priority calculation rules.
-* Set priority per post.
-* Exclude individual posts or pages.
+* Options to define which post types and taxonomies get included in the sitemap
+* Updates Lastmod on post modification or on comments.
+* Set Priority per post type, per taxonomy and per individual post.
+* Exclude individual posts and pages.
 
 **Google News Sitemap**
 
@@ -50,18 +54,12 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Configure <genres> label both globally and post by post
 * Pings both Google and Bing on new publications.
 
-**More**
-
-* Compatible with multi-lingual sites using **Polylang** or **WPML** to allow all languages to be indexed equally.
-* Option to add new robots.txt rules. These can be used to further control (read: limit) the indexation of various parts of your site and subsequent spread of pagerank across your sites pages.
-* Includes XLS stylesheets for human readable sitemaps.
 
 = Contribute =
 
 If you're happy with this plugin as it is, please consider writing a quick [rating](https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/#new-post) or helping other users out on the [support forum](https://wordpress.org/support/plugin/xml-sitemap-feed).
 
 If you wish to help build this plugin, you're very welcome to [translate it into your language](https://translate.wordpress.org/projects/wp-plugins/xml-sitemap-feed/) or contribute code on [Github](https://github.com/RavanH/xml-sitemap-feed/).
-
 
 = Credits =
 
@@ -122,9 +120,11 @@ You will also want to add the sitemap to your [Google Webmasters Tools account](
 
 The rules of the Google News game are that you do not feed the monster any stale food. Older than 2 days is bad. You need to whip up some fresh chow ;)
 
-= Can I manipulate values for priority and changefreq? =
+= Can I manipulate values for Priority and Changefreq? =
 
-Yes. You can find default settings for priority, changefreq and lastmod on **Settings > Reading**. A fixed priority can be set on a post by post basis too.
+You can find default settings for Priority on **Settings > Reading**. A fixed priority can be set on a post by post basis too.
+
+Changefreq has been dropped since version 4.9 because it is no longer taken into account by Google.
 
 = Do I need to submit the sitemap to search engines? =
 
@@ -136,7 +136,7 @@ Besides that, Google and Bing are pinged upon each new publication.
 
 = Does this plugin ping search engines? =
 
-Yes, Google and Bing are pinged upon each new publication. Unless you disable this feature on **Settings > Reading**.
+Yes, Google and Bing are pinged upon each new publication. Unless you disable this feature on **Settings > Writing**.
 
 = Do I need to change my robots.txt? =
 
@@ -279,6 +279,14 @@ Bugfixes: double content type filtering and missing featured images (thanks @fly
 
 = 4.9.5 =
 * Removal of the keywords and access tags as Google dropped support
+* Taxonomy terms improvements
+* Exclude Woocommerce product_shipping_class taxonomy
+* FIX: plain and /index.php/ permalink strucure
+TODO add taxonomy term limit as option
+TODO update term_modified_gmt on new post AND term modification
+TODO revisit admin texts on priority calc
+TODO on uninstall remove term meta lastmod dates?
+TODO test uninstall and clean install defaults
 
 = 4.9.4 =
 * FIX: missing featured images, thanks @flyerua

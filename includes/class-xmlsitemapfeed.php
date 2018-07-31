@@ -49,7 +49,7 @@ class XMLSitemapFeed {
 
 	/**
 	 * Default language
-	 * @var null $blog_language
+	 * @var null/string $blog_language
 	 */
 	private $blog_language = null;
 
@@ -73,6 +73,7 @@ class XMLSitemapFeed {
 	 * @var array
 	 */
 	private $disabled_post_types = array('attachment');
+	private $disabled_post_types_news = array('attachment','page');
 
 	/**
 	 * Excluded taxonomies
@@ -80,7 +81,7 @@ class XMLSitemapFeed {
 	 * post format taxonomy is disabled
 	 * @var array
 	 */
-	private $disabled_taxonomies = array('post_format');
+	private $disabled_taxonomies = array('post_format','product_shipping_class');
 
 	/**
 	 * Google News genres
@@ -102,13 +103,14 @@ class XMLSitemapFeed {
 	private $domain;
 	private $scheme;
 	private $home_url;
-	private $firstdate;
-	private $lastmodified; // unused at the moment
-	private $postmodified = array();
-	private $termmodified = array();
+	private $plain_permalinks;
+	private $lastmodified;
+	private $timespan;
+
+	private $taxonomy_postcount = 0;
+
 	private $frontpages = null;
 	private $blogpages = null;
-	private $images = array();
 
 	/**
 	 * Get sitemap feed conditional
@@ -146,6 +148,20 @@ class XMLSitemapFeed {
 		}
 
 		return $this->domain;
+	}
+
+	/**
+	 * Whether or not to use plain permalinks
+	 * Used for sitemap index and admin page
+	 *
+	 * @return bool
+	 */
+	public function plain_permalinks() {
+		if ( empty( $this->plain_permalinks ) ) {
+			$permalink_structure = get_option('permalink_structure');
+			$this->plain_permalinks = ('' == $permalink_structure || 0 === strpos($permalink_structure,'/index.php') ) ? true : false;
+		}
+		return $this->plain_permalinks;
 	}
 
 	/**
@@ -188,9 +204,9 @@ class XMLSitemapFeed {
 		// post_types
 		$this->defaults['post_types'] = array();
 
-		foreach ( get_post_types(array('public'=>true),'names') as $name ) { // want 'publicly_queryable' but that excludes pages for some weird reason
+		foreach ( get_post_types(array('public'=>true),'names') as $name ) {
 			// skip unallowed post types
-			if (in_array($name,$this->disabled_post_types)) {
+			if ( in_array($name,$this->disabled_post_types()) ) {
 				continue;
 			}
 
@@ -200,35 +216,33 @@ class XMLSitemapFeed {
 				'archive' => '',
 				'priority' => '0.5',
 				'dynamic_priority' => '',
-				'tags' => array('image' => 'attached'/*,'video' => ''*/)
+				'tags' => array( 'image' => 'attached' /*,'video' => ''*/)
 			);
 		}
 
-		$active_arr = array('post','page');
-
-		foreach ( $active_arr as $name ) {
-			if ( isset($this->defaults['post_types'][$name]) ) {
-				$this->defaults['post_types'][$name]['active'] = '1';
-			}
-		}
-
 		if ( isset($this->defaults['post_types']['post']) ) {
+			$this->defaults['post_types']['post']['active'] = '1';
 			$this->defaults['post_types']['post']['archive'] = 'yearly';
 			$this->defaults['post_types']['post']['priority'] = '0.7';
 			$this->defaults['post_types']['post']['dynamic_priority'] = '1';
 		}
 
 		if ( isset($this->defaults['post_types']['page']) ) {
+			$this->defaults['post_types']['page']['active'] = '1';
 			unset($this->defaults['post_types']['page']['archive']);
 			$this->defaults['post_types']['page']['priority'] = '0.3';
-			$this->defaults['post_types']['page']['dynamic_priority'] = '1';
 		}
 
 		// taxonomies
 		$this->defaults['taxonomies'] = array(); // by default do not include any taxonomies
 
-		// news sitemap settings
-		$this->defaults['news_sitemap'] = array();
+		// taxonomy settings
+		$this->defaults['taxonomy_settings'] = array(
+			'number' => '1000',
+			'dynamic_priority' => '1',
+			'min_priority' => '0.1',
+			'max_priority' => '0.3'
+		);
 
 		// search engines to ping
 		$this->defaults['ping'] = array(
@@ -274,6 +288,9 @@ class XMLSitemapFeed {
 
 		// additional allowed domains
 		$this->defaults['domains'] = array();
+
+		// news sitemap settings
+		$this->defaults['news_sitemap'] = array();
 
 		// news sitemap tags settings
 		$this->defaults['news_tags'] = array(
@@ -345,7 +362,10 @@ class XMLSitemapFeed {
 	 * Get disabled post types
 	 * @return array
 	 */
-	protected function disabled_post_types() {
+	protected function disabled_post_types( $sitemap = '' ) {
+		if ( 'news' == $sitemap )
+			return $this->disabled_post_types_news;
+
 		return $this->disabled_post_types;
 	}
 
@@ -618,28 +638,22 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function head( $style = '' ) {
-		$output = '';
-
-		// check if headers are already sent (bad) and set up a warning in admin (how?)
-		if ( headers_sent($filename, $linenum) )
-			$output = "<!-- WARNING: Headers already sent by $filename on line $linenum. Please fix! -->\n";
+		$output = '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>' . PHP_EOL;
 
 		// which style sheet
 		switch ($style) {
 			case 'index':
-			$style_sheet = plugins_url('xsl/sitemap-index.xsl',__FILE__);
+			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('xsl/sitemap-index.xsl',__FILE__) . '?ver=' . XMLSF_VERSION .'"?>' . PHP_EOL;
 			break;
 
 			case 'news':
-			$style_sheet = plugins_url('xsl/sitemap-news.xsl',__FILE__);
+			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('xsl/sitemap-news.xsl',__FILE__) . '?ver=' . XMLSF_VERSION .'"?>' . PHP_EOL;
 			break;
 
 			default:
-			$style_sheet = plugins_url('xsl/sitemap.xsl',__FILE__);
+			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('xsl/sitemap.xsl',__FILE__) . '?ver=' . XMLSF_VERSION .'"?>' . PHP_EOL;
 		}
 
-		$output .= '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>' . PHP_EOL;
-		$output .= '<?xml-stylesheet type="text/xsl" href="' . $style_sheet . '?ver=' . XMLSF_VERSION .'"?>' . PHP_EOL;
 		$output .= '<!-- generated-on="' . date('Y-m-d\TH:i:s+00:00') . '" -->' . PHP_EOL;
 		$output .= '<!-- generator="XML & Google News Sitemap Feed plugin for WordPress" -->' . PHP_EOL;
 		$output .= '<!-- generator-url="https://status301.net/wordpress-plugins/xml-sitemap-feed/" -->' . PHP_EOL;
@@ -658,43 +672,43 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function modified( $sitemap = 'post_type', $term = '' ) {
-		global $post;
+		$lastmod = '';
 
 		if ( 'post_type' == $sitemap ) :
+			global $post;
 
 			// if blog page then look for last post date
-			if ( $post->post_type == 'page' && $this->is_home($post->ID) )
+			if ( $post->post_type == 'page' && $this->is_home($post->ID) ) {
 				return get_lastpostmodified('gmt'); // TODO limit to sitemap included post types...
-
-			if ( empty($this->postmodified[$post->ID]) ) {
-				$postmodified = get_post_modified_time( 'Y-m-d H:i:s', true, $post->ID );
-				$options = $this->get_post_types();
-
-				if( !empty($options[$post->post_type]['update_lastmod_on_comments']) )
-					$lastcomment = get_comments( array(
-						'status' => 'approve',
-						'number' => 1,
-						'post_id' => $post->ID,
-					) );
-
-				if ( isset($lastcomment[0]->comment_date_gmt) )
-					if ( mysql2date( 'U', $lastcomment[0]->comment_date_gmt, false ) > mysql2date( 'U', $postmodified, false ) )
-						$postmodified = $lastcomment[0]->comment_date_gmt;
-
-				// make sure lastmod is not older than publication date (happens on scheduled posts)
-				if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($postmodified) )
-					$postmodified = $post->post_date_gmt;
-
-				$this->postmodified[$post->ID] = $postmodified;
 			}
 
-			return $this->postmodified[$post->ID];
+			$lastmod = get_post_modified_time( 'Y-m-d H:i:s', true, $post->ID );
 
-		elseif ( !empty($term) ) :
+			$options = $this->get_post_types();
+			if ( !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
+				$lastcomment = get_comments( array(
+					'status' => 'approve',
+					'number' => 1,
+					'post_id' => $post->ID,
+				) );
+
+				if ( isset($lastcomment[0]->comment_date_gmt) )
+					if ( mysql2date( 'U', $lastcomment[0]->comment_date_gmt, false ) > mysql2date( 'U', $lastmod, false ) )
+						$lastmod = $lastcomment[0]->comment_date_gmt;
+			}
+
+			// make sure lastmod is not older than publication date (happens on scheduled posts)
+			if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($lastmod) ) {
+				$lastmod = $post->post_date_gmt;
+			};
+
+		elseif ( 'taxonomy' == $sitemap ) :
 
 			if ( is_object($term) ) {
-				if ( !isset($this->termmodified[$term->term_id]) ) {
-				// get the latest post in this taxonomy item, to use its post_date as lastmod
+				$lastmod = get_term_meta( $term->term_id, 'term_modified_gmt', true );
+
+				if ( empty($lastmod) ) {
+					// get the latest post in this taxonomy item, to use its post_date as lastmod
 					$posts = get_posts (
 						array(
 							'post_type' => 'any',
@@ -712,27 +726,44 @@ class XMLSitemapFeed {
 							)
 						)
 					);
-					$this->termmodified[$term->term_id] = isset($posts[0]->post_date_gmt) ? $posts[0]->post_date_gmt : '';
+					$lastmod = isset($posts[0]->post_date_gmt) ? $posts[0]->post_date_gmt : '';
+					// get post date here, not modified date because we're only
+					// concerned about new entries on the (first) taxonomy page
+
+					update_term_meta( $term->term_id, 'term_modified_gmt', $lastmod );
 				}
-				return $this->termmodified[$term->term_id];
 			} else {
+
 				$obj = get_taxonomy($term);
 
 				$lastmodified = array();
 				foreach ( (array)$obj->object_type as $object_type ) {
 					$lastmodified[] = get_lastpostdate( 'gmt', $object_type );
-					// returns last post date, not last modified date... (TODO consider making this an opion)
+					// get post date here, not modified date because we're only
+					// concerned about new entries on the (first) taxonomy page
 				}
 
 				sort($lastmodified);
 				$lastmodified = array_filter($lastmodified);
-
-				return end($lastmodified);
-			}
+				$lastmod = end( $lastmodified );
+			};
 
 		endif;
 
-		return '';
+		return $lastmod;
+	}
+
+	/**
+	 * Get last modified
+	 *
+	 * @param string $sitemap
+	 * @param string $term
+	 *
+	 * @return string
+	 */
+	public function get_lastmod( $sitemap = 'post_type', $term = '' ) {
+		$return = trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $this->modified( $sitemap, $term ), false ) );
+		return !empty($return) ? '<lastmod>'.$return.'</lastmod>' . PHP_EOL : '';
 	}
 
 	/**
@@ -770,41 +801,25 @@ class XMLSitemapFeed {
 	 */
 	public function get_images( $sitemap = '' ) {
 		global $post;
+		$images = array();
 
-		if ( empty($this->images[$post->ID]) ) :
+		if ( 'news' == $sitemap ) {
+			$options = $this->get_option('news_tags');
+			$which = isset($options['image']) ? $options['image'] : '';
+		} else {
+			$options = $this->get_post_types();
+			$which = isset($options[$post->post_type]['tags']['image']) ? $options[$post->post_type]['tags']['image'] : '';
+		}
 
-			if ( 'news' == $sitemap ) {
-				$options = $this->get_option('news_tags');
-				$which = isset($options['image']) ? $options['image'] : '';
-			} else {
-				$options = $this->get_post_types();
-				$which = isset($options[$post->post_type]['tags']['image']) ? $options[$post->post_type]['tags']['image'] : '';
-			}
-
-			if ( 'attached' == $which ) {
-				$args = array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => -1, 'post_status' =>'inherit', 'post_parent' => $post->ID );
-				$attachments = get_posts($args);
-				if ( $attachments ) {
-					foreach ( $attachments as $attachment ) {
-						$url = wp_get_attachment_image_url( $attachment->ID, 'full' );
-						$url = $this->get_absolute_url( $url );
-						if ( !empty($url) ) {
-							$this->images[$post->ID][] = array(
-								'loc' => esc_attr( esc_url_raw( $url ) ),
-								'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
-								'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
-								// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
-							);
-						}
-					}
-				}
-			} elseif ( 'featured' == $which ) {
-				if ( has_post_thumbnail( $post->ID ) ) {
-					$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
-					$url = wp_get_attachment_image_url( get_post_thumbnail_id( $post->ID ), 'full' );
+		if ( 'attached' == $which ) {
+			$args = array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => -1, 'post_status' =>'inherit', 'post_parent' => $post->ID );
+			$attachments = get_posts($args);
+			if ( $attachments ) {
+				foreach ( $attachments as $attachment ) {
+					$url = wp_get_attachment_image_url( $attachment->ID, 'full' );
 					$url = $this->get_absolute_url( $url );
 					if ( !empty($url) ) {
-						$this->images[$post->ID][] =  array(
+						$images[] = array(
 							'loc' => esc_attr( esc_url_raw( $url ) ),
 							'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
 							'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
@@ -813,24 +828,54 @@ class XMLSitemapFeed {
 					}
 				}
 			}
+		} elseif ( 'featured' == $which ) {
+			if ( has_post_thumbnail( $post->ID ) ) {
+				$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
+				$url = wp_get_attachment_image_url( get_post_thumbnail_id( $post->ID ), 'full' );
+				$url = $this->get_absolute_url( $url );
+				if ( !empty($url) ) {
+					$images[] =  array(
+						'loc' => esc_attr( esc_url_raw( $url ) ),
+						'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
+						'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
+						// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
+					);
+				}
+			}
+		}
 
-		endif;
-
-		return ( isset($this->images[$post->ID]) ) ? $this->images[$post->ID] : false;
+		return ( !empty($images) ) ? $images : false;
 	}
 
 	/**
-	 * Get last modified
+	 * Prepare priority calculation values
 	 *
-	 * @param string $sitemap
-	 * @param string $term
+	 * @param $sitemap string
+	 * @param $name string
 	 *
-	 * @return string
+	 * @return null
 	 */
-	public function get_lastmod( $sitemap = 'post_type', $term = '' ) {
-		$return = trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $this->modified( $sitemap, $term ), false ) );
-		return !empty($return) ? '	<lastmod>'.$return.'</lastmod>
-	' : '';
+	public function priority_calc_values( $sitemap, $name ) {
+
+		if ( $sitemap === 'post_type' ) :
+
+			if ( empty($this->timespan) ) {
+				// last posts or page modified date in Unix seconds
+				$this->lastmodified = mysql2date('U',get_lastpostmodified('gmt',$name),false);
+				// uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
+				$this->timespan = $this->lastmodified - mysql2date('U',get_firstpostdate('gmt',$name),false);
+			};
+
+		elseif ( $sitemap === 'taxonomy' ) :
+
+			// count total posts in taxonomy
+			$tax_obj = get_taxonomy($name);
+			foreach ($tax_obj->object_type as $post_type) {
+				$_post_count = wp_count_posts($post_type);
+				$this->taxonomy_postcount += $_post_count->publish;
+			};
+
+		endif;
 	}
 
 	/**
@@ -842,6 +887,7 @@ class XMLSitemapFeed {
 	 * @return string
 	 */
 	public function get_priority( $sitemap = 'post_type', $term = '' ) {
+		$priority = 0.5;
 
 		if ( 'post_type' == $sitemap ) :
 
@@ -850,74 +896,59 @@ class XMLSitemapFeed {
 			$defaults = $this->defaults('post_types');
 			$priority_meta = get_metadata('post', $post->ID, '_xmlsf_priority' , true);
 
-			if ( !empty($priority_meta) || $priority_meta == '0' ) {
+			if ( '' !== $priority_meta ) {
 				$priority = floatval(str_replace(',','.',$priority_meta));
 			} elseif ( !empty($options[$post->post_type]['dynamic_priority']) ) {
 				$post_modified = mysql2date('U',$post->post_modified_gmt, false);
 
-				if ( empty($this->lastmodified) ) {
-					$this->lastmodified = mysql2date('U',get_lastpostmodified('gmt',$post->post_type),false);
-					// last posts or page modified date in Unix seconds
-				}
-
-				if ( empty($this->firstdate) ) {
-					$this->firstdate = mysql2date('U',get_firstpostdate('gmt',$post->post_type),false);
-					// uses get_firstpostdate() function defined in xml-sitemap/hacks.php !
-				}
-
 				if ( isset($options[$post->post_type]['priority']) ) {
-					$priority_value = floatval(str_replace(',','.',$options[$post->post_type]['priority']));
+					$priority = floatval(str_replace(',','.',$options[$post->post_type]['priority']));
 				} else {
-					$priority_value = floatval($defaults[$post->post_type]['priority']);
+					$priority = floatval($defaults[$post->post_type]['priority']);
 				}
 
 				// reduce by age
 				// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
-				if ( is_sticky($post->ID) || $this->is_home($post->ID) ) {
-					$priority = $priority_value;
-				} else {
-					$priority = ( $this->lastmodified > $this->firstdate ) ? $priority_value - $priority_value * ( $this->lastmodified - $post_modified ) / ( $this->lastmodified - $this->firstdate ) : $priority_value;
+				if ( !is_sticky($post->ID) && !$this->is_home($post->ID) && $this->timespan > 0 ) {
+					$priority -= $priority * ( $this->lastmodified - $post_modified ) / $this->timespan;
 				}
 
-				if ( $post->comment_count > 0 ) {
-					$priority = $priority + 0.1 + ( 0.9 - $priority ) * $post->comment_count / wp_count_comments($post->post_type)->approved;
+				// increase by relative comment count
+				if ( $post->comment_count > 0 && $priority <= 0.9 ) {
+					$priority += 0.1 + ( 0.9 - $priority ) * $post->comment_count / wp_count_comments($post->post_type)->approved;
+				}
+
+				// make sure we're not below 0.1 after automatic calculation
+				if ( $priority < .1 ) {
+					$priority = .1;
 				}
 			} else {
 				$priority = ( isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ) ? $options[$post->post_type]['priority'] : $defaults[$post->post_type]['priority'];
 			}
 
-		elseif ( ! empty($term) ) :
+		elseif ( 'taxonomy' == $sitemap ) :
 
-			$max_priority = 0.4;
-			$min_priority = 0.0;
-			// TODO make these values optional?
+			$defaults = $this->defaults('taxonomy_settings');
 
-			$tax_obj = get_taxonomy($term->taxonomy);
-			$postcount = 0;
-			foreach ($tax_obj->object_type as $post_type) {
-				$_post_count = wp_count_posts($post_type);
-				$postcount += $_post_count->publish;
+			if ( is_object($term) && $this->taxonomy_postcount && !empty($defaults['dynamic_priority']) ) {
+				$priority = $defaults['min_priority'] + ( $term->count - 1 ) / $this->taxonomy_postcount;
+
+				if ( $priority > $defaults['max_priority'] ) $priority = $defaults['max_priority'];
+			} else {
+				$priority = ( $defaults['min_priority'] + $defaults['max_priority'] ) / 2;
 			}
-
-			$priority = ( $postcount > 0 ) ? $min_priority + ( $max_priority * $term->count / $postcount ) : $min_priority;
-
-		else :
-
-			$priority = 0.5;
 
 		endif;
 
-		// make sure we're not below zero or cases where we ended up above 1 (sticky posts with many comments)
-		$priority = filter_var( $priority, FILTER_VALIDATE_INT, array(
-				'options' => array(
-					'default' => .5,
-					'min_range' => 0,
-					'max_range' => 1
-				)
-			)
-		);
+		// a final check for limits
+		if ( $priority < 0 ) {
+			$priority = 0;
+		}
+		if ( $priority > 1 ) {
+			$priority = 1;
+		}
 
-		return number_format( $priority, 1 );
+		return round( $priority, 1 );
 	}
 
 	/**
@@ -1007,8 +1038,9 @@ class XMLSitemapFeed {
 	public function get_index_url( $sitemap = 'home', $type = false, $param = false ) {
 		$split_url = explode('?', $this->home_url());
 
-		if ( '' == get_option('permalink_structure') || '1' != get_option('blog_public')) {
-			$name = '?feed='.$name;
+		if ( $this->plain_permalinks() ) {
+			$name = '?feed=sitemap-'.$sitemap;
+			$name .= $type ? '-'.$type : '';
 			$name .= $param ? '&m='.$param : '';
 			$name .= isset($split_url[1]) && !empty($split_url[1]) ? '&' . $split_url[1] : '';
 		} else {
@@ -1101,10 +1133,10 @@ class XMLSitemapFeed {
 
 	// add sitemap location in robots.txt generated by WP
 	public function robots($output) {
-		echo '# XML Sitemap & Google News Feeds version ' . XMLSF_VERSION . ' - http://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
+		echo '# XML Sitemap & Google News Feeds version ' . XMLSF_VERSION . ' - https://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
 
 		if ( '1' != get_option('blog_public') ) {
-			echo '# XML Sitemaps are disabled. Please see Site Visibility on Settings > Reading.';
+			echo '# XML Sitemaps are disabled while this site is not public. Please see Site Visibility on Settings > Reading.' . PHP_EOL;
 		} else {
 			foreach ( $this->get_sitemaps() as $pretty )
 				echo 'Sitemap: ' . trailingslashit(get_bloginfo('url')) . $pretty . PHP_EOL;
@@ -1231,8 +1263,15 @@ class XMLSitemapFeed {
 				add_action( 'the_post', array( $this, 'wpml_language_switcher' ) );
 			}
 
-			// prepare for news and return modified request
-			if ( $request['feed'] == 'sitemap-news' ) {
+			$feed = explode( '-' , $request['feed'] );
+
+			if ( !isset( $feed[1] ) ) return $request;
+
+			switch( $feed[1] ) {
+
+				case 'news':
+
+				// prepare for news and return modified request
 				$defaults = $this->defaults('news_tags');
 				$options = $this->get_option('news_tags');
 				$news_post_types = isset($options['post_type']) && !empty($options['post_type']) ? (array)$options['post_type'] : $defaults['post_type'];
@@ -1267,75 +1306,77 @@ class XMLSitemapFeed {
 				// set the news sitemap conditional tag
 				$this->is_news = true;
 
-				return $request;
-			}
+				break;
 
-			$options = $this->get_post_types();
+				case 'posttype':
 
-			foreach ( $options as $post_type ) {
-				if( !empty($post_type['update_lastmod_on_comments']) ) {
-					$request['withcomments'] = true;
-					break;
+				if ( !isset( $feed[2] ) ) break;
+
+				$options = $this->get_post_types();
+
+				// prepare priority calculation
+				if ( !empty($options[$feed[2]]['dynamic_priority']) ) $this->priority_calc_values( 'post_type', $feed[2] );
+
+				// setup filter
+				add_filter( 'post_limits', array( $this, 'filter_limits' ) );
+
+				$request['post_type'] = $feed[2];
+				$request['orderby'] = 'modified';
+				$request['is_date'] = false;
+
+				break;
+
+				case 'taxonomy':
+
+				if ( !isset( $feed[2] ) ) break;
+
+				// prepare ptiority calculation
+				$this->priority_calc_values( 'taxonomy', $feed[2] );
+
+				// WPML compat
+				global $sitepress;
+				if ( is_object($sitepress) ) {
+					remove_filter( 'get_terms_args', array($sitepress,'get_terms_args_filter') );
+					remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
+					remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
+					$sitepress->switch_lang('all');
 				}
-			}
 
-			// for index and custom sitemap, nothing (else) to do (yet)
-			if ( $request['feed'] === 'sitemap' ) {
-				return $request;
-			}
+				add_filter( 'get_terms_args', array( $this, 'set_terms_args' ) );
 
-			// prepare for post types and return modified request
-			if ( strpos($request['feed'],'posttype') === 8 ) {
-				foreach ( $options as $post_type ) {
-					if ( $request['feed'] == 'sitemap-posttype-'.$post_type['name'] ) {
-						// setup filter
-						add_filter( 'post_limits', array($this, 'filter_limits') );
+				// pass on taxonomy name via request
+				$request['taxonomy'] = $feed[2];
 
-						$request['post_type'] = $post_type['name'];
-						$request['orderby'] = 'modified';
-						$request['is_date'] = false;
+				break;
 
-						return $request;
-					}
-				}
-			}
-
-			// prepare for taxonomies and return modified request
-			if ( strpos($request['feed'],'taxonomy') === 8 ) {
-				foreach ( $this->get_taxonomies() as $taxonomy ) {
-					if ( $request['feed'] == 'sitemap-taxonomy-'.$taxonomy ) {
-
-						$request['taxonomy'] = $taxonomy;
-
-						// WPML compat
-						global $sitepress;
-						if ( is_object($sitepress) ) {
-							remove_filter( 'get_terms_args', array($sitepress,'get_terms_args_filter') );
-							remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
-							remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
-							$sitepress->switch_lang('all');
-						}
-
-						// $request['number'] = '5'; //$this->get_option();
-						// https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
-						// number > 1000
-						// order > DESC
-						// orderby > 'count' (+pad_counts!)
-						// pad_counts > true
-						// update_term_meta_cache > false
-						// fields > ???
-
-						// TODO consider optional "order by" : "post count" / "post update"
-						// with 'orderby' => 'meta_value_num' + update taxonomy term with timestamp on post update
-
-						return $request;
-					}
-				}
+				default:
+				// do nothing
 			}
 
 		endif;
 
 		return $request;
+	}
+
+	/**
+	 * Terms arguments filter
+	 * Does not check if we are really in a sitemap feed.
+	 *
+	 * @param $args
+	 *
+	 * @return array
+	 */
+	function set_terms_args( $args ) {
+		// https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
+		$args['number'] = $this->defaults['taxonomy_settings']['number'];
+		$args['order'] = 'DESC';
+		$args['orderby'] = 'count';
+		$args['pad_counts'] = true;
+		$args['lang'] = '';
+		$args['hierachical'] = 0;
+		$args['suppress_filter'] = true;
+
+		return $args;
 	}
 
 	/**
@@ -1590,8 +1631,8 @@ class XMLSitemapFeed {
 	 * @return $urls array
 	 */
 	public function nginx_helper_purge_urls( $urls = array(), $redis = false ) {
-		// are permalinks set, blog public and $urls an array?
-		if ( '' == get_option('permalink_structure') || '1' != get_option('blog_public') || ! is_array( $urls ) ) {
+		// are permalinks set?
+		if ( $this->plain_permalinks() ) {
 			return $urls;
 		}
 
@@ -1663,7 +1704,7 @@ class XMLSitemapFeed {
 
 			if ( version_compare('4.4', $old_version, '>') ) {
 				// remove robots.txt rules blocking stylesheets
-			 	if ( $robot_rules = get_option($this->prefix.'robots') ) {
+			 	if ( $robot_rules = get_option( $this->prefix.'robots' ) ) {
 					$robot_rules = str_replace(array('Disallow: */wp-content/','Allow: */wp-content/uploads/'),'',$robot_rules);
 					delete_option( $this->prefix.'robots' );
 					add_option( $this->prefix.'robots', $robot_rules, '', 'no' );
@@ -1852,6 +1893,14 @@ class XMLSitemapFeed {
 	}
 
 	/**
+	 * Plugin deactivation
+	 */
+	public function deactivation() {
+		delete_option( 'xmlsf_version' );
+		delete_option( 'rewrite_rules' );
+	}
+
+	/**
 	 * Echo usage info
 	 * for debugging
 	 */
@@ -1906,6 +1955,7 @@ class XMLSitemapFeed {
 
 		// NGINX HELPER PURGE URLS
 		add_filter( 'rt_nginx_helper_purge_urls', array($this, 'nginx_helper_purge_urls'), 10, 2 );
-	}
 
+		register_deactivation_hook( $basename, array($this, 'deactivation' ) );
+	}
 }
