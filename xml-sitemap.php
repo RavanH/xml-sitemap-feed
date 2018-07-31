@@ -34,7 +34,7 @@ Author URI: http://status301.net/
  *                           Passes variable $url; must return true or false.
  *  xmlsf_excluded        -> Filters the response when checking the post for exclusion flags.
  *                           Passes variable $post_id; must return true or false.
- *  the_title_xmlsitemap  -> Filters the Google News publication name, title and keywords
+ *  the_title_xmlsitemap  -> Filters the Google News publication name and title
  *                           plus the Image title and caption tags
  *  xmlsf_custom_urls     -> Filters the custom urls array
  *  xmlsf_custom_sitemaps -> Filters the custom sitemaps array

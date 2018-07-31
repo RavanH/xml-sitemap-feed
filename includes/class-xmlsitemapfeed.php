@@ -288,10 +288,6 @@ class XMLSitemapFeed {
 			),
 			'genres' => array(
 				'default' => ''
-			),
-			'keywords' => array(
-				'from' => 'category',
-				'default' => ''
 			)
 		);
 	}

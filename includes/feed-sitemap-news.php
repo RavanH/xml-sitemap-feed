@@ -110,36 +110,6 @@ if ( have_posts() ) :
 <?php
 	}
 
-	// keywords tag
-	$keywords = '';
-	if( !empty($options['keywords']) ) {
-		if ( !empty($options['keywords']['from']) ) {
-			$terms = get_the_terms( $post->ID, $options['keywords']['from'] );
-			if ( is_array($terms) ) {
-				$sep = '';
-				foreach($terms as $obj) {
-					if (!empty($obj->name)) {
-						$keywords .= $sep . $obj->name;
-						$sep = ', ';
-					}
-				}
-			}
-		}
-
-		$keywords = trim(apply_filters('the_title_xmlsitemap', $keywords));
-
-		if ( empty($keywords) && !empty($options['keywords']['default']) ) {
-			$keywords = trim(apply_filters('the_title_xmlsitemap', $options['keywords']['default']));
-		}
-
-	}
-
-	if ( !empty($keywords) ) {
-	?>
-			<news:keywords><?php echo $keywords; ?></news:keywords>
-<?php
-	}
-
 	/* xmlsf_news_tags_after action hook */
 	do_action( 'xmlsf_news_tags_after' );
 	?>

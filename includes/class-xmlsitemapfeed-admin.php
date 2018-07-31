@@ -652,29 +652,6 @@ jQuery( document ).ready( function() {
 				</select></label></li>
 			</ul>
 		</fieldset>';
-
-    	// keywords
-		$keywords = !empty($options['keywords']) ? $options['keywords'] : array();
-		$keywords_from = !empty($keywords['from']) ? $keywords['from'] : '';
-		echo '
-		<fieldset id="xmlsf_news_keywords"><legend class="screen-reader-text">&lt;keywords&gt;</legend>
-			<p>'.sprintf(__('The %s tag is used to help classify the articles you submit to Google News by <strong>topic</strong>.','xml-sitemap-feed'),'<strong>&lt;keywords&gt;</strong>').'</p>
-			<ul>
-			<li><label>'.sprintf(__('Use %s for topics.','xml-sitemap-feed'),' <select name="'.$this->prefix.'news_tags[keywords][from]" id="xmlsf_news_tags_keywords_from">
-						<option value="">'.translate('None').'</option>
-						<option value="category" '.selected( "category" == $keywords_from, true, false).'>'.translate('Categories').'</option>
-						<option value="post_tag" '.selected( "post_tag" == $keywords_from, true, false).'>'.translate('Tags').'</option>
-			</select>').'</label></li>';
-		if ("category" !== $keywords_from) {
-			echo '
-			<li><label>'.__('Default topic(s):','xml-sitemap-feed').' <input type="text" name="'.$this->prefix.'news_tags[keywords][default]" id="xmlsf_news_tags_keywords_default" value="';
-			echo !empty($keywords['default']) ? $keywords['default'] : '';
-			echo '" class="regular-text"></label> <span class="description">'.__('Separate with a comma.','xml-sitemap-feed').'</span></li>';
-		}
-		echo '
-			</ul>
-			<p class="description">'.__('Keywords may be drawn from, but are not limited to, the list of <a href="https://support.google.com/news/publisher/answer/116037" target="_blank">existing Google News keywords</a>.','xml-sitemap-feed').'</p>
-		</fieldset>';
 	}
 
 	//sanitize callback functions

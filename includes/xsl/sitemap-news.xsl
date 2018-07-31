@@ -43,7 +43,6 @@
 				<td><xsl:value-of select="news:news/news:publication/news:language"/></td>
 				<td><xsl:value-of select="news:news/news:access"/></td>
 				<td><xsl:value-of select="news:news/news:genres"/></td>
-				<td><xsl:value-of select="news:news/news:keywords"/></td>
 				<td><xsl:value-of select="count(image:image)"/></td>
 				<td><xsl:value-of select="concat(substring(news:news/news:publication_date,0,11),concat(' ', substring(news:news/news:publication_date,12,8)))"/></td>
 			</tr>
