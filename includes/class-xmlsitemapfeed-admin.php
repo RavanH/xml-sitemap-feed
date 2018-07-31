@@ -587,31 +587,6 @@ jQuery( document ).ready( function() {
 
 		$options = parent::get_option('news_tags');
 
-		// access tag
-		$access = !empty($options['access']) ? $options['access'] : '';
-		$access_default = !empty($access['default']) ? $access['default'] : '';
-		$access_password = !empty($access['password']) ? $access['password'] : '';
-		echo '
-		  <fieldset id="xmlsf_news_labels_access"><legend class="screen-reader-text">&lt;access&gt;</legend>
-			<p>'.sprintf(__('The %4$s tag specifies whether an article is available to all readers (%1$s), or only to those with a free (%2$s) or paid membership (%3$s) to your site.','xml-sitemap-feed'),translate('Public'),__('Registration','xml-sitemap-feed'),__('Subscription','xml-sitemap-feed'),'<strong>&lt;access&gt;</strong>').'
-			'.__('You can assign a different access level when writing a post.','xml-sitemap-feed') . '</p>
-		    <ul>';
-
-		echo '
-			<li><label>'.__('Tag normal posts as','xml-sitemap-feed').' <select name="'.$this->prefix.'news_tags[access][default]" id="xmlsf_news_tags_access_default">
-				<option value="">'.translate('Public').'</option>
-				<option value="Registration" '.selected( "Registration" == $access_default, true, false).'>'.__('Free registration','xml-sitemap-feed').'</option>
-				<option value="Subscription" '.selected( "Subscription" == $access_default, true, false).'>'.__('Paid subscription','xml-sitemap-feed').'</option>
-			</select></label></li>';
-		echo '
-			<li><label>'.__('Tag Password Protected posts as','xml-sitemap-feed').' <select name="'.$this->prefix.'news_tags[access][password]" id="xmlsf_news_tags_access_password">
-				<option value="Registration" '.selected( "Registration" == $access_password, true, false).'>'.__('Free registration','xml-sitemap-feed').'</option>
-				<option value="Subscription" '.selected( "Subscription" == $access_password, true, false).'>'.__('Paid subscription','xml-sitemap-feed').'</option>
-			</select></label></li>';
-		echo '
-		    </ul>
-		  </fieldset>';
-
 		// genres tag
 		$gn_translations = array(
 			'PressRelease' => __('PressRelease','xml-sitemap-feed'),
@@ -639,29 +614,6 @@ jQuery( document ).ready( function() {
 		echo '
 				</select></label></li>
 			</ul>
-		</fieldset>';
-
-    	// keywords
-		$keywords = !empty($options['keywords']) ? $options['keywords'] : array();
-		$keywords_from = !empty($keywords['from']) ? $keywords['from'] : '';
-		echo '
-		<fieldset id="xmlsf_news_keywords"><legend class="screen-reader-text">&lt;keywords&gt;</legend>
-			<p>'.sprintf(__('The %s tag is used to help classify the articles you submit to Google News by <strong>topic</strong>.','xml-sitemap-feed'),'<strong>&lt;keywords&gt;</strong>').'</p>
-			<ul>
-			<li><label>'.sprintf(__('Use %s for topics.','xml-sitemap-feed'),' <select name="'.$this->prefix.'news_tags[keywords][from]" id="xmlsf_news_tags_keywords_from">
-						<option value="">'.translate('None').'</option>
-						<option value="category" '.selected( "category" == $keywords_from, true, false).'>'.translate('Categories').'</option>
-						<option value="post_tag" '.selected( "post_tag" == $keywords_from, true, false).'>'.translate('Tags').'</option>
-			</select>').'</label></li>';
-		if ("category" !== $keywords_from) {
-			echo '
-			<li><label>'.__('Default topic(s):','xml-sitemap-feed').' <input type="text" name="'.$this->prefix.'news_tags[keywords][default]" id="xmlsf_news_tags_keywords_default" value="';
-			echo !empty($keywords['default']) ? $keywords['default'] : '';
-			echo '" class="regular-text"></label> <span class="description">'.__('Separate with a comma.','xml-sitemap-feed').'</span></li>';
-		}
-		echo '
-			</ul>
-			<p class="description">'.__('Keywords may be drawn from, but are not limited to, the list of <a href="https://support.google.com/news/publisher/answer/116037" target="_blank">existing Google News keywords</a>.','xml-sitemap-feed').'</p>
 		</fieldset>';
 	}
 
@@ -916,24 +868,8 @@ jQuery( document ).ready( function() {
 		// The actual fields for data entry
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
 		$exclude = get_post_meta( $post->ID, '_xmlsf_news_exclude', true );
-		$access = get_post_meta( $post->ID, '_xmlsf_news_access', true );
-		$disabled = false;
 
-		// disable options and (visibly) set excluded to true for private posts
-		if ( 'private' == $post->post_status ) {
-			$disabled = true;
-			$exclude = true;
-		}
-
-		echo '<p><label>'.__('Access','xml-sitemap-feed').'
-			<select name="xmlsf_news_access" id="xmlsf_news_access">
-				<option value="">'.translate('Default').'</option>
-				<option value="Public" '.selected( "Public" == $access, true, false).'>'.translate('Public').'</option>
-				<option value="Registration" '.selected( "Registration" == $access, true, false).'>'.__('Registration','xml-sitemap-feed').'</option>
-				<option value="Subscription" '.selected( "Subscription" == $access, true, false).'>'.__('Subscription','xml-sitemap-feed').'</option>
-			</select></label></p>';
-
-		echo '<p><label><input type="checkbox" name="xmlsf_news_exclude" id="xmlsf_news_exclude" value="1" '.checked(!empty($exclude), true, false).' '.disabled( $disabled, true, false ).'> ';
+		echo '<p><label><input type="checkbox" name="xmlsf_news_exclude" id="xmlsf_news_exclude" value="1"'.checked('private' == $post->post_status || !empty($exclude), true, false).disabled('private' == $post->post_status, true, false).'> ';
 		_e('Exclude from Google News Sitemap.','xml-sitemap-feed');
 		echo '</label></p>';
 	}
@@ -965,13 +901,6 @@ jQuery( document ).ready( function() {
 			update_post_meta($post_id, '_xmlsf_news_exclude', $_POST['xmlsf_news_exclude']);
 		} else {
 			delete_post_meta($post_id, '_xmlsf_news_exclude');
-		}
-
-		// _xmlsf_news_access
-		if ( isset($_POST['xmlsf_news_access']) && $_POST['xmlsf_news_access'] != '' ) {
-			update_post_meta($post_id, '_xmlsf_news_access', $_POST['xmlsf_news_access']);
-		} else {
-			delete_post_meta($post_id, '_xmlsf_news_access');
 		}
 	}
 

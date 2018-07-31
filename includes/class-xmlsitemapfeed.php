@@ -297,16 +297,7 @@ class XMLSitemapFeed {
 			'post_type' => array('post'),
 			'categories' => '',
 			'image' => 'featured',
-			'access' => array(
-				'default' => '',
-				//'private' => 'Registration', // private posts do not show up in feeds when not logged in. no point in setting access level then...
-				'password' => 'Subscription'
-			),
 			'genres' => array(
-				'default' => ''
-			),
-			'keywords' => array(
-				'from' => 'category',
 				'default' => ''
 			)
 		);
@@ -1539,7 +1530,7 @@ class XMLSitemapFeed {
 							continue;
 						}
 						// ping !
-						if ( $this->ping( add_query_arg( $data['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap-news']), $data['uri'] ) ) ) {
+						if ( isset($data['req'], $data['uri']) && $this->ping( add_query_arg( $data['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap-news']), $data['uri'] ) ) ) {
 							$to_ping[$se]['pong'][$sitemaps['sitemap-news']] = time();
 							$update = true;
 						}
@@ -1565,7 +1556,7 @@ class XMLSitemapFeed {
 								continue;
 							}
 							// ping !
-							if ( $this->ping( add_query_arg( $data['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap']), $data['uri'] ) ) ) {
+							if ( isset($data['req'], $data['uri']) && $this->ping( add_query_arg( $data['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap']), $data['uri'] ) ) ) {
 								$to_ping[$se]['pong'][$sitemaps['sitemap']] = time();
 								$update = true;
 							}
