@@ -1898,6 +1898,14 @@ class XMLSitemapFeed {
 	}
 
 	/**
+	 * Plugin deactivation
+	 */
+	public function deactivation() {
+		delete_option( 'xmlsf_version' );
+		delete_option( 'rewrite_rules' );
+	}
+
+	/**
 	 * Echo usage info
 	 * for debugging
 	 */
@@ -1952,6 +1960,7 @@ class XMLSitemapFeed {
 
 		// NGINX HELPER PURGE URLS
 		add_filter( 'rt_nginx_helper_purge_urls', array($this, 'nginx_helper_purge_urls'), 10, 2 );
-	}
 
+		register_deactivation_hook( $basename, array($this, 'deactivation' ) );
+	}
 }
