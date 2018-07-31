@@ -47,7 +47,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 
 * Optionally include Image tags with caption and title for featured images or attached images.
 * Options to: set a different News Publication Name, include custom post types or limit inclusion to certain post categories.
-* Configure <access>, <genres> and <keywords> tags both globally and post by post
+* Configure <genres> label both globally and post by post
 * Pings both Google and Bing on new publications.
 
 **More**
@@ -277,8 +277,11 @@ Bugfixes: double content type filtering and missing featured images (thanks @fly
 
 == Changelog ==
 
+= 4.9.5 =
+* Removal of the keywords and access tags as Google dropped support
+
 = 4.9.4 =
-* FIX: missing featured images, thanks @flyerua 
+* FIX: missing featured images, thanks @flyerua
 * FIX: double content type response header filtering
 
 = 4.9.3 =

@@ -67,24 +67,6 @@ if ( have_posts() ) :
 				echo mysql2date('Y-m-d\TH:i:s+00:00', $post->post_date_gmt, false); ?></news:publication_date>
 			<news:title><?php echo apply_filters( 'the_title_xmlsitemap', get_the_title() ); ?></news:title>
 <?php
-	// access tag
-	$access = get_post_meta( $post->ID, '_xmlsf_news_access', true );
-
-	if (empty($access)) // if not set per meta, let's get global settings
-	  if (!empty($options['access']))
-			if ( post_password_required() )
-				if (!empty($options['access']['password']))
-					$access = $options['access']['password'];
-			else
-				if (!empty($options['access']['default']))
-					$access = $options['access']['default'];
-
-	if (!empty($access) && $access != 'Public' ) {
-	?>
-			<news:access><?php echo $access; ?></news:access>
-<?php
-	}
-
 	// genres tag
 	$genres = '';
 	$terms = get_the_terms($post->ID,'gn-genre');
@@ -107,36 +89,6 @@ if ( have_posts() ) :
 	if ( !empty($genres) ) {
 	?>
 			<news:genres><?php echo $genres; ?></news:genres>
-<?php
-	}
-
-	// keywords tag
-	$keywords = '';
-	if( !empty($options['keywords']) ) {
-		if ( !empty($options['keywords']['from']) ) {
-			$terms = get_the_terms( $post->ID, $options['keywords']['from'] );
-			if ( is_array($terms) ) {
-				$sep = '';
-				foreach($terms as $obj) {
-					if (!empty($obj->name)) {
-						$keywords .= $sep . $obj->name;
-						$sep = ', ';
-					}
-				}
-			}
-		}
-
-		$keywords = trim(apply_filters('the_title_xmlsitemap', $keywords));
-
-		if ( empty($keywords) && !empty($options['keywords']['default']) ) {
-			$keywords = trim(apply_filters('the_title_xmlsitemap', $options['keywords']['default']));
-		}
-
-	}
-
-	if ( !empty($keywords) ) {
-	?>
-			<news:keywords><?php echo $keywords; ?></news:keywords>
 <?php
 	}
 
