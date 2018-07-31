@@ -281,11 +281,6 @@ class XMLSitemapFeed {
 			'post_type' => array('post'),
 			'categories' => '',
 			'image' => 'featured',
-			'access' => array(
-				'default' => '',
-				//'private' => 'Registration', // private posts do not show up in feeds when not logged in. no point in setting access level then...
-				'password' => 'Subscription'
-			),
 			'genres' => array(
 				'default' => ''
 			)

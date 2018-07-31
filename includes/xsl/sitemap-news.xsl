@@ -26,9 +26,7 @@
 				<th>#</th>
 				<th>Title</th>
 				<th>Language</th>
-				<th>Access</th>
 				<th>Genre(s)</th>
-				<th>Keyword(s)</th>
 				<th>Image(s)</th>
 				<th>Publication Date (GMT)</th>
 			</tr>
@@ -41,7 +39,6 @@
 					<a href="{$itemURL}"><xsl:value-of select="news:news/news:title"/></a>
 				</td>
 				<td><xsl:value-of select="news:news/news:publication/news:language"/></td>
-				<td><xsl:value-of select="news:news/news:access"/></td>
 				<td><xsl:value-of select="news:news/news:genres"/></td>
 				<td><xsl:value-of select="count(image:image)"/></td>
 				<td><xsl:value-of select="concat(substring(news:news/news:publication_date,0,11),concat(' ', substring(news:news/news:publication_date,12,8)))"/></td>
