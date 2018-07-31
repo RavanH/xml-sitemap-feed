@@ -800,12 +800,12 @@ jQuery( document ).ready( function() {
 			// Only include metaboxes on post types that are included
 			if (isset($post_type["active"]))
 				add_meta_box(
-				    'xmlsf_section',
-				    __( 'XML Sitemap', 'xml-sitemap-feed' ),
-				    array($this,'meta_box'),
-				    $post_type['name'],
-				    'side',
-            'low'
+					'xmlsf_section',
+					__( 'XML Sitemap', 'xml-sitemap-feed' ),
+					array($this,'meta_box'),
+					$post_type['name'],
+					'side',
+					'low'
 				);
 		}
 	}
@@ -829,16 +829,21 @@ jQuery( document ).ready( function() {
 		// disable options and (visibly) set priority to 1 for front page
 		if ( $post->ID == get_option('page_on_front') ) {
 			$disabled = true;
-			$priority = '1'; // force excluded to true for private posts
+			$exclude = false;
+			$priority = '1'; // force priority to 1 for front page
 		}
 
 		echo '<p><label>';
 		_e('Priority','xml-sitemap-feed');
-		echo ' <input type="number" step="0.1" min="0" max="1" name="xmlsf_priority" id="xmlsf_priority" value="'.$priority.'" class="small-text" '.disabled( $disabled, true, false ).'></label> <span class="description">';
+		echo ' <input type="number" step="0.1" min="0" max="1" name="xmlsf_priority" id="xmlsf_priority" value="'.
+			$priority.'" class="small-text" '.
+			disabled( $disabled, true, false ).'></label> <span class="description">';
 		printf(__('Leave empty for automatic Priority as configured on %1$s > %2$s.','xml-sitemap-feed'),translate('Settings'),'<a href="' . admin_url('options-reading.php') . '#xmlsf">' . translate('Reading') . '</a>');
 		echo '</span></p>';
 
-		echo '<p><label><input type="checkbox" name="xmlsf_exclude" id="xmlsf_exclude" value="1" '.checked(!empty($exclude), true, false).' '.disabled( $disabled, true, false ).'> ';
+		echo '<p><label><input type="checkbox" name="xmlsf_exclude" id="xmlsf_exclude" value="1" '.
+			checked(!empty($exclude), true, false).
+			disabled( $disabled, true, false ).'> ';
 		_e('Exclude from XML Sitemap','xml-sitemap-feed');
 		echo '</label></p>';
 	}
@@ -869,7 +874,9 @@ jQuery( document ).ready( function() {
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
 		$exclude = get_post_meta( $post->ID, '_xmlsf_news_exclude', true );
 
-		echo '<p><label><input type="checkbox" name="xmlsf_news_exclude" id="xmlsf_news_exclude" value="1"'.checked('private' == $post->post_status || !empty($exclude), true, false).disabled('private' == $post->post_status, true, false).'> ';
+		echo '<p><label><input type="checkbox" name="xmlsf_news_exclude" id="xmlsf_news_exclude" value="1"'.
+			checked('private' == $post->post_status || !empty($exclude), true, false).
+			disabled('private' == $post->post_status, true, false).'> ';
 		_e('Exclude from Google News Sitemap.','xml-sitemap-feed');
 		echo '</label></p>';
 	}
