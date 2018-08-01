@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravan
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 4.4
 Tested up to: 4.9
-Stable tag: 4.9.4
+Stable tag: 5.0
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -271,20 +271,18 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 4.9.4 =
-Bugfixes: double content type filtering and missing featured images (thanks @flyerua)
+= 5.0 =
+Dropped keywords and access tags. Taxonomy sitemaps improvements: new options, priority calculation. Permalink and Woocommerce compatibility fixes.
 
 
 == Changelog ==
 
-= 4.9.5 =
+= 5.0 =
 * Removal of the keywords and access tags as Google dropped support
 * Taxonomy terms improvements
 * Exclude Woocommerce product_shipping_class taxonomy
-* FIX: plain and /index.php/ permalink strucure
-TODO add taxonomy term limit as option
-TODO update term_modified_gmt on new post AND term modification
-TODO on uninstall remove term meta lastmod dates?
+* FIX: plain and /index.php/ permalink structure
+* FIX: clear all options on uninstall
 
 = 4.9.4 =
 * FIX: missing featured images, thanks @flyerua
