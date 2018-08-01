@@ -1,4 +1,4 @@
-=== XML Sitemap & Google News feeds ===
+=== XML Sitemap & Google News ===
 Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
@@ -285,7 +285,6 @@ Bugfixes: double content type filtering and missing featured images (thanks @fly
 TODO add taxonomy term limit as option
 TODO update term_modified_gmt on new post AND term modification
 TODO on uninstall remove term meta lastmod dates?
-TODO test uninstall and clean install defaults
 
 = 4.9.4 =
 * FIX: missing featured images, thanks @flyerua
