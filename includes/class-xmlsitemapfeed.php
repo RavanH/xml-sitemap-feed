@@ -248,32 +248,13 @@ class XMLSitemapFeed {
 			'google' => array (
 				'active' => '1',
 				'uri' => 'http://www.google.com/ping',
-				'type' => 'GET',
-				'req' => 'sitemap',
-				'news' => '1'
+				'req' => 'sitemap'
 			),
 			'bing' => array (
 				'active' => '1',
 				'uri' => 'http://www.bing.com/ping',
-				'type' => 'GET',
-				'req' => 'sitemap',
-				'news' => '1'
-			),
-			'yandex' => array (
-				'active' => '',
-				'uri' => 'http://ping.blogs.yandex.ru/RPC2',
-				'type' => 'RPC',
-			),
-			'baidu' => array (
-				'active' => '',
-				'uri' => 'http://ping.baidu.com/ping/RPC2',
-				'type' => 'RPC',
-			),
-			'others' => array (
-				'active' => '1',
-				'uri' => 'http://rpc.pingomatic.com/',
-				'type' => 'RPC',
-			),
+				'req' => 'sitemap'
+			)
 		);
 
 		// robots
@@ -1473,7 +1454,11 @@ class XMLSitemapFeed {
 	public function ping($uri, $timeout = 3) {
 		$response = wp_remote_request( $uri, array('timeout'=>$timeout) );
 
-		return ( '200' == wp_remote_retrieve_response_code($response) ) ? true : false;
+		if ( defined('WP_DEBUG') && WP_DEBUG ) {
+			error_log( print_r( $response, true ) );
+		}
+
+		return wp_remote_retrieve_response_code($response);
 	}
 
 	/**
@@ -1484,68 +1469,73 @@ class XMLSitemapFeed {
 	 * @param $post
 	 */
 	public function do_pings($new_status, $old_status, $post) {
-		$sitemaps = $this->get_sitemaps();
-		$to_ping = $this->get_ping();
-		$update = false;
 
-		// first check if news sitemap is set
-		if ( !empty($sitemaps['sitemap-news']) ) {
-			// then check if we've got a post type that is included in our news sitemap
-			$news_tags = $this->get_option('news_tags');
-			if ( !empty($news_tags['post_type']) && is_array($news_tags['post_type']) && in_array($post->post_type,$news_tags['post_type']) ) {
+		// are we publishing?
+		if ( $old_status != 'publish' && $new_status == 'publish' ) {
 
-				// TODO: check if we're posting to an included category!
+			$sitemaps = $this->get_sitemaps();
+			$did_pong = $this->get_option('pong', array());
+			$pong = $did_pong;
+			$data = $this->defaults('ping');
 
-				// are we publishing?
-				if ( $old_status != 'publish' && $new_status == 'publish' ) {
+			// first check if news sitemap is set
+			if ( !empty($sitemaps['sitemap-news']) ) {
+				// then check if we've got a post type that is included in our news sitemap
+				$news_tags = $this->get_option('news_tags');
+				if ( !empty($news_tags['post_type']) && is_array($news_tags['post_type']) && in_array($post->post_type,$news_tags['post_type']) ) {
+
+					// TODO: check if we're posting to an included category!
+
 					// loop through ping targets
-					foreach ($to_ping as $se => $data) {
-						// check active switch
-						if( empty($data['active']) || empty($data['news']) ) {
-							continue;
-						}
-						// and if we did not ping already within the last 5 minutes
-						if( !empty($data['pong']) && is_array($data['pong']) && !empty($data['pong'][$sitemaps['sitemap-news']]) && (int)$data['pong'][$sitemaps['sitemap-news']] + 300 > time() ) {
+					foreach ($this->get_ping() as $se => $settings) {
+						// check active switch and if we did not ping already within the last 5 minutes
+						if ( empty($settings['active'])
+							 || ( !empty($did_pong)
+								 && is_array($did_pong)
+								 && !empty($did_pong[$se][$sitemaps['sitemap-news']]['time'])
+								 && (int)$did_pong[$se][$sitemaps['sitemap-news']]['time'] + 300 > time() )
+							) {
 							continue;
 						}
 						// ping !
-						if ( isset($data['req'], $data['uri']) && $this->ping( add_query_arg( $data['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap-news']), $data['uri'] ) ) ) {
-							$to_ping[$se]['pong'][$sitemaps['sitemap-news']] = time();
-							$update = true;
+						if ( isset($data[$se]['req'], $data[$se]['uri'])
+						 	 AND $code = $this->ping( add_query_arg( $data[$se]['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap-news']), $data[$se]['uri'] ) ) ) {
+							$pong[$se][$sitemaps['sitemap-news']] = array( 'time' => time(), 'code' => $code );
 						}
 					}
 				}
 			}
-		}
 
-		// first check if regular sitemap is set
-		if ( !empty($sitemaps['sitemap']) ) {
-			// then check if we've got a post type that is included in our sitemap
-			foreach($this->get_post_types() as $post_type) {
-				if ( !empty($post_type) && is_array($post_type) && in_array($post->post_type,$post_type) ) {
-					// are we publishing?
-					if ( $old_status != 'publish' && $new_status == 'publish' ) {
-						foreach ($to_ping as $se => $data) {
-							// check active switch
-							if ( empty($data['active']) || empty($data['type']) || $data['type']!='GET' ) {
+			// first check if regular sitemap is set
+			if ( !empty($sitemaps['sitemap']) ) {
+				// then check if we've got a post type that is included in our sitemap
+				foreach($this->get_post_types() as $post_type) {
+
+					if ( is_array($post_type) && isset($post_type['name']) && $post->post_type == $post_type['name'] ) {
+
+						foreach ($this->get_ping() as $se => $settings) {
+
+							// check active switch and if we did not ping already within the last hour
+							if ( empty($settings['active'])
+								 || !empty($did_pong)
+								 && is_array($did_pong)
+								 && !empty($did_pong[$se][$sitemaps['sitemap']]['time'])
+								 && (int)$did_pong[$se][$sitemaps['sitemap']]['time'] + 3600 > time() ) {
 								continue;
 							}
-							// and if we did not ping already within the last hour
-							if ( !empty($data['pong']) && is_array($data['pong']) && !empty($data['pong'][$sitemaps['sitemap']]) && (int)$data['pong'][$sitemaps['sitemap']] + 3600 > time() ) {
-								continue;
-							}
+
 							// ping !
-							if ( isset($data['req'], $data['uri']) && $this->ping( add_query_arg( $data['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap']), $data['uri'] ) ) ) {
-								$to_ping[$se]['pong'][$sitemaps['sitemap']] = time();
-								$update = true;
+							if ( isset($data[$se]['req'], $data[$se]['uri'])
+								 AND $code = $this->ping( add_query_arg( $data[$se]['req'], urlencode(trailingslashit(get_bloginfo('url')).$sitemaps['sitemap']), $data[$se]['uri'] ) ) ) {
+								$pong[$se][$sitemaps['sitemap']] = array( 'time' => time(), 'code' => $code );
 							}
 						}
 					}
 				}
 			}
-		}
 
-		if ( $update ) update_option($this->prefix.'ping',$to_ping);
+			if ( $pong != $did_pong ) update_option($this->prefix.'pong',$pong);
+		}
 	}
 
 	/**

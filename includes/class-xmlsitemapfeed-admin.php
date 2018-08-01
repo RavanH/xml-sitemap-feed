@@ -54,64 +54,28 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 	public function ping_settings_field() {
 		$options = parent::get_ping();
 		$defaults = parent::defaults('ping');
-		$update_services = get_option('ping_sites');
+		$pong = $this->get_option('pong', array());
 
 		$names = array(
-			'google' => array (
-				'name' => __('Google','xml-sitemap-feed'),
-			),
-			'bing' => array (
-				'name' => __('Bing & Yahoo','xml-sitemap-feed'),
-			),
-			'yandex' => array (
-				'name' => __('Yandex','xml-sitemap-feed'),
-			),
-			'baidu' => array (
-				'name' => __('Baidu','xml-sitemap-feed'),
-			),
-			'others' => array (
-				'name' => __('Ping-O-Matic','xml-sitemap-feed'),
-			)
+			'google' => __('Google','xml-sitemap-feed'),
+			'bing' => __('Bing & Yahoo','xml-sitemap-feed')
 		);
-		foreach ( $names as $key => $values ) {
-			if (array_key_exists($key,$defaults) && is_array($values))
-				$defaults[$key] += $values;
-		}
 
 		echo '
-		<fieldset id="xmlsf_ping"><legend class="screen-reader-text">'.translate('Update Services').'</legend>
+		<fieldset id="xmlsf_ping"><legend class="screen-reader-text">'.__('Ping Services','xml-sitemap-feed').'</legend>
 			';
 
 		foreach ( $defaults as $key => $values ) {
-			if ( isset($values['type']) && $values['type'] == 'RPC' ) {
-				$active = ( strpos($update_services,untrailingslashit($values['uri'])) === false ) ? false : true;
-			} else {
-				$active = !empty($options[$key]['active']) ? true : false;
-			}
 			echo '
 				<label><input type="checkbox" name="'.$this->prefix.'ping['.
 				$key.'][active]" id="xmlsf_ping_'.
 				$key.'" value="1"'.
-				checked( $active, true, false).' /> ';
-			echo isset($names[$key]) && !empty($names[$key]['name']) ? $names[$key]['name'] : $key ;
+				checked( !empty($options[$key]['active']), true, false).' /> ';
+			echo isset($names[$key]) && !empty($names[$key]) ? $names[$key] : $key ;
 			echo '</label>';
 
-			echo '
-				<input type="hidden" name="'.$this->prefix.'ping['.
-				$key.'][uri]" value="'.
-				$values['uri'].'" />';
-			echo '
-				<input type="hidden" name="'.$this->prefix.'ping['.
-				$key.'][type]" value="'.
-				$values['type'].'" />';
-			if (isset($values['news']))
-				echo '
-				<input type="hidden" name="'.$this->prefix.'ping['.
-				$key.'][news]" value="'.
-				$values['news'].'" />';
-
 			echo ' <span class="description">';
-			if (!empty($options[$key]['pong'])) {
+			if (!empty($pong[$key])) {
 				if ( $tzstring = get_option('timezone_string') ) {
 					// use same timezoneformat as translatable examples in options-general.php
 					$timezone_format = translate_with_gettext_context('Y-m-d G:i:s', 'timezone date format');
@@ -120,13 +84,13 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 					$timezone_format = 'Y-m-d G:i:s T';
 				}
 
-				foreach ((array)$options[$key]['pong'] as $pretty => $time) {
-					echo '
-						<input type="hidden" name="'.$this->prefix.'ping['.
-						$key.'][pong]['.$pretty.']" value="'.
-						$time.'" />';
-					if ( !empty($time) )
-						echo sprintf(__('Successfully sent %1$s on %2$s.','xml-sitemap-feed'),$pretty, date($timezone_format,$time)).' ';
+				foreach ((array)$pong[$key] as $pretty => $data) {
+					if ( !empty($data['time']) ) {
+						if ( '200' == $data['code'] )
+							echo sprintf(__('Successfully sent %1$s on %2$s.','xml-sitemap-feed'),$pretty, date($timezone_format,$data['time'])).' ';
+						else
+							echo sprintf(__('Failed to send %1$s on %2$s.','xml-sitemap-feed'),$pretty, date($timezone_format,$data['time'])).' ';
+					}
 				}
 				date_default_timezone_set('UTC');
 			}
@@ -141,44 +105,15 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		$defaults = parent::defaults('ping');
 		$old = parent::get_option('ping');
 		$sanitized = array();
-		$update_services = get_option('ping_sites');
-		$update_services_new = $update_services;
 
 		foreach ($defaults as $key => $values) {
 			if(!isset($new[$key]))
 				continue;
 
-			if ( isset($values['type']) && $values['type']=='RPC' && isset($values['uri']) ) {
-				// did we toggle the option?
-				$changed = true;
-				if ( isset($old[$key]) ) {
-					$old_active = isset($old[$key]['active']) ? $old[$key]['active'] : '';
-					$new_active = isset($new[$key]['active']) ? $new[$key]['active'] : '';
-					if ( $old_active == $new_active )
-						$changed = false;
-				}
-
-				if ( $changed ) {
-					// then change the ping_sites list according to option
-					if ( !empty($new[$key]['active']) && strpos($update_services,untrailingslashit($values['uri'])) === false )
-						$update_services_new .= "\n" . $values['uri'];
-					elseif ( empty($new[$key]['active']) && strpos($update_services,untrailingslashit($values['uri'])) !== false )
-						$update_services_new = str_replace(array(trailingslashit($values['uri']),untrailingslashit($values['uri'])),'',$update_services_new);
-				} else {
-					// or change the option according to ping_sites
-					if ( strpos($update_services,untrailingslashit($values['uri'])) !== false )
-						$new[$key]['active'] = '1';
-					else
-						unset($new[$key]['active']);
-				}
-			}
-			if ( is_array($new[$key]) ) {
+			if ( is_array($new[$key])  ) {
 				$sanitized += array( $key => $new[$key] );
 			}
 		}
-
-		if($update_services_new != $update_services)
-			update_option('ping_sites',$update_services_new);
 
 		return $sanitized;
 	}
@@ -1030,7 +965,8 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 
 		if ( isset($sitemaps['sitemap']) || isset($sitemaps['sitemap-news']) ) {
 			register_setting('writing', $this->prefix.'ping', array($this,'sanitize_ping_settings') );
-			add_settings_field($this->prefix.'ping', translate('Update Services'), array($this,'ping_settings_field'), 'writing');
+			add_settings_field($this->prefix.'ping', __('Ping Services','xml-sitemap-feed'), array($this,'ping_settings_field'), 'writing');
+
 	        // save post meta box settings
 	        add_action( 'save_post', array($this,'save_metadata') );
 		}
