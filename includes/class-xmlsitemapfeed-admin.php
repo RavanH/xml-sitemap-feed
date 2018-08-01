@@ -87,9 +87,9 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 				foreach ((array)$pong[$key] as $pretty => $data) {
 					if ( !empty($data['time']) ) {
 						if ( '200' == $data['code'] )
-							echo sprintf(__('Successfully sent %1$s on %2$s.','xml-sitemap-feed'),$pretty, date($timezone_format,$data['time'])).' ';
+							echo ' &nbsp;&ndash;&nbsp; ' . sprintf(__('Successfully sent %1$s on %2$s.','xml-sitemap-feed'),$pretty, date($timezone_format,$data['time'])).' ';
 						else
-							echo sprintf(__('Failed to send %1$s on %2$s.','xml-sitemap-feed'),$pretty, date($timezone_format,$data['time'])).' ';
+							echo ' &nbsp;&ndash;&nbsp; ' .sprintf(__('Failed to send %1$s on %2$s.','xml-sitemap-feed'),$pretty, date($timezone_format,$data['time'])).' ';
 					}
 				}
 				date_default_timezone_set('UTC');
