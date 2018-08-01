@@ -255,7 +255,7 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
             jQuery("#xmlsf_post_types_'.$post_type->name.'_settings").hide();
             jQuery("#xmlsf_post_types_'.$post_type->name.'_link").click( function(event) {
             		event.preventDefault();
-			jQuery("#xmlsf_post_types_'.$post_type->name.'_settings").toggle("slow");
+			jQuery("#xmlsf_post_types_'.$post_type->name.'_settings").toggle("fast");
 	    });
         });
     </script>
@@ -318,25 +318,13 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			}
 		}
 
-/*		echo '
-		<p class="description">* '.__('Priority settings do not affect ranking in search results in any way. They are only meant to suggest search engines which URLs to index first. Once a URL has been indexed, its Priority becomes meaningless until its Lastmod is updated.','xml-sitemap-feed').' <a href="#xmlsf_post_types_note_1_more" id="xmlsf_post_types_note_1_link">'.translate('Read more...').'</a>
-		<span id="xmlsf_post_types_note_1_more">'.__('Maximum Priority (1.0) is reserved for the front page, individual posts and, when allowed, posts with high comment count.','xml-sitemap-feed').' '.__('Priority values are taken as relative values. Setting all to the same (high) value is pointless.','xml-sitemap-feed').'</span></p>
-<script type="text/javascript">
-jQuery( document ).ready( function() {
-    jQuery("#xmlsf_post_types_note_1_more").hide();
-    jQuery("#xmlsf_post_types_note_1_link").click( function(event) {
-	event.preventDefault();
-	jQuery("#xmlsf_post_types_note_1_link").hide();
-	jQuery("#xmlsf_post_types_note_1_more").show("slow");
-    });
-});
-</script>';*/
 		echo '
 		</fieldset>';
 	}
 
 	public function taxonomies_settings_field() {
-		$options = parent::get_taxonomies();
+		$taxonomies = parent::get_taxonomies();
+		$taxonomy_settings = parent::get_option('taxonomy_settings');
 		$active = parent::get_option('post_types');
 		$output = '';
 
@@ -357,7 +345,7 @@ jQuery( document ).ready( function() {
 				$taxonomy->name.']" id="xmlsf_taxonomies_'.
 				$taxonomy->name.'" value="'.
 				$taxonomy->name.'"'.
-				checked(in_array($taxonomy->name,$options), true, false).' /> '.
+				checked(in_array($taxonomy->name,$taxonomies), true, false).' /> '.
 				$taxonomy->label.'</label> ('.
 				$count.') ';
 
@@ -372,26 +360,25 @@ jQuery( document ).ready( function() {
 			echo '
 		<fieldset id="xmlsf_taxonomies"><legend class="screen-reader-text">'.__('XML Sitemaps for taxonomies','xml-sitemap-feed').'</legend>
 			';
-
 			echo $output;
-
-/*			echo '
-			<p class="description">'.__('It is generally not recommended to include taxonomy pages, unless their content brings added value.','xml-sitemap-feed').' <a href="#xmlsf_taxonomies_note_1_more" id="xmlsf_taxonomies_note_1_link">'.translate('Read more...').'</a>
-			<span id="xmlsf_taxonomies_note_1_more">'.__('For example, when you use category descriptions with information that is not present elsewhere on your site or if taxonomy pages list posts with an excerpt that is different from, but complementary to the post content. In these cases you might consider including certain taxonomies. Otherwise, if you fear <a href="http://moz.com/learn/seo/duplicate-content">negative affects of duplicate content</a> or PageRank spread, you might even consider disallowing indexation of taxonomies.','xml-sitemap-feed').' '.
-			sprintf(__('You can do this by adding specific robots.txt rules in the %s field above.','xml-sitemap-feed'),'<strong>'.__('Additional robots.txt rules','xml-sitemap-feed').'</strong>');
-			echo '</span></p>
+			echo '<span class="description"><a id="xmlsf_taxonomy_settings_link" href="#xmlsf_taxonomy_settings">'.translate('Settings').'</a></span><br>
 <script type="text/javascript">
-jQuery( document ).ready( function() {
-    jQuery("#xmlsf_taxonomies_note_1_more").hide();
-    jQuery("#xmlsf_taxonomies_note_1_link").click( function(event) {
-	event.preventDefault();
-	jQuery("#xmlsf_taxonomies_note_1_link").hide();
-	jQuery("#xmlsf_taxonomies_note_1_more").show("slow");
-    });
-});
-</script>';*/
-
-echo '
+	jQuery( document ).ready( function() {
+		jQuery("#xmlsf_taxonomy_settings").hide();
+		jQuery("#xmlsf_taxonomy_settings_link").click( function(event) {
+				event.preventDefault();
+		jQuery("#xmlsf_taxonomy_settings").toggle("fast");
+	});
+	});
+</script>
+			<ul style="margin-left:18px" id="xmlsf_taxonomy_settings">
+				<li><label>'.__('Priority','xml-sitemap-feed').' <input type="number" step="0.1" min="0.1" max="0.9" name="'.$this->prefix.'taxonomy_settings[priority]" id="xmlsf_taxonomy_priority" value="'.
+					( isset($taxonomy_settings['priority']) ? $taxonomy_settings['priority'] : '' ) . '" class="small-text" /></label></li>
+				<li><label><input type="checkbox" name="'.$this->prefix.'taxonomy_settings[dynamic_priority]" id="xmlsf_taxonomy_dynamic_priority" value="1"'.
+					checked( !empty($taxonomy_settings['dynamic_priority']), true, false ) . '" />'.__('Automatic Priority calculation.','xml-sitemap-feed').'</label></li>
+				<li><label>'.__('Maximum number of terms per taxonomy sitemap','xml-sitemap-feed').' <input type="number" name="'.$this->prefix.'taxonomy_settings[term_limit]" id="xmlsf_taxonomy_term_limit" value="'.
+					( isset($taxonomy_settings['term_limit']) ? $taxonomy_settings['term_limit'] : '' ) . '" class="small-text" /></label></li>
+			</ul>
 		</fieldset>';
 		} else {
 			echo '
@@ -693,6 +680,18 @@ echo '
 		return $new;
 	}
 
+	public function sanitize_taxonomy_settings_settings($new) {
+		$old = parent::get_option('taxonomy_settings');
+
+		if ($old != $new) {
+			$sanitized['term_limit'] = isset($new['term_limit']) ? intval($new['term_limit']) : $old['term_limit'];
+			$sanitized['priority'] = isset($new['priority']) ? $this->sanitize_priority($new['priority'], 0.1, 0.9) : $old['priority'];
+			$sanitized['dynamic_priority'] = !empty($new['dynamic_priority']) ? '1' : '';
+		}
+
+		return $sanitized;
+	}
+
 	public function sanitize_custom_sitemaps_settings($new) {
 		$old = parent::get_custom_sitemaps();
 		$callback = create_function('$a','return filter_var($a,FILTER_VALIDATE_URL);');
@@ -989,9 +988,7 @@ echo '
 			add_settings_field($this->prefix.'robots', __('Additional robots.txt rules','xml-sitemap-feed'), array($this,'robots_settings_field'), 'reading');
 		}
 
-		if ( is_multisite() ) {
-			add_settings_field($this->prefix.'reset', __('Reset XML sitemaps','xml-sitemap-feed'), array($this,'reset_settings_field'), 'reading');
-		}
+		add_settings_field($this->prefix.'reset', __('Reset XML sitemaps','xml-sitemap-feed'), array($this,'reset_settings_field'), 'reading');
 
 		if ( isset($sitemaps['sitemap-news']) ) {
 			// XML SITEMAP SETTINGS
@@ -1015,6 +1012,7 @@ echo '
 			add_settings_field($this->prefix.'post_types', __('Include post types','xml-sitemap-feed'), array($this,'post_types_settings_field'), 'reading', 'xml_sitemap_section');
 			// taxonomies
 			register_setting('reading', $this->prefix.'taxonomies', array($this,'sanitize_taxonomies_settings') );
+			register_setting('reading', $this->prefix.'taxonomy_settings', array($this,'sanitize_taxonomy_settings_settings') );
 			add_settings_field($this->prefix.'taxonomies', __('Include taxonomies','xml-sitemap-feed'), array($this,'taxonomies_settings_field'), 'reading', 'xml_sitemap_section');
 			// custom domains
 			register_setting('reading', $this->prefix.'domains', array($this,'sanitize_domains_settings') );

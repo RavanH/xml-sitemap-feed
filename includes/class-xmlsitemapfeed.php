@@ -107,7 +107,7 @@ class XMLSitemapFeed {
 	private $lastmodified;
 	private $timespan;
 
-	private $taxonomy_postcount = 0;
+	private $taxonomy_termmaxposts = null;
 
 	private $frontpages = null;
 	private $blogpages = null;
@@ -238,10 +238,9 @@ class XMLSitemapFeed {
 
 		// taxonomy settings
 		$this->defaults['taxonomy_settings'] = array(
-			'number' => '1000',
+			'priority' => '0.3',
 			'dynamic_priority' => '1',
-			'min_priority' => '0.1',
-			'max_priority' => '0.3'
+			'term_limit' => '1000'
 		);
 
 		// search engines to ping
@@ -848,37 +847,6 @@ class XMLSitemapFeed {
 	}
 
 	/**
-	 * Prepare priority calculation values
-	 *
-	 * @param $sitemap string
-	 * @param $name string
-	 *
-	 * @return null
-	 */
-	public function priority_calc_values( $sitemap, $name ) {
-
-		if ( $sitemap === 'post_type' ) :
-
-			if ( empty($this->timespan) ) {
-				// last posts or page modified date in Unix seconds
-				$this->lastmodified = mysql2date('U',get_lastpostmodified('gmt',$name),false);
-				// uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
-				$this->timespan = $this->lastmodified - mysql2date('U',get_firstpostdate('gmt',$name),false);
-			};
-
-		elseif ( $sitemap === 'taxonomy' ) :
-
-			// count total posts in taxonomy
-			$tax_obj = get_taxonomy($name);
-			foreach ($tax_obj->object_type as $post_type) {
-				$_post_count = wp_count_posts($post_type);
-				$this->taxonomy_postcount += $_post_count->publish;
-			};
-
-		endif;
-	}
-
-	/**
 	 * Get priority
 	 *
 	 * @param string $sitemap
@@ -928,21 +896,25 @@ class XMLSitemapFeed {
 
 		elseif ( 'taxonomy' == $sitemap ) :
 
-			$defaults = $this->defaults('taxonomy_settings');
+			$options = $this->get_option('taxonomy_settings');
+			$options['priority'] = empty($options['priority']) ? $this->defaults['taxonomy_settings']['priority']: floatval($options['priority']);
 
-			if ( is_object($term) && $this->taxonomy_postcount && !empty($defaults['dynamic_priority']) ) {
-				$priority = $defaults['min_priority'] + ( $term->count - 1 ) / $this->taxonomy_postcount;
+			$priority = $options['priority'];
 
-				if ( $priority > $defaults['max_priority'] ) $priority = $defaults['max_priority'];
-			} else {
-				$priority = ( $defaults['min_priority'] + $defaults['max_priority'] ) / 2;
+			if ( $options['priority'] > 0.1 && !empty($options['dynamic_priority']) && is_object($term) ) {
+				// set first term post count as maximum
+				if ( null == $this->taxonomy_termmaxposts ) {
+					$this->taxonomy_termmaxposts = $term->count;
+				}
+
+				$priority -= ( $this->taxonomy_termmaxposts - $term->count ) * ( $priority - 0.1 ) / $this->taxonomy_termmaxposts;
 			}
 
 		endif;
 
 		// a final check for limits
-		if ( $priority < 0 ) {
-			$priority = 0;
+		if ( $priority < 0.1 ) {
+			$priority = 0.1;
 		}
 		if ( $priority > 1 ) {
 			$priority = 1;
@@ -1271,83 +1243,85 @@ class XMLSitemapFeed {
 
 				case 'news':
 
-				// prepare for news and return modified request
-				$defaults = $this->defaults('news_tags');
-				$options = $this->get_option('news_tags');
-				$news_post_types = isset($options['post_type']) && !empty($options['post_type']) ? (array)$options['post_type'] : $defaults['post_type'];
+					// prepare for news and return modified request
+					$defaults = $this->defaults('news_tags');
+					$options = $this->get_option('news_tags');
+					$news_post_types = isset($options['post_type']) && !empty($options['post_type']) ? (array)$options['post_type'] : $defaults['post_type'];
 
-				// disable caching
-				define('DONOTCACHEPAGE', true);
-				define('DONOTCACHEDB', true);
+					// disable caching
+					define('DONOTCACHEPAGE', true);
+					define('DONOTCACHEDB', true);
 
-				// set up query filters
-				$live = false;
-				foreach ($news_post_types as $news_post_type) {
-					if ( get_lastpostdate('gmt', $news_post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
-						$live = true;
-						break;
+					// set up query filters
+					$live = false;
+					foreach ($news_post_types as $news_post_type) {
+						if ( get_lastpostdate('gmt', $news_post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
+							$live = true;
+							break;
+						}
 					}
-				}
-				if ( $live ) {
-					add_filter('post_limits', array($this, 'filter_news_limits'));
-					add_filter('posts_where', array($this, 'filter_news_where'), 10, 1);
-				} else {
-					add_filter('post_limits', array($this, 'filter_no_news_limits'));
-				}
+					if ( $live ) {
+						add_filter('post_limits', array($this, 'filter_news_limits'));
+						add_filter('posts_where', array($this, 'filter_news_where'), 10, 1);
+					} else {
+						add_filter('post_limits', array($this, 'filter_no_news_limits'));
+					}
 
-				// post type
-				$request['post_type'] = $news_post_types;
+					// post type
+					$request['post_type'] = $news_post_types;
 
-				// categories
-				if ( isset($options['categories']) && is_array($options['categories']) ) {
-					$request['cat'] = implode(',',$options['categories']);
-				}
+					// categories
+					if ( isset($options['categories']) && is_array($options['categories']) ) {
+						$request['cat'] = implode(',',$options['categories']);
+					}
 
-				// set the news sitemap conditional tag
-				$this->is_news = true;
+					// set the news sitemap conditional tag
+					$this->is_news = true;
 
-				break;
+					break;
 
 				case 'posttype':
 
-				if ( !isset( $feed[2] ) ) break;
+					if ( !isset( $feed[2] ) ) break;
 
-				$options = $this->get_post_types();
+					$options = $this->get_post_types();
 
-				// prepare priority calculation
-				if ( !empty($options[$feed[2]]['dynamic_priority']) ) $this->priority_calc_values( 'post_type', $feed[2] );
+					// prepare priority calculation
+					if ( !empty($options[$feed[2]]['dynamic_priority']) ) {
+						// last posts or page modified date in Unix seconds
+						$this->lastmodified = mysql2date('U',get_lastpostmodified('gmt',$feed[2]),false);
+						// uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
+						$this->timespan = $this->lastmodified - mysql2date('U',get_firstpostdate('gmt',$feed[2]),false);
+					};
 
-				// setup filter
-				add_filter( 'post_limits', array( $this, 'filter_limits' ) );
+					// setup filter
+					add_filter( 'post_limits', array( $this, 'filter_limits' ) );
 
-				$request['post_type'] = $feed[2];
-				$request['orderby'] = 'modified';
-				$request['is_date'] = false;
+					$request['post_type'] = $feed[2];
+					$request['orderby'] = 'modified';
+					$request['is_date'] = false;
 
-				break;
+					break;
 
 				case 'taxonomy':
 
-				if ( !isset( $feed[2] ) ) break;
+					if ( !isset( $feed[2] ) ) break;
 
-				// prepare ptiority calculation
-				$this->priority_calc_values( 'taxonomy', $feed[2] );
+					// WPML compat
+					global $sitepress;
+					if ( is_object($sitepress) ) {
+						remove_filter( 'get_terms_args', array($sitepress,'get_terms_args_filter') );
+						remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
+						remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
+						$sitepress->switch_lang('all');
+					}
 
-				// WPML compat
-				global $sitepress;
-				if ( is_object($sitepress) ) {
-					remove_filter( 'get_terms_args', array($sitepress,'get_terms_args_filter') );
-					remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
-					remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
-					$sitepress->switch_lang('all');
-				}
+					add_filter( 'get_terms_args', array( $this, 'set_terms_args' ) );
 
-				add_filter( 'get_terms_args', array( $this, 'set_terms_args' ) );
+					// pass on taxonomy name via request
+					$request['taxonomy'] = $feed[2];
 
-				// pass on taxonomy name via request
-				$request['taxonomy'] = $feed[2];
-
-				break;
+					break;
 
 				default:
 				// do nothing
@@ -1368,7 +1342,8 @@ class XMLSitemapFeed {
 	 */
 	function set_terms_args( $args ) {
 		// https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
-		$args['number'] = $this->defaults['taxonomy_settings']['number'];
+		$options = $this->get_option('taxonomy_settings');
+		$args['number'] = isset($options['term_limit']) ? intval($options['term_limit']) : $this->defaults['taxonomy_settings']['term_limit'];
 		$args['order'] = 'DESC';
 		$args['orderby'] = 'count';
 		$args['pad_counts'] = true;
