@@ -284,7 +284,6 @@ Bugfixes: double content type filtering and missing featured images (thanks @fly
 * FIX: plain and /index.php/ permalink strucure
 TODO add taxonomy term limit as option
 TODO update term_modified_gmt on new post AND term modification
-TODO revisit admin texts on priority calc
 TODO on uninstall remove term meta lastmod dates?
 TODO test uninstall and clean install defaults
 

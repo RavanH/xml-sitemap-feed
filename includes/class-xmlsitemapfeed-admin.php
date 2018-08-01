@@ -279,24 +279,24 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 						selected( $archive == $value, true, false).
 						'>'.$translation.'</option>';
 					echo '</select>
-					</label> <span class="description"> '.__('Split by year if you experience errors or slow sitemaps. In very rare cases, split by month is needed.','xml-sitemap-feed').'</span></li>';
+					</label> <span class="description"> '.__('Choose split by month if you experience errors or slow sitemaps.','xml-sitemap-feed').'</span></li>';
 				}
 
 				$priority_val = !empty($options[$post_type->name]['priority']) ? $options[$post_type->name]['priority'] : $defaults[$post_type->name]['priority'];
 				echo '
 					<li><label>'.__('Priority','xml-sitemap-feed').' <input type="number" step="0.1" min="0.1" max="0.9" name="'.$this->prefix.'post_types['.
 					$post_type->name.'][priority]" id="xmlsf_post_types_'.
-					$post_type->name.'_priority" value="'.$priority_val.'" class="small-text"></label> <span class="description">'.__('Priority can be overridden on individual posts.','xml-sitemap-feed').' *</span></li>';
+					$post_type->name.'_priority" value="'.$priority_val.'" class="small-text"></label> <span class="description">'.__('Priority can be overridden on individual posts.','xml-sitemap-feed').'</span></li>';
 
 				echo '
 					<li><label><input type="checkbox" name="'.$this->prefix.'post_types['.
 					$post_type->name.'][dynamic_priority]" value="1" '.
-					checked( !empty($options[$post_type->name]['dynamic_priority']), true, false).' /> '.__('Automatic Priority calculation.','xml-sitemap-feed').'</label> <span class="description">'.__('Adjusts the Priority based on factors like age, comments, sticky post or blog page. Individual posts with fixed Priority will always keep that value.','xml-sitemap-feed').'</span></li>';
+					checked( !empty($options[$post_type->name]['dynamic_priority']), true, false).' /> '.__('Automatic Priority calculation.','xml-sitemap-feed').'</label> <span class="description">'.__('Adjusts the Priority based on factors like age, comments, sticky post or blog page.','xml-sitemap-feed').'</span></li>';
 
 				echo '
 					<li><label><input type="checkbox" name="'.$this->prefix.'post_types['.
 					$post_type->name.'][update_lastmod_on_comments]" value="1" '.
-					checked( !empty($options[$post_type->name]["update_lastmod_on_comments"]), true, false).' /> '.__('Update Lastmod on comments.','xml-sitemap-feed').'</label> <span class="description">'.__('Set this if discussion on your site warrants reindexation upon each new comment.','xml-sitemap-feed').'</li>';
+					checked( !empty($options[$post_type->name]["update_lastmod_on_comments"]), true, false).' /> '.__('Update the Last Changed date on each new comment.','xml-sitemap-feed').'</label></li>';
 
 				$image = isset($options[$post_type->name]['tags']['image']) ? $options[$post_type->name]['tags']['image'] : $defaults[$post_type->name]['tags']['image'];
 				$context = ( $post_type->name === 'page' ) ? 'page' : 'post';
@@ -318,7 +318,7 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			}
 		}
 
-		echo '
+/*		echo '
 		<p class="description">* '.__('Priority settings do not affect ranking in search results in any way. They are only meant to suggest search engines which URLs to index first. Once a URL has been indexed, its Priority becomes meaningless until its Lastmod is updated.','xml-sitemap-feed').' <a href="#xmlsf_post_types_note_1_more" id="xmlsf_post_types_note_1_link">'.translate('Read more...').'</a>
 		<span id="xmlsf_post_types_note_1_more">'.__('Maximum Priority (1.0) is reserved for the front page, individual posts and, when allowed, posts with high comment count.','xml-sitemap-feed').' '.__('Priority values are taken as relative values. Setting all to the same (high) value is pointless.','xml-sitemap-feed').'</span></p>
 <script type="text/javascript">
@@ -330,7 +330,7 @@ jQuery( document ).ready( function() {
 	jQuery("#xmlsf_post_types_note_1_more").show("slow");
     });
 });
-</script>';
+</script>';*/
 		echo '
 		</fieldset>';
 	}
@@ -375,7 +375,7 @@ jQuery( document ).ready( function() {
 
 			echo $output;
 
-			echo '
+/*			echo '
 			<p class="description">'.__('It is generally not recommended to include taxonomy pages, unless their content brings added value.','xml-sitemap-feed').' <a href="#xmlsf_taxonomies_note_1_more" id="xmlsf_taxonomies_note_1_link">'.translate('Read more...').'</a>
 			<span id="xmlsf_taxonomies_note_1_more">'.__('For example, when you use category descriptions with information that is not present elsewhere on your site or if taxonomy pages list posts with an excerpt that is different from, but complementary to the post content. In these cases you might consider including certain taxonomies. Otherwise, if you fear <a href="http://moz.com/learn/seo/duplicate-content">negative affects of duplicate content</a> or PageRank spread, you might even consider disallowing indexation of taxonomies.','xml-sitemap-feed').' '.
 			sprintf(__('You can do this by adding specific robots.txt rules in the %s field above.','xml-sitemap-feed'),'<strong>'.__('Additional robots.txt rules','xml-sitemap-feed').'</strong>');
@@ -389,11 +389,13 @@ jQuery( document ).ready( function() {
 	jQuery("#xmlsf_taxonomies_note_1_more").show("slow");
     });
 });
-</script>
+</script>';*/
+
+echo '
 		</fieldset>';
 		} else {
 			echo '
-		<p style="color: red" class="warning">'.__('No taxonomies available for the currently included post types.','xml-sitemap-feed').'</p>';
+		<p class="description warning">'.__('No taxonomies available for the currently included post types.','xml-sitemap-feed').'</p>';
 		}
 	}
 
@@ -404,7 +406,7 @@ jQuery( document ).ready( function() {
 		<fieldset><legend class="screen-reader-text">'.__('Include custom XML Sitemaps','xml-sitemap-feed').'</legend>
 			<label>'.__('Additional XML Sitemaps to append to the main XML Sitemap Index:','xml-sitemap-feed').'<br>
 			<textarea name="'.$this->prefix.'custom_sitemaps" id="xmlsf_custom_sitemaps" class="large-text" cols="50" rows="4" />'. implode("\n",$lines) .'</textarea></label>
-			<p class="description">'.__('Add the full URL, including protocol (http/https) and domain, of any XML Sitemap that you want to append to the Sitemap Index. Start each URL on a new line.','xml-sitemap-feed').'<br><span style="color: red" class="warning">'.__('Only valid sitemaps are allowed in the Sitemap Index. Use your Google/Bing Webmaster Tools to verify!','xml-sitemap-feed').'</span></p>
+			<p class="description">'.__('Add the full URL, including protocol (http/https) and domain.','xml-sitemap-feed').' '.__('Start each URL on a new line.','xml-sitemap-feed').'<br><span style="color: red" class="warning">'.__('Only valid sitemaps are allowed in the Sitemap Index. Use your Google/Bing Webmaster Tools to verify!','xml-sitemap-feed').'</span></p>
 		</fieldset>';
 
 	}
@@ -421,10 +423,10 @@ jQuery( document ).ready( function() {
 		}
 
 		echo '
-		<fieldset><legend class="screen-reader-text">'.__('Include custom URLs','xml-sitemap-feed').'</legend>
-			<label>'.__('Additional URLs to append in an extra XML Sitemap:','xml-sitemap-feed').'<br>
+		<fieldset><legend class="screen-reader-text">'.__('Include custom web pages','xml-sitemap-feed').'</legend>
+			<label>'.__('Additional web pages to append in an extra XML Sitemap:','xml-sitemap-feed').'<br>
 			<textarea name="'.$this->prefix.'urls" id="xmlsf_urls" class="large-text" cols="50" rows="4" />'. implode("\n",$lines) .'</textarea></label>
-			<p class="description">'.__('Add the full URL, including protocol (http/https) and domain, of any (static) page that you want to append to the ones already included by WordPress. Optionally add a priority value between 0 and 1, separated with a space after the URL. Start each URL on a new line.','xml-sitemap-feed').'</p>
+			<p class="description">'.__('Add the full URL, including protocol (http/https) and domain.','xml-sitemap-feed').' '.__('Optionally add a priority value between 0 and 1, separated with a space after the URL.','xml-sitemap-feed').' '.__('Start each URL on a new line.','xml-sitemap-feed').'</p>
 		</fieldset>';
 
 	}
@@ -436,7 +438,18 @@ jQuery( document ).ready( function() {
 		echo '
 		<fieldset><legend class="screen-reader-text">'.__('Allowed domains','xml-sitemap-feed').'</legend>
 			<label>'.__('Additional domains to allow in the XML Sitemaps:','xml-sitemap-feed').'<br><textarea name="'.$this->prefix.'domains" id="xmlsf_domains" class="large-text" cols="50" rows="4" />'. implode("\n",$domains) .'</textarea></label>
-			<p class="description">'.sprintf(__('By default, only the domain %s as used in your WordPress site address is allowed. This means that all URLs that use another domain (custom URLs or using a plugin like Page Links To) are filtered from the XML Sitemap. However, if you are the verified owner of other domains in your Google/Bing Webmaster Tools account, you can include these in the same sitemap. Add these domains, without protocol (http/https) each on a new line. Note that if you enter a domain with www, all URLs without it or with other subdomains will be filtered.','xml-sitemap-feed'),'<strong>'.$default.'</strong>').'</p>
+			<p class="description">'.sprintf(__('By default, only the domain %s as used in your WordPress site address is allowed.','xml-sitemap-feed'),'<strong>'.$default.'</strong>').' <a href="#xmlsf_domains_note_1_more" id="xmlsf_domains_note_1_link">'.translate('Read more...').'</a><p><p id="xmlsf_domains_note_1_more" class="description">'.
+			__('This means that all URLs that use another domain (custom URLs or using a plugin like Page Links To) are filtered from the XML Sitemap. However, if you are the verified owner of other domains in your Google/Bing Webmaster Tools account, you can include these in the same sitemap. Add these domains, without protocol (http/https) each on a new line. Note that if you enter a domain with www, all URLs without it or with other subdomains will be filtered.','xml-sitemap-feed').'</p>
+			<script type="text/javascript">
+			jQuery( document ).ready( function() {
+			    jQuery("#xmlsf_domains_note_1_more").hide();
+			    jQuery("#xmlsf_domains_note_1_link").click( function(event) {
+				event.preventDefault();
+				jQuery("#xmlsf_domains_note_1_link").hide();
+				jQuery("#xmlsf_domains_note_1_more").show("fast");
+			    });
+			});
+			</script>
 		</fieldset>';
 
 	}
@@ -554,7 +567,8 @@ jQuery( document ).ready( function() {
 			echo '
 					</select>
 				</label>
-				<p class="description">'.__('If you wish to limit posts that will feature in your News Sitemap to certain categories, select them here. If no categories are selected, posts of all categories will be included in your News Sitemap.','xml-sitemap-feed').' '.__('Use the Ctrl/Cmd key plus click to select more than one or to deselect.','xml-sitemap-feed');
+				<p class="description">'.__('If you wish to limit posts that will feature in your News Sitemap to certain categories, select them here. If no categories are selected, posts of all categories will be included in your News Sitemap.','xml-sitemap-feed').
+				' '.__('Use the Ctrl/Cmd key plus click to select more than one or to deselect.','xml-sitemap-feed');
 			echo '
 			</fieldset>';
 		}
@@ -576,14 +590,15 @@ jQuery( document ).ready( function() {
 				'>'.__('Attached images','xml-sitemap-feed').'</option>
 				';
 		echo '</select></label>
-			<p class="description">'.__('Note: Google News prefers at most one image per article in the News Sitemap. If multiple valid images are specified, the crawler will have to pick one arbitrarily. Images in News Sitemaps should be in jpeg or png format.','xml-sitemap-feed').' <a href="https://support.google.com/news/publisher/answer/13369" target="_blank">'.translate('Read more...').'</a></p>
+			<p class="description">'.__('Note: Google News prefers at most one image per article in the News Sitemap. If multiple valid images are specified, the crawler will have to pick one arbitrarily. Images in News Sitemaps should be in jpeg or png format.','xml-sitemap-feed').' '.sprintf(__('Read more on %s.','xml-sitemap-feed'),'<a href="https://support.google.com/news/publisher/answer/13369" target="_blank">'.__('Prevent missing or incorrect images','xml-sitemap-feed').'</a>').'</p>
 		</fieldset>';
 	}
 
 	public function news_labels_field() {
 		echo '
 		<fieldset id="xmlsf_news_labels"><legend class="screen-reader-text">' . __('Source labels','xml-sitemap-feed') . '</legend>
-			<p>' . __('Source labels provide more information about the content of your articles.','xml-sitemap-feed') . '</p>';
+			<p>' . __('Source labels provide more information about the content of your articles.','xml-sitemap-feed') . ' ' .
+			__('The FactCheck label may only be applied if you publish stories with fact-checking content that\'s indicated by schema.org ClaimReview markup.','xml-sitemap-feed').' '.sprintf(__('Read more about source labels on %s','xml-sitemap-feed'),'<a href="https://support.google.com/news/publisher/answer/4582731" target="_blank">'.__('What does each source label mean?','xml-sitemap-feed').'</a>') . '</p>';
 
 		$options = parent::get_option('news_tags');
 
@@ -602,10 +617,6 @@ jQuery( document ).ready( function() {
 
 		echo '
 		  <fieldset id="xmlsf_news_labels_genres"><legend class="screen-reader-text">&lt;genres&gt;</legend>
-			<p>'.sprintf(__('The %s tag specifies one or more properties for an article, namely, whether it is a press release, a blog post, an opinion, an op-ed piece, user-generated content, or satire.','xml-sitemap-feed'),'<strong>&lt;genres&gt;</strong>').' '.__('You can assign different genres when writing a post.','xml-sitemap-feed');
-
-		echo '</p>
-			<p class="description">'.__('Use Ctrl plus click to select more than one or to deselect.','xml-sitemap-feed').' '.__('The FactCheck label may be applied if you publish stories with fact-checking content that\'s indicated by schema.org ClaimReview markup.','xml-sitemap-feed').' '.sprintf(__('Read more about source labels on %s','xml-sitemap-feed'),'<a href="https://support.google.com/news/publisher/answer/4582731" target="_blank">'.__('What does each source label mean?','xml-sitemap-feed').'</a>').'</p>
 			<ul>
 				<li><label>'.__('Default genre:','xml-sitemap-feed').'<br><select multiple name="'.$this->prefix.'news_tags[genres][default][]" id="xmlsf_news_tags_genres_default" size="'.count($this->gn_genres).'">';
 		foreach ( $this->gn_genres as $name ) {
@@ -614,6 +625,7 @@ jQuery( document ).ready( function() {
 		echo '
 				</select></label></li>
 			</ul>
+			<p class="description">'.__('Use the Ctrl/Cmd key plus click to select more than one or to deselect.','xml-sitemap-feed').'</p>
 		</fieldset>';
 	}
 
