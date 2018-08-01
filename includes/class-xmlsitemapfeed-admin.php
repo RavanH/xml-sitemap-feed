@@ -375,9 +375,9 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 				<li><label>'.__('Priority','xml-sitemap-feed').' <input type="number" step="0.1" min="0.1" max="0.9" name="'.$this->prefix.'taxonomy_settings[priority]" id="xmlsf_taxonomy_priority" value="'.
 					( isset($taxonomy_settings['priority']) ? $taxonomy_settings['priority'] : '' ) . '" class="small-text" /></label></li>
 				<li><label><input type="checkbox" name="'.$this->prefix.'taxonomy_settings[dynamic_priority]" id="xmlsf_taxonomy_dynamic_priority" value="1"'.
-					checked( !empty($taxonomy_settings['dynamic_priority']), true, false ) . '" />'.__('Automatic Priority calculation.','xml-sitemap-feed').'</label></li>
+					checked( !empty($taxonomy_settings['dynamic_priority']), true, false ) . ' />'.__('Automatic Priority calculation.','xml-sitemap-feed').'</label></li>
 				<li><label>'.__('Maximum number of terms per taxonomy sitemap','xml-sitemap-feed').' <input type="number" name="'.$this->prefix.'taxonomy_settings[term_limit]" id="xmlsf_taxonomy_term_limit" value="'.
-					( isset($taxonomy_settings['term_limit']) ? $taxonomy_settings['term_limit'] : '' ) . '" class="small-text" /></label></li>
+					( isset($taxonomy_settings['term_limit']) ? $taxonomy_settings['term_limit'] : '' ) . '" class="small-text" /></label> <span class="description">'.__('Set to 0 for unlimited.','xml-sitemap-feed').'</span></li>
 			</ul>
 		</fieldset>';
 		} else {
@@ -681,20 +681,18 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 	}
 
 	public function sanitize_taxonomy_settings_settings($new) {
-		$old = parent::get_option('taxonomy_settings');
+		$defaults = parent::defaults('taxonomy_settings');
+		$sanitized = array();
 
-		if ($old != $new) {
-			$sanitized['term_limit'] = isset($new['term_limit']) ? intval($new['term_limit']) : $old['term_limit'];
-			$sanitized['priority'] = isset($new['priority']) ? $this->sanitize_priority($new['priority'], 0.1, 0.9) : $old['priority'];
-			$sanitized['dynamic_priority'] = !empty($new['dynamic_priority']) ? '1' : '';
-		}
+		$sanitized['term_limit'] = isset($new['term_limit']) ? intval($new['term_limit']) : $defaults['term_limit'];
+		$sanitized['priority'] = isset($new['priority']) && is_numeric($new['priority']) ? $this->sanitize_priority($new['priority'], 0.1, 0.9) : $defaults['priority'];
+		$sanitized['dynamic_priority'] = !empty($new['dynamic_priority']) ? '1' : '';
 
 		return $sanitized;
 	}
 
 	public function sanitize_custom_sitemaps_settings($new) {
 		$old = parent::get_custom_sitemaps();
-		$callback = create_function('$a','return filter_var($a,FILTER_VALIDATE_URL);');
 
 		// clean up input
 		if(is_array($new)) {
@@ -726,7 +724,10 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 
 		// build sanitized output
 		$sanitized = array();
-		$callback = create_function('$a','return filter_var($a,FILTER_VALIDATE_URL) || is_numeric($a);');
+		if ( version_compare( PHP_VERSION, '5.3.0', '<') )
+			$callback = create_function( '$a', 'return filter_var($a,FILTER_VALIDATE_URL) || is_numeric($a);' );
+		else
+			$callback = function($a) { return filter_var($a,FILTER_VALIDATE_URL) || is_numeric($a); };
 
 		foreach ($input as $line) {
 			if(empty($line))
@@ -1019,7 +1020,7 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			add_settings_field($this->prefix.'domains', __('Allowed domains','xml-sitemap-feed'), array($this,'domains_settings_field'), 'reading', 'xml_sitemap_section');
 			// custom urls
 			register_setting('reading', $this->prefix.'urls', array($this,'sanitize_urls_settings') );
-			add_settings_field($this->prefix.'urls', __('Include custom URLs','xml-sitemap-feed'), array($this,'urls_settings_field'), 'reading', 'xml_sitemap_section');
+			add_settings_field($this->prefix.'urls', __('Include custom web pages','xml-sitemap-feed'), array($this,'urls_settings_field'), 'reading', 'xml_sitemap_section');
 			// custom sitemaps
 			register_setting('reading', $this->prefix.'custom_sitemaps', array($this,'sanitize_custom_sitemaps_settings') );
 			add_settings_field($this->prefix.'custom_sitemaps', __('Include custom XML Sitemaps','xml-sitemap-feed'), array($this,'custom_sitemaps_settings_field'), 'reading', 'xml_sitemap_section');

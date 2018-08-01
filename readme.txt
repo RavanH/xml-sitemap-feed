@@ -283,6 +283,7 @@ Dropped keywords and access tags. Taxonomy sitemaps improvements: new options, p
 * Exclude Woocommerce product_shipping_class taxonomy
 * FIX: plain and /index.php/ permalink structure
 * FIX: clear all options on uninstall
+* PHP 7.2+ compat: create_function deprecated
 
 = 4.9.4 =
 * FIX: missing featured images, thanks @flyerua
