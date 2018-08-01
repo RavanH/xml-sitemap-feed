@@ -26,18 +26,12 @@ foreach ( $urls as $url ) {
 	if (empty($url[0]))
 		continue;
 
-	if ( $xmlsf->is_allowed_domain( $url[0] ) ) {
 ?>
 	<url>
 		<loc><?php echo esc_url( $url[0] ); ?></loc>
 		<priority><?php echo ( isset($url[1]) && is_numeric($url[1]) ) ? $url[1] : '0.5'; ?></priority>
  	</url>
 <?php
-	} else {
-?>
-	<!-- URL <?php echo esc_url( $url[0] ); ?> skipped: Not within allowed domains. -->
-<?php
-	}
 }
 ?></urlset>
 <?php $xmlsf->_e_usage();

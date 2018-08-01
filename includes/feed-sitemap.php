@@ -59,7 +59,7 @@ if ( !empty($urls) ) {
 // custom sitemaps
 $custom_sitemaps = $xmlsf->get_custom_sitemaps();
 foreach ($custom_sitemaps as $url) {
-	if (empty($url) || !$xmlsf->is_allowed_domain($url))
+	if (empty($url))
 		continue;
 ?>
 	<sitemap>
