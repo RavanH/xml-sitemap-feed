@@ -1732,16 +1732,10 @@ class XMLSitemapFeed {
 		}
 	}
 
-
 	/**
 	 * Init
 	 */
 	public function init() {
-		// TEXT DOMAIN
-		if ( is_admin() ) { // translations needed on admin only
-			load_plugin_textdomain('xml-sitemap-feed', false, dirname( self::$plugin_basename ) . '/languages' );
-		}
-
 		$sitemaps = $this->get_sitemaps();
 
 		if (isset($sitemaps['sitemap'])) {
