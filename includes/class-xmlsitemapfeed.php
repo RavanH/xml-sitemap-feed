@@ -187,20 +187,76 @@ class XMLSitemapFeed {
 	 */
 	private function set_defaults() {
 		// sitemaps
-		if ( '1' == get_option('blog_public') ) {
-			$this->defaults['sitemaps'] = array(
-				'sitemap' => 'sitemap.xml'
-			);
-		} else {
-			$this->defaults['sitemaps'] = array();
-		}
+		$sitemaps = ( '1' !== get_option('blog_public') ) ? array() : array(
+			'sitemap' => 'sitemap.xml'
+		);
 
-		// post_types
-		$this->defaults['post_types'] = array();
+		$this->defaults = array(
+			'version' => '',
+			'sitemaps' => $sitemaps,
+			'post_types' => array(
+				'post' => array(
+					'name' => 'post',
+					'active' => '1',
+					'archive' => 'yearly',
+					'priority' => '0.7',
+					'dynamic_priority' => '1',
+					'tags' => array(
+						'image' => 'attached'
+						/*'video' => ''*/
+					)
+				),
+				'page' => array(
+					'name' => 'page',
+					'active' => '1',
+					'priority' => '0.3',
+					'dynamic_priority' => '',
+					'tags' => array(
+						'image' => 'attached'
+						/*'video' => ''*/
+					)
+				)
+			),
+			'taxonomies' => array(),
+			'taxonomy_settings' => array(
+				'priority' => '0.3',
+				'dynamic_priority' => '1',
+				'term_limit' => '1000'
+			),
+			'ping' => array(
+				'google' => array(
+					'active' => '1',
+					'uri' => 'http://www.google.com/ping',
+					'req' => 'sitemap'
+				),
+				'bing' => array(
+					'active' => '1',
+					'uri' => 'http://www.bing.com/ping',
+					'req' => 'sitemap'
+				)
+			),
+			'pong' => array(),
+			'robots' => '',
+			'urls' => array(),
+			'custom_sitemaps' => array(),
+			'domains' => array(),
+			//'news_sitemap' => array(),
+			'news_tags' => array(
+				'name' => '',
+				'post_type' => array('post'),
+				'categories' => '',
+				'image' => 'featured',
+				'genres' => array(
+					'default' => ''
+				)
+			)
+		);
 
+		// append public post_types defaults
 		foreach ( get_post_types(array('public'=>true),'names') as $name ) {
 			// skip unallowed post types
-			if ( in_array($name,$this->disabled_post_types()) ) {
+			$skip = array_merge( array('post','page'), $this->disabled_post_types() );
+			if ( in_array($name,$skip) ) {
 				continue;
 			}
 
@@ -213,69 +269,6 @@ class XMLSitemapFeed {
 				'tags' => array( 'image' => 'attached' /*,'video' => ''*/)
 			);
 		}
-
-		if ( isset($this->defaults['post_types']['post']) ) {
-			$this->defaults['post_types']['post']['active'] = '1';
-			$this->defaults['post_types']['post']['archive'] = 'yearly';
-			$this->defaults['post_types']['post']['priority'] = '0.7';
-			$this->defaults['post_types']['post']['dynamic_priority'] = '1';
-		}
-
-		if ( isset($this->defaults['post_types']['page']) ) {
-			$this->defaults['post_types']['page']['active'] = '1';
-			unset($this->defaults['post_types']['page']['archive']);
-			$this->defaults['post_types']['page']['priority'] = '0.3';
-		}
-
-		// taxonomies
-		$this->defaults['taxonomies'] = array(); // by default do not include any taxonomies
-
-		// taxonomy settings
-		$this->defaults['taxonomy_settings'] = array(
-			'priority' => '0.3',
-			'dynamic_priority' => '1',
-			'term_limit' => '1000'
-		);
-
-		// search engines to ping
-		$this->defaults['ping'] = array(
-			'google' => array (
-				'active' => '1',
-				'uri' => 'http://www.google.com/ping',
-				'req' => 'sitemap'
-			),
-			'bing' => array (
-				'active' => '1',
-				'uri' => 'http://www.bing.com/ping',
-				'req' => 'sitemap'
-			)
-		);
-
-		// robots
-		$this->defaults['robots'] = '';
-
-		// additional urls
-		$this->defaults['urls'] = array();
-
-		// additional custom_sitemaps
-		$this->defaults['custom_sitemaps'] = array();
-
-		// additional allowed domains
-		$this->defaults['domains'] = array();
-
-		// news sitemap settings
-		$this->defaults['news_sitemap'] = array();
-
-		// news sitemap tags settings
-		$this->defaults['news_tags'] = array(
-			'name' => '',
-			'post_type' => array('post'),
-			'categories' => '',
-			'image' => 'featured',
-			'genres' => array(
-				'default' => ''
-			)
-		);
 	}
 
 	/**
@@ -286,9 +279,8 @@ class XMLSitemapFeed {
 	 * @return array
 	 */
 	protected function defaults($key = false) {
-		if ( empty($this->defaults) ) {
+		if ( empty($this->defaults) )
 			$this->set_defaults();
-		}
 
 		if ( $key ) {
 			$return = ( isset($this->defaults[$key]) ) ? $this->defaults[$key] : '';
@@ -1468,7 +1460,7 @@ class XMLSitemapFeed {
 		if ( $old_status != 'publish' && $new_status == 'publish' ) {
 
 			$sitemaps = $this->get_sitemaps();
-			$did_pong = $this->get_option('pong', array());
+			$did_pong = $this->get_option('pong');
 			$pong = $did_pong;
 			$data = $this->defaults('ping');
 
@@ -1540,7 +1532,6 @@ class XMLSitemapFeed {
 	 * Clear settings
 	 */
 	public function clear_settings() {
-		delete_option( 'xmlsf_version' );
 		foreach ( $this->defaults() as $option => $settings ) {
 			delete_option( 'xmlsf_' . $option );
 		}
@@ -1711,9 +1702,11 @@ class XMLSitemapFeed {
 	 * Plugins loaded: load text domain
 	 */
 	public function plugins_loaded() {
-		// TEXT DOMAIN
-		if ( is_admin() ) { // text domain needed on admin only
-			load_plugin_textdomain('xml-sitemap-feed', false, dirname( self::$plugin_basename ) . '/languages' );
+		// UPGRADE
+		$version = get_option( 'xmlsf_version', 0 );
+
+		if ( version_compare(self::$plugin_basename, $version, '>') ) {
+			$this->upgrade($version);
 		}
 	}
 
@@ -1744,11 +1737,9 @@ class XMLSitemapFeed {
 	 * Init
 	 */
 	public function init() {
-		// UPGRADE
-		$version = get_option( 'xmlsf_version', 0 );
-
-		if ( version_compare(self::$plugin_basename, $version, '>') ) {
-			$this->upgrade($version);
+		// TEXT DOMAIN
+		if ( is_admin() ) { // translations needed on admin only
+			load_plugin_textdomain('xml-sitemap-feed', false, dirname( self::$plugin_basename ) . '/languages' );
 		}
 
 		$sitemaps = $this->get_sitemaps();
