@@ -18,18 +18,6 @@ class XMLSitemapFeed {
 	public static $plugin_version;
 
 	/**
-	* Pretty permalinks base name
-	* @var string
-	*/
-	public $base_name = 'sitemap';
-
-	/**
-	* Pretty permalinks extension
-	* @var string
-	*/
-	public $extension = 'xml';
-
-	/**
 	* Signifies whether the request has been filtered.
 	* @var bool
 	*/
@@ -201,7 +189,7 @@ class XMLSitemapFeed {
 		// sitemaps
 		if ( '1' == get_option('blog_public') ) {
 			$this->defaults['sitemaps'] = array(
-				'sitemap' => XMLSF_NAME
+				'sitemap' => 'sitemap.xml'
 			);
 		} else {
 			$this->defaults['sitemaps'] = array();
@@ -1003,10 +991,10 @@ class XMLSitemapFeed {
 			$name .= $param ? '&m='.$param : '';
 			$name .= isset($split_url[1]) && !empty($split_url[1]) ? '&' . $split_url[1] : '';
 		} else {
-			$name = $this->base_name.'-'.$sitemap;
+			$name = 'sitemap-'.$sitemap;
 			$name .= $type ? '-'.$type : '';
 			$name .= $param ? '.'.$param : '';
-			$name .= '.'.$this->extension;
+			$name .= '.xml';
 			$name .= isset($split_url[1]) && !empty($split_url[1]) ? '?' . $split_url[1] : '';
 		}
 
@@ -1151,23 +1139,23 @@ class XMLSitemapFeed {
 
 		if (!empty($sitemaps['sitemap'])) {
 			// home urls
-			$xmlsf_rules[ $this->base_name . '-home\.' . $this->extension . '$' ] = $wp_rewrite->index . '?feed=sitemap-home';
+			$xmlsf_rules[ 'sitemap-home\.xml$' ] = $wp_rewrite->index . '?feed=sitemap-home';
 
 			// add rules for post types (can be split by month or year)
 			foreach ( $this->get_post_types() as $post_type ) {
 				if ( isset($post_type['active']) && '1' == $post_type['active'] ) {
-					$xmlsf_rules[ $this->base_name . '-posttype-' . $post_type['name'] . '\.([0-9]+)?\.?' . $this->extension . '$' ] = $wp_rewrite->index . '?feed=sitemap-posttype-' . $post_type['name'] . '&m=$matches[1]';
+					$xmlsf_rules[ 'sitemap-posttype-' . $post_type['name'] . '\.([0-9]+)?\.xml$' ] = $wp_rewrite->index . '?feed=sitemap-posttype-' . $post_type['name'] . '&m=$matches[1]';
 				}
 			}
 
 			// add rules for taxonomies
 			foreach ( $this->get_taxonomies() as $taxonomy ) {
-				$xmlsf_rules[ $this->base_name . '-taxonomy-' . $taxonomy . '\.' . $this->extension . '$' ] = $wp_rewrite->index . '?feed=sitemap-taxonomy-' . $taxonomy;
+				$xmlsf_rules[ 'sitemap-taxonomy-' . $taxonomy . '\.xml$' ] = $wp_rewrite->index . '?feed=sitemap-taxonomy-' . $taxonomy;
 			}
 
 			$urls = $this->get_urls();
 			if(!empty($urls)) {
-				$xmlsf_rules[ $this->base_name . '-custom\.' . $this->extension . '$' ] = $wp_rewrite->index . '?feed=sitemap-custom';
+				$xmlsf_rules[ 'sitemap-custom\.xml$' ] = $wp_rewrite->index . '?feed=sitemap-custom';
 			}
 
 		}

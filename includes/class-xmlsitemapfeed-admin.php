@@ -19,12 +19,12 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		$options = parent::get_sitemaps();
 
 		echo '<fieldset id="xmlsf_sitemaps"><legend class="screen-reader-text">'.__('XML Sitemaps','xml-sitemap-feed').'</legend>
-			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="'.htmlspecialchars(XMLSF_NAME).'" '.checked(isset($options['sitemap']), true, false).' /> '.__('XML Sitemap Index','xml-sitemap-feed').'</label>';//xmlsf
+			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="sitemap.xml" '.checked(isset($options['sitemap']), true, false).' /> '.__('XML Sitemap Index','xml-sitemap-feed').'</label>';//xmlsf
 		if (isset($options['sitemap']))
 			echo '<span class="description"> &nbsp;&ndash;&nbsp; <a href="#xmlsf" id="xmlsf_link">'.translate('Settings').'</a> &nbsp;&ndash;&nbsp; <a href="'.trailingslashit(get_bloginfo('url')). ( $this->plain_permalinks() ? '?feed=sitemap' : $options['sitemap'] ) .'" target="_blank">'.translate('View').'</a></span>';
 
 		echo '<br>
-			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="'.htmlspecialchars(XMLSF_NEWS_NAME).'" '.checked(isset($options['sitemap-news']), true, false).' /> '.__('Google News Sitemap','xml-sitemap-feed').'</label>';
+			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="sitemap-news.xml" '.checked(isset($options['sitemap-news']), true, false).' /> '.__('Google News Sitemap','xml-sitemap-feed').'</label>';
 		if (isset($options['sitemap-news']))
 			echo '<span class="description"> &nbsp;&ndash;&nbsp; <a href="#xmlnf" id="xmlnf_link">'.translate('Settings').'</a> &nbsp;&ndash;&nbsp; <a href="'.trailingslashit(get_bloginfo('url')). ( $this->plain_permalinks() ? '?feed=sitemap-news' : $options['sitemap-news'] ) .'" target="_blank">'.translate('View').'</a></span>';
 

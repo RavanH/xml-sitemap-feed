@@ -1,5 +1,17 @@
 <?php
-// if uninstall not called from WordPress exit
+/**
+ * XMLSF_MULTISITE_UNINSTALL
+ *
+ * Set this constant in wp-config.php if you want to allow looping over each site
+ * in the network to run XMLSitemapFeed_Uninstall->uninstall() defined in uninstall.php
+ *
+ * Be careful: There is NO batch-processing so it does not scale on large networks!
+ *
+ * example:
+ * define('XMLSF_MULTISITE_UNINSTALL', true);
+ */
+
+// exit if uninstall not called from WordPress
 if ( !defined('WP_UNINSTALL_PLUGIN') )
     exit();
 

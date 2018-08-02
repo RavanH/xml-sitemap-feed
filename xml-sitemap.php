@@ -58,45 +58,6 @@ Author URI: http://status301.net/
 
 if ( ! defined( 'WPINC' ) ) die;
 
-/* --------------------
- *      CONSTANTS
- * -------------------- */
-
-/**
- * The following constants can be used to change plugin defaults
- * by defining them in wp-config.php
- */
-
-/**
- * XMLSF_NAME
- *
- * Pretty permalink name for the main sitemap (index)
- */
-
-if ( !defined('XMLSF_NAME') )
-	define('XMLSF_NAME', 'sitemap.xml');
-
-/**
- * XMLSF_NEWS_NAME
- *
- * Pretty permalink name for the news sitemap
- */
-
-if ( !defined('XMLSF_NEWS_NAME') )
-	define('XMLSF_NEWS_NAME', 'sitemap-news.xml');
-
-/**
- * XMLSF_MULTISITE_UNINSTALL
- *
- * Set this constant in wp-config.php if you want to allow looping over each site
- * in the network to run XMLSitemapFeed_Uninstall->uninstall() defined in uninstall.php
- *
- * Be careful: There is NO batch-processing so it does not scale on large networks!
- *
- * example:
- * define('XMLSF_MULTISITE_UNINSTALL', true);
- */
-
 /* -------------------------------------
  *        INCLUDE & INSTANTIATE
  * ------------------------------------- */
