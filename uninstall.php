@@ -67,6 +67,7 @@ class XMLSitemapFeed_Uninstall {
 		delete_option('xmlsf_taxonomy_settings');
 		delete_option('xmlsf_news_sitemap');
 		delete_option('xmlsf_ping');
+		delete_option('xmlsf_pong');
 		delete_option('xmlsf_robots');
 		delete_option('xmlsf_urls');
 		delete_option('xmlsf_custom_sitemaps');
