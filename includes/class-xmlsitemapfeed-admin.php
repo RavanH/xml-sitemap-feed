@@ -6,6 +6,12 @@
 class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 
 	/**
+	 * Static files conflicting with this plugin
+	 * @var array
+	 */
+	private $static_files = array();
+
+	/**
 	* SETTINGS
 	*/
 
@@ -659,16 +665,12 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 
 		// build sanitized output
 		$sanitized = array();
-		if ( version_compare( PHP_VERSION, '5.3.0', '<') )
-			$callback = create_function( '$a', 'return filter_var($a,FILTER_VALIDATE_URL) || is_numeric($a);' );
-		else
-			$callback = function($a) { return filter_var($a,FILTER_VALIDATE_URL) || is_numeric($a); };
 
 		foreach ($input as $line) {
 			if(empty($line))
 				continue;
 
-			$arr = array_values(array_filter(explode(" ",trim($line)),$callback));
+			$arr = array_values(array_filter(explode(" ",trim($line)),array($this,'sanitize_urls_array_filter')));
 
 			if(isset($arr[0])) {
 				if(isset($arr[1]))
@@ -688,6 +690,10 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		}
 
 		return (!empty($sanitized)) ? $sanitized : '';
+	}
+
+	public function sanitize_urls_array_filter( $url ) {
+		return filter_var( $url, FILTER_VALIDATE_URL ) || is_numeric( $url );
 	}
 
 	public function sanitize_domains_settings($new) {
@@ -897,13 +903,6 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 				wp_insert_term(	$name, 'gn-genre' );
 			}
 		}
-
-		// CATCH TRANSIENT for static file warning
-		$files = get_transient('xmlsf_static_files_found');
-		if ( !empty($files) ) {
-			// TODO admin message about static files: explode(', ',$files);
-			// with option to ignore or delete files or check again...
-		}
 	}
 
 	/**
@@ -987,6 +986,45 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 	}
 
 	/**
+	 * Check for static sitemap files
+	 */
+	public function check_static_files() {
+		if ( !current_user_can( 'manage_options' ) ) return;
+
+		if ( !is_multisite() || is_main_site() || is_network_admin() ) {
+			$home_path = trailingslashit( get_home_path() );
+			$check_for = $this->get_sitemaps();
+			if ( !empty($this->get_option('robots')) )
+				$check_for['robots'] = 'robots.txt';
+
+			foreach ( $check_for as $name => $pretty ) {
+				if ( file_exists( $home_path . $pretty ) ) {
+					$this->files[] = $home_path . $pretty;
+				}
+			}
+
+			if ( !empty($this->files) ) {
+				add_action( 'admin_notices', array($this,'static_files_admin_notice') );
+			}
+		}
+
+	}
+
+	public function static_files_admin_notice() {
+		// TODO admin message about static files: ;
+		// with option to ignore or delete files or check again...
+		$number = count($this->files);
+		echo '<div class="notice notice-warning fade is-dismissible">';
+		echo '<p><strong>' . __('XML Sitemap & Google News Feeds','xml-sitemap-feed') . '</strong> ' .
+		sprintf( _n(
+			'The following conflicting static file has been detected. Either remove it or disable the corresponding plugin setting.',
+			'The following %s conflicting static files have been detected. Either remove them or disable the corresponding settings.',
+			$number,'xml-sitemap-feed'), number_format_i18n($number) ) . '</p>';
+		echo '<ul><li>' . implode('</li><li>',$this->files) . '</li></ul>';
+		echo '</div>';
+	}
+
+	/**
 	 * INIT
 	 */
 
@@ -995,6 +1033,8 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		$this->handle_flags();
 
 		$this->register_settings();
+
+		$this->check_static_files();
 
 	}
 

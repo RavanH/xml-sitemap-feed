@@ -1647,9 +1647,6 @@ class XMLSitemapFeed {
 		// ... but make sure rules are regenerated when admin is visited.
 		set_transient( 'xmlsf_flush_rewrite_rules', '' );
 
-		// set this up with a transient too !! get_home_path function not available on init !?!
-		$this->check_static_files();
-
 		if ( $old_version !== 0 ) :
 
 			if ( version_compare('4.4', $old_version, '>') ) {
@@ -1707,28 +1704,6 @@ class XMLSitemapFeed {
 
 		if ( version_compare(self::$plugin_basename, $version, '>') ) {
 			$this->upgrade($version);
-		}
-	}
-
-	/**
-	 * Check for static sitemap files
-	 */
-	public function check_static_files() {
-		$files = array();
-
-		if ( !is_multisite() || is_main_site() || is_network_admin() ) {
-			$home_path = trailingslashit( get_home_path() );
-			$check_for = $this->get_sitemaps();
-			$check_for['robots'] = 'robots.txt';
-			foreach ( $check_for as $name => $pretty ) {
-				if ( file_exists( $home_path . $pretty ) ) {
-					$files[] = $home_path . $pretty;
-				}
-			}
-		}
-
-		if ( !empty($files) ) {
-			set_transient('xmlsf_static_files_found', $files);
 		}
 	}
 
