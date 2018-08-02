@@ -62,14 +62,12 @@ if ( ! defined( 'WPINC' ) ) die;
  *      CONSTANTS
  * -------------------- */
 
-define('XMLSF_VERSION', '5.0');
-
-/*
+/**
  * The following constants can be used to change plugin defaults
  * by defining them in wp-config.php
  */
 
-/*
+/**
  * XMLSF_NAME
  *
  * Pretty permalink name for the main sitemap (index)
@@ -78,7 +76,7 @@ define('XMLSF_VERSION', '5.0');
 if ( !defined('XMLSF_NAME') )
 	define('XMLSF_NAME', 'sitemap.xml');
 
-/*
+/**
  * XMLSF_NEWS_NAME
  *
  * Pretty permalink name for the news sitemap
@@ -87,7 +85,7 @@ if ( !defined('XMLSF_NAME') )
 if ( !defined('XMLSF_NEWS_NAME') )
 	define('XMLSF_NEWS_NAME', 'sitemap-news.xml');
 
-/*
+/**
  * XMLSF_MULTISITE_UNINSTALL
  *
  * Set this constant in wp-config.php if you want to allow looping over each site
@@ -100,19 +98,31 @@ if ( !defined('XMLSF_NEWS_NAME') )
  */
 
 /* -------------------------------------
- *      INCLUDE HACKS & CLASS
+ *        INCLUDE & INSTANTIATE
  * ------------------------------------- */
 
-$xmlsf_dir = plugin_dir_path( __FILE__ );
+/**
+ * Functions
+ */
 
-if ( file_exists ( $xmlsf_dir . 'xml-sitemap-feed' ) )
-	$xmlsf_dir .= 'xml-sitemap-feed/';
+require dirname(__FILE__) . '/includes/functions.php';
 
-include_once( $xmlsf_dir . 'includes/functions.php' );
-include_once( $xmlsf_dir . 'includes/class-xmlsitemapfeed.php' );
+/**
+ * Main class
+ */
 
-/* ----------------------
- *     INSTANTIATE
- * ---------------------- */
+require dirname(__FILE__) . '/includes/class-xmlsitemapfeed.php';
 
-$xmlsf = new XMLSitemapFeed( plugin_basename(__FILE__) );
+$xmlsf = new XMLSitemapFeed( plugin_basename(__FILE__), '5.0' );
+
+/**
+ * Admin class
+ */
+
+if ( is_admin() ) {
+
+	require dirname( __FILE__ ) . '/includes/class-xmlsitemapfeed-admin.php';
+
+	$xmlsf_admin = new XMLSitemapFeed_Admin( plugin_basename(__FILE__) );
+
+}
