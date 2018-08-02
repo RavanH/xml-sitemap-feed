@@ -1761,26 +1761,6 @@ class XMLSitemapFeed {
 	}
 
 	/**
-	 * Flush rules
-	 *
-	 * @param bool|false $hard
-	 */
-	public function flush_rules( $hard = false ) {
-		// did you flush already?
-		if ( $this->yes_mother ) {
-			return; // yes, mother!
-		}
-
-		flush_rewrite_rules($hard);
-
-		if ( defined('WP_DEBUG') && WP_DEBUG ) {
-			error_log('XML Sitemap Feeds rewrite rules flushed');
-		}
-
-		$this->yes_mother = true;
-	}
-
-	/**
 	 * register google news taxonomies
 	 */
 	public function register_gn_taxonomies() {

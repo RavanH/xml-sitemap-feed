@@ -907,6 +907,20 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 	}
 
 	/**
+	 * Flush rules
+	 *
+	 * @param bool|false $hard
+	 */
+	public function flush_rules( $hard = false ) {
+
+		flush_rewrite_rules($hard);
+
+		if ( defined('WP_DEBUG') && WP_DEBUG ) {
+			error_log('XML Sitemap Feeds rewrite rules flushed');
+		}
+	}
+
+	/**
 	 * Register settings and add settings fields
 	 */
 
