@@ -27,12 +27,12 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		echo '<fieldset id="xmlsf_sitemaps"><legend class="screen-reader-text">'.__('XML Sitemaps','xml-sitemap-feed').'</legend>
 			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="sitemap.xml" '.checked(isset($options['sitemap']), true, false).' /> '.__('XML Sitemap Index','xml-sitemap-feed').'</label>';//xmlsf
 		if (isset($options['sitemap']))
-			echo '<span class="description"> &nbsp;&ndash;&nbsp; <a href="#xmlsf" id="xmlsf_link">'.translate('Settings').'</a> &nbsp;&ndash;&nbsp; <a href="'.trailingslashit(get_bloginfo('url')). ( $this->plain_permalinks() ? '?feed=sitemap' : $options['sitemap'] ) .'" target="_blank">'.translate('View').'</a></span>';
+			echo '<span class="description"> &nbsp;&ndash;&nbsp; <a href="#xmlsf" id="xmlsf_link">'.translate('Settings').'</a> | <a href="'.trailingslashit(get_bloginfo('url')). ( $this->plain_permalinks() ? '?feed=sitemap' : $options['sitemap'] ) .'" target="_blank">'.translate('View').'</a></span>';
 
 		echo '<br>
 			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="sitemap-news.xml" '.checked(isset($options['sitemap-news']), true, false).' /> '.__('Google News Sitemap','xml-sitemap-feed').'</label>';
 		if (isset($options['sitemap-news']))
-			echo '<span class="description"> &nbsp;&ndash;&nbsp; <a href="#xmlnf" id="xmlnf_link">'.translate('Settings').'</a> &nbsp;&ndash;&nbsp; <a href="'.trailingslashit(get_bloginfo('url')). ( $this->plain_permalinks() ? '?feed=sitemap-news' : $options['sitemap-news'] ) .'" target="_blank">'.translate('View').'</a></span>';
+			echo '<span class="description"> &nbsp;&ndash;&nbsp; <a href="#xmlnf" id="xmlnf_link">'.translate('Settings').'</a> | <a href="'.trailingslashit(get_bloginfo('url')). ( $this->plain_permalinks() ? '?feed=sitemap-news' : $options['sitemap-news'] ) .'" target="_blank">'.translate('View').'</a></span>';
 
 		echo '
 		</fieldset>';
@@ -336,7 +336,6 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			<textarea name="'.$this->prefix.'custom_sitemaps" id="xmlsf_custom_sitemaps" class="large-text" cols="50" rows="4" />'. implode("\n",$lines) .'</textarea></label>
 			<p class="description">'.__('Add the full URL, including protocol (http/https) and domain.','xml-sitemap-feed').' '.__('Start each URL on a new line.','xml-sitemap-feed').'<br><span style="color: red" class="warning">'.__('Only valid sitemaps are allowed in the Sitemap Index. Use your Google/Bing Webmaster Tools to verify!','xml-sitemap-feed').'</span></p>
 		</fieldset>';
-
 	}
 
 	public function urls_settings_field() {
@@ -356,7 +355,6 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			<textarea name="'.$this->prefix.'urls" id="xmlsf_urls" class="large-text" cols="50" rows="4" />'. implode("\n",$lines) .'</textarea></label>
 			<p class="description">'.__('Add the full URL, including protocol (http/https) and domain.','xml-sitemap-feed').' '.__('Optionally add a priority value between 0 and 1, separated with a space after the URL.','xml-sitemap-feed').' '.__('Start each URL on a new line.','xml-sitemap-feed').'</p>
 		</fieldset>';
-
 	}
 
 	public function domains_settings_field() {
@@ -379,7 +377,6 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			});
 			</script>
 		</fieldset>';
-
 	}
 
 
@@ -734,15 +731,6 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		return $new;
 	}
 
-
-	// action links
-
-	public function add_action_link( $links ) {
-		$settings_link = '<a href="' . admin_url('options-reading.php') . '#blog_public">' . translate('Settings') . '</a>';
-		array_unshift( $links, $settings_link );
-		return $links;
-	}
-
 	/**
 	* META BOXES
 	*/
@@ -876,7 +864,7 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 
 		// CATCH TRANSIENT for flushing rewrite rules after the sitemaps setting has changed
 		if ( delete_transient('xmlsf_flush_rewrite_rules') ) {
-			$this->flush_rules();
+			flush_rewrite_rules();
 		}
 
 		// CATCH TRANSIENT for recreating terms
@@ -902,20 +890,6 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			foreach ($this->gn_genres as $name) {
 				wp_insert_term(	$name, 'gn-genre' );
 			}
-		}
-	}
-
-	/**
-	 * Flush rules
-	 *
-	 * @param bool|false $hard
-	 */
-	public function flush_rules( $hard = false ) {
-
-		flush_rewrite_rules($hard);
-
-		if ( defined('WP_DEBUG') && WP_DEBUG ) {
-			error_log('XML Sitemap Feeds rewrite rules flushed');
 		}
 	}
 
@@ -989,39 +963,70 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 	 * Check for static sitemap files
 	 */
 	public function check_static_files() {
-		if ( !current_user_can( 'manage_options' ) ) return;
 
-		if ( !is_multisite() || is_main_site() || is_network_admin() ) {
-			$home_path = trailingslashit( get_home_path() );
-			$check_for = $this->get_sitemaps();
-			if ( !empty($this->get_option('robots')) )
-				$check_for['robots'] = 'robots.txt';
+		$home_path = trailingslashit( get_home_path() );
+		$check_for = $this->get_sitemaps();
+		if ( !empty($this->get_option('robots')) )
+			$check_for['robots'] = 'robots.txt';
 
-			foreach ( $check_for as $name => $pretty ) {
-				if ( file_exists( $home_path . $pretty ) ) {
-					$this->files[] = $home_path . $pretty;
-				}
-			}
-
-			if ( !empty($this->files) ) {
-				add_action( 'admin_notices', array($this,'static_files_admin_notice') );
+		foreach ( $check_for as $name => $pretty ) {
+			if ( file_exists( $home_path . $pretty ) ) {
+				$this->files[$pretty] = $home_path . $pretty;
 			}
 		}
+	}
 
+	public function static_files_admin_notice_deleted() {
+		echo '<div class="notice notice-success fade is-dismissible">';
+		echo '<p><strong>' . __('Successfully deleted:','xml-sitemap-feed') . '</strong></p>';
+		echo '<ul><li>' . implode('</li><li>',$this->deleted) . '</li></ul>';
+		echo '</div>';
+	}
+
+	public function static_files_admin_notice_failed() {
+		echo '<div class="notice notice-error fade is-dismissible">';
+		echo '<p><strong>' . __('Failed to delete:','xml-sitemap-feed') . '</strong></p>';
+		echo '<ul><li>' . implode('</li><li>',$this->deleted) . '</li></ul>';
+		//echo '<p>' . __('Please delete them manually via FTP or your hosting provider control panel.','xml-sitemap-feed') . '</p>';
+		echo '</div>';
 	}
 
 	public function static_files_admin_notice() {
-		// TODO admin message about static files: ;
-		// with option to ignore or delete files or check again...
-		$number = count($this->files);
-		echo '<div class="notice notice-warning fade is-dismissible">';
-		echo '<p><strong>' . __('XML Sitemap & Google News Feeds','xml-sitemap-feed') . '</strong> ' .
-		sprintf( _n(
-			'The following conflicting static file has been detected. Either remove it or disable the corresponding plugin setting.',
-			'The following %s conflicting static files have been detected. Either remove them or disable the corresponding settings.',
-			$number,'xml-sitemap-feed'), number_format_i18n($number) ) . '</p>';
-		echo '<ul><li>' . implode('</li><li>',$this->files) . '</li></ul>';
-		echo '</div>';
+		//$screen = get_current_screen();
+		if ( !get_user_meta( get_current_user_id(), 'xmlsf_static_files_warning_dismissed' ) /*$screen->id === 'options-reading' */) {
+			$nonce = wp_create_nonce( 'xmlsf-static-warning-nonce' );
+			$number = count($this->files);
+
+			echo '<div class="notice notice-warning fade is-dismissible">';
+			echo '<p><strong>' . __('XML Sitemap & Google News Feeds','xml-sitemap-feed') . '</strong></p><p>' .
+			sprintf( _n(
+				'The following conflicting file has been found. Either delete it or disable the corresponding plugin setting.',
+				'The following %s conflicting files have been detected. Either delete them or disable the corresponding settings.',
+				$number,'xml-sitemap-feed'), number_format_i18n($number) ) . '</p>';
+			echo '<ul style="padding-left:20px;list-style:initial">';
+			$all = '';
+			foreach ($this->files as $name => $file) {
+				echo '<li>' . $name . ' &nbsp;&ndash;&nbsp; <a style="color:red" href="?xmlsf-delete[]='.$name.'&_wpnonce=' . $nonce . '" onclick="return confirm(\'' .
+				__('Attempt to delete file:','xml-sitemap-feed').'\n' . $file . '\n\n'.translate('Are you sure you want to do this?').'\')" />' . translate('Delete') . '</a></li>';
+				$all .= 'xmlsf-delete[]=' . $name . '&';
+			}
+			echo '</ul>';
+			echo '<p><strong><a href="' . admin_url('options-reading.php') . '#blog_public">' . translate('Settings') .'</a> | ';
+
+			if ( $number > 1 ) echo '<a style="color:red" href="?' . $all . '_wpnonce=' . $nonce . '" onclick="return confirm(\'' .
+				__('Attempt to delete all conflicting files!','xml-sitemap-feed').'\n\n'.translate('Are you sure you want to do this?').'\')" />' . __('Delete all files','xml-sitemap-feed') . '</a> | ';
+
+			echo '<a href="?xmlsf-static-dismiss&_wpnonce=' . $nonce . '">' . translate('Dismiss') .'</a></strong></p>';
+			echo '</div>';
+		}
+	}
+
+	// plugin action links
+
+	public function add_action_link( $links ) {
+		$settings_link = '<a href="' . admin_url('options-reading.php') . '#blog_public">' . translate('Settings') . '</a>';
+		array_unshift( $links, $settings_link );
+		return $links;
 	}
 
 	/**
@@ -1034,8 +1039,39 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 
 		$this->register_settings();
 
-		$this->check_static_files();
+		// CHECK STATIC FILES
+		if ( !current_user_can( 'manage_options' ) || ( is_multisite() && !is_super_admin() ) ) return;
 
+		$this->check_static_files();
+		if ( isset( $_GET['_wpnonce'] ) ) {
+			if ( wp_verify_nonce( $_GET['_wpnonce'], 'xmlsf-static-warning-nonce' ) ) {
+				if ( isset( $_GET['xmlsf-static-dismiss'] ) ) {
+					add_user_meta( get_current_user_id(), 'xmlsf_static_files_warning_dismissed', 'true', true );
+					return;
+				}
+				if ( isset( $_GET['xmlsf-delete'] ) ) {
+					foreach ( $this->files as $name => $file ) {
+						if ( !in_array($name,$_GET['xmlsf-delete']) )
+							continue;
+						if ( unlink($file) )
+							$this->deleted[] = $file;
+						else
+							$this->failed[] = $file;
+						unset($this->files[$name]);
+					}
+					if ( !empty($this->deleted) ) {
+						add_action( 'admin_notices', array($this,'static_files_admin_notice_deleted') );
+					}
+					if ( !empty($this->failed) ) {
+						add_action( 'admin_notices', array($this,'static_files_admin_notice_failed') );
+					}
+				}
+			}
+		}
+
+		if ( !empty($this->files) ) {
+			add_action( 'admin_notices', array($this,'static_files_admin_notice') );
+		}
 	}
 
 	/**

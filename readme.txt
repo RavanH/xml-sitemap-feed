@@ -280,6 +280,8 @@ Dropped keywords and access tags. Taxonomy sitemaps improvements: new options, p
 = 5.0 =
 * Removal of the keywords and access tags as Google dropped support
 * Taxonomy terms improvements
+* Admin warning on conflicting static files
+* Option to delete conflicting static files
 * Exclude Woocommerce product_shipping_class taxonomy
 * FIX: plain and /index.php/ permalink structure
 * FIX: clear all options on uninstall
