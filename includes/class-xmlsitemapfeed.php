@@ -1133,7 +1133,7 @@ class XMLSitemapFeed {
 			// add rules for post types (can be split by month or year)
 			foreach ( $this->get_post_types() as $post_type ) {
 				if ( isset($post_type['active']) && '1' == $post_type['active'] ) {
-					$xmlsf_rules[ 'sitemap-posttype-' . $post_type['name'] . '\.([0-9]+)?\.xml$' ] = $wp_rewrite->index . '?feed=sitemap-posttype-' . $post_type['name'] . '&m=$matches[1]';
+					$xmlsf_rules[ 'sitemap-posttype-' . $post_type['name'] . '\.([0-9]+)?\.?xml$' ] = $wp_rewrite->index . '?feed=sitemap-posttype-' . $post_type['name'] . '&m=$matches[1]';
 				}
 			}
 
