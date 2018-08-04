@@ -54,6 +54,20 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Configure <genres> label both globally and post by post
 * Pings both Google and Bing on new publications.
 
+= Privacy / GDPR =
+
+This plugin does not collect any user or visitor data nor set browser cookies. Using this plugin should not impact your site privacy policy in any way.
+
+**Data that is published**
+
+An XML Sitemap index, referencing other sitemaps containing your web site's public post URLs of selected post types that are already public, along with their last modification date and associated image URLs, and any selected public archive URLs.
+
+A Google News Sitemap containing your web site's public and recent (last 48 hours) URLs of selected news post type, along with their publication time stamp and associated image URL.
+
+**Data that is transmitted**
+
+Data actively transmitted to search engines is your sitemap location and time of publication. This happens upon each post publication when at least one of the Ping options on Settings > Writing is enabled. In this case, the selected search engines are alerted of the location and updated state of your sitemap.
+
 
 = Contribute =
 
