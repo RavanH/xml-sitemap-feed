@@ -272,7 +272,8 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 == Upgrade Notice ==
 
 = 5.0 =
-Dropped keywords and access tags. Taxonomy sitemaps improvements: new options, priority calculation. Permalink and Woocommerce compatibility fixes.
+
+Gutenberg compatibility. Dropped keywords and access tags. Taxonomy sitemaps improvements: new options, priority calculation. Permalink and Woocommerce compatibility fixes.
 
 
 == Changelog ==
@@ -283,11 +284,13 @@ Dropped keywords and access tags. Taxonomy sitemaps improvements: new options, p
 * Admin warning on conflicting static files
 * Option to delete conflicting static files
 * Exclude Woocommerce product_shipping_class taxonomy
+* FIX: Gutenberg editor GN genre taxonomy not showing
 * FIX: plain and /index.php/ permalink structure
 * FIX: clear all options on uninstall
 * FIX: Pings
 * PHP 7.2+ compat: create_function deprecated
 * No more domain filtering for custom URLs and sitemaps
+* Heavy code restructure and cleanup
 
 = 4.9.4 =
 * FIX: missing featured images, thanks @flyerua

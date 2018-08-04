@@ -81,14 +81,14 @@ class XMLSitemapFeed {
 	 * Google News genres
 	 * @var array
 	 */
-	protected $gn_genres = array(
+	public static $gn_genres = array(
 		'PressRelease',
 		'Satire',
 		'Blog',
 		'OpEd',
 		'Opinion',
-		'UserGenerated'
-		//'FactCheck'
+		'UserGenerated',
+		'FactCheck'
 	);
 
 	/**
@@ -120,14 +120,6 @@ class XMLSitemapFeed {
 	 */
 	public function is_news() {
 		return (bool) $this->is_news;
-	}
-
-	/**
-	 * Get gn_genres
-	 * @return array
-	 */
-	public function gn_genres() {
-		return $this->gn_genres;
 	}
 
 	/**
@@ -609,15 +601,15 @@ class XMLSitemapFeed {
 		// which style sheet
 		switch ($style) {
 			case 'index':
-			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('xsl/sitemap-index.xsl',__FILE__) . '?ver=' . self::$plugin_version .'"?>' . PHP_EOL;
+			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('styles/sitemap-index.xsl',self::$plugin_basename) . '?ver=' . self::$plugin_version .'"?>' . PHP_EOL;
 			break;
 
 			case 'news':
-			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('xsl/sitemap-news.xsl',__FILE__) . '?ver=' . self::$plugin_version .'"?>' . PHP_EOL;
+			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('styles/sitemap-news.xsl',self::$plugin_basename) . '?ver=' . self::$plugin_version .'"?>' . PHP_EOL;
 			break;
 
 			default:
-			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('xsl/sitemap.xsl',__FILE__) . '?ver=' . self::$plugin_version .'"?>' . PHP_EOL;
+			$output .= '<?xml-stylesheet type="text/xsl" href="' . plugins_url('styles/sitemap.xsl',self::$plugin_basename) . '?ver=' . self::$plugin_version .'"?>' . PHP_EOL;
 		}
 
 		$output .= '<!-- generated-on="' . date('Y-m-d\TH:i:s+00:00') . '" -->' . PHP_EOL;
@@ -1344,42 +1336,42 @@ class XMLSitemapFeed {
 	 * Set up the sitemap index template
 	 */
 	public function load_template_index() {
-		load_template( dirname( __FILE__ ) . '/feed-sitemap.php' );
+		load_template( dirname( __FILE__ ) . '/views/feed-sitemap.php' );
 	}
 
 	/**
 	 * set up the sitemap home page(s) template
 	 */
 	public function load_template_base() {
-		load_template( dirname( __FILE__ ) . '/feed-sitemap-home.php' );
+		load_template( dirname( __FILE__ ) . '/views/feed-sitemap-home.php' );
 	}
 
 	/**
 	 * set up the post types sitemap template
 	 */
 	public function load_template() {
-		load_template( dirname( __FILE__ ) . '/feed-sitemap-post_type.php' );
+		load_template( dirname( __FILE__ ) . '/views/feed-sitemap-post_type.php' );
 	}
 
 	/**
 	 * set up the taxonomy sitemap template
 	 */
 	public function load_template_taxonomy() {
-		load_template( dirname( __FILE__ ) . '/feed-sitemap-taxonomy.php' );
+		load_template( dirname( __FILE__ ) . '/views/feed-sitemap-taxonomy.php' );
 	}
 
 	/**
 	 * set up the news sitemap template
 	 */
 	public function load_template_news() {
-		load_template( dirname( __FILE__ ) . '/feed-sitemap-news.php' );
+		load_template( dirname( __FILE__ ) . '/views/feed-sitemap-news.php' );
 	}
 
 	/**
 	 * set up the custom sitemap template
 	 */
 	public function load_template_custom() {
-		load_template( dirname( __FILE__ ) . '/feed-sitemap-custom.php' );
+		load_template( dirname( __FILE__ ) . '/views/feed-sitemap-custom.php' );
 	}
 
 	/**
@@ -1754,6 +1746,7 @@ class XMLSitemapFeed {
 			),
 			'public' => false,
 			'show_ui' => true,
+			'show_in_rest' => true,
 			'show_tagcloud' => false,
 			'query_var' => false,
 			'capabilities' => array( // prevent creation / deletion

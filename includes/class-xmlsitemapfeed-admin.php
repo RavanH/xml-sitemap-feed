@@ -15,44 +15,32 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 	* SETTINGS
 	*/
 
-	// TODO refer to support forum + invite plugin rating !
+	/* SITEMAPS */
 
-	/**
-	 * Sitemaps
-	 * settings field
-	 */
 	public function sitemaps_settings_field() {
 		$options = parent::get_sitemaps();
 
-		echo '<fieldset id="xmlsf_sitemaps"><legend class="screen-reader-text">'.__('XML Sitemaps','xml-sitemap-feed').'</legend>
-			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="sitemap.xml" '.checked(isset($options['sitemap']), true, false).' /> '.__('XML Sitemap Index','xml-sitemap-feed').'</label>';//xmlsf
-		if (isset($options['sitemap']))
-			echo '<span class="description"> &nbsp;&ndash;&nbsp; <a href="#xmlsf" id="xmlsf_link">'.translate('Settings').'</a> | <a href="'.trailingslashit(get_bloginfo('url')). ( $this->plain_permalinks() ? '?feed=sitemap' : $options['sitemap'] ) .'" target="_blank">'.translate('View').'</a></span>';
+		// TODO refer to support forum + invite plugin rating !
 
-		echo '<br>
-			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="sitemap-news.xml" '.checked(isset($options['sitemap-news']), true, false).' /> '.__('Google News Sitemap','xml-sitemap-feed').'</label>';
-		if (isset($options['sitemap-news']))
-			echo '<span class="description"> &nbsp;&ndash;&nbsp; <a href="#xmlnf" id="xmlnf_link">'.translate('Settings').'</a> | <a href="'.trailingslashit(get_bloginfo('url')). ( $this->plain_permalinks() ? '?feed=sitemap-news' : $options['sitemap-news'] ) .'" target="_blank">'.translate('View').'</a></span>';
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-sitemaps.php';
+	}
 
-		echo '
-		</fieldset>';
-		echo '
-    <script type="text/javascript">
-        jQuery( document ).ready( function() {
-            jQuery( "#xmlsf_link" ).click( function(event) {
-	     	        event.preventDefault();
-	     	        jQuery("html, body").animate({
-			  scrollTop: jQuery("a[name=\'xmlsf\']").offset().top - 30
-			}, 1000);
-	    });
-            jQuery( "#xmlnf_link" ).click( function(event) {
-	     	        event.preventDefault();
-	     	        jQuery("html, body").animate({
-			  scrollTop: jQuery("a[name=\'xmlnf\']").offset().top - 30
-			}, 1000);
-	    });
-        });
-    </script>';
+	public function sanitize_sitemaps_settings($new) {
+		$old = parent::get_sitemaps();
+
+		if ( isset($new['reset']) && $new['reset'] == '1' ) {
+			// if reset is checked, set transient to clear all settings
+			set_transient('xmlsf_clear_settings','');
+		} elseif ( $old != $new ) {
+			// when sitemaps are added or removed, set transient to flush rewrite rules
+			set_transient('xmlsf_flush_rewrite_rules','');
+
+			if ( empty($old['sitemap-news']) && !empty($new['sitemap-news']) )
+				set_transient('xmlsf_create_genres','');
+		}
+
+		return $new;
 	}
 
 	/* PINGS */
@@ -61,50 +49,33 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		$options = parent::get_ping();
 		$defaults = parent::defaults('ping');
 		$pong = $this->get_option('pong', array());
+		$ping_data = array( 'google' => '', 'bing' => '' );
 
-		$names = array(
-			'google' => __('Google','xml-sitemap-feed'),
-			'bing' => __('Bing & Yahoo','xml-sitemap-feed')
-		);
-
-		echo '
-		<fieldset id="xmlsf_ping"><legend class="screen-reader-text">'.__('Ping Services','xml-sitemap-feed').'</legend>
-			';
+		if ( $tzstring = get_option('timezone_string') ) {
+			// use same timezoneformat as translatable examples in options-general.php
+			$timezone_format = translate_with_gettext_context('Y-m-d G:i:s', 'timezone date format');
+			date_default_timezone_set($tzstring);
+		} else {
+			$timezone_format = 'Y-m-d G:i:s T';
+		}
 
 		foreach ( $defaults as $key => $values ) {
-			echo '
-				<label><input type="checkbox" name="'.$this->prefix.'ping['.
-				$key.'][active]" id="xmlsf_ping_'.
-				$key.'" value="1"'.
-				checked( !empty($options[$key]['active']), true, false).' /> ';
-			echo isset($names[$key]) && !empty($names[$key]) ? $names[$key] : $key ;
-			echo '</label>';
-
-			echo ' <span class="description">';
-			if (!empty($pong[$key])) {
-				if ( $tzstring = get_option('timezone_string') ) {
-					// use same timezoneformat as translatable examples in options-general.php
-					$timezone_format = translate_with_gettext_context('Y-m-d G:i:s', 'timezone date format');
-					date_default_timezone_set($tzstring);
-				} else {
-					$timezone_format = 'Y-m-d G:i:s T';
-				}
-
+			if ( !empty($pong[$key]) ) {
 				foreach ((array)$pong[$key] as $pretty => $data) {
 					if ( !empty($data['time']) ) {
 						if ( '200' == $data['code'] )
-							echo ' &nbsp;&ndash;&nbsp; ' . sprintf(__('Successfully sent %1$s on %2$s.','xml-sitemap-feed'),$pretty, date($timezone_format,$data['time'])).' ';
+							$ping_data[$key] .= ' &nbsp;&ndash;&nbsp; ' . sprintf(__('Successfully sent %1$s on %2$s.','xml-sitemap-feed'),$pretty, date($timezone_format,$data['time']));
 						else
-							echo ' &nbsp;&ndash;&nbsp; ' .sprintf(__('Failed to send %1$s on %2$s.','xml-sitemap-feed'),$pretty, date($timezone_format,$data['time'])).' ';
+							$ping_data[$key] .= ' &nbsp;&ndash;&nbsp; ' .sprintf(__('Failed to send %1$s on %2$s.','xml-sitemap-feed'),$pretty, date($timezone_format,$data['time']));
 					}
 				}
-				date_default_timezone_set('UTC');
 			}
-			echo '</span><br>';
 		}
 
-		echo '
-		</fieldset>';
+		date_default_timezone_set('UTC');
+
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-ping.php';
 	}
 
 	public function sanitize_ping_settings($new) {
@@ -127,22 +98,24 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 	/* ROBOTS */
 
 	public function robots_settings_field() {
-		echo '
-		<fieldset><legend class="screen-reader-text">'.__('Additional robots.txt rules','xml-sitemap-feed').'</legend>
-			<label>'.sprintf(__('Rules that will be appended to the %s generated by WordPress:','xml-sitemap-feed'),'<a href="'.trailingslashit(get_bloginfo('url')).'robots.txt" target="_blank">robots.txt</a>').'<br><textarea name="'.$this->prefix.'robots" id="xmlsf_robots" class="large-text" cols="50" rows="6" />'.esc_attr( parent::get_robots() ).'</textarea></label>
-			<p class="description">'.__('These rules will not have effect when you are using a static robots.txt file.','xml-sitemap-feed').'<br><span style="color: red" class="warning">'.__('Only add rules here when you know what you are doing, otherwise you might break search engine access to your site.','xml-sitemap-feed').'</span></p>
-		</fieldset>';
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-robots.php';
 	}
 
+	public function sanitize_robots_settings($new) {
+		// clean up input
+		if(is_array($new)) {
+		  $new = array_filter($new);
+		  $new = reset($new);
+		}
+		return trim(strip_tags($new));
+	}
+
+	/* RESET */
+
 	public function reset_settings_field() {
-		echo '
-		<fieldset><legend class="screen-reader-text">'.__('Reset XML sitemaps','xml-sitemap-feed').'</legend>
-			<label><input type="checkbox" name="'.$this->prefix.'sitemaps[reset]" value="1" onchange="if(this.checked){if(!confirm(\''.
-				__('Selecting this will clear all XML Sitemap & Google News Sitemap settings after Save Changes. Are you sure?','xml-sitemap-feed').'\')){this.checked=false}}" /> '.
-				__('Clear all XML Sitemap & Google News Sitemap settings.','xml-sitemap-feed').'</label>
-		</fieldset>';
-		echo '
-		<p class="description">'.__('Check this option and Save Changes to start fresh with the default settings.','xml-sitemap-feed').'</p>';
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-sitemap-reset.php';
 	}
 
 	/**
@@ -150,124 +123,27 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 	*/
 
 	public function xml_sitemap_settings() {
-		echo '<p><a target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feeds&item_number='.parent::$plugin_basename.'&no_shipping=0&tax=0&charset=UTF%2d8" title="'.
-		sprintf(__('Donate to keep the free %s plugin development & support going!','xml-sitemap-feed'),__('XML Sitemap & Google News Feeds','xml-sitemap-feed')).'"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" style="border:none;float:right;margin:4px 0 0 10px" alt="'.
-		sprintf(__('Donate to keep the free %s plugin development & support going!','xml-sitemap-feed'),__('XML Sitemap & Google News Feeds','xml-sitemap-feed')).'" width="92" height="26" /></a>'.
-		sprintf(__('These settings control the XML Sitemaps generated by the %s plugin.','xml-sitemap-feed'),__('XML Sitemap & Google News Feeds','xml-sitemap-feed')).' '.
-		sprintf(__('For ping options, go to %s.','xml-sitemap-feed'),'<a href="options-writing.php">'.translate('Writing Settings').'</a>').'</p>';
+		// The actual settings section text
+		include dirname( __FILE__ ) . '/views/admin/section-sitemap.php';
 	}
 
 	public function post_types_settings_field() {
-		$options = parent::get_post_types();
-		$defaults = parent::defaults('post_types');
-		$do_note = false;
-
 		$post_types = get_post_types(array('public'=>true),'objects');
 		if ( !is_array($post_types) || is_wp_error($post_types) )
 			return;
 
-		echo '<fieldset id="xmlsf_post_types"><legend class="screen-reader-text">'.__('XML Sitemaps for post types','xml-sitemap-feed').'</legend>
-			';
-		foreach ( $post_types  as $post_type ) {
-			// skip unallowed post types
-			if (in_array($post_type->name,parent::disabled_post_types()))
-				continue;
-
-			$count = wp_count_posts( $post_type->name );
-
-			echo '
-				<input type="hidden" name="'.$this->prefix.'post_types['.
-				$post_type->name.'][name]" value="'.
-				$post_type->name.'" />';
-
-			echo '
-				<label><input type="checkbox" name="'.$this->prefix.'post_types['.
-				$post_type->name.'][active]" id="xmlsf_post_types_'.
-				$post_type->name.'" value="1" '.
-				checked( !empty($options[$post_type->name]["active"]), true, false).' /> '.
-				$post_type->label.'</label> ('.
-				$count->publish.')';
-
-			if (!empty($options[$post_type->name]['active'])) {
-
-				echo ' &nbsp;&ndash;&nbsp; <span class="description"><a id="xmlsf_post_types_'.$post_type->name.'_link" href="#xmlsf_post_types_'.$post_type->name.'_settings">'.translate('Settings').'</a></span><br>
-    <script type="text/javascript">
-        jQuery( document ).ready( function() {
-            jQuery("#xmlsf_post_types_'.$post_type->name.'_settings").hide();
-            jQuery("#xmlsf_post_types_'.$post_type->name.'_link").click( function(event) {
-            		event.preventDefault();
-			jQuery("#xmlsf_post_types_'.$post_type->name.'_settings").toggle("fast");
-	    });
-        });
-    </script>
-    				<ul style="margin-left:18px" id="xmlsf_post_types_'.$post_type->name.'_settings">';
-
-
-				if ( isset($defaults[$post_type->name]['archive']) ) {
-					$archives = array (
-								'yearly' => __('Year','xml-sitemap-feed'),
-								'monthly' => __('Month','xml-sitemap-feed')
-								);
-					$archive = !empty($options[$post_type->name]['archive']) ? $options[$post_type->name]['archive'] : $defaults[$post_type->name]['archive'];
-					echo '
-					<li><label>'.__('Split by','xml-sitemap-feed').' <select name="'.$this->prefix.'post_types['.
-						$post_type->name.'][archive]" id="xmlsf_post_types_'.
-						$post_type->name.'_archive">
-						<option value="">'.translate('None').'</option>';
-					foreach ($archives as $value => $translation)
-						echo '
-						<option value="'.$value.'" '.
-						selected( $archive == $value, true, false).
-						'>'.$translation.'</option>';
-					echo '</select>
-					</label> <span class="description"> '.__('Choose split by month if you experience errors or slow sitemaps.','xml-sitemap-feed').'</span></li>';
-				}
-
-				$priority_val = !empty($options[$post_type->name]['priority']) ? $options[$post_type->name]['priority'] : $defaults[$post_type->name]['priority'];
-				echo '
-					<li><label>'.__('Priority','xml-sitemap-feed').' <input type="number" step="0.1" min="0.1" max="0.9" name="'.$this->prefix.'post_types['.
-					$post_type->name.'][priority]" id="xmlsf_post_types_'.
-					$post_type->name.'_priority" value="'.$priority_val.'" class="small-text"></label> <span class="description">'.__('Priority can be overridden on individual posts.','xml-sitemap-feed').'</span></li>';
-
-				echo '
-					<li><label><input type="checkbox" name="'.$this->prefix.'post_types['.
-					$post_type->name.'][dynamic_priority]" value="1" '.
-					checked( !empty($options[$post_type->name]['dynamic_priority']), true, false).' /> '.__('Automatic Priority calculation.','xml-sitemap-feed').'</label> <span class="description">'.__('Adjusts the Priority based on factors like age, comments, sticky post or blog page.','xml-sitemap-feed').'</span></li>';
-
-				echo '
-					<li><label><input type="checkbox" name="'.$this->prefix.'post_types['.
-					$post_type->name.'][update_lastmod_on_comments]" value="1" '.
-					checked( !empty($options[$post_type->name]["update_lastmod_on_comments"]), true, false).' /> '.__('Update the Last Changed date on each new comment.','xml-sitemap-feed').'</label></li>';
-
-				$image = isset($options[$post_type->name]['tags']['image']) ? $options[$post_type->name]['tags']['image'] : $defaults[$post_type->name]['tags']['image'];
-				$context = ( $post_type->name === 'page' ) ? 'page' : 'post';
-				echo '
-					<li><label>'.__('Add image tags for','xml-sitemap-feed').' <select name="'.$this->prefix.'post_types['.
-						$post_type->name.'][tags][image]">
-						<option value="">'.translate('None').'</option>
-						<option value="featured" '.
-						selected( $image == "featured", true, false).
-						'>'.translate_with_gettext_context('Featured Image',$context).'</option>
-						<option value="attached" '.
-						selected( $image == "attached", true, false).
-						'>'.__('Attached images','xml-sitemap-feed').'</option>
-					</select></label></li>
-
-				</ul>';
-			} else {
-				echo '<br>';
-			}
-		}
-
-		echo '
-		</fieldset>';
+		$options = parent::get_post_types();
+		$defaults = parent::defaults('post_types');
+	
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-sitemap-post-types.php';
 	}
 
 	public function taxonomies_settings_field() {
 		$taxonomies = parent::get_taxonomies();
 		$taxonomy_settings = parent::get_option('taxonomy_settings');
 		$active = parent::get_option('post_types');
-		$output = '';
+		$tax_list = array();
 
 		foreach ( get_taxonomies(array('public'=>true),'objects') as $taxonomy ) {
 			// skip unallowed post types
@@ -281,61 +157,28 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			if ($skip) continue; // skip if none of the associated post types are active
 
 			$count = wp_count_terms( $taxonomy->name );
-			$output .= '
-				<label><input type="checkbox" name="'.$this->prefix.'taxonomies['.
-				$taxonomy->name.']" id="xmlsf_taxonomies_'.
-				$taxonomy->name.'" value="'.
-				$taxonomy->name.'"'.
-				checked(in_array($taxonomy->name,$taxonomies), true, false).' /> '.
-				$taxonomy->label.'</label> ('.
-				$count.') ';
+			$tax_list[] = '<label><input type="checkbox" name="'.$this->prefix.'taxonomies['.
+				$taxonomy->name.']" id="xmlsf_taxonomies_'.$taxonomy->name.'" value="'.$taxonomy->name.'"'.
+				checked(in_array($taxonomy->name,$taxonomies), true, false).' /> '.$taxonomy->label.' ('.$count.')</label>';
 
 //			if ( in_array($taxonomy->name,$options) && empty($taxonomy->show_tagcloud) )
 //				echo '<span class="description error" style="color: red">'.__('This taxonomy type might not be suitable for public use. Please check the urls in the taxonomy sitemap.','xml-sitemap-feed').'</span>';
-
-			$output .= '
-				<br>';
 		}
 
-		if ($output) {
-			echo '
-		<fieldset id="xmlsf_taxonomies"><legend class="screen-reader-text">'.__('XML Sitemaps for taxonomies','xml-sitemap-feed').'</legend>
-			';
-			echo $output;
-			echo '<span class="description"><a id="xmlsf_taxonomy_settings_link" href="#xmlsf_taxonomy_settings">'.translate('Settings').'</a></span><br>
-<script type="text/javascript">
-	jQuery( document ).ready( function() {
-		jQuery("#xmlsf_taxonomy_settings").hide();
-		jQuery("#xmlsf_taxonomy_settings_link").click( function(event) {
-				event.preventDefault();
-		jQuery("#xmlsf_taxonomy_settings").toggle("fast");
-	});
-	});
-</script>
-			<ul style="margin-left:18px" id="xmlsf_taxonomy_settings">
-				<li><label>'.__('Priority','xml-sitemap-feed').' <input type="number" step="0.1" min="0.1" max="0.9" name="'.$this->prefix.'taxonomy_settings[priority]" id="xmlsf_taxonomy_priority" value="'.
-					( isset($taxonomy_settings['priority']) ? $taxonomy_settings['priority'] : '' ) . '" class="small-text" /></label></li>
-				<li><label><input type="checkbox" name="'.$this->prefix.'taxonomy_settings[dynamic_priority]" id="xmlsf_taxonomy_dynamic_priority" value="1"'.
-					checked( !empty($taxonomy_settings['dynamic_priority']), true, false ) . ' />'.__('Automatic Priority calculation.','xml-sitemap-feed').'</label></li>
-				<li><label>'.__('Maximum number of terms per taxonomy sitemap','xml-sitemap-feed').' <input type="number" name="'.$this->prefix.'taxonomy_settings[term_limit]" id="xmlsf_taxonomy_term_limit" value="'.
-					( isset($taxonomy_settings['term_limit']) ? $taxonomy_settings['term_limit'] : '' ) . '" class="small-text" /></label> <span class="description">'.__('Set to 0 for unlimited.','xml-sitemap-feed').'</span></li>
-			</ul>
-		</fieldset>';
-		} else {
-			echo '
-		<p class="description warning">'.__('No taxonomies available for the currently included post types.','xml-sitemap-feed').'</p>';
+		if ( empty($tax_list) ) {
+			echo '<p class="description warning">'.__('No taxonomies available for the currently included post types.','xml-sitemap-feed').'</p>';
+			return;
 		}
+
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-sitemap-taxonomies.php';
 	}
 
 	public function custom_sitemaps_settings_field() {
 		$lines = parent::get_custom_sitemaps();
 
-		echo '
-		<fieldset><legend class="screen-reader-text">'.__('Include custom XML Sitemaps','xml-sitemap-feed').'</legend>
-			<label>'.__('Additional XML Sitemaps to append to the main XML Sitemap Index:','xml-sitemap-feed').'<br>
-			<textarea name="'.$this->prefix.'custom_sitemaps" id="xmlsf_custom_sitemaps" class="large-text" cols="50" rows="4" />'. implode("\n",$lines) .'</textarea></label>
-			<p class="description">'.__('Add the full URL, including protocol (http/https) and domain.','xml-sitemap-feed').' '.__('Start each URL on a new line.','xml-sitemap-feed').'<br><span style="color: red" class="warning">'.__('Only valid sitemaps are allowed in the Sitemap Index. Use your Google/Bing Webmaster Tools to verify!','xml-sitemap-feed').'</span></p>
-		</fieldset>';
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-sitemap-custom.php';
 	}
 
 	public function urls_settings_field() {
@@ -349,50 +192,62 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			}
 		}
 
-		echo '
-		<fieldset><legend class="screen-reader-text">'.__('Include custom web pages','xml-sitemap-feed').'</legend>
-			<label>'.__('Additional web pages to append in an extra XML Sitemap:','xml-sitemap-feed').'<br>
-			<textarea name="'.$this->prefix.'urls" id="xmlsf_urls" class="large-text" cols="50" rows="4" />'. implode("\n",$lines) .'</textarea></label>
-			<p class="description">'.__('Add the full URL, including protocol (http/https) and domain.','xml-sitemap-feed').' '.__('Optionally add a priority value between 0 and 1, separated with a space after the URL.','xml-sitemap-feed').' '.__('Start each URL on a new line.','xml-sitemap-feed').'</p>
-		</fieldset>';
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-sitemap-urls.php';
 	}
 
-	public function domains_settings_field() {
+	/**
+	 * Domain settings field and sanitization
+	 */
+
+	 public function domains_settings_field() {
 		$default = parent::domain();
 		$domains = (array) parent::get_option('domains');
 
-		echo '
-		<fieldset><legend class="screen-reader-text">'.__('Allowed domains','xml-sitemap-feed').'</legend>
-			<label>'.__('Additional domains to allow in the XML Sitemaps:','xml-sitemap-feed').'<br><textarea name="'.$this->prefix.'domains" id="xmlsf_domains" class="large-text" cols="50" rows="4" />'. implode("\n",$domains) .'</textarea></label>
-			<p class="description">'.sprintf(__('By default, only the domain %s as used in your WordPress site address is allowed.','xml-sitemap-feed'),'<strong>'.$default.'</strong>').' <a href="#xmlsf_domains_note_1_more" id="xmlsf_domains_note_1_link">'.translate('Read more...').'</a><p><p id="xmlsf_domains_note_1_more" class="description">'.
-			__('This means that all URLs that use another domain (custom URLs or using a plugin like Page Links To) are filtered from the XML Sitemap. However, if you are the verified owner of other domains in your Google/Bing Webmaster Tools account, you can include these in the same sitemap. Add these domains, without protocol (http/https) each on a new line. Note that if you enter a domain with www, all URLs without it or with other subdomains will be filtered.','xml-sitemap-feed').'</p>
-			<script type="text/javascript">
-			jQuery( document ).ready( function() {
-			    jQuery("#xmlsf_domains_note_1_more").hide();
-			    jQuery("#xmlsf_domains_note_1_link").click( function(event) {
-				event.preventDefault();
-				jQuery("#xmlsf_domains_note_1_link").hide();
-				jQuery("#xmlsf_domains_note_1_more").show("fast");
-			    });
-			});
-			</script>
-		</fieldset>';
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-sitemap-domains.php';
 	}
 
+	public function sanitize_domains_settings($new) {
+		$default = parent::domain();
+
+		// clean up input
+		if(is_array($new)) {
+		  $new = array_filter($new);
+		  $new = reset($new);
+		}
+		$input = $new ? explode("\n",trim(strip_tags($new))) : array();
+
+		// build sanitized output
+		$sanitized = array();
+		foreach ($input as $line) {
+			$line = trim($line);
+			$parsed_url = parse_url(trim(filter_var($line,FILTER_SANITIZE_URL)));
+			// Before PHP version 5.4.7, parse_url will return the domain as path when scheme is omitted so we do:
+			if ( !empty($parsed_url['host']) ) {
+				$domain = trim( $parsed_url['host'] );
+			} else {
+				$domain_arr = explode('/', $parsed_url['path']);
+				$domain_arr = array_filter($domain_arr);
+				$domain = array_shift( $domain_arr );
+				$domain = trim( $domain );
+			}
+
+			// filter out empties and default domain
+			if(!empty($domain) && $domain !== $default && strpos($domain,".".$default) === false)
+				$sanitized[] = $domain;
+		}
+
+		return (!empty($sanitized)) ? $sanitized : '';
+	}
 
 	/**
 	* GOOGLE NEWS SITEMAP SECTION
 	*/
 
 	public function news_sitemap_settings() {
-		echo '<p><a target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feeds&item_number='.parent::$plugin_basename.'&no_shipping=0&tax=0&charset=UTF%2d8" title="'.
-		sprintf(__('Donate to keep the free %s plugin development & support going!','xml-sitemap-feed'),__('XML Sitemap & Google News Feeds','xml-sitemap-feed')).'"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" style="border:none;float:right;margin:4px 0 0 10px" alt="'.
-		sprintf(__('Donate to keep the free %s plugin development & support going!','xml-sitemap-feed'),__('XML Sitemap & Google News Feeds','xml-sitemap-feed')).'" width="92" height="26" /></a>'.
-		sprintf(__('These settings control the Google News Sitemap generated by the %s plugin.','xml-sitemap-feed'),__('XML Sitemap & Google News Feeds','xml-sitemap-feed')).' '.
-		__('When you are done configuring and preparing your news content and you are convinced your site adheres to the <a href="https://support.google.com/news/publisher/answer/40787" target="_blank">Google News guidelines</a>, go ahead and <a href="https://partnerdash.google.com/partnerdash/d/news" target="_blank">submit your site for inclusion</a>!','xml-sitemap-feed').' '.
-		__('It is strongly recommended to submit your news sitemap to your Google Webmasters Tools account to monitor for warnings or errors. Read more on how to <a href="https://support.google.com/webmasters/answer/183669" target="_blank">Manage sitemaps with the Sitemaps page</a>.','xml-sitemap-feed').' '.
-		sprintf(__('For ping options, go to %s.','xml-sitemap-feed'),'<a href="options-writing.php">'.translate('Writing Settings').'</a>').'</p>';
-
+		// The actual section text 
+		include dirname( __FILE__ ) . '/views/admin/section-news.php';
 	}
 
 	//TODO: publication name allow tag %category% ... post_types (+ exclusion per post or none + allow inclusion per post), limit to category ...
@@ -400,11 +255,9 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		$options = parent::get_option('news_tags');
 
 		$name = !empty($options['name']) ? $options['name'] : '';
-		echo '
-		<fieldset><legend class="screen-reader-text">'.__('Publication name','xml-sitemap-feed').'</legend>
-			<input type="text" name="'.$this->prefix.'news_tags[name]" id="xmlsf_news_name" value="'.$name.'" class="regular-text"> <span class="description">'.sprintf(__('By default, the general %s setting will be used.','xml-sitemap-feed'),'<a href="options-general.php">'.translate('Site Title').'</a>').'</span><p class="description">' .
-			__('The publication name should match the name submitted on the Google News Publisher Center. If you wish to change it, please read <a href="https://support.google.com/news/publisher/answer/40402" target="_blank">Updated publication name</a>.','xml-sitemap-feed') . '</p>
-		</fieldset>';
+
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-news-name.php';
 	}
 
 	public function news_post_type_field() {
@@ -420,12 +273,11 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			echo '
 			<p style="color: red" class="error">'.__('Error: There where no valid post types found. Without at least one public post type, a Google News Sitemap cannot be created by this plugin. Please deselect the option Google News Sitemap at <a href="#xmlsf_sitemaps">Enable XML sitemaps</a> and choose another method.','xml-sitemap-feed').'</p>';
 		} else {
-			echo '
-			<fieldset><legend class="screen-reader-text">'.__('Include post types','xml-sitemap-feed').'</legend>';
 
+			$options = array();
 			foreach ( $post_types as $post_type ) {
 				// skip unallowed post types
-				if ( !is_object($post_type) || in_array($post_type->name,parent::disabled_post_types('news')) )
+				if ( !is_object($post_type) || in_array($post_type->name,$this->disabled_post_types('news')) )
 					continue;
 
 				$checked = in_array($post_type->name,$news_post_type) ? true : false;
@@ -439,16 +291,16 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 					}
 				}
 
-				echo '
-				<label><input type="checkbox" name="'.$this->prefix.'news_tags[post_type][]" id="xmlsf_post_type_'.
+				$options[] = '<label><input type="checkbox" name="'.
+					$this->prefix.'news_tags[post_type][]" id="xmlsf_post_type_'.
 					$post_type->name.'" value="'.$post_type->name.'" '.
 					checked( $checked, true, false ).' '.
 					disabled( $disabled, true, false ).' /> '.
-					$post_type->label.'</label><br>';
+					$post_type->label.'</label>';
 			}
-			echo '
-				<p class="description">'.sprintf(__('At least one post type must be selected. By default, the post type %s will be used.','xml-sitemap-feed'),translate('Posts')).'</p>
-			</fieldset>';
+
+			// The actual fields for data entry
+			include dirname( __FILE__ ) . '/views/admin/field-news-post-types.php';
 		}
 
 	}
@@ -462,68 +314,25 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			return;
 		}
 
-		$all_categories = get_terms( 'category', array('hide_empty' => 0,'hierachical' => true) );
 		$selected_categories = isset($options['categories']) && is_array($options['categories']) ? $options['categories'] : array();
-		$count = count($all_categories);
 
-		if ($count==0) {
-			echo '
-			<p class="description">' . translate('No categories') . '</p>';
-			return;
-		} else {
-			echo '
-			<fieldset><legend class="screen-reader-text">'.translate('Categories').'</legend>';
+		$cat_list = str_replace('name="post_category[]"','name="'.$this->prefix.'news_tags[categories][]"', wp_terms_checklist( null, array( 'taxonomy' => 'category', 'selected_cats' => $selected_categories, 'echo' => false ) ) );
 
-			$size = $count < 15 ? $count : 15;
-			echo '
-				<label>'.__('Limit to posts in these post categories:','xml-sitemap-feed').'<br>
-					<select multiple name="'.$this->prefix.'news_tags[categories][]" size="'.$size.'">';
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-news-categories.php';
 
-			foreach($all_categories as $category) {
-				$depth = count( explode( '%#%', get_category_parents($category, false, '%#%') ) ) - 2;
-				$pad = str_repeat('&nbsp;', $depth * 3);
-
-				$cat_name = apply_filters('list_cats', $category->name, $category);
-				echo '
-						<option class="depth-'.$depth.'" value="'.$category->term_id.'" '.
-						selected( in_array($category->term_id,$selected_categories), true, false ).
-						'>'.$pad.$cat_name.'</option>';
-			}
-			echo '
-					</select>
-				</label>
-				<p class="description">'.__('If you wish to limit posts that will feature in your News Sitemap to certain categories, select them here. If no categories are selected, posts of all categories will be included in your News Sitemap.','xml-sitemap-feed').
-				' '.__('Use the Ctrl/Cmd key plus click to select more than one or to deselect.','xml-sitemap-feed');
-			echo '
-			</fieldset>';
-		}
 	}
 
 	public function news_image_field() {
 		$options = parent::get_option('news_tags');
 
 		$image = !empty($options['image']) ? $options['image'] : '';
-		echo '
-		<fieldset><legend class="screen-reader-text">'.translate('Images').'</legend>
-			<label>'.__('Add image tags for','xml-sitemap-feed').' <select name="'.$this->prefix.'news_tags[image]">
-				<option value="">'.translate('None').'</option>
-				<option value="featured" '.
-				selected( $image == "featured", true, false).
-				'>'.translate_with_gettext_context('Featured Image','post').'</option>
-				<option value="attached" '.
-				selected( $image == "attached", true, false).
-				'>'.__('Attached images','xml-sitemap-feed').'</option>
-				';
-		echo '</select></label>
-			<p class="description">'.__('Note: Google News prefers at most one image per article in the News Sitemap. If multiple valid images are specified, the crawler will have to pick one arbitrarily. Images in News Sitemaps should be in jpeg or png format.','xml-sitemap-feed').' '.sprintf(__('Read more on %s.','xml-sitemap-feed'),'<a href="https://support.google.com/news/publisher/answer/13369" target="_blank">'.__('Prevent missing or incorrect images','xml-sitemap-feed').'</a>').'</p>
-		</fieldset>';
+
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-news-image.php';
 	}
 
 	public function news_labels_field() {
-		echo '
-		<fieldset id="xmlsf_news_labels"><legend class="screen-reader-text">' . __('Source labels','xml-sitemap-feed') . '</legend>
-			<p>' . __('Source labels provide more information about the content of your articles.','xml-sitemap-feed') . ' ' .
-			__('The FactCheck label may only be applied if you publish stories with fact-checking content that\'s indicated by schema.org ClaimReview markup.','xml-sitemap-feed').' '.sprintf(__('Read more about source labels on %s','xml-sitemap-feed'),'<a href="https://support.google.com/news/publisher/answer/4582731" target="_blank">'.__('What does each source label mean?','xml-sitemap-feed').'</a>') . '</p>';
 
 		$options = parent::get_option('news_tags');
 
@@ -539,46 +348,20 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		);
 		$genres = !empty($options['genres']) ? $options['genres'] : array();
 		$genres_default = !empty($genres['default']) ? (array)$genres['default'] : array();
+		$disabled = array('FactCheck');
 
-		echo '
-		  <fieldset id="xmlsf_news_labels_genres"><legend class="screen-reader-text">&lt;genres&gt;</legend>
-			<ul>
-				<li><label>'.__('Default genre:','xml-sitemap-feed').'<br><select multiple name="'.$this->prefix.'news_tags[genres][default][]" id="xmlsf_news_tags_genres_default" size="'.count($this->gn_genres).'">';
-		foreach ( $this->gn_genres as $name ) {
-			echo '<option value="'.$name.'" '.selected( in_array($name,$genres_default), true, false ).'>' . ( isset($gn_translations[$name]) && !empty($gn_translations[$name]) ? $gn_translations[$name] : $name ) . '&nbsp;</option>';
-    	}
-		echo '
-				</select></label></li>
-			</ul>
-			<p class="description">'.__('Use the Ctrl/Cmd key plus click to select more than one or to deselect.','xml-sitemap-feed').'</p>
-		</fieldset>';
+		foreach ( parent::$gn_genres as $name ) {
+			$genre_list[] = '<label><input type="checkbox" name="' .
+				$this->prefix . 'news_tags[genres][default][]" id="xmlsf_news_tags_genres_default_' .
+				$name . '" value="' . $name . '"' . checked( in_array($name,$genres_default), true, false ) . disabled(in_array($name,$disabled), true, false ) . ' />' .
+				( isset($gn_translations[$name]) && !empty($gn_translations[$name]) ? $gn_translations[$name] : $name ) . '</label>';
+		}
+
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/field-news-labels.php';
 	}
 
 	//sanitize callback functions
-
-	public function sanitize_robots_settings($new) {
-		// clean up input
-		if(is_array($new)) {
-		  $new = array_filter($new);
-		  $new = reset($new);
-		}
-		return trim(strip_tags($new));
-	}
-
-	public function sanitize_sitemaps_settings($new) {
-		$old = parent::get_sitemaps();
-
-		if ( isset($new['reset']) && $new['reset'] == '1' ) {// if reset is checked, set transient to clear all settings
-			set_transient('xmlsf_clear_settings','');
-		} elseif ( $old != $new ) {// when sitemaps are added or removed, set transient to flush rewrite rules
-			set_transient('xmlsf_flush_rewrite_rules','');
-
-			if ( empty($old['sitemap-news']) && !empty($new['sitemap-news']) )
-				set_transient('xmlsf_create_genres','');
-		}
-
-		return $new;
-	}
 
 	public function sanitize_post_types_settings( $new = array() ) {
 		$old = parent::get_post_types();
@@ -693,39 +476,6 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		return filter_var( $url, FILTER_VALIDATE_URL ) || is_numeric( $url );
 	}
 
-	public function sanitize_domains_settings($new) {
-		$default = parent::domain();
-
-		// clean up input
-		if(is_array($new)) {
-		  $new = array_filter($new);
-		  $new = reset($new);
-		}
-		$input = $new ? explode("\n",trim(strip_tags($new))) : array();
-
-		// build sanitized output
-		$sanitized = array();
-		foreach ($input as $line) {
-			$line = trim($line);
-			$parsed_url = parse_url(trim(filter_var($line,FILTER_SANITIZE_URL)));
-			// Before PHP version 5.4.7, parse_url will return the domain as path when scheme is omitted so we do:
-			if ( !empty($parsed_url['host']) ) {
-				$domain = trim( $parsed_url['host'] );
-			} else {
-				$domain_arr = explode('/', $parsed_url['path']);
-				$domain_arr = array_filter($domain_arr);
-				$domain = array_shift( $domain_arr );
-				$domain = trim( $domain );
-			}
-
-			// filter out empties and default domain
-			if(!empty($domain) && $domain !== $default && strpos($domain,".".$default) === false)
-				$sanitized[] = $domain;
-		}
-
-		return (!empty($sanitized)) ? $sanitized : '';
-	}
-
 	public function sanitize_news_tags_settings($new) {
 		// TODO default post type : to 'post' when none are selected
 		return $new;
@@ -755,7 +505,6 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		// Use nonce for verification
 		wp_nonce_field( parent::$plugin_basename, 'xmlsf_sitemap_nonce' );
 
-		// The actual fields for data entry
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
 		$exclude = get_post_meta( $post->ID, '_xmlsf_exclude', true );
 		$priority = get_post_meta( $post->ID, '_xmlsf_priority', true );
@@ -774,19 +523,14 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			$priority = '1'; // force priority to 1 for front page
 		}
 
-		echo '<p><label>';
-		_e('Priority','xml-sitemap-feed');
-		echo ' <input type="number" step="0.1" min="0" max="1" name="xmlsf_priority" id="xmlsf_priority" value="'.
-			$priority.'" class="small-text" '.
-			disabled( $disabled, true, false ).'></label> <span class="description">';
-		printf(__('Leave empty for automatic Priority as configured on %1$s > %2$s.','xml-sitemap-feed'),translate('Settings'),'<a href="' . admin_url('options-reading.php') . '#xmlsf">' . translate('Reading') . '</a>');
-		echo '</span></p>';
+		$description = sprintf(
+			__('Leave empty for automatic Priority as configured on %1$s > %2$s.','xml-sitemap-feed'), 
+			translate('Settings'), 
+			'<a href="' . admin_url('options-reading.php') . '#xmlsf">' . translate('Reading') . '</a>'
+		);
 
-		echo '<p><label><input type="checkbox" name="xmlsf_exclude" id="xmlsf_exclude" value="1" '.
-			checked(!empty($exclude), true, false).
-			disabled( $disabled, true, false ).'> ';
-		_e('Exclude from XML Sitemap','xml-sitemap-feed');
-		echo '</label></p>';
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/meta-box.php';
 	}
 
 	/* Adds a News Sitemap box to the side column */
@@ -811,15 +555,12 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		// Use nonce for verification
 		wp_nonce_field( parent::$plugin_basename, 'xmlsf_sitemap_nonce' );
 
-		// The actual fields for data entry
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
-		$exclude = get_post_meta( $post->ID, '_xmlsf_news_exclude', true );
+		$exclude = 'private' == $post->post_status || get_post_meta( $post->ID, '_xmlsf_news_exclude', true );
+		$disabled = 'private' == $post->post_status;
 
-		echo '<p><label><input type="checkbox" name="xmlsf_news_exclude" id="xmlsf_news_exclude" value="1"'.
-			checked('private' == $post->post_status || !empty($exclude), true, false).
-			disabled('private' == $post->post_status, true, false).'> ';
-		_e('Exclude from Google News Sitemap.','xml-sitemap-feed');
-		echo '</label></p>';
+		// The actual fields for data entry
+		include dirname( __FILE__ ) . '/views/admin/meta-box-news.php';
 	}
 
 	/* When the post is saved, save our meta data */
@@ -874,7 +615,7 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			$terms = get_terms( 'gn-genre', array('hide_empty' => false) );
 			if ( is_array($terms) && !empty($terms) ) {
 				foreach ( $terms as $term ) {
-					if ( in_array($term->name,$this->gn_genres) ) {
+					if ( in_array($term->name,parent::$gn_genres) ) {
 						$slug = strtolower($term->name);
 						if ( $term->slug !== $slug )
 							wp_update_term( $term->term_id, 'gn-genre', array(
@@ -887,8 +628,11 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 			}
 
 			// add any new ones
-			foreach ($this->gn_genres as $name) {
+			foreach (parent::$gn_genres as $name) {
 				wp_insert_term(	$name, 'gn-genre' );
+				if ( defined('WP_DEBUG') && WP_DEBUG ) {
+					error_log( 'Created GN Genre taxonomy term ' . $name );
+				}
 			}
 		}
 	}
@@ -971,53 +715,30 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 
 		foreach ( $check_for as $name => $pretty ) {
 			if ( file_exists( $home_path . $pretty ) ) {
-				$this->files[$pretty] = $home_path . $pretty;
+				$this->static_files[$pretty] = $home_path . $pretty;
 			}
 		}
 	}
 
 	public function static_files_admin_notice_deleted() {
-		echo '<div class="notice notice-success fade is-dismissible">';
-		echo '<p><strong>' . __('Successfully deleted:','xml-sitemap-feed') . '</strong></p>';
-		echo '<ul><li>' . implode('</li><li>',$this->deleted) . '</li></ul>';
-		echo '</div>';
+		include dirname( __FILE__ ) . '/views/admin/notice-deleted.php';
 	}
 
 	public function static_files_admin_notice_failed() {
-		echo '<div class="notice notice-error fade is-dismissible">';
-		echo '<p><strong>' . __('Failed to delete:','xml-sitemap-feed') . '</strong></p>';
-		echo '<ul><li>' . implode('</li><li>',$this->deleted) . '</li></ul>';
-		//echo '<p>' . __('Please delete them manually via FTP or your hosting provider control panel.','xml-sitemap-feed') . '</p>';
-		echo '</div>';
+		include dirname( __FILE__ ) . '/views/admin/notice-failed.php';
+	}
+
+	public function static_files_admin_notice_nonce() {
+		include dirname( __FILE__ ) . '/views/admin/notice-nonce-error.php';
 	}
 
 	public function static_files_admin_notice() {
 		//$screen = get_current_screen();
 		if ( !get_user_meta( get_current_user_id(), 'xmlsf_static_files_warning_dismissed' ) /*$screen->id === 'options-reading' */) {
 			$nonce = wp_create_nonce( 'xmlsf-static-warning-nonce' );
-			$number = count($this->files);
+			$number = count($this->static_files);
 
-			echo '<div class="notice notice-warning fade is-dismissible">';
-			echo '<p><strong>' . __('XML Sitemap & Google News Feeds','xml-sitemap-feed') . '</strong></p><p>' .
-			sprintf( _n(
-				'The following conflicting file has been found. Either delete it or disable the corresponding plugin setting.',
-				'The following %s conflicting files have been detected. Either delete them or disable the corresponding settings.',
-				$number,'xml-sitemap-feed'), number_format_i18n($number) ) . '</p>';
-			echo '<ul style="padding-left:20px;list-style:initial">';
-			$all = '';
-			foreach ($this->files as $name => $file) {
-				echo '<li>' . $name . ' &nbsp;&ndash;&nbsp; <a style="color:red" href="?xmlsf-delete[]='.$name.'&_wpnonce=' . $nonce . '" onclick="return confirm(\'' .
-				__('Attempt to delete file:','xml-sitemap-feed').'\n' . $file . '\n\n'.translate('Are you sure you want to do this?').'\')" />' . translate('Delete') . '</a></li>';
-				$all .= 'xmlsf-delete[]=' . $name . '&';
-			}
-			echo '</ul>';
-			echo '<p><strong><a href="' . admin_url('options-reading.php') . '#blog_public">' . translate('Settings') .'</a> | ';
-
-			if ( $number > 1 ) echo '<a style="color:red" href="?' . $all . '_wpnonce=' . $nonce . '" onclick="return confirm(\'' .
-				__('Attempt to delete all conflicting files!','xml-sitemap-feed').'\n\n'.translate('Are you sure you want to do this?').'\')" />' . __('Delete all files','xml-sitemap-feed') . '</a> | ';
-
-			echo '<a href="?xmlsf-static-dismiss&_wpnonce=' . $nonce . '">' . translate('Dismiss') .'</a></strong></p>';
-			echo '</div>';
+			include dirname( __FILE__ ) . '/views/admin/notice.php';
 		}
 	}
 
@@ -1043,33 +764,36 @@ class XMLSitemapFeed_Admin extends XMLSitemapFeed {
 		if ( !current_user_can( 'manage_options' ) || ( is_multisite() && !is_super_admin() ) ) return;
 
 		$this->check_static_files();
-		if ( isset( $_GET['_wpnonce'] ) ) {
-			if ( wp_verify_nonce( $_GET['_wpnonce'], 'xmlsf-static-warning-nonce' ) ) {
-				if ( isset( $_GET['xmlsf-static-dismiss'] ) ) {
-					add_user_meta( get_current_user_id(), 'xmlsf_static_files_warning_dismissed', 'true', true );
-					return;
-				}
-				if ( isset( $_GET['xmlsf-delete'] ) ) {
-					foreach ( $this->files as $name => $file ) {
-						if ( !in_array($name,$_GET['xmlsf-delete']) )
-							continue;
-						if ( unlink($file) )
-							$this->deleted[] = $file;
-						else
-							$this->failed[] = $file;
-						unset($this->files[$name]);
-					}
-					if ( !empty($this->deleted) ) {
-						add_action( 'admin_notices', array($this,'static_files_admin_notice_deleted') );
-					}
-					if ( !empty($this->failed) ) {
-						add_action( 'admin_notices', array($this,'static_files_admin_notice_failed') );
-					}
-				}
+
+		if ( isset( $_GET['xmlsf-static-dismiss'] ) ) {
+			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( $_GET['_wpnonce'], 'xmlsf-static-warning-nonce' ) ) {
+				add_user_meta( get_current_user_id(), 'xmlsf_static_files_warning_dismissed', 'true', true );
 			}
 		}
 
-		if ( !empty($this->files) ) {
+		if ( isset( $_GET['xmlsf-delete'] ) ) {
+			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( $_GET['_wpnonce'], 'xmlsf-static-warning-nonce' ) ) {
+				foreach ( $this->static_files as $name => $file ) {
+					if ( !in_array($name,$_GET['xmlsf-delete']) )
+						continue;
+					if ( unlink($file) )
+						$this->deleted[] = $file;
+					else
+						$this->failed[] = $file;
+					unset($this->static_files[$name]);
+				}
+				if ( !empty($this->deleted) ) {
+					add_action( 'admin_notices', array($this,'static_files_admin_notice_deleted') );
+				}
+				if ( !empty($this->failed) ) {
+					add_action( 'admin_notices', array($this,'static_files_admin_notice_failed') );
+				}
+			} else {
+				add_action( 'admin_notices', array($this,'static_files_admin_notice_nonce') );
+			}
+		}
+
+		if ( !empty($this->static_files) ) {
 			add_action( 'admin_notices', array($this,'static_files_admin_notice') );
 		}
 	}
