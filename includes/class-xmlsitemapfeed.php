@@ -360,7 +360,7 @@ class XMLSitemapFeed {
 		foreach ( $this->get_post_types() as $type => $values ) {
 			if ( !empty($values['active']) ) {
 				$count = wp_count_posts( $values['name'] );
-				if ( $count->publish > 0 ) {
+				if ( property_exists($count,'publish') && $count->publish ) {
 					$values['count'] = $count->publish;
 					$return[$type] = $values;
 				}
@@ -1113,15 +1113,20 @@ class XMLSitemapFeed {
 	 *
 	 * @return void
 	 */
-	public function rewrite_rules($wp_rewrite) {
+	public function rewrite_rules() {
+		global $wp_rewrite;
 		$xmlsf_rules = array();
 		$sitemaps = $this->get_sitemaps();
+
+		/* One rule to ring them all */
+		//$xmlsf_rules[ 'sitemap([a-z0-9_-]+)?\.([0-9]+)?\.?xml$' ] = $wp_rewrite->index . '?feed=sitemap$matches[1]&m=$matches[2]';
 
 		foreach ( $sitemaps as $name => $pretty ) {
 			$xmlsf_rules[ preg_quote($pretty) . '$' ] = $wp_rewrite->index . '?feed=' . $name;
 		}
 
 		if (!empty($sitemaps['sitemap'])) {
+
 			// home urls
 			$xmlsf_rules[ 'sitemap-home\.xml$' ] = $wp_rewrite->index . '?feed=sitemap-home';
 
@@ -1144,7 +1149,9 @@ class XMLSitemapFeed {
 
 		}
 
-		$wp_rewrite->rules = $xmlsf_rules + $wp_rewrite->rules;
+		foreach ($xmlsf_rules as $key => $value) {
+			add_rewrite_rule($key, $value, 'top');
+		}
 	}
 
 	/**
@@ -1745,10 +1752,12 @@ class XMLSitemapFeed {
 				//'menu_name' => __('GN Genres','xml-sitemap-feed'),
 			),
 			'public' => false,
+			'publicly_queryable' => false,
 			'show_ui' => true,
 			'show_in_rest' => true,
 			'show_tagcloud' => false,
 			'query_var' => false,
+			'rewrite' => false,
 			'capabilities' => array( // prevent creation / deletion
 				'manage_terms' => 'nobody',
 				'edit_terms' => 'nobody',
@@ -1793,7 +1802,7 @@ class XMLSitemapFeed {
 		add_action( 'plugins_loaded', array($this,'plugins_loaded'), 11 );
 
 		// REWRITES
-		add_action( 'generate_rewrite_rules', array($this, 'rewrite_rules') );
+		add_action( 'init', array($this, 'rewrite_rules') );
 		add_filter( 'user_trailingslashit', array($this, 'trailingslash') );
 
 		// TAXONOMIES, ACTIONS, UPGRADE...

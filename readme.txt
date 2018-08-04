@@ -287,24 +287,25 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 = 5.0 =
 
-Gutenberg compatibility. Dropped keywords and access tags. Taxonomy sitemaps improvements: new options, priority calculation. Permalink and Woocommerce compatibility fixes.
+Gutenberg compatibility. Dropped keywords and access tags. Taxonomy sitemaps improvements. Permalink and Woocommerce compatibility fixes.
 
 
 == Changelog ==
 
 = 5.0 =
+* NEW: Taxonomy term options: priority and automatic calculation
+* NEW: Admin warning on conflicting static files
+* NEW: Option to delete conflicting static files
 * Removal of the keywords and access tags as Google dropped support
-* Taxonomy terms improvements
-* Admin warning on conflicting static files
-* Option to delete conflicting static files
+* Taxonomy term sitemaps speed improvent: get lastmod date from database
 * Exclude Woocommerce product_shipping_class taxonomy
+* PHP 7.2+ compat: create_function deprecated
+* No more domain filtering for custom URLs and sitemaps
+* Heavy code restructure and cleanup
 * FIX: Gutenberg editor GN genre taxonomy not showing
 * FIX: plain and /index.php/ permalink structure
 * FIX: clear all options on uninstall
 * FIX: Pings
-* PHP 7.2+ compat: create_function deprecated
-* No more domain filtering for custom URLs and sitemaps
-* Heavy code restructure and cleanup
 
 = 4.9.4 =
 * FIX: missing featured images, thanks @flyerua
