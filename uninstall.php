@@ -51,13 +51,13 @@ class XMLSitemapFeed_Uninstall {
 	 */
 	function uninstall($blog_id = false) {
 		// delete all taxonomy terms
-		register_taxonomy( 'gn-genre', null );
+		//register_taxonomy( 'gn-genre', null );
 
-		$terms = get_terms( 'gn-genre', array('hide_empty' => false) );
+		//$terms = get_terms( 'gn-genre', array('hide_empty' => false) );
 
-		if ( is_array($terms) )
-			foreach ( $terms as $term )
-				wp_delete_term(	$term->term_id, 'gn-genre' );
+		//if ( is_array($terms) )
+		//	foreach ( $terms as $term )
+		//		wp_delete_term(	$term->term_id, 'gn-genre' );
 
 		// remove plugin settings
 		delete_option('xmlsf_version');

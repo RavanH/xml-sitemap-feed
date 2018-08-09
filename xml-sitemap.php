@@ -10,6 +10,8 @@ Author: RavanH
 Author URI: http://status301.net/
 */
 
+define( 'XMLSF_VERSION', '5.0' );
+
 /*  Copyright 2018 RavanH
     http://status301.net/
     mailto: ravanhagen@gmail.com
@@ -50,6 +52,7 @@ Author URI: http://status301.net/
  * --------------------
  *  AVAILABLE FUNCTIONS
  * --------------------
+ *
  *  is_sitemap() -> conditional, returns bolean, true if the request is for an xml sitemap
  *  is_news()    -> conditional, returns bolean, true if the request is for an xml news sitemap
  *
@@ -57,6 +60,10 @@ Author URI: http://status301.net/
  */
 
 if ( ! defined( 'WPINC' ) ) die;
+
+define( 'XMLSF_DIR', dirname(__FILE__) );
+
+define( 'XMLSF_BASENAME', plugin_basename(__FILE__) );
 
 /* -------------------------------------
  *        INCLUDE & INSTANTIATE
@@ -66,24 +73,24 @@ if ( ! defined( 'WPINC' ) ) die;
  * Functions
  */
 
-require dirname(__FILE__) . '/includes/functions.php';
+require XMLSF_DIR . '/functions.php';
 
 /**
- * Main class
+ * Main
  */
 
-require dirname(__FILE__) . '/includes/class-xmlsitemapfeed.php';
-
-$xmlsf = new XMLSitemapFeed( plugin_basename(__FILE__), '5.0' );
+require XMLSF_DIR . '/control/common.php';
 
 /**
- * Admin class
+ * Admin
  */
 
 if ( is_admin() ) {
 
-	require dirname( __FILE__ ) . '/includes/class-xmlsitemapfeed-admin.php';
+	xmlsf();
 
-	$xmlsf_admin = new XMLSitemapFeed_Admin( plugin_basename(__FILE__) );
+	require XMLSF_DIR . '/control/admin.php';
+
+	new XMLSitemapFeed_Admin();
 
 }
