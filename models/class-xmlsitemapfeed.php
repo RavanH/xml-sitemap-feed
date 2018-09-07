@@ -117,7 +117,7 @@ class XMLSitemapFeed {
 		if ( empty($this->defaults) ) :
 
 			// sitemaps
-			$sitemaps = ( '1' !== get_option('blog_public') ) ? array() : array(
+			$sitemaps = ( '1' !== get_option('blog_public') ) ? '' : array(
 				'sitemap' => 'sitemap.xml'
 			);
 
@@ -144,7 +144,7 @@ class XMLSitemapFeed {
 						)
 					)
 				),
-				'taxonomies' => array(),
+				'taxonomies' => '',
 				'taxonomy_settings' => array(
 					'active' => '1',
 					'priority' => '0.3',
@@ -156,9 +156,9 @@ class XMLSitemapFeed {
 					'bing'
 				),
 				'robots' => '',
-				'urls' => array(),
-				'custom_sitemaps' => array(),
-				'domains' => array(),
+				'urls' => '',
+				'custom_sitemaps' => '',
+				'domains' => '',
 				'news_tags' => array(
 					'name' => '',
 					'post_type' => array('post'),

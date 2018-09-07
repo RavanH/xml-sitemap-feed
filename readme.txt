@@ -300,6 +300,7 @@ Gutenberg compatibility. Dropped keywords and access tags. Taxonomy sitemaps imp
 * NEW Admin warning on conflicting static files
 * NEW Option to delete conflicting static files
 * NEW Filters for post types: xmlsf_post_types and xmlsf_news_post_types
+* NEW Filters for priority values: xmlsf_post_priority and xmlsf_term_priority
 * Removal of Genre, Keywords and Access tags as Google dropped support
 * Taxonomy term sitemaps speed improvent: get lastmod date from database
 * Exclude Woocommerce product_shipping_class taxonomy

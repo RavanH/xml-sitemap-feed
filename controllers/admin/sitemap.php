@@ -7,6 +7,11 @@ class XMLSF_Admin_Sitemap
      */
     private $screen_id;
 
+	/**
+     * Holds the public taxonomies array
+     */
+    private $public_taxonomies;
+
     /**
      * Start up
      */
@@ -14,7 +19,20 @@ class XMLSF_Admin_Sitemap
     {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
-    }
+	}
+
+	/**
+     * Gets public taxonomies
+     */
+    public function public_taxonomies()
+	{
+		if ( !isset( $this->public_taxonomies ) ) {
+			include XMLSF_DIR . '/models/public/sitemap.php';
+			$this->public_taxonomies = xmlsf_public_taxonomies();
+		}
+
+		return $this->public_taxonomies;
+	}
 
 	/**
      * Add options page
@@ -39,7 +57,7 @@ class XMLSF_Admin_Sitemap
 		// SECTIONS & SETTINGS
 
 		// post_types
-		add_settings_section( 'xml_sitemap_post_types_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', array($this,'xml_sitemap_settings_section'), 'xmlsf_post_types' );
+		add_settings_section( 'xml_sitemap_post_types_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_post_types' );
 		$post_types = apply_filters( 'xmlsf_post_types', get_post_types( array( 'public' => true ) /*,'objects'*/) );
 
 		if ( is_array($post_types) && !empty($post_types) ) :
@@ -53,10 +71,12 @@ class XMLSF_Admin_Sitemap
 		endif;
 
 		// taxonomies
-		add_settings_section( 'xml_sitemap_taxonomies_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', array($this,'xml_sitemap_settings_section'), 'xmlsf_taxonomies' );
-		add_settings_field( 'xmlsf_taxonomies', __('Include taxonomies','xml-sitemap-feed'), array($this,'taxonomies_settings_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
+		add_settings_section( 'xml_sitemap_taxonomies_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_taxonomies' );
+		add_settings_field( 'xmlsf_taxonomy_settings', translate('General'), array($this,'taxonomy_settings_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
+		$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
+		if ( !empty( $taxonomy_settings['active'] ) && !empty( get_option( 'xmlsf_taxonomies' ) ) ) add_settings_field( 'xmlsf_taxonomies', __('Include taxonomies','xml-sitemap-feed'), array($this,'taxonomies_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
 
-		add_settings_section( 'xml_sitemap_advanced_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', array($this,'xml_sitemap_settings_section'), 'xmlsf_advanced' );
+		add_settings_section( 'xml_sitemap_advanced_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_advanced' );
 		// custom domains
 		add_settings_field( 'xmlsf_domains', __('Allowed domains','xml-sitemap-feed'), array($this,'domains_settings_field'), 'xmlsf_advanced', 'xml_sitemap_advanced_section' );
 		// custom urls
@@ -65,6 +85,8 @@ class XMLSF_Admin_Sitemap
 		add_settings_field( 'xmlsf_custom_sitemaps', __('External XML Sitemaps','xml-sitemap-feed'), array($this,'custom_sitemaps_settings_field'), 'xmlsf_advanced', 'xml_sitemap_advanced_section' );
 
 		$active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'post_types';
+
+		$options = (array) get_option( 'xmlsf_sitemaps' );
 
 		include XMLSF_DIR . '/views/admin/page-sitemap.php';
     }
@@ -80,8 +102,8 @@ class XMLSF_Admin_Sitemap
 		// post_types
 		register_setting( 'xmlsf_post_types', 'xmlsf_post_types', array('XMLSF_Admin_Sitemap_Sanitize','post_types_settings') );
 		// taxonomies
-		register_setting( 'xmlsf_taxonomies', 'xmlsf_taxonomies', array('XMLSF_Admin_Sitemap_Sanitize','taxonomies_settings') );
-		register_setting( 'xmlsf_taxonomies', 'xmlsf_taxonomy_settings', array('XMLSF_Admin_Sitemap_Sanitize','taxonomy_settings_settings') );
+		register_setting( 'xmlsf_taxonomies', 'xmlsf_taxonomy_settings', array('XMLSF_Admin_Sitemap_Sanitize','taxonomy_settings') );
+		register_setting( 'xmlsf_taxonomies', 'xmlsf_taxonomies', array('XMLSF_Admin_Sitemap_Sanitize','taxonomies') );
 		// custom domains
 		register_setting( 'xmlsf_advanced', 'xmlsf_domains', array('XMLSF_Admin_Sitemap_Sanitize','domains_settings') );
 		// custom urls
@@ -151,12 +173,6 @@ class XMLSF_Admin_Sitemap
 		$screen->set_help_sidebar( $content );
 	}
 
-	public function xml_sitemap_settings_section()
-	{
-		// The actual settings section text
-		include XMLSF_DIR . '/views/admin/section-sitemap.php';
-	}
-
 	public function post_types_settings_field( $post_type )
 	{
 		// post type slug passed as section name
@@ -170,12 +186,18 @@ class XMLSF_Admin_Sitemap
 		include XMLSF_DIR . '/views/admin/field-sitemap-post-type.php';
 	}
 
-	public function taxonomies_settings_field()
+	public function taxonomy_settings_field()
 	{
-		$taxonomies = (array) get_option( 'xmlsf_taxonomies' );
+		$taxonomies = get_option( 'xmlsf_taxonomies' );
 		$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
 
-		$tax_list = xmlsf_taxonomies_list( $taxonomies );
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/field-sitemap-taxonomy-settings.php';
+	}
+
+	public function taxonomies_field()
+	{
+		$taxonomies = get_option( 'xmlsf_taxonomies' );
 
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-sitemap-taxonomies.php';

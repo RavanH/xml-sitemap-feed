@@ -1,3 +1,6 @@
+<style type="text/css">
+<?php include XMLSF_DIR . '/views/styles/admin.css'; ?>
+</style>
 <div class="wrap">
 
 	<h1><?php _e('Google News Sitemap','xml-sitemap-feed'); ?></h1>
@@ -13,16 +16,52 @@
 
 	<?php do_action('xmlsf_news_settings_before'); ?>
 
-	<form method="post" action="options.php">
+	<div class="main">
+		<form method="post" action="options.php">
 
-		<?php settings_fields( 'xmlsf-news' ); ?>
+			<?php settings_fields( 'xmlsf-news' ); ?>
 
-		<?php do_settings_sections( 'xmlsf-news' ); ?>
+			<?php do_settings_sections( 'xmlsf-news' ); ?>
 
-		<?php submit_button(); ?>
+			<?php do_action('xmlsf_news_settings_after'); ?>
 
-	</form>
+			<?php submit_button(); ?>
 
-	<?php do_action('xmlsf_news_settings_after'); ?>
+		</form>
+	</div>
+
+	<div class="sidebar">
+		<h3><?php echo translate('View'); ?></h3>
+		<p>
+			<a href="<?php echo trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap-news' : $options['sitemap-news'] ); ?>" target="_blank" class="button button-large"><?php _e('Google News Sitemap','xml-sitemap-feed'); ?></a>
+		</p>
+
+		<h3><?php echo translate('Help'); ?></h3>
+		<p>
+			<?php printf (
+			/* translators: Plugin name, Support forum URL on WordPress.org */
+			__( 'These options are provided by %1$s. For help, please go to <a href="%2$s" target="_blank">Support</a>.', 'xml-sitemap-feed' ),
+			'<strong>'.__('XML Sitemap & Google News','xml-sitemap-feed') . '</strong>', 'https://wordpress.org/support/plugin/xml-sitemap-feed'
+			); ?>
+		</p>
+
+		<?php include XMLSF_DIR . '/views/admin/help-tab-news-sidebar.php'; ?>
+
+		<h3><?php _e('Contribute','xml-sitemap-feed'); ?></h3>
+		<p>
+			<?php printf (
+			/* translators: Review page URL and Translation page URL on WordPress.org */
+			__( 'If you would like to contribute and share with the rest of the WordPress community, please consider writing a quick <a href="%1$s" target="_blank">Review</a> or help out with <a href="%2$s" target="_blank">Translating</a>!', 'xml-sitemap-feed' ),
+			'https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/', 'https://translate.wordpress.org/projects/wp-plugins/xml-sitemap-feed'
+			); ?>
+		</p>
+		<p>
+			<?php printf (
+			/* translators: Github project URL */
+			__( 'For feature requests, reporting issues or contributing code, you can find and fork this plugin on <a href="%s" target="_blank">Github</a>.', 'xml-sitemap-feed' ),
+			'https://github.com/RavanH/xml-sitemap-feed'
+			); ?>
+		</p>
+	</div>
 
 </div>

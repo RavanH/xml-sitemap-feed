@@ -2,19 +2,20 @@
 
 class XMLSF_Admin_Sitemap_Sanitize
 {
-	public static function taxonomies_settings( $new )
+	public static function taxonomies( $new )
 	{
 		return $new;
 	}
 
-	public static function taxonomy_settings_settings( $new )
+	public static function taxonomy_settings( $new )
 	{
 		$sanitized = array();
 
-		$sanitized['term_limit'] = isset($new['term_limit']) ? intval($new['term_limit']) : 5000;
-		if ( $sanitized['term_limit'] < 1 || $sanitized['term_limit'] > 50000 ) $sanitized['term_limit'] = 50000;
+		$sanitized['active'] = !empty($new['active']) ? '1' : '';
 		$sanitized['priority'] = isset($new['priority']) && is_numeric($new['priority']) ? self::priority($new['priority'], 0.1, 0.9) : $defaults['priority'];
 		$sanitized['dynamic_priority'] = !empty($new['dynamic_priority']) ? '1' : '';
+		$sanitized['term_limit'] = isset($new['term_limit']) ? intval($new['term_limit']) : 5000;
+		if ( $sanitized['term_limit'] < 1 || $sanitized['term_limit'] > 50000 ) $sanitized['term_limit'] = 50000;
 
 		return $sanitized;
 	}
@@ -88,9 +89,12 @@ class XMLSF_Admin_Sitemap_Sanitize
 			$new = array_filter($new);
 			$new = reset($new);
 		}
-		$input = $new ? explode( PHP_EOL, sanitize_textarea_field($new) ) : array();
+
+		if ( empty($new) )
+			return '';
 
 		// build sanitized output
+		$lines = explode( PHP_EOL, sanitize_textarea_field($new) );
 		$sanitized = array();
 		foreach ( $input as $line ) {
 			$line = filter_var( esc_url( trim( $line ) ), FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
@@ -108,6 +112,10 @@ class XMLSF_Admin_Sitemap_Sanitize
 			$new = array_filter($new);
 			$new = reset($new);
 		}
+
+		if ( empty($new) )
+			return '';
+
 		$input = explode( PHP_EOL, sanitize_textarea_field( $new ) );
 
 		// build sanitized output
@@ -131,30 +139,6 @@ class XMLSF_Admin_Sitemap_Sanitize
 			}
 		}
 
-		return ! empty( $sanitized ) ? $sanitized : '';
+		return $sanitized;
 	}
-}
-
-function xmlsf_taxonomies_list( $checked ) {
-	$disabled = xmlsf()->disabled_taxonomies();
-	$active = get_option( 'xmlsf_post_types' );
-
-	foreach ( get_taxonomies( array( 'public' => true ), 'objects' ) as $taxonomy ) {
-		// skip unallowed post types
-		if ( in_array( $taxonomy->name, $disabled ) )
-			continue;
-
-		$skip = true;
-		foreach ( $taxonomy->object_type as $post_type)
-			if ( !empty( $active[$post_type]['active'] ) && $active[$post_type]['active'] == '1' )
-				$skip = false;
-
-		if ($skip) continue; // skip if none of the associated post types are active
-
-		$count = wp_count_terms( $taxonomy->name );
-		$tax_list[] = '<label><input type="checkbox" name="'.'xmlsf_taxonomies[]" id="xmlsf_taxonomies_' . $taxonomy->name . '" value="' . $taxonomy->name . '"' .
-			checked( in_array( $taxonomy->name, $checked ), true, false ).' /> ' . $taxonomy->label . ' (' . $count . ')</label>';
-	}
-
-	return $tax_list;
 }

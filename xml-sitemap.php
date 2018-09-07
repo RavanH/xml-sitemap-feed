@@ -44,6 +44,10 @@ define( 'XMLSF_VERSION', '5.0' );
  *                           Passes variable $post_id; must return a 2 or 3 letter
  *                           language ISO 639 code with the exception of zh-cn and zh-tw.
  *	xmlsf_post_types      -> Filters the post types array for the XML sitemaps index.
+ *	xmlsf_post_priority   -> Filters a post priority value. Passes variables $priority and $post->ID.
+ *							 Must return a float value between 0.1 and 1.0
+ *	xmlsf_term_priority   -> Filters a taxonomy term priority value. Passes variables $priority and $term->slug.
+ *							 Must return a float value between 0.1 and 1.0
  *	xmlsf_news_post_types -> Filters the post types array for the Google News sitemap.
  *
  *  ACTIONS
@@ -197,6 +201,37 @@ function xmlsf_maybe_upgrade() {
 			if ( is_array( $terms ) )
 				foreach ( $terms as $term )
 					wp_delete_term(	$term->term_id, 'gn-genre' );
+
+			// new taxonomy settings
+			$taxonomies = get_option( 'xmlsf_taxonomies' );
+			if ( empty($taxonomies) ) {
+				$active = '';
+			} else {
+				$available = 0;
+				$not_empty = 0;
+				$checked = count($taxonomies);
+				foreach ( (array) get_option( 'xmlsf_post_types' ) as $post_type => $settings ) {
+					if ( empty($settings['active']) ) continue;
+					$taxonomies = get_object_taxonomies( $post_type, 'objects' );
+					// check each tax public flag and term count and append name to array
+					foreach ( $taxonomies as $taxonomy ) {
+						if ( !empty( $taxonomy->public ) && !in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) )
+							$available++;
+							if ( !empty( wp_count_terms( $taxonomy->name, array('hide_empty'=>true) ) ) )
+								$not_empty++;
+					}
+				}
+				if ( $checked == $available || $checked == $not_empty )
+					update_option( 'xmlsf_taxonomies', '' );
+				$active = '1';
+			}
+			$taxonomy_settings = array(
+				'active' => $active,
+				'priority' => '0.3',
+				'dynamic_priority' => '1',
+				'term_limit' => '5000'
+			);
+			add_option( 'xmlsf_taxonomy_settings', $taxonomy_settings );
 
 			// update ping option
 			$ping = get_option( 'xmlsf_ping' );

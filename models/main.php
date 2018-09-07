@@ -46,8 +46,8 @@ function xmlsf_filter_request( $request ) {
 			$request = xmlsf_sitemap_news_filter_request( $request );
 		} else {
 			require_once XMLSF_DIR . '/controllers/public/sitemap.php';
-			xmlsf_feed_templates();
 			require_once XMLSF_DIR . '/models/public/sitemap.php';
+			xmlsf_feed_templates();
 			$request = xmlsf_sitemap_filter_request( $request );
 		}
 

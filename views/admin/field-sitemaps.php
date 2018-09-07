@@ -7,7 +7,7 @@
         <?php _e('XML Sitemap Index','xml-sitemap-feed'); ?>
     </label>
 
-    <?php if (isset($options['sitemap'])) {
+    <?php if ( isset($options['sitemap']) ) {
         $sitemap_url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap' : $options['sitemap'] );
     ?>
     <span class="description">

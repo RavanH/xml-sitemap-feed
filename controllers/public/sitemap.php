@@ -52,14 +52,15 @@ function xmlsf_feed_templates() {
 		add_action( 'do_feed_sitemap-custom', 'xmlsf_load_template_custom', 10, 1 );
 
 		$post_types = get_option('xmlsf_post_types');
-		if ( is_array($post_types) )
-			foreach ( $post_types as $post_type => $settings )
-				add_action( 'do_feed_sitemap-posttype-'.$post_type, 'xmlsf_load_template', 10, 1 );
-
-		$taxonomies = get_option('xmlsf_taxonomies');
-		if ( is_array($taxonomies) )
-			foreach ( $taxonomies as $taxonomy )
-				add_action( 'do_feed_sitemap-taxonomy-'.$taxonomy, 'xmlsf_load_template_taxonomy', 10, 1 );
+		if ( is_array($post_types) ) {
+			foreach ( $post_types as $post_type => $settings ) {
+				if ( !empty($settings['active']) )
+					add_action( 'do_feed_sitemap-posttype-'.$post_type, 'xmlsf_load_template', 10, 1 );
+			}
+		}
+		foreach ( xmlsf_get_taxonomies() as $name ) {
+			add_action( 'do_feed_sitemap-taxonomy-'.$name, 'xmlsf_load_template_taxonomy', 10, 1 );
+		}
 	}
 }
 

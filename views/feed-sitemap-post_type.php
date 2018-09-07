@@ -54,8 +54,6 @@ if ( have_posts() ) :
 	}
 
 	$have_posts = true;
-
-	// TODO more image tags & video tags
 	?>
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>

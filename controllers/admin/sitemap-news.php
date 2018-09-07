@@ -44,7 +44,7 @@ class XMLSF_Admin_Sitemap_News
 		$this->options = get_option( 'xmlsf_news_tags', array() );
 
 		// SECTION
-		add_settings_section( 'news_sitemap_section', /* '<a name="xmlnf"></a>'.__('Google News Sitemap','xml-sitemap-feed') */ '', array($this,'sitemap_settings'), 'xmlsf-news' );
+		add_settings_section( 'news_sitemap_section', /* '<a name="xmlnf"></a>'.__('Google News Sitemap','xml-sitemap-feed') */ '', '', 'xmlsf-news' );
 
 		// SETTINGS
 		add_settings_field( 'xmlsf_news_name', '<label for="xmlsf_news_name">'.__('Publication name','xml-sitemap-feed').'</label>', array($this,'name_field'), 'xmlsf-news', 'news_sitemap_section' );
@@ -63,6 +63,8 @@ class XMLSF_Admin_Sitemap_News
 
 		add_settings_field( 'xmlsf_news_image', translate('Images'), array( $this,'image_field' ), 'xmlsf-news', 'news_sitemap_section' );
 		add_settings_field( 'xmlsf_news_labels', __('Source labels', 'xml-sitemap-feed' ), array($this,'labels_field'), 'xmlsf-news', 'news_sitemap_section' );
+
+		$options = (array) get_option( 'xmlsf_sitemaps' );
 
 		include XMLSF_DIR . '/views/admin/page-sitemap-news.php';
     }
@@ -148,16 +150,8 @@ class XMLSF_Admin_Sitemap_News
 		$screen->set_help_sidebar( $content );
 	}
 
-	public function sitemap_settings()
-	{
-		// The actual section text
-		include XMLSF_DIR . '/views/admin/section-news.php';
-	}
-
 	public function name_field()
 	{
-		//TODO: publication name allow tag %category% ... post_types (+ exclusion per post or none + allow inclusion per post), limit to category ...
-
 		$name = !empty($this->options['name']) ? $this->options['name'] : '';
 
 		// The actual fields for data entry
