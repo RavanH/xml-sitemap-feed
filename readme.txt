@@ -71,7 +71,7 @@ Data actively transmitted to search engines is your sitemap location and time of
 
 = Contribute =
 
-If you're happy with this plugin as it is, please consider writing a quick [rating](https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/#new-post) or helping other users out on the [support forum](https://wordpress.org/support/plugin/xml-sitemap-feed).
+If you're happy with this plugin as it is, please consider writing a quick [rating](https://wordpress.org/support/plugin/xml-sitemap-feed/review/#new-post) or helping other users out on the [support forum](https://wordpress.org/support/plugin/xml-sitemap-feed).
 
 If you wish to help build this plugin, you're very welcome to [translate it into your language](https://translate.wordpress.org/projects/wp-plugins/xml-sitemap-feed/) or contribute code on [Github](https://github.com/RavanH/xml-sitemap-feed/).
 
@@ -293,19 +293,23 @@ Gutenberg compatibility. Dropped keywords and access tags. Taxonomy sitemaps imp
 == Changelog ==
 
 = 5.0 =
-* NEW: Taxonomy term options: priority and automatic calculation
-* NEW: Admin warning on conflicting static files
-* NEW: Option to delete conflicting static files
-* Removal of the keywords and access tags as Google dropped support
+* Complete code restructure and cleanup: MVC and JIT inclusion
+* Fewer DB queries, much smaller memory footprint on normal queries
+* NEW Admin interface with dedicated options pages and help tabs
+* NEW Taxonomy term options: priority and automatic calculation
+* NEW Admin warning on conflicting static files
+* NEW Option to delete conflicting static files
+* NEW Filters for post types: xmlsf_post_types and xmlsf_news_post_types
+* NEW Filters for priority values: xmlsf_post_priority and xmlsf_term_priority
+* Removal of Genre, Keywords and Access tags as Google dropped support
 * Taxonomy term sitemaps speed improvent: get lastmod date from database
 * Exclude Woocommerce product_shipping_class taxonomy
 * PHP 7.2+ compat: create_function deprecated
 * No more domain filtering for custom URLs and sitemaps
-* Heavy code restructure and cleanup
-* FIX: Gutenberg editor GN genre taxonomy not showing
-* FIX: plain and /index.php/ permalink structure
-* FIX: clear all options on uninstall
-* FIX: Pings
+* FIX Gutenberg editor GN genre taxonomy not showing
+* FIX Plain and /index.php/ permalink structure
+* FIX Clear all options on uninstall
+* FIX Pings
 
 = 4.9.4 =
 * FIX: missing featured images, thanks @flyerua
