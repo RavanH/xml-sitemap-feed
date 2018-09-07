@@ -60,6 +60,7 @@ class XMLSitemapFeed_Uninstall {
 		//		wp_delete_term(	$term->term_id, 'gn-genre' );
 
 		// remove plugin settings
+		delete_option('xmlsf_static_files');
 		delete_option('xmlsf_version');
 		delete_option('xmlsf_sitemaps');
 		delete_option('xmlsf_post_types');

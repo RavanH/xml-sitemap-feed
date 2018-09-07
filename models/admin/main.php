@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * Nginx helper purge urls
+ * adds sitemap urls to the purge array.
+ *
+ * @param $urls array
+ * @param $redis bool|false
+ *
+ * @return $urls array
+ */
+function xmlsf_nginx_helper_purge_urls( $urls = array(), $redis = false ) {
+
+	if ( $redis ) {
+		// wildcard allowed, this makes everything simple
+		$urls[] = '/sitemap*.xml';
+	} else {
+		// no wildcard, go through the motions
+		$sitemaps = get_option( 'xmlsf_sitemaps' );
+
+		if ( !empty( $sitemaps['sitemap-news'] ) ) {
+			$urls[] = '/sitemap-news.xml';
+		}
+
+		if ( !empty( $sitemaps['sitemap'] ) ) {
+			$urls[] = '/sitemap.xml';
+			$urls[] = '/sitemap-home.xml';
+			$urls[] = '/sitemap-custom.xml';
+
+			// add public post types sitemaps
+			$post_types = get_option( 'xmlsf_post_types' );
+			if ( is_array($post_types) )
+				foreach ( $post_types as $post_type => $settings ) {
+					$archive = !empty($settings['archive']) ? $settings['archive'] : '';
+					foreach ( xmlsf_get_archives($post_type,$archive) as $url )
+						 $urls[] = parse_url( $url, PHP_URL_PATH);
+				};
+
+			// add public post taxonomies sitemaps
+			$taxonomies = get_option('xmlsf_taxonomies');
+			if ( is_array($taxonomies) )
+				foreach ( $taxonomies as $taxonomy ) {
+					$urls[] = parse_url( xmlsf_get_index_url('taxonomy',$taxonomy), PHP_URL_PATH);
+				};
+		}
+	}
+
+	return $urls;
+}
+
+// plugin action links
+
+function xmlsf_add_action_link( $links ) {
+	$settings_link = '<a href="' . admin_url('options-reading.php') . '#blog_public">' . translate('Settings') . '</a>';
+	array_unshift( $links, $settings_link );
+	return $links;
+}
+
+class XMLSF_Admin_Sanitize
+{
+
+	public static function sitemaps_settings( $new )
+	{
+		$old = get_option( 'xmlsf_sitemaps' );
+		$sanitized = $new;
+
+		if  ( '1' !== get_option('blog_public') ) {
+			$sanitized = '';
+		}
+
+		if ( $old != $sanitized ) {
+			// when sitemaps are added or removed, set transients
+			set_transient('xmlsf_flush_rewrite_rules','');
+			set_transient('xmlsf_check_static_files','');
+		}
+
+		return $sanitized;
+	}
+
+	public static function ping_settings( $new )
+	{
+		return is_array($new) ? $new : array();
+	}
+
+	public static function robots_settings( $new )
+	{
+		$old = get_option('xmlsf_robots');
+
+		// clean up input
+		if ( is_array( $new ) ) {
+		  $new = array_filter( $new );
+		  $new = reset( $new );
+		}
+
+		if ( empty($old) && !empty($new) )
+			set_transient('xmlsf_check_static_files','');
+
+		return sanitize_textarea_field( $new );
+	}
+}

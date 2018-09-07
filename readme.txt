@@ -293,19 +293,22 @@ Gutenberg compatibility. Dropped keywords and access tags. Taxonomy sitemaps imp
 == Changelog ==
 
 = 5.0 =
-* NEW: Taxonomy term options: priority and automatic calculation
-* NEW: Admin warning on conflicting static files
-* NEW: Option to delete conflicting static files
+* Complete code restructure and cleanup: MVC and JIT inclusion
+* Fewer DB queries, much smaller memory footprint on normal queries
+* NEW Admin interface with dedicated options pages and help tabs
+* NEW Taxonomy term options: priority and automatic calculation
+* NEW Admin warning on conflicting static files
+* NEW Option to delete conflicting static files
+* NEW Filters for post types: xmlsf_post_types and xmlsf_news_post_types
 * Removal of Genre, Keywords and Access tags as Google dropped support
 * Taxonomy term sitemaps speed improvent: get lastmod date from database
 * Exclude Woocommerce product_shipping_class taxonomy
 * PHP 7.2+ compat: create_function deprecated
 * No more domain filtering for custom URLs and sitemaps
-* Heavy code restructure and cleanup: MVC and JIT inclusion
-* FIX: Gutenberg editor GN genre taxonomy not showing
-* FIX: plain and /index.php/ permalink structure
-* FIX: clear all options on uninstall
-* FIX: Pings
+* FIX Gutenberg editor GN genre taxonomy not showing
+* FIX Plain and /index.php/ permalink structure
+* FIX Clear all options on uninstall
+* FIX Pings
 
 = 4.9.4 =
 * FIX: missing featured images, thanks @flyerua
