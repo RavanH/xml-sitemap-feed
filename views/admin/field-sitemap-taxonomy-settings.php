@@ -9,9 +9,9 @@
 	        <?php _e( 'Include taxonomies', 'xml-sitemap-feed' ); ?> (<?php echo count( $this->public_taxonomies() ); ?>)
 	    </label>
 		<?php if ( empty( $this->public_taxonomies() ) ) { ?>
-		<span class="description warning" style="color: red;">
+		<p class="description warning" style="color: red;">
 			<?php _e( 'No taxonomies available for the currently included post types.', 'xml-sitemap-feed' ); ?>
-		</span>
+		</p>
 		<?php } ?>
 	</p>
     <p>

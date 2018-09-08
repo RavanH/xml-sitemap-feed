@@ -129,7 +129,7 @@ function xmlsf_init() {
 	add_filter( 'robots_txt', 'xmlsf_robots_txt', 9 );
 }
 
-add_action( 'init', 'xmlsf_init', 0 );
+add_action( 'init', 'xmlsf_init' );
 
 /**
  * Upgrade/install, maybe...
@@ -208,7 +208,6 @@ function xmlsf_maybe_upgrade() {
 				$active = '';
 			} else {
 				$available = 0;
-				$not_empty = 0;
 				$checked = count($taxonomies);
 				foreach ( (array) get_option( 'xmlsf_post_types' ) as $post_type => $settings ) {
 					if ( empty($settings['active']) ) continue;
@@ -217,11 +216,9 @@ function xmlsf_maybe_upgrade() {
 					foreach ( $taxonomies as $taxonomy ) {
 						if ( !empty( $taxonomy->public ) && !in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) )
 							$available++;
-							if ( !empty( wp_count_terms( $taxonomy->name, array('hide_empty'=>true) ) ) )
-								$not_empty++;
 					}
 				}
-				if ( $checked == $available || $checked == $not_empty )
+				if ( $checked == $available )
 					update_option( 'xmlsf_taxonomies', '' );
 				$active = '1';
 			}

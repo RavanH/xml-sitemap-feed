@@ -78,7 +78,7 @@ function xmlsf_untrailingslash( $request ) {
  * @return array
  */
 function xmlsf_filter_post_types( $post_types ) {
-	foreach ( array('attachment') as $post_type ) {
+	foreach ( xmlsf()->disabled_post_types() as $post_type ) {
 		if ( isset( $post_types[$post_type]) )
 			unset( $post_types[$post_type] );
 	}

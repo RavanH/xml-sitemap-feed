@@ -9,7 +9,6 @@
 	        <?php printf( /* translators: Post type name and post count */ __('Include %s', 'xml-sitemap-feed'), $obj->label ); ?> (<?php echo $count->publish; ?>)
 	    </label>
 	</p>
-	<?php if ( !empty($options[$obj->name]['active']) ) : ?>
 
     <?php
     if ( empty($obj->hierarchical) ) {
@@ -75,5 +74,5 @@
             </select>
         </label>
     </p>
-	<?php endif; ?>
+
 </fieldset>
