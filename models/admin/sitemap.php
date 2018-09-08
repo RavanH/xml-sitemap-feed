@@ -94,7 +94,7 @@ class XMLSF_Admin_Sitemap_Sanitize
 			return '';
 
 		// build sanitized output
-		$lines = explode( PHP_EOL, sanitize_textarea_field($new) );
+		$input = explode( PHP_EOL, sanitize_textarea_field($new) );
 		$sanitized = array();
 		foreach ( $input as $line ) {
 			$line = filter_var( esc_url( trim( $line ) ), FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
@@ -102,10 +102,10 @@ class XMLSF_Admin_Sitemap_Sanitize
 				$sanitized[] = $line;
 		}
 
-		return $sanitized;
+		return !empty($sanitized) ? $sanitized : '';
 	}
 
-	public static function urls_settings( $new )
+	public static function custom_urls_settings( $new )
 	{
 		// clean up input
 		if ( is_array( $new ) ) {
@@ -126,7 +126,7 @@ class XMLSF_Admin_Sitemap_Sanitize
 
 			$arr = explode( " ", trim( $line ) );
 
-			$url = filter_var( esc_url( trim( $arr[0] ) ), FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
+			$url = filter_var( esc_url( trim( $arr[0] ) ), FILTER_VALIDATE_URL );
 
 			if ( !empty( $url ) ) {
 
@@ -139,6 +139,6 @@ class XMLSF_Admin_Sitemap_Sanitize
 			}
 		}
 
-		return $sanitized;
+		return !empty($sanitized) ? $sanitized : '';
 	}
 }

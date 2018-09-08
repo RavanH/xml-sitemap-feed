@@ -235,7 +235,7 @@ function xmlsf_maybe_upgrade() {
 			$new = array( 'google', 'bing' );
 			if ( is_array($ping) ) {
 				foreach ( $ping as $key => $value ) {
-					if ( is_array($value) && empty( $value['active'] && isset( $new[$key] ) ) ) {
+					if ( is_array($value) && empty( $value['active'] ) && isset( $new[$key] ) ) {
 						unset( $new[$key] );
 					}
 				}

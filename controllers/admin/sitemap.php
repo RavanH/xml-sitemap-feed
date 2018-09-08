@@ -107,7 +107,7 @@ class XMLSF_Admin_Sitemap
 		// custom domains
 		register_setting( 'xmlsf_advanced', 'xmlsf_domains', array('XMLSF_Admin_Sitemap_Sanitize','domains_settings') );
 		// custom urls
-		register_setting( 'xmlsf_advanced', 'xmlsf_urls', array('XMLSF_Admin_Sitemap_Sanitize','urls_settings') );
+		register_setting( 'xmlsf_advanced', 'xmlsf_urls', array('XMLSF_Admin_Sitemap_Sanitize','custom_urls_settings') );
 		// custom sitemaps
 		register_setting( 'xmlsf_advanced', 'xmlsf_custom_sitemaps', array('XMLSF_Admin_Sitemap_Sanitize','custom_sitemaps_settings') );
     }
