@@ -18,7 +18,7 @@
 			<?php } ?>
 		</ul>
 		<p>
-			<input type="submit" class="button button-small" name="xmlsf-delete-submit" value="<?php _e('Delete files','xml-sitemap-feed'); ?>" onclick="return confirm('<?php _e('Attempt to delete selected conflicting files.','xml-sitemap-feed'); ?>\n\n<?php echo translate('Are you sure you want to do this?'); ?>')" />
+			<input type="submit" class="button button-small" name="xmlsf-delete-submit" value="<?php _e('Delete selected files','xml-sitemap-feed'); ?>" onclick="return confirm('<?php _e('Attempt to delete selected conflicting files.','xml-sitemap-feed'); ?>\n\n<?php echo translate('Are you sure you want to do this?'); ?>')" />
 			&nbsp;
 			<input type="submit" class="button button-small" name="xmlsf-static-dismiss" value="<?php echo translate('Dismiss'); ?>" />
 	    </p>
