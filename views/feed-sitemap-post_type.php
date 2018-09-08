@@ -46,9 +46,7 @@ if ( have_posts() ) :
 				get_post_meta( $post->ID, '_xmlsf_exclude', true ),
 				$post->ID
 			)
-		 ) ||
-		 in_array( $post->ID, xmlsf_get_frontpages() ) ||
-		 !xmlsf_is_allowed_domain( get_permalink() ) ) {
+		 ) || !xmlsf_is_allowed_domain( get_permalink() ) ) {
 
 		continue;
 	}
