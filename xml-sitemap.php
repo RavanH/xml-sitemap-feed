@@ -251,6 +251,10 @@ function xmlsf_maybe_upgrade() {
 			add_option( 'xmlsf_robots', $robots, null, false );
 		}
 
+		if ( version_compare( '5.0.2', $db_version, '>' ) ) {
+			delete_option( 'xmlsf_version' );
+		}
+
 		if ( defined('WP_DEBUG') && WP_DEBUG ) {
 			error_log('XML Sitemap Feeds upgraded from '.$db_version.' to '.XMLSF_VERSION);
 		};

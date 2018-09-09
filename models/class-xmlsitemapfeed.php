@@ -182,7 +182,7 @@ class XMLSitemapFeed {
 				foreach ( $post_types as $name )
 					$this->defaults['post_types'][$name] = array(
 						//'name' => $name,
-						'active' => '1',
+						'active' => '',
 						'archive' => '',
 						'priority' => '0.5',
 						'dynamic_priority' => '',
