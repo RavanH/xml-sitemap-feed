@@ -252,6 +252,16 @@ function xmlsf_maybe_upgrade() {
 		}
 
 		if ( version_compare( '5.0.2', $db_version, '>' ) ) {
+			$defaults = xmlsf()->defaults();
+
+			foreach ( $defaults as $option => $default ) {
+				if ( get_option( 'xmlsf_'.$option ) ) continue;
+				if ( in_array( $option, array('ping','robots') ) )
+					add_option( 'xmlsf_'.$option, $default, null, false );
+				else
+					add_option( 'xmlsf_'.$option, $default );
+			}
+
 			delete_option( 'xmlsf_version' );
 		}
 
