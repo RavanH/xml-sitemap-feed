@@ -36,6 +36,12 @@
 			<a href="<?php echo trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap-news' : $options['sitemap-news'] ); ?>" target="_blank" class="button button-large"><?php _e('Google News Sitemap','xml-sitemap-feed'); ?></a>
 		</p>
 
+		<h3><?php echo translate('Tools'); ?></h3>
+		<form action="" method="post">
+			<?php wp_nonce_field( XMLSF_BASENAME.'-help', '_xmlsf_help_nonce' ); ?>
+			<input type="submit" name="xmlsf-check-conflicts" class="button button-small" value="<?php _e( 'Check for conflicts', 'xml-sitemap-feed' ); ?>" />
+		</form>
+
 		<h3><?php echo translate('Help'); ?></h3>
 		<p>
 			<?php printf (

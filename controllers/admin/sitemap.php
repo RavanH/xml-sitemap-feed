@@ -122,7 +122,6 @@ class XMLSF_Admin_Sitemap
 
 		ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-sitemaps.php';
-		include XMLSF_DIR . '/views/admin/help-tab-tools.php';
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();
 

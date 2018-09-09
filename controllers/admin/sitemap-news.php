@@ -89,7 +89,6 @@ class XMLSF_Admin_Sitemap_News
 
 		ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-news.php';
-		include XMLSF_DIR . '/views/admin/help-tab-tools.php';
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();
 

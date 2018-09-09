@@ -169,9 +169,7 @@ function xmlsf_maybe_upgrade() {
 				$urls = explode( PHP_EOL, $urls );
 				update_option('xmlsf_custom_sitemaps',$urls);
 			}
-		}
 
-		if ( version_compare( '4.4.1', $db_version, '>' ) ) {
 			// register location taxonomies then delete all terms
 			register_taxonomy( 'gn-location-3', null );
 			$terms = get_terms( 'gn-location-3', array('hide_empty' => false) );
