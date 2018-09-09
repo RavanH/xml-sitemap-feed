@@ -144,7 +144,7 @@ class XMLSitemapFeed {
 					),
 					'page' => array(
 						'active' => '1',
-						'priority' => '0.3',
+						'priority' => '0.5',
 						'dynamic_priority' => '',
 						'tags' => array(
 							'image' => 'attached'
@@ -166,13 +166,7 @@ class XMLSitemapFeed {
 				'robots' => '',
 				'urls' => '',
 				'custom_sitemaps' => '',
-				'domains' => '',
-				'news_tags' => array(
-					'name' => '',
-					'post_type' => array('post'),
-					'categories' => '',
-					'image' => 'featured'
-				)
+				'domains' => ''
 			);
 
 			$post_types = apply_filters( 'xmlsf_post_types', get_post_types(array('public'=>true,'_builtin'=>false),'names') );
