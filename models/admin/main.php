@@ -61,17 +61,38 @@ class XMLSF_Admin_Sanitize
 
 	public static function sitemaps_settings( $new )
 	{
-		$old = get_option( 'xmlsf_sitemaps' );
-		$sanitized = $new;
-
 		if  ( '1' !== get_option('blog_public') ) {
-			$sanitized = '';
+			return '';
 		}
 
-		if ( $old != $sanitized ) {
+		$old = get_option( 'xmlsf_sitemaps' );
+		$sanitized = array();
+
+		if ( $old !== $new ) {
 			// when sitemaps are added or removed, set transients
 			set_transient('xmlsf_flush_rewrite_rules','');
 			set_transient('xmlsf_check_static_files','');
+
+			// switched on news sitemap
+			if ( !empty($new['sitemap-news']) && empty($old['sitemap-news'] ) ) {
+				// check news tag settings
+				if ( !get_option( 'xmlsf_news_tags' ) ) {
+					add_option( 'xmlsf_news_tags', array(
+						'name' => '',
+						'post_type' => array('post'),
+						'categories' => '',
+						'image' => 'featured'
+					) );
+				}
+			}
+		}
+
+		if ( !empty($new['sitemap']) ) {
+			$sanitized['sitemap'] = apply_filters( 'xmlsf_sitemap_filename', $new['sitemap'] );			
+		}
+
+		if ( !empty($new['sitemap-news']) ) {
+			$sanitized['sitemap-news'] = apply_filters( 'xmlsf_sitemap_news_filename', $new['sitemap-news'] );
 		}
 
 		return $sanitized;

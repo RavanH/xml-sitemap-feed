@@ -288,9 +288,6 @@ class XMLSF_Admin_Controller
 		delete_option( 'xmlsf_static_files' );
 		delete_option( 'xmlsf_pong' );
 
-		//delete_option( 'xmlsf_version' );
-		//xmlsf_maybe_upgrade();
-
 		add_action( 'admin_notices', array('XMLSF_Admin_Notices','clear_settings_admin_notice') );
 	}
 
