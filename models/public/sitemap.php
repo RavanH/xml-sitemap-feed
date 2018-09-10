@@ -26,44 +26,59 @@ function xmlsf_get_index_url( $sitemap = 'home', $type = false, $param = false )
 }
 
 /**
- * Echos last modified date tag
+ * Get last modified date
  *
  * @param string $sitemap
  * @param string $term
  *
- * @return void
+ * @return string|bool date|false
  */
-function xmlsf_the_lastmod( $sitemap = 'post_type', $term = '' ) {
-	$return = trim( mysql2date( 'Y-m-d\TH:i:s+00:00', xmlsf_modified( $sitemap, $term ), false ) );
-	echo !empty($return) ? '<lastmod>'.$return.'</lastmod>' . PHP_EOL : '';
+function xmlsf_get_lastmod( $sitemap = 'post_type', $term = '' ) {
+	$modified = trim( mysql2date( 'Y-m-d\TH:i:s+00:00', xmlsf_modified( $sitemap, $term ), false ) );
+	return !empty($modified) ? $modified : false;
 }
 
 /**
- * Get home urls
+ * Get root pages data
  * @return array
  */
-function xmlsf_get_home_urls() {
-	$urls = array();
-
+function xmlsf_get_root_data() {
+	// language roots
 	global $sitepress; // Polylang and WPML compat
-	if ( function_exists('pll_the_languages') ) {
+	if ( function_exists('pll_the_languages') && function_exists('pll_home_url') ) {
 		$languages = pll_the_languages( array( 'raw' => 1 ) );
 		if ( is_array($languages) ) {
 			foreach ( $languages as $language ) {
-				$urls[] = pll_home_url( $language['slug'] );
+				$url = pll_home_url( $language['slug'] );
+				$data[$url] = array(
+					'priority' => '1.0',
+					'lastmod' => mysql2date( 'Y-m-d\TH:i:s+00:00', get_lastpostdate('gmt'), false )
+					// TODO make lastmod date language specific
+				);
 			}
-		} else {
-			$urls[] = home_url();
 		}
 	} elseif ( is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'language_url') ) {
 		foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term ) {
-			$urls[] = $sitepress->language_url($term);
+			$url = $sitepress->language_url($term);
+			$data[$url] = array(
+				'priority' => '1.0',
+				'lastmod' => mysql2date( 'Y-m-d\TH:i:s+00:00', get_lastpostdate('gmt'), false )
+				// TODO make lastmod date language specific
+			);
 		}
 	} else {
-		$urls[] = home_url();
+		// single site root
+		$data = array(
+			home_url() => array(
+				'priority' => '1.0',
+				'lastmod' => mysql2date( 'Y-m-d\TH:i:s+00:00', get_lastpostdate('gmt'), false )
+			)
+		);
 	}
 
-	return $urls;
+	// TODO custom post type root pages here
+
+	return $data;
 }
 
 /**
@@ -156,7 +171,7 @@ function xmlsf_get_blogpages() {
  * @return bool
  */
 function xmlsf_is_home( $post_id ) {
-	return in_array( $post_id, xmlsf_get_blogpages() );
+	return in_array( $post_id, xmlsf_get_blogpages() ) || in_array( $post_id, xmlsf_get_frontpages() );
 }
 
 /**
@@ -256,25 +271,22 @@ function xmlsf_modified( $sitemap = 'post_type', $term = '' ) {
  * @param string $sitemap
  * @param WP_Term|string $term
  *
- * @return string
+ * @return floatval
  */
-function xmlsf_the_priority( $sitemap = 'post_type', $term = '' ) {
+function xmlsf_get_priority( $sitemap = 'post_type', $term = '' ) {
 	$priority = 0.5;
 
 	if ( 'post_type' == $sitemap ) :
 
 		global $post;
 		$options = get_option( 'xmlsf_post_types' );
-		$priority_meta = get_metadata( 'post', $post->ID, '_xmlsf_priority' , true );
+		$priority_meta = get_metadata( 'post', $post->ID, '_xmlsf_priority', true );
+		$priority = isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ? floatval($options[$post->post_type]['priority']) : 0.5;
 
 		if ( '' !== $priority_meta ) {
 			$priority = floatval(str_replace(',','.',$priority_meta));
-		} elseif ( is_array($options) && !empty($options[$post->post_type]['dynamic_priority']) ) {
+		} elseif ( !empty($options[$post->post_type]['dynamic_priority']) ) {
 			$post_modified = mysql2date('U',$post->post_modified_gmt, false);
-
-			if ( isset($options[$post->post_type]['priority']) ) {
-				$priority = floatval(str_replace(',','.',$options[$post->post_type]['priority']));
-			}
 
 			// reduce by age
 			// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
@@ -286,32 +298,23 @@ function xmlsf_the_priority( $sitemap = 'post_type', $term = '' ) {
 			if ( $post->comment_count > 0 && $priority <= 0.9 ) {
 				$priority += 0.1 + ( 0.9 - $priority ) * $post->comment_count / wp_count_comments($post->post_type)->approved;
 			}
-
-			// make sure we're not below 0.1 after automatic calculation
-			if ( $priority < .1 ) {
-				$priority = .1;
-			}
-		} elseif ( is_array($options) && isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ) {
-			$priority = floatval( $options[$post->post_type]['priority'] );
-		};
+		}
 
 		$priority = apply_filters( 'xmlsf_post_priority', $priority, $post->ID );
 
 	elseif ( 'taxonomy' == $sitemap ) :
 
 		$options = get_option( 'xmlsf_taxonomy_settings' );
-		if ( is_array( $options ) && !empty( $options['priority'] ) ) {
-			$priority = floatval( $options['priority'] );
-		}
+		$priority = isset( $options['priority'] ) && is_numeric( $options['priority'] ) ? floatval( $options['priority'] ) : 0.5 ;
 
-		if ( $priority > 0.1 && is_array($options) && !empty($options['dynamic_priority']) && is_object($term) ) {
+		if ( !empty($options['dynamic_priority']) && $priority > 0.1 && is_object($term) ) {
 			// set first and highest term post count as maximum
 			if ( null == xmlsf()->taxonomy_termmaxposts ) {
 				xmlsf()->taxonomy_termmaxposts = $term->count;
 			}
 
 			$priority -= ( xmlsf()->taxonomy_termmaxposts - $term->count ) * ( $priority - 0.1 ) / xmlsf()->taxonomy_termmaxposts;
-		};
+		}
 
 		$priority = apply_filters( 'xmlsf_term_priority', $priority, $term->slug );
 
@@ -325,7 +328,7 @@ function xmlsf_the_priority( $sitemap = 'post_type', $term = '' ) {
 		$priority = 1;
 	}
 
-	echo '<priority>' . round( (float) $priority, 1 ) . '</priority>' . PHP_EOL;
+	return round( (float) $priority, 1 );
 }
 
 /**
@@ -369,7 +372,7 @@ function xmlsf_set_terms_args( $args ) {
  */
 function xmlsf_sitemap_filter_request( $request ) {
 
-	$feed = explode( '-' , $request['feed'] );
+	$feed = explode( '-' ,$request['feed'], 3 );
 
 	if ( !isset( $feed[1] ) ) return $request;
 

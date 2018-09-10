@@ -10,7 +10,7 @@ if ( ! defined( 'WPINC' ) ) die;
 echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 <?xml-stylesheet type="text/xsl" href="' . plugins_url('views/styles/sitemap-taxonomy.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION . '"?>
 '; ?>
-<?php xmlsf_get_generator(); ?>
+<?php xmlsf_generator(); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
@@ -34,4 +34,4 @@ if ( is_array($urls) ) :
 
 endif;
 ?></urlset>
-<?php xmlsf_get_usage(); ?>
+<?php xmlsf_usage(); ?>

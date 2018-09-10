@@ -23,7 +23,7 @@ if ( !empty($options['image']) ) {
 echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 <?xml-stylesheet type="text/xsl" href="' . plugins_url('views/styles/sitemap-news.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION . '"?>
 '; ?>
-<?php xmlsf_get_generator(); ?>
+<?php xmlsf_generator(); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 	xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
 <?php echo $image_xmlns; ?>
@@ -108,4 +108,4 @@ if ( !$have_posts ) :
 <?php
 endif;
 ?></urlset>
-<?php xmlsf_get_usage(); ?>
+<?php xmlsf_usage(); ?>

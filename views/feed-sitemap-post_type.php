@@ -22,7 +22,7 @@ if ( !empty($image) ) {
 echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 <?xml-stylesheet type="text/xsl" href="' . plugins_url('views/styles/sitemap.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION . '"?>
 '; ?>
-<?php xmlsf_get_generator(); ?>
+<?php xmlsf_generator(); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 <?php echo $image_xmlns; ?>
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -32,6 +32,8 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 
 // set empty sitemap flag
 $have_posts = false;
+
+echo get_query_var('post_type');
 
 // loop away!
 if ( have_posts() ) :
@@ -55,8 +57,10 @@ if ( have_posts() ) :
 	?>
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
-		<?php xmlsf_the_priority(); ?>
-		<?php xmlsf_the_lastmod(); ?>
+		<priority><?php echo xmlsf_get_priority(); ?></priority>
+<?php if ( $lastmod = xmlsf_get_lastmod() ) { ?>
+		<lastmod><?php echo $lastmod; ?></lastmod>
+<?php } ?>
 <?php
 	if ( !empty($image) ) :
 		foreach ( xmlsf_get_images() as $image ) {
@@ -97,4 +101,4 @@ if ( !$have_posts ) :
 <?php
 endif;
 ?></urlset>
-<?php xmlsf_get_usage(); ?>
+<?php xmlsf_usage(); ?>

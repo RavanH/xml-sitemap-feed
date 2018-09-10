@@ -15,7 +15,7 @@ function xmlsf_wpml_language_switcher() {
 /**
  * Generator info
  */
-function xmlsf_get_generator() {
+function xmlsf_generator() {
 	$date = date('Y-m-d\TH:i:s+00:00');
 
 	require XMLSF_DIR . '/views/_generator.php';
@@ -24,7 +24,7 @@ function xmlsf_get_generator() {
 /**
  * Usage info for debugging
  */
-function xmlsf_get_usage() {
+function xmlsf_usage() {
 	if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
 		$num = get_num_queries();
 		$mem = function_exists('memory_get_peak_usage') ? round(memory_get_peak_usage()/1024/1024,2) : 0;
