@@ -382,7 +382,7 @@ class XMLSF_Admin_Controller
 		$home_path = trailingslashit( get_home_path() );
 		$sitemaps = get_option( 'xmlsf_sitemaps' );
 		$check_for = is_array($sitemaps) ? $sitemaps : array();
-		if ( !empty( get_option('xmlsf_robots') ) ) {
+		if ( get_option('xmlsf_robots') ) {
 			$check_for['robots'] = 'robots.txt';
 		}
 
@@ -393,7 +393,7 @@ class XMLSF_Admin_Controller
 		}
 
 		if ( $update ) {
-			if ( !empty(self::$static_files) ) {
+			if ( !empty( self::$static_files ) ) {
 				update_option( 'xmlsf_static_files', self::$static_files, false );
 			} else {
 				delete_option( 'xmlsf_static_files' );

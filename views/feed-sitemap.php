@@ -52,7 +52,7 @@ foreach ( xmlsf_get_taxonomies() as $taxonomy ) : ?>
 endforeach;
 
 // custom URLs sitemap
-if ( !empty( apply_filters( 'xmlsf_custom_urls', get_option('xmlsf_urls') ) ) ) :
+if ( apply_filters( 'xmlsf_custom_urls', get_option('xmlsf_urls') ) ) :
 ?>
 	<sitemap>
 		<loc><?php echo xmlsf_get_index_url('custom'); ?></loc>

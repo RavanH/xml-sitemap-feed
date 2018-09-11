@@ -8,7 +8,7 @@
 	        <input type="checkbox" name="xmlsf_taxonomy_settings[active]" id="xmlsf_taxonomy_active" value="1"<?php checked( !empty( $taxonomy_settings['active'] ), true); ?> />
 	        <?php _e( 'Include taxonomies', 'xml-sitemap-feed' ); ?> (<?php echo count( $this->public_taxonomies() ); ?>)
 	    </label>
-		<?php if ( empty( $this->public_taxonomies() ) ) { ?>
+		<?php if ( ! $this->public_taxonomies() ) { ?>
 		<p class="description warning" style="color: red;">
 			<?php _e( 'No taxonomies available for the currently included post types.', 'xml-sitemap-feed' ); ?>
 		</p>

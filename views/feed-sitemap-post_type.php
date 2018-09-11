@@ -33,8 +33,6 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 // set empty sitemap flag
 $have_posts = false;
 
-echo get_query_var('post_type');
-
 // loop away!
 if ( have_posts() ) :
     while ( have_posts() ) :
@@ -42,14 +40,11 @@ if ( have_posts() ) :
 
 	// check if page is in the exclusion list (like front page or post meta)
 	// or if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
-	if ( !empty(
-			apply_filters(
-				'xmlsf_excluded',
-				get_post_meta( $post->ID, '_xmlsf_exclude', true ),
-				$post->ID
-			)
-		 ) || !xmlsf_is_allowed_domain( get_permalink() ) ) {
-
+	if ( apply_filters(
+			'xmlsf_excluded',
+			get_post_meta( $post->ID, '_xmlsf_exclude', true ),
+			$post->ID
+		 ) || xmlsf_is_allowed_domain( get_permalink() ) === false ) {
 		continue;
 	}
 

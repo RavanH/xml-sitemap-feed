@@ -12,7 +12,7 @@
 		echo implode( '<br/>', $tax_list );
 	?>
 
-	<?php if ( empty( $this->public_taxonomies() ) ) { ?>
+	<?php if ( ! $this->public_taxonomies() ) { ?>
 	<p class="description warning" style="color: red;">
 		<?php _e( 'No taxonomies available for the currently included post types.', 'xml-sitemap-feed' ); ?>
 	</p>

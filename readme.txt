@@ -279,15 +279,17 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.0.1 =
+= 5.0.2 =
 
 Bugfix release.
 
 == Changelog ==
 
-= 5.0.1 =
+= 5.0.2 =
+* FIX Custom post types with a hyphen not showing
 * FIX Admin static files message fatal error, thanks @kitchin
 * FIX Improper if statement in upgrade routine, thanks @kitchin
+* FIX PHP 5.4 compatibility issues
 
 = 5.0 =
 * Complete code restructure and cleanup: MVC and JIT inclusion

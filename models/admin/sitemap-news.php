@@ -7,7 +7,7 @@ class XMLSF_Admin_Sitemap_News_Sanitize
 		$sanitized = is_array( $new ) ? $new : array();
 
 		// at least one, default post type
-		if ( empty( $sanitized['post_type'] || !is_array( $sanitized['post_type'] ) ) ) {
+		if ( empty( $sanitized['post_type'] ) || !is_array( $sanitized['post_type'] ) ) {
 			$sanitized['post_type'] = array('post');
 		}
 

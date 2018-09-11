@@ -82,25 +82,18 @@ function xmlsf_sitemap_news_filter_request( $request ) {
  *
  * @return string
  */
-function xmlsf_the_news_language( $post_id ) {
+function xmlsf_get_language( $post_id ) {
 
-	if ( empty(xmlsf()->blog_language) ) {
-		// get site language for default language
-		xmlsf()->blog_language = xmlsf_parse_language_string( get_bloginfo('language') );
-	}
+	$language = xmlsf()->blog_language();
 
-	$language = xmlsf()->blog_language;
-
+	// WPML compat
+	global $sitepress;
 	// Polylang
 	if ( function_exists('pll_get_post_language') ) {
 		$lang = pll_get_post_language( $post_id, 'slug' );
 		if ( !empty($lang) )
 			$language = xmlsf_parse_language_string( $lang );
-	}
-
-	// WPML compat
-	global $sitepress;
-	if ( is_object($sitepress) && method_exists($sitepress, 'get_language_for_element') ) {
+	} elseif ( is_object($sitepress) && method_exists($sitepress, 'get_language_for_element') ) {
 		$post_type = (array) get_query_var( 'post_type', 'post' );
 		$lang = $sitepress->get_language_for_element( $post_id, 'post_'.$post_type[0] );
 		//apply_filters( 'wpml_element_language_code', null, array( 'element_id' => $post_id, 'element_type' => $post_type ) );
@@ -108,7 +101,7 @@ function xmlsf_the_news_language( $post_id ) {
 			$language = xmlsf_parse_language_string( $lang );
 	}
 
-	return '<news:language>' . apply_filters( 'xmlsf_post_language', $language, $post_id ) . '</news:language>' . PHP_EOL;
+	return apply_filters( 'xmlsf_post_language', $language, $post_id );
 }
 
 /**

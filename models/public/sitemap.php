@@ -44,7 +44,8 @@ function xmlsf_get_lastmod( $sitemap = 'post_type', $term = '' ) {
  */
 function xmlsf_get_root_data() {
 	// language roots
-	global $sitepress; // Polylang and WPML compat
+	global $sitepress;
+	// Polylang and WPML compat
 	if ( function_exists('pll_the_languages') && function_exists('pll_home_url') ) {
 		$languages = pll_the_languages( array( 'raw' => 1 ) );
 		if ( is_array($languages) ) {
@@ -69,7 +70,7 @@ function xmlsf_get_root_data() {
 	} else {
 		// single site root
 		$data = array(
-			home_url() => array(
+			trailingslashit( home_url() ) => array(
 				'priority' => '1.0',
 				'lastmod' => mysql2date( 'Y-m-d\TH:i:s+00:00', get_lastpostdate('gmt'), false )
 			)
@@ -125,16 +126,16 @@ function xmlsf_get_frontpages() {
  */
 function xmlsf_get_translations( $post_id ) {
 	$translation_ids = array();
+
+	// WPML compat
+	global $sitepress;
 	// Polylang compat
 	if ( function_exists('pll_get_post_translations') ) {
 		$translations = pll_get_post_translations($post_id);
 		foreach ( $translations as $slug => $id ) {
 			if ( $post_id != $id ) $translation_ids[] = $id;
 		}
-	}
-	// WPML compat
-	global $sitepress;
-	if ( is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'get_object_id') ) {
+	} elseif ( is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'get_object_id') ) {
 		foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term ) {
 			$id = $sitepress->get_object_id($post_id,'page',false,$term);
 			if ( $post_id != $id ) $translation_ids[] = $id;

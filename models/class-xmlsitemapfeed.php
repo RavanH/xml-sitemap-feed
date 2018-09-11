@@ -233,6 +233,21 @@ class XMLSitemapFeed {
 	 * Get scheme
 	 * @return string
 	 */
+	public function blog_language() {
+		if ( $this->blog_language === null ) {
+			// get site language for default language
+			$this->blog_language = xmlsf_parse_language_string( get_bloginfo('language') );
+		}
+
+		return $this->blog_language;
+	}
+
+
+
+	/**
+	 * Get scheme
+	 * @return string
+	 */
 	public function scheme() {
 		// scheme to use
 		if ( empty($this->scheme) ) {
