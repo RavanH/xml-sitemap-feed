@@ -69,7 +69,7 @@ class XMLSF_Admin_Sitemap_Sanitize
 		return $sanitized;
 	}
 
-	private static function priority( $priority, $min = 0.0, $max = 1.0 )
+	public static function priority( $priority, $min = 0.0, $max = 1.0 )
 	{
 		$priority = floatval(str_replace(",",".",$priority));
 
