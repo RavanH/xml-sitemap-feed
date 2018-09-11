@@ -247,7 +247,7 @@ class XMLSF_Admin_Controller
 			return;
 
 		// _xmlsf_priority
-		if ( isset($_POST['xmlsf_priority']) && is_numeric($_POST['xmlsf_priority']) ) {
+		if ( isset($_POST['xmlsf_priority']) ) {
 			update_post_meta($post_id, '_xmlsf_priority', XMLSF_Admin_Sitemap_Sanitize::priority($_POST['xmlsf_priority']) );
 		} else {
 			delete_post_meta($post_id, '_xmlsf_priority');

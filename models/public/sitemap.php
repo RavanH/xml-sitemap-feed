@@ -275,16 +275,20 @@ function xmlsf_modified( $sitemap = 'post_type', $term = '' ) {
  * @return floatval
  */
 function xmlsf_get_priority( $sitemap = 'post_type', $term = '' ) {
+
+	// locale LC_NUMERIC should be set to C for these calculations
+	// it is assumed to be done at the request filter
+	//setlocale( LC_NUMERIC, 'C' );
+
 	$priority = 0.5;
 
 	if ( 'post_type' == $sitemap ) :
 
 		global $post;
 		$options = get_option( 'xmlsf_post_types' );
-		$priority_meta = get_metadata( 'post', $post->ID, '_xmlsf_priority', true );
 		$priority = isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ? floatval($options[$post->post_type]['priority']) : 0.5;
 
-		if ( '' !== $priority_meta ) {
+		if ( $priority_meta = get_metadata( 'post', $post->ID, '_xmlsf_priority', true ) ) {
 			$priority = floatval(str_replace(',','.',$priority_meta));
 		} elseif ( !empty($options[$post->post_type]['dynamic_priority']) ) {
 			$post_modified = mysql2date('U',$post->post_modified_gmt, false);

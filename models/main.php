@@ -11,6 +11,9 @@ function xmlsf_filter_request( $request ) {
 
 	if ( isset($request['feed']) && strpos($request['feed'],'sitemap') === 0 ) :
 
+		// make sure we have the proper locale setting for calculations
+		setlocale( LC_NUMERIC, 'C' );
+
 		require_once XMLSF_DIR . '/controllers/public/shared.php';
 		require_once XMLSF_DIR . '/models/public/shared.php';
 
