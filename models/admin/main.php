@@ -27,6 +27,8 @@ function xmlsf_nginx_helper_purge_urls( $urls = array(), $redis = false ) {
 			$urls[] = '/sitemap-home.xml';
 			$urls[] = '/sitemap-custom.xml';
 
+			include_once XMLSF_DIR . '/models/public/sitemap.php';
+
 			// add public post types sitemaps
 			$post_types = get_option( 'xmlsf_post_types' );
 			if ( is_array($post_types) )
@@ -88,7 +90,7 @@ class XMLSF_Admin_Sanitize
 		}
 
 		if ( !empty($new['sitemap']) ) {
-			$sanitized['sitemap'] = apply_filters( 'xmlsf_sitemap_filename', $new['sitemap'] );			
+			$sanitized['sitemap'] = apply_filters( 'xmlsf_sitemap_filename', $new['sitemap'] );
 		}
 
 		if ( !empty($new['sitemap-news']) ) {
