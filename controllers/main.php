@@ -13,14 +13,12 @@ function xmlsf_rewrite_rules() {
 	$sitemaps = get_option( 'xmlsf_sitemaps' );
 
 	if ( isset($sitemaps['sitemap']) ) {
-
 		/* One rule to ring them all */
 		add_rewrite_rule('sitemap([a-z0-9_-]+)?\.([0-9]+)?\.?xml$', $wp_rewrite->index . '?feed=sitemap$matches[1]&m=$matches[2]', 'top');
+	}
 
-	} elseif( isset($sitemaps['sitemap-news']) ) {
-
+	if( isset($sitemaps['sitemap-news']) ) {
 		add_rewrite_rule('sitemap-news\.xml$', $wp_rewrite->index . '?feed=sitemap-news', 'top');
-
 	}
 }
 
