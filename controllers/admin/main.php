@@ -9,7 +9,7 @@ class XMLSF_Admin_Controller
 	 * Static files conflicting with this plugin
 	 * @var array
 	 */
-	public static $static_files = array();
+	public static $static_files = null;
 
 	/**
 	 * CONSTRUCTOR
@@ -39,10 +39,13 @@ class XMLSF_Admin_Controller
 		// ACTION LINK
 		add_filter( 'plugin_action_links_' . XMLSF_BASENAME, 'xmlsf_add_action_link' );
 
-		add_action( 'admin_init', array( $this, 'transients_actions' ), 0 );
-		add_action( 'admin_init', array( $this, 'tools_actions' ), 0 );
+		add_action( 'admin_init', array( $this, 'notices_actions' ) );
+		add_action( 'admin_init', array( $this, 'transients_actions' ) );
+		add_action( 'admin_init', array( $this, 'tools_actions' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
-		add_action( 'admin_init', array( $this, 'admin_notices' ) );
+		if ( ( !is_multisite() && current_user_can( 'manage_options' ) ) || is_super_admin() )
+			add_action( 'admin_init', array( $this, 'verify_static_files' ) );
+		add_action( 'admin_init', array( $this, 'verify_wpseo_settings' ) );
 	}
 
 	/**
@@ -274,7 +277,7 @@ class XMLSF_Admin_Controller
 	public function clear_settings()
 	{
 		if ( !isset( $_POST['_xmlsf_help_nonce'] ) || !wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
-			add_action( 'admin_notices', array('XMLSF_Admin_Notices','admin_notice_nonce_fail') );
+			add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_nonce_fail') );
 			return;
 		}
 
@@ -288,7 +291,7 @@ class XMLSF_Admin_Controller
 		delete_option( 'xmlsf_static_files' );
 		delete_option( 'xmlsf_pong' );
 
-		add_action( 'admin_notices', array('XMLSF_Admin_Notices','clear_settings_admin_notice') );
+		add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_clear_settings') );
 	}
 
 	/**
@@ -338,7 +341,7 @@ class XMLSF_Admin_Controller
 	public function delete_static_files()
 	{
 		if ( !isset( $_POST['_xmlsf_notice_nonce'] ) || !wp_verify_nonce( $_POST['_xmlsf_notice_nonce'], XMLSF_BASENAME.'-notice' ) ) {
-			add_action( 'admin_notices', array('XMLSF_Admin_Notices','admin_notice_nonce_fail') );
+			add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_nonce_fail') );
 			return;
 		}
 
@@ -348,56 +351,92 @@ class XMLSF_Admin_Controller
 
 		$allowed_files = array('sitemap.xml','sitemap-news.xml','robots.txt');
 
-		$this->check_static_files( false );
+		$this->verify_static_files( false );
 
 		$i = '1';
 		foreach ( $_POST['xmlsf-delete'] as $name ) {
 			if ( !in_array($name,$allowed_files) ) {
 				unset(self::$static_files[$name]);
-				add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_admin_notice_not_allowed'), $i );
+				add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_not_allowed'), $i );
 				continue;
 			}
 			if ( !isset(self::$static_files[$name]) ) {
-				//add_action( 'admin_notices', array($this,'static_files_admin_notice_not_found') );
 				// do nothing and be quiet about it...
 				continue;
 			}
 			if ( unlink(self::$static_files[$name]) ) {
 				unset(self::$static_files[$name]);
-				add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_admin_notice_deleted'), $i );
+				add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_deleted'), $i );
 			} else {
-				add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_admin_notice_failed'), $i );
+				add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_failed'), $i );
 			}
 			$i ++;
 		}
 
-		$this->check_static_files();
+		$this->verify_static_files();
+	}
+
+	/**
+	 * Check for conflicting WPSEO settings
+	 */
+	public function verify_wpseo_settings()
+	{
+		// WP SEO Plugin conflict notice
+		if ( is_plugin_active('wordpress-seo/wp-seo.php') ) {
+			// check date archive redirection
+			$wpseo_titles = get_option( 'wpseo_titles' );
+			if ( !empty( $wpseo_titles['disable-date'] ) ) {
+				// check is Split by option is set anywhere
+				foreach ( (array) get_option( 'xmlsf_post_types' ) as $type => $settings ) {
+					if ( is_array( $settings ) && !empty( $settings['archive'] ) ) {
+						add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_wpseo_date_redirect' ) );
+						break;
+					}
+				}
+			}
+			// check wpseo sitemap option
+			$wpseo = get_option( 'wpseo' );
+			$sitemaps = get_option( 'xmlsf_sitemaps' );
+			if ( !empty( $wpseo['enable_xml_sitemap'] ) && !empty( $sitemaps['sitemap'] ) ) {
+				add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_wpseo_sitemap' ) );
+			}
+		}
 	}
 
 	/**
 	 * Check for static sitemap files
 	 */
-	public function check_static_files( $update = true )
+	public function verify_static_files( $hard = false )
 	{
-		$home_path = trailingslashit( get_home_path() );
-		$sitemaps = get_option( 'xmlsf_sitemaps' );
-		$check_for = is_array($sitemaps) ? $sitemaps : array();
-		if ( get_option('xmlsf_robots') ) {
-			$check_for['robots'] = 'robots.txt';
-		}
-
-		foreach ( $check_for as $name => $pretty ) {
-			if ( file_exists( $home_path . $pretty ) ) {
-				self::$static_files[$pretty] = $home_path . $pretty;
+		// STATIC FILES Notice
+		if ( false === $hard ) {
+			if ( null === self::$static_files )
+				self::$static_files = get_option( 'xmlsf_static_files', array() );
+		} else {
+			$home_path = trailingslashit( get_home_path() );
+			$sitemaps = get_option( 'xmlsf_sitemaps' );
+			self::$static_files = array();
+			$check_for = is_array($sitemaps) ? $sitemaps : array();
+			if ( get_option('xmlsf_robots') ) {
+				$check_for['robots'] = 'robots.txt';
 			}
-		}
 
-		if ( $update ) {
+			foreach ( $check_for as $name => $pretty ) {
+				if ( file_exists( $home_path . $pretty ) ) {
+					self::$static_files[$pretty] = $home_path . $pretty;
+				}
+			}
+
 			if ( !empty( self::$static_files ) ) {
 				update_option( 'xmlsf_static_files', self::$static_files, false );
 			} else {
 				delete_option( 'xmlsf_static_files' );
+				add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_none_found') );
 			}
+		}
+
+		if ( !empty(self::$static_files) ) {
+			add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_static_files') );
 		}
 	}
 
@@ -407,32 +446,33 @@ class XMLSF_Admin_Controller
 			$this->clear_settings();
 		}
 
+		if ( isset( $_POST['xmlsf-delete-submit'] ) ) {
+			$this->delete_static_files();
+		}
+
 		if ( isset( $_POST['xmlsf-check-conflicts'] ) ) {
 			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
 				// reset ignored warnings
-				delete_user_meta( get_current_user_id(), 'xmlsf_static_files_warning_dismissed' );
-				delete_user_meta( get_current_user_id(), 'xmlsf_date_redirect_error_dismissed' );
+				delete_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
 
-				$this->check_static_files();
+				$this->verify_static_files( true );
 
-				if ( empty(self::$static_files) )
-					add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_admin_notice_none_found') );
+				$this->verify_wpseo_settings();
 
 			} else {
-				add_action( 'admin_notices', array('XMLSF_Admin_Notices','admin_notice_nonce_fail') );
+				add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_nonce_fail') );
 			}
 		}
+	}
 
-		if ( isset( $_POST['xmlsf-static-dismiss'] ) ) {
-			self::$static_files_admin_notice_dismiss();
-		}
-
-		if ( isset( $_POST['xmlsf-date-dismiss'] ) ) {
-			$this->date_redirect_admin_notice_dismiss();
-		}
-
-		if ( isset( $_POST['xmlsf-delete-submit'] ) ) {
-			$this->delete_static_files();
+	public function notices_actions()
+	{
+		if ( isset( $_POST['xmlsf-dismiss'] ) ) {
+			if ( isset( $_POST['_xmlsf_notice_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_notice_nonce'], XMLSF_BASENAME.'-notice' ) ) {
+				add_user_meta( get_current_user_id(), 'xmlsf_dismissed', $_POST['xmlsf-dismiss'], false );
+			} else {
+				add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_nonce_fail') );
+			}
 		}
 	}
 
@@ -447,36 +487,8 @@ class XMLSF_Admin_Controller
 		}
 
 		// CATCH TRANSIENT for static file check
-		if ( delete_transient('xmlsf_check_static_files') ) {
-			$this->check_static_files();
-		}
-	}
-
-	public function admin_notices()
-	{
-		// STATIC FILES Notice
-		if ( current_user_can( 'manage_options' ) || ( is_multisite() && is_super_admin() ) ) {
-
-			self::$static_files = get_option( 'xmlsf_static_files', array() );
-
-			if ( !empty(self::$static_files) ) {
-				add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_admin_notice') );
-			}
-		}
-
-		// WP SEO Plugin conflict notice
-		if ( is_plugin_active('wordpress-seo/wp-seo.php') ) {
-			// check date archive redirection
-			$wpseo_titles = (array) get_option( 'wpseo_titles' );
-			if ( !empty( $wpseo_titles['disable-date'] ) ) {
-				// check is Split by option is set anywhere
-				foreach ( (array) get_option( 'xmlsf_post_types' ) as $type => $settings ) {
-					if ( is_array( $settings ) && !empty( $settings['archive'] ) ) {
-						add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'wpseo_date_redirect_admin_notice' ) );
-						break;
-					}
-				}
-			}
+		if ( delete_transient('xmlsf_verify_static_files') ) {
+			$this->verify_static_files( true );
 		}
 	}
 }

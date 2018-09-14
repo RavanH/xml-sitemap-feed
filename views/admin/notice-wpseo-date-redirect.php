@@ -16,6 +16,7 @@
 	<form action="" method="post">
 		<?php wp_nonce_field( XMLSF_BASENAME.'-notice', '_xmlsf_notice_nonce' ); ?>
 		<p>
+			<input type="hidden" name="xmlsf-dismiss" value="date_redirect" />
 			<input type="submit" class="button button-small" name="xmlsf-date-dismiss" value="<?php echo translate('Dismiss'); ?>" />
 		</p>
 	</form>
