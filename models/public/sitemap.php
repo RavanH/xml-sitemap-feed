@@ -191,7 +191,7 @@ function xmlsf_modified( $sitemap = 'post_type', $term = '' ) {
 
 		// if blog page then look for last post date
 		if ( $post->post_type == 'page' && xmlsf_is_home($post->ID) ) {
-			return get_lastpostmodified('gmt'); // TODO limit to sitemap included post types...
+			return get_lastpostmodified('gmt');
 		}
 
 		$lastmod = get_post_modified_time( 'Y-m-d H:i:s', true, $post->ID );
@@ -577,13 +577,13 @@ if( !function_exists('_get_post_time') ) {
 	$key = "{$which}post{$field}{$m}:$timezone";
 
 	if ( 'any' !== $post_type ) {
-        $key .= ':' . sanitize_key( $post_type );
-    }
+		$key .= ':' . sanitize_key( $post_type );
+	}
 
 	$date = wp_cache_get( $key, 'timeinfo' );
-    if ( false !== $date ) {
-        return $date;
-    }
+	if ( false !== $date ) {
+		return $date;
+	}
 
 	if ( $post_type === 'any' ) {
 		$post_types = get_post_types( array( 'public' => true ) );
@@ -639,3 +639,10 @@ if( !function_exists('_get_post_time') ) {
     return false;
  }
 }
+/* CODE SUGGESTION BY Frédéric Demarle
+ * to make this language aware.
+
+"SELECT post_{$field}_gmt FROM $wpdb->posts" . PLL()->model->post->join_clause()
+."WHERE post_status = 'publish' AND post_type IN ({$post_types})" . PLL()->model->post->where_clause( $lang )
+. ORDER BY post_{$field}_gmt DESC LIMIT 1
+*/

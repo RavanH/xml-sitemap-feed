@@ -250,10 +250,10 @@ class XMLSF_Admin_Controller
 			return;
 
 		// _xmlsf_priority
-		if ( isset($_POST['xmlsf_priority']) ) {
-			update_post_meta($post_id, '_xmlsf_priority', XMLSF_Admin_Sitemap_Sanitize::priority($_POST['xmlsf_priority']) );
-		} else {
+		if ( empty($_POST['xmlsf_priority']) && '0' !== $_POST['xmlsf_priority'] ) {
 			delete_post_meta($post_id, '_xmlsf_priority');
+		} else {
+			update_post_meta($post_id, '_xmlsf_priority', XMLSF_Admin_Sitemap_Sanitize::priority($_POST['xmlsf_priority']) );
 		}
 
 		// _xmlsf_exclude
