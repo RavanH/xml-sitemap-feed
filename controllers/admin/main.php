@@ -44,7 +44,7 @@ class XMLSF_Admin_Controller
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		if ( ( !is_multisite() && current_user_can( 'manage_options' ) ) || is_super_admin() )
-			add_action( 'admin_init', array( $this, 'verify_static_files' ) );
+			add_action( 'admin_init', array( $this, 'static_files' ) );
 		add_action( 'admin_init', array( $this, 'verify_wpseo_settings' ) );
 	}
 
@@ -351,7 +351,7 @@ class XMLSF_Admin_Controller
 
 		$allowed_files = array('sitemap.xml','sitemap-news.xml','robots.txt');
 
-		$this->verify_static_files( false );
+		$this->static_files();
 
 		$i = '1';
 		foreach ( $_POST['xmlsf-delete'] as $name ) {
@@ -406,37 +406,38 @@ class XMLSF_Admin_Controller
 	/**
 	 * Check for static sitemap files
 	 */
-	public function verify_static_files( $hard = false )
+	public function static_files()
 	{
-		// STATIC FILES Notice
-		if ( false === $hard ) {
-			if ( null === self::$static_files )
-				self::$static_files = get_option( 'xmlsf_static_files', array() );
-		} else {
-			$home_path = trailingslashit( get_home_path() );
-			$sitemaps = get_option( 'xmlsf_sitemaps' );
-			self::$static_files = array();
-			$check_for = is_array($sitemaps) ? $sitemaps : array();
-			if ( get_option('xmlsf_robots') ) {
-				$check_for['robots'] = 'robots.txt';
-			}
+		if ( null === self::$static_files )
+			self::$static_files = get_option( 'xmlsf_static_files', array() );
 
-			foreach ( $check_for as $name => $pretty ) {
-				if ( file_exists( $home_path . $pretty ) ) {
-					self::$static_files[$pretty] = $home_path . $pretty;
-				}
-			}
+		if ( !empty(self::$static_files) )
+			add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_static_files') );
+	}
 
-			if ( !empty( self::$static_files ) ) {
-				update_option( 'xmlsf_static_files', self::$static_files, false );
-			} else {
-				delete_option( 'xmlsf_static_files' );
-				add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_none_found') );
+	/**
+	 * Check for static sitemap files
+	 */
+	public function verify_static_files()
+	{
+		$home_path = trailingslashit( get_home_path() );
+		$sitemaps = get_option( 'xmlsf_sitemaps' );
+		self::$static_files = array();
+		$check_for = is_array($sitemaps) ? $sitemaps : array();
+		if ( get_option('xmlsf_robots') ) {
+			$check_for['robots'] = 'robots.txt';
+		}
+
+		foreach ( $check_for as $name => $pretty ) {
+			if ( file_exists( $home_path . $pretty ) ) {
+				self::$static_files[$pretty] = $home_path . $pretty;
 			}
 		}
 
-		if ( !empty(self::$static_files) ) {
-			add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_static_files') );
+		if ( !empty( self::$static_files ) ) {
+			update_option( 'xmlsf_static_files', self::$static_files, false );
+		} else {
+			delete_option( 'xmlsf_static_files' );
 		}
 	}
 
@@ -455,7 +456,9 @@ class XMLSF_Admin_Controller
 				// reset ignored warnings
 				delete_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
 
-				$this->verify_static_files( true );
+				$this->verify_static_files();
+				if ( empty( self::$static_files ) )
+					add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_none_found') );
 
 				$this->verify_wpseo_settings();
 
@@ -488,7 +491,7 @@ class XMLSF_Admin_Controller
 
 		// CATCH TRANSIENT for static file check
 		if ( delete_transient('xmlsf_verify_static_files') ) {
-			$this->verify_static_files( true );
+			$this->verify_static_files();
 		}
 	}
 }

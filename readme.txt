@@ -5,7 +5,7 @@ Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Googl
 Requires at least: 4.4
 Requires PHP: 5.4
 Tested up to: 4.9
-Stable tag: 5.0.5
+Stable tag: 5.0.6
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -285,7 +285,9 @@ Bugfix release.
 
 == Changelog ==
 
-= 5.0.5 =
+= 5.0.6 =
+* NEW Admin warning on conflicting plugin settings
+* FIX Empty post priority saved as 0.0
 * FIX Call to undefined function xmlsf_get_archives()
 * FIX force LC_NUMERIC locale to C
 * FIX Call to private method
