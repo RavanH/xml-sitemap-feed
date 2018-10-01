@@ -33,30 +33,35 @@
 	</div>
 
 	<div class="sidebar">
-		<h3><?php echo translate('View'); ?></h3>
+		<h3><span class="dashicons dashicons-welcome-view-site"></span> <?php echo translate('View'); ?></h3>
 		<p>
-			<a href="<?php echo trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap' : $options['sitemap'] ); ?>" target="_blank" class="button button-large"><?php _e('XML Sitemap Index','xml-sitemap-feed'); ?></a>
+			<?php
+			printf (
+			/* translators: Sitemap name with URL */
+			__( 'Open your %s', 'xml-sitemap-feed' ),
+			'<strong><a href="'.$url.'" target="_blank">'.__('XML Sitemap Index','xml-sitemap-feed') . '</a></strong><span class="dashicons dashicons-external"></span>'
+			); ?>
 		</p>
 
-		<h3><?php echo translate('Tools'); ?></h3>
+		<h3><span class="dashicons dashicons-admin-tools"></span> <?php echo translate('Tools'); ?></h3>
 		<form action="" method="post">
 			<?php wp_nonce_field( XMLSF_BASENAME.'-help', '_xmlsf_help_nonce' ); ?>
 			<input type="submit" name="xmlsf-check-conflicts" class="button button-small" value="<?php _e( 'Check for conflicts', 'xml-sitemap-feed' ); ?>" /> &nbsp;
 			<input type="submit" name="xmlsf-clear-settings" class="button button-small" value="<?php _e( 'Reset XML sitemaps', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm('<?php _e('Clear all XML Sitemap & Google News Sitemap settings.','xml-sitemap-feed'); ?> <?php _e('This will revert all your sitemap settings to the plugin defaults.','xml-sitemap-feed'); ?>\n\n<?php echo translate('Are you sure you want to do this?'); ?>')" />
 		</form>
 
-		<h3><?php echo translate('Help'); ?></h3>
+		<h3><span class="dashicons dashicons-sos"></span> <?php echo translate('Help'); ?></h3>
 		<p>
 			<?php printf (
-			/* translators: Plugin name, Support forum URL on WordPress.org */
-			__( 'These options are provided by %1$s. For help, please go to <a href="%2$s" target="_blank">Support</a>.', 'xml-sitemap-feed' ),
-			'<strong>'.__('XML Sitemap & Google News','xml-sitemap-feed') . '</strong>', 'https://wordpress.org/support/plugin/xml-sitemap-feed'
+			/* translators: Support forum URL on WordPress.org */
+			__( 'You can find instructions on the help tab above. If you still have questions, please go to the <a href="%s" target="_blank">Support forum</a>.', 'xml-sitemap-feed' ),
+			'https://wordpress.org/support/plugin/xml-sitemap-feed'
 			); ?>
 		</p>
 
 		<?php include XMLSF_DIR . '/views/admin/help-tab-sidebar.php'; ?>
 
-		<h3><?php _e('Contribute','xml-sitemap-feed'); ?></h3>
+		<h3><span class="dashicons dashicons-thumbs-up"></span> <?php _e('Contribute','xml-sitemap-feed'); ?></h3>
 		<p>
 			<?php printf (
 			/* translators: Review page URL and Translation page URL on WordPress.org */

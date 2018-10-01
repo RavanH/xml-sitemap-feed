@@ -65,6 +65,7 @@ class XMLSF_Admin_Sitemap_News
 		add_settings_field( 'xmlsf_news_labels', __('Source labels', 'xml-sitemap-feed' ), array($this,'labels_field'), 'xmlsf-news', 'news_sitemap_section' );
 
 		$options = (array) get_option( 'xmlsf_sitemaps' );
+		$url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap-news' : $options['sitemap-news'] );
 
 		include XMLSF_DIR . '/views/admin/page-sitemap-news.php';
     }
@@ -159,6 +160,7 @@ class XMLSF_Admin_Sitemap_News
 
 	public function post_type_field()
 	{
+		global $wp_taxonomies;
 		$post_types = apply_filters( 'xmlsf_news_post_types', get_post_types( array( 'public' => true ) /*,'objects'*/) );
 
 		if ( is_array($post_types) && !empty($post_types) ) :
@@ -166,20 +168,16 @@ class XMLSF_Admin_Sitemap_News
 			$news_post_type = isset($this->options['post_type']) && !empty( $this->options['post_type'] ) ? (array) $this->options['post_type'] : array('post');
 
 			$type = ( 1 == count( $news_post_type ) ) ? 'radio' : 'checkbox';
-			//{
-				// The actual fields for data entry
-				//include XMLSF_DIR . '/views/admin/field-news-post-type.php';
-			//} else {
-				global $wp_taxonomies;
-				$allowed = ( !empty( $this->options['categories'] ) && isset( $wp_taxonomies['category'] ) ) ? $wp_taxonomies['category']->object_type : $post_types;
 
-				$do_warning = !empty( $this->options['categories'] ) && count($post_types) > 1 ? true : false;
+			$allowed = ( !empty( $this->options['categories'] ) && isset( $wp_taxonomies['category'] ) ) ? $wp_taxonomies['category']->object_type : $post_types;
 
-				// The actual fields for data entry
-				include XMLSF_DIR . '/views/admin/field-news-post-type.php';
-			//}
+			$do_warning = !empty( $this->options['categories'] ) && count($post_types) > 1 ? true : false;
+
+			// The actual fields for data entry
+			include XMLSF_DIR . '/views/admin/field-news-post-type.php';
 
 		else :
+
 			echo '<p class="description warning">'.__('There appear to be no post types available.','xml-sitemap-feed').'</p>';
 
 		endif;

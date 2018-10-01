@@ -88,6 +88,7 @@ class XMLSF_Admin_Sitemap
 		$active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'post_types';
 
 		$options = (array) get_option( 'xmlsf_sitemaps' );
+		$url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap' : $options['sitemap'] );
 
 		include XMLSF_DIR . '/views/admin/page-sitemap.php';
     }
@@ -134,7 +135,6 @@ class XMLSF_Admin_Sitemap
 
 		ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-post-types.php';
-		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
