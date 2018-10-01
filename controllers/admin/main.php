@@ -202,7 +202,7 @@ class XMLSF_Admin_Controller
 		$description = sprintf(
 			__('Leave empty for automatic Priority as configured on %1$s > %2$s.','xml-sitemap-feed'),
 			translate('Settings'),
-			'<a href="' . admin_url('options-reading.php') . '#xmlsf">' . translate('Reading') . '</a>'
+			'<a href="' . admin_url('options-general.php') . '?page=xmlsf">' . __('XML Sitemap','xml-sitemap-feed') . '</a>'
 		);
 
 		// The actual fields for data entry
