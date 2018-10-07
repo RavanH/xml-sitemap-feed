@@ -27,7 +27,8 @@ class XMLSitemapFeed_Uninstall {
 	 *
 	 * @since 4.4
 	 */
-	function __construct() {
+	function __construct()
+	{
 		global $wpdb;
 
 		// check if it is a multisite and if XMLSF_MULTISITE_UNINSTALL constant is defined
@@ -49,16 +50,8 @@ class XMLSitemapFeed_Uninstall {
 	 *
 	 * @since 4.4
 	 */
-	function uninstall($blog_id = false) {
-		// delete all taxonomy terms
-		//register_taxonomy( 'gn-genre', null );
-
-		//$terms = get_terms( 'gn-genre', array('hide_empty' => false) );
-
-		//if ( is_array($terms) )
-		//	foreach ( $terms as $term )
-		//		wp_delete_term(	$term->term_id, 'gn-genre' );
-
+	function uninstall($blog_id = false)
+	{
 		// remove plugin settings
 		delete_option('xmlsf_static_files');
 		delete_option('xmlsf_version');
@@ -66,9 +59,7 @@ class XMLSitemapFeed_Uninstall {
 		delete_option('xmlsf_post_types');
 		delete_option('xmlsf_taxonomies');
 		delete_option('xmlsf_taxonomy_settings');
-		delete_option('xmlsf_news_sitemap');
 		delete_option('xmlsf_ping');
-		delete_option('xmlsf_pong');
 		delete_option('xmlsf_robots');
 		delete_option('xmlsf_urls');
 		delete_option('xmlsf_custom_sitemaps');
