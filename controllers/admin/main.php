@@ -373,7 +373,7 @@ class XMLSF_Admin_Controller
 			$i ++;
 		}
 
-		$this->verify_static_files();
+		$this->check_static_files();
 	}
 
 	/**
@@ -418,7 +418,7 @@ class XMLSF_Admin_Controller
 	/**
 	 * Check for static sitemap files
 	 */
-	public function verify_static_files()
+	public function check_static_files()
 	{
 		$home_path = trailingslashit( get_home_path() );
 		$sitemaps = get_option( 'xmlsf_sitemaps' );
@@ -456,7 +456,7 @@ class XMLSF_Admin_Controller
 				// reset ignored warnings
 				delete_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
 
-				$this->verify_static_files();
+				$this->check_static_files();
 				if ( empty( self::$static_files ) )
 					add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_none_found') );
 
@@ -490,8 +490,8 @@ class XMLSF_Admin_Controller
 		}
 
 		// CATCH TRANSIENT for static file check
-		if ( delete_transient('xmlsf_verify_static_files') ) {
-			$this->verify_static_files();
+		if ( delete_transient('xmlsf_check_static_files') ) {
+			$this->check_static_files();
 		}
 	}
 }

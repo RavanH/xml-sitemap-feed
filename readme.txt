@@ -279,13 +279,14 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.0.5 =
+= 5.0.7 =
 
 Bugfix release.
 
 == Changelog ==
 
-= 5.0.6 =
+= 5.0.7 =
+* FIX static files check on activation
 * NEW Admin warning on conflicting plugin settings
 * FIX Empty post priority saved as 0.0
 * FIX Call to undefined function xmlsf_get_archives()
