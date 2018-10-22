@@ -50,12 +50,12 @@ function xmlsf_sitemap_news_filter_request( $request ) {
 
 	// set up query filters
 	$live = false;
-	if ( is_array($post_types) )
-		foreach ($post_types as $post_type)
-			if ( get_lastpostdate('gmt', $post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
-				$live = true;
-				break;
-			};
+	foreach ($post_types as $post_type) {
+		if ( get_lastpostdate('gmt', $post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
+			$live = true;
+			break;
+		}
+	}
 
 	if ( $live ) {
 		add_filter( 'post_limits', 'xmlsf_news_filter_limits' );

@@ -110,12 +110,14 @@ function xmlsf_is_allowed_domain( $url ) {
 	$return = false;
 	$parsed_url = parse_url($url);
 
-	if (isset($parsed_url['host']))
-		foreach ( $domains as $domain )
+	if (isset($parsed_url['host'])) {
+		foreach ( $domains as $domain ) {
 			if ( $parsed_url['host'] == $domain || strpos($parsed_url['host'],'.'.$domain) !== false ) {
 				$return = true;
 				break;
-			};
+			}
+		}
+	}
 
 	return apply_filters( 'xmlsf_allowed_domain', $return, $url );
 }
