@@ -48,7 +48,7 @@ if ( have_posts() ) :
 		 	'xmlsf_news_excluded',
 		 	get_post_meta( $post->ID, '_xmlsf_news_exclude', true ),
 		 	$post->ID
-		 ) || xmlsf_is_allowed_domain( get_permalink() ) === false )
+		 ) || !xmlsf_is_allowed_domain( get_permalink() ) )
 		continue;
 
 	$have_posts = true;

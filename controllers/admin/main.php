@@ -43,6 +43,7 @@ class XMLSF_Admin_Controller
 		add_action( 'admin_init', array( $this, 'transients_actions' ) );
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_init', array( $this, 'register_meta_boxes' ) );
 		if ( ( !is_multisite() && current_user_can( 'manage_options' ) ) || is_super_admin() )
 			add_action( 'admin_init', array( $this, 'static_files' ) );
 		add_action( 'admin_init', array( $this, 'verify_wpseo_settings' ) );
@@ -51,6 +52,42 @@ class XMLSF_Admin_Controller
 	/**
 	* SETTINGS
 	*/
+
+	/**
+	 * Register settings and add settings fields
+	 */
+
+	public function register_settings()
+	{
+		$sitemaps = (array) get_option( 'xmlsf_sitemaps' );
+
+		// sitemaps
+		register_setting( 'reading', 'xmlsf_sitemaps', array('XMLSF_Admin_Sanitize','sitemaps_settings') );
+		add_settings_field( 'xmlsf_sitemaps', __('Enable XML sitemaps','xml-sitemap-feed'), array($this,'sitemaps_settings_field'), 'reading' );
+
+		// custom domains, only when any sitemap is active
+		if ( isset($sitemaps['sitemap']) || isset($sitemaps['sitemap-news']) ) {
+			register_setting( 'reading', 'xmlsf_domains', array('XMLSF_Admin_Sanitize','domains_settings') );
+			add_settings_field( 'xmlsf_domains', __('Allowed domains','xml-sitemap-feed'), array($this,'domains_settings_field'), 'reading' );
+		}
+
+		// help tab
+		add_action( 'load-options-reading.php', array($this,'xml_sitemaps_help') );
+
+		// robots rules, only when permalinks are set
+		$rules = get_option( 'rewrite_rules' );
+		if( ! xmlsf()->plain_permalinks() && isset( $rules['robots\.txt$'] ) ) {
+			register_setting( 'reading', 'xmlsf_robots', array('XMLSF_Admin_Sanitize','robots_settings') );
+			add_settings_field( 'xmlsf_robots', __('Additional robots.txt rules','xml-sitemap-feed'), array($this,'robots_settings_field'), 'reading' );
+		}
+
+		// ping, only when any sitemap is active
+		if ( isset($sitemaps['sitemap']) || isset($sitemaps['sitemap-news']) ) {
+			register_setting( 'writing', 'xmlsf_ping', array('XMLSF_Admin_Sanitize','ping_settings') );
+			add_settings_field( 'xmlsf_ping', __('Ping Services','xml-sitemap-feed'), array($this,'ping_settings_field'), 'writing' );
+			add_action( 'load-options-writing.php', array($this,'ping_settings_help') );
+		}
+	}
 
 	/* SITEMAPS */
 
@@ -81,6 +118,10 @@ class XMLSF_Admin_Controller
 		) );
 	}
 
+	/**
+	 * Sitemap settings fields
+	 */
+
 	public function sitemaps_settings_field()
 	{
 		if ( 1 == get_option('blog_public') ) :
@@ -95,6 +136,19 @@ class XMLSF_Admin_Controller
 			_e( 'XML Sitemaps are not available because of your site&#8217;s visibility settings (above).', 'xml-sitemap-feed' );
 
 		endif;
+	}
+
+	/**
+	 * Domain settings field
+	 */
+
+	public function domains_settings_field()
+	{
+		$domains = get_option('xmlsf_domains');
+		if ( !is_array($domains) ) $domains = array();
+
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/field-sitemap-domains.php';
 	}
 
 	/* ROBOTS */
@@ -124,37 +178,39 @@ class XMLSF_Admin_Controller
 
 	public function ping_settings_field()
 	{
-		if ( 1 == get_option('blog_public') ) :
+		$options = get_option( 'xmlsf_ping' );
 
-			$sitemaps = get_option( 'xmlsf_sitemaps' );
-			if ( empty($sitemaps) ) {
-				printf(
-					/* translators: Reading Settings URL */
-					__( 'Search engines will not be pinged because there are no <a href="%s">sitemaps enabled</a>.', 'xml-sitemap-feed' ),
-					admin_url('options-reading.php')
-				);
-				return;
-			}
-
-			$options = get_option( 'xmlsf_ping' );
-
-			// The actual fields for data entry
-			include XMLSF_DIR . '/views/admin/field-ping.php';
-
-		else :
-
-			printf(
-				/* translators: Reading Settings URL */
-				__( 'Search engines will not be pinged because of your site&#8217;s <a href="%s">visibility settings</a>.', 'xml-sitemap-feed' ),
-				admin_url('options-reading.php')
-			);
-
-		endif;
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/field-ping.php';
 	}
 
 	/**
 	* META BOXES
 	*/
+
+	/**
+	 * Register settings and add settings fields
+	 */
+
+	public function register_meta_boxes()
+	{
+		$sitemaps = (array) get_option( 'xmlsf_sitemaps' );
+
+		if ( isset($sitemaps['sitemap-news']) ) {
+      		// post meta box
+      		add_action( 'add_meta_boxes', array($this,'add_meta_box_news') );
+		}
+
+		if ( isset($sitemaps['sitemap']) ) {
+			// post meta box
+			add_action( 'add_meta_boxes', array($this,'add_meta_box') );
+		}
+
+		if ( isset($sitemaps['sitemap']) || isset($sitemaps['sitemap-news']) ) {
+	        // save post meta box settings
+	        add_action( 'save_post', array($this,'save_metadata') );
+		}
+	}
 
 	/* Adds a XML Sitemap box to the side column */
 	public function add_meta_box ()
@@ -295,49 +351,9 @@ class XMLSF_Admin_Controller
 	}
 
 	/**
-	 * Register settings and add settings fields
-	 */
-
-	public function register_settings()
-	{
-		$sitemaps = (array) get_option( 'xmlsf_sitemaps' );
-
-		// sitemaps
-		register_setting( 'reading', 'xmlsf_sitemaps', array('XMLSF_Admin_Sanitize','sitemaps_settings') );
-		add_settings_field( 'xmlsf_sitemaps', __('Enable XML sitemaps','xml-sitemap-feed'), array($this,'sitemaps_settings_field'), 'reading' );
-		add_action('load-options-reading.php', array($this,'xml_sitemaps_help'));
-
-		// robots rules only when permalinks are set
-		$rules = get_option( 'rewrite_rules' );
-		if( ! xmlsf()->plain_permalinks() && isset( $rules['robots\.txt$'] ) ) {
-			register_setting( 'reading', 'xmlsf_robots', array('XMLSF_Admin_Sanitize','robots_settings') );
-			add_settings_field( 'xmlsf_robots', __('Additional robots.txt rules','xml-sitemap-feed'), array($this,'robots_settings_field'), 'reading' );
-		}
-
-		// ping
-		register_setting('writing', 'xmlsf_ping', array('XMLSF_Admin_Sanitize','ping_settings') );
-		add_settings_field('xmlsf_ping', __('Ping Services','xml-sitemap-feed'), array($this,'ping_settings_field'), 'writing');
-		add_action('load-options-writing.php', array($this,'ping_settings_help'));
-
-		if ( isset($sitemaps['sitemap-news']) ) {
-      		// post meta box
-      		add_action( 'add_meta_boxes', array($this,'add_meta_box_news') );
-		}
-
-		if ( isset($sitemaps['sitemap']) ) {
-			// post meta box
-			add_action( 'add_meta_boxes', array($this,'add_meta_box') );
-		}
-
-		if ( isset($sitemaps['sitemap']) || isset($sitemaps['sitemap-news']) ) {
-	        // save post meta box settings
-	        add_action( 'save_post', array($this,'save_metadata') );
-		}
-	}
-
-	/**
 	 * Delete static sitemap files
 	 */
+
 	public function delete_static_files()
 	{
 		if ( !isset( $_POST['_xmlsf_notice_nonce'] ) || !wp_verify_nonce( $_POST['_xmlsf_notice_nonce'], XMLSF_BASENAME.'-notice' ) ) {
