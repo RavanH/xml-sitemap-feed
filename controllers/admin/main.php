@@ -106,6 +106,18 @@ class XMLSF_Admin_Controller
 		) );
 
 		ob_start();
+		include XMLSF_DIR . '/views/admin/help-tab-allowed-domains.php';
+		include XMLSF_DIR . '/views/admin/help-tab-support.php';
+		$content = ob_get_clean();
+
+		get_current_screen()->add_help_tab( array(
+			'id'      => 'allowed-domains',
+			'title'   =>__( 'Allowed domains', 'xml-sitemap-feed' ),
+			'content' => $content,
+			'priority' => 11
+		) );
+
+		ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-robots.php';
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();

@@ -148,9 +148,6 @@ class XMLSF_Admin_Sitemap
 			'content' => $content,
 		) );
 
-		// default domain
-		$default = parse_url( home_url(), PHP_URL_HOST );
-
 		ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-advanced.php';
 		$content = ob_get_clean();
