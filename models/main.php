@@ -30,7 +30,8 @@ function xmlsf_filter_request( $request ) {
 		$request['update_post_term_cache'] = false;
 		$request['update_post_meta_cache'] = false;
 
-		// Polylang compat
+		// PLUGIN COMPATIBILITIES
+		// Polylang
 		$request['lang'] = '';
 		// WPML compat
 		global $wpml_query_filter;
@@ -39,6 +40,8 @@ function xmlsf_filter_request( $request ) {
 			remove_filter( 'posts_where', array( $wpml_query_filter, 'posts_where_filter' ) );
 			add_action( 'the_post', 'xmlsf_wpml_language_switcher' );
 		}
+		// bbPress
+		remove_filter( 'bbp_request', 'bbp_request_feed_trap' );
 
 		if ( $request['feed'] == 'sitemap-news' ) {
 			// set the news sitemap conditional flag
@@ -81,7 +84,7 @@ function xmlsf_untrailingslash( $request ) {
  * @return array
  */
 function xmlsf_filter_post_types( $post_types ) {
-	foreach ( xmlsf()->disabled_post_types() as $post_type ) {
+	foreach ( array('attachment','reply') as $post_type ) {
 		if ( isset( $post_types[$post_type]) )
 			unset( $post_types[$post_type] );
 	}
@@ -97,7 +100,7 @@ function xmlsf_filter_post_types( $post_types ) {
  * @return array
  */
 function xmlsf_news_filter_post_types( $post_types ) {
-	foreach ( array('attachment','page') as $post_type ) {
+	foreach ( array('attachment','page','reply') as $post_type ) {
 		if ( isset( $post_types[$post_type]) )
 			unset( $post_types[$post_type] );
 	}
