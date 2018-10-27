@@ -61,14 +61,6 @@ class XMLSitemapFeed {
 	private $plain_permalinks = null;
 
 	/**
-	 * Excluded post types
-	 *
-	 * post format taxonomy is disabled
-	 * @var array
-	 */
-	private $disabled_post_types = array('attachment','reply');
-
-	/**
 	 * Excluded taxonomies
 	 *
 	 * post format taxonomy is disabled
@@ -256,14 +248,6 @@ class XMLSitemapFeed {
 		}
 
 		return $this->scheme;
-	}
-
-	/**
-	 * Get disabled post types
-	 * @return array
-	 */
-	public function disabled_post_types() {
-		return $this->disabled_post_types;
 	}
 
 	/**
