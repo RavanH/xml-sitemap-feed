@@ -283,7 +283,11 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 Bugfix release.
 
+
 == Changelog ==
+
+= 5.1 =
+* bbPress compatibility
 
 = 5.0.7 =
 * Allowed domains back to Settings > Reading
