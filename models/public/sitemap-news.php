@@ -45,8 +45,8 @@ function xmlsf_sitemap_news_filter_request( $request ) {
 	$post_types = apply_filters( 'xmlsf_news_post_types', $post_types);
 
 	// disable caching
-	define('DONOTCACHEPAGE', true);
-	define('DONOTCACHEDB', true);
+	if ( ! defined('DONOTCACHEPAGE') ) define('DONOTCACHEPAGE', true);
+	if ( ! defined('DONOTCACHEDB') ) define('DONOTCACHEDB', true);
 
 	// set up query filters
 	$live = false;
