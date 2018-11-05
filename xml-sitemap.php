@@ -50,7 +50,7 @@ define( 'XMLSF_VERSION', '5.0.90' );
  *							 Must return a float value between 0.1 and 1.0
  *	xmlsf_term_priority   -> Filters a taxonomy term priority value. Passes variables $priority and $term->slug.
  *							 Must return a float value between 0.1 and 1.0
- *	xmlsf_news_post_types -> Filters the post types array for the Google News sitemap.
+ *	xmlsf_news_post_types -> Filters the post types array for the Google News sitemap settings page.
  *
  *  ACTIONS
  *  xmlsf_news_tags_after -> Fired inside the Google News Sitemap loop at the end of the news
