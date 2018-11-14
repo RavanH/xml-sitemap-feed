@@ -46,7 +46,7 @@ class XMLSF_Admin_Controller
 		add_action( 'admin_init', array( $this, 'register_meta_boxes' ) );
 		if ( ( !is_multisite() && current_user_can( 'manage_options' ) ) || is_super_admin() )
 			add_action( 'admin_init', array( $this, 'static_files' ) );
-		add_action( 'admin_init', array( $this, 'verify_wpseo_settings' ) );
+		add_action( 'admin_init', array( $this, 'check_plugin_conflicts' ) );
 	}
 
 	/**
@@ -405,16 +405,18 @@ class XMLSF_Admin_Controller
 	}
 
 	/**
-	 * Check for conflicting WPSEO settings
+	 * Check for conflicting plugins and their settings
 	 */
-	public function verify_wpseo_settings()
+	public function check_plugin_conflicts()
 	{
-		// WP SEO Plugin conflict notice
-		if ( is_plugin_active('wordpress-seo/wp-seo.php') ) {
+		$sitemaps = get_option( 'xmlsf_sitemaps', array() );
+
+		// WP SEO Plugin conflict notices
+		if ( ! empty( $sitemaps['sitemap'] ) && is_plugin_active('wordpress-seo/wp-seo.php') ) {
 			// check date archive redirection
 			$wpseo_titles = get_option( 'wpseo_titles' );
 			if ( !empty( $wpseo_titles['disable-date'] ) ) {
-				// check is Split by option is set anywhere
+				// check if Split by option is set anywhere
 				foreach ( (array) get_option( 'xmlsf_post_types' ) as $type => $settings ) {
 					if ( is_array( $settings ) && !empty( $settings['archive'] ) ) {
 						add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_wpseo_date_redirect' ) );
@@ -424,9 +426,33 @@ class XMLSF_Admin_Controller
 			}
 			// check wpseo sitemap option
 			$wpseo = get_option( 'wpseo' );
-			$sitemaps = get_option( 'xmlsf_sitemaps' );
-			if ( !empty( $wpseo['enable_xml_sitemap'] ) && !empty( $sitemaps['sitemap'] ) ) {
+			if ( !empty( $wpseo['enable_xml_sitemap'] ) ) {
 				add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_wpseo_sitemap' ) );
+			}
+		}
+
+		//error_log( print_r( is_plugin_active('wp-seopress/seopress.php'), true ) );
+
+		// WP SEO Plugin conflict notices
+		if ( ! empty( $sitemaps['sitemap'] ) && is_plugin_active('wp-seopress/seopress.php') ) {
+
+			$seopress_toggle = get_option( 'seopress_toggle' );
+
+			// check date archive redirection
+			$seopress_titles = get_option( 'seopress_titles_option_name' );
+			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) ) {
+				// check if Split by option is set anywhere
+				foreach ( (array) get_option( 'xmlsf_post_types' ) as $type => $settings ) {
+					if ( is_array( $settings ) && !empty( $settings['archive'] ) ) {
+						add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_seopress_date_redirect' ) );
+						break;
+					}
+				}
+			}
+			// check wpseo sitemap option
+			$seopress_xml_sitemap = get_option( 'seopress_xml_sitemap_option_name' );
+			if ( ! empty( $seopress_toggle['toggle-xml-sitemap'] ) && !empty( $seopress_xml_sitemap['seopress_xml_sitemap_general_enable'] ) ) {
+				add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_seopress_sitemap' ) );
 			}
 		}
 	}
@@ -488,7 +514,7 @@ class XMLSF_Admin_Controller
 				if ( empty( self::$static_files ) )
 					add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_none_found') );
 
-				$this->verify_wpseo_settings();
+				$this->check_plugin_conflicts();
 
 			} else {
 				add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_nonce_fail') );
