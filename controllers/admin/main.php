@@ -434,9 +434,8 @@ class XMLSF_Admin_Controller
 		// WP SEO Plugin conflict notices
 		if ( ! empty( $sitemaps['sitemap'] ) && is_plugin_active('wp-seopress/seopress.php') ) {
 
-			$seopress_toggle = get_option( 'seopress_toggle' );
-
 			// check date archive redirection
+			$seopress_toggle = get_option( 'seopress_toggle' );
 			$seopress_titles = get_option( 'seopress_titles_option_name' );
 			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) ) {
 				// check if Split by option is set anywhere
