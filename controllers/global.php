@@ -6,8 +6,6 @@
 
 function xmlsf_init() {
 
-	xmlsf_maybe_upgrade();
-
 	if ( is_admin() ) {
 		require XMLSF_DIR . '/controllers/admin/main.php';
 	}
@@ -25,9 +23,6 @@ function xmlsf_init() {
 
 		// Update term meta lastmod date
 		add_action( 'transition_post_status', 'update_term_modified_meta', 10, 3 );
-
-		// add rewrite rules
-		xmlsf_rewrite_rules();
 
 		// include main model functions
 		require XMLSF_DIR . '/models/main.php';
@@ -52,6 +47,26 @@ function xmlsf_init() {
 
 	// add robots.txt filter
 	add_filter( 'robots_txt', 'xmlsf_robots_txt', 9 );
+}
+
+/**
+ * Add sitemap rewrite rules
+ *
+ * @uses object $wp_rewrite
+ *
+ * @return void
+ */
+function xmlsf_rewrite_rules() {
+	global $wp_rewrite;
+
+	$sitemaps = get_option( 'xmlsf_sitemaps' );
+
+	if ( isset($sitemaps['sitemap']) ) {
+		/* One rule to ring them all */
+		add_rewrite_rule('sitemap(-[a-z0-9_\-]+)?\.([0-9]+\.)?xml$', $wp_rewrite->index . '?feed=sitemap$matches[1]&m=$matches[2]', 'top');
+	} elseif ( isset($sitemaps['sitemap-news']) ) {
+		add_rewrite_rule('sitemap-news\.xml$', $wp_rewrite->index . '?feed=sitemap-news', 'top');
+	}
 }
 
 /**

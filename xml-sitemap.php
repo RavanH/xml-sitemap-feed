@@ -79,6 +79,13 @@ require XMLSF_DIR . '/models/global.php';
 
 require XMLSF_DIR . '/controllers/global.php';
 
+// add rewrite rules
+add_action( 'init', 'xmlsf_rewrite_rules', 1 );
+
+// quick check for db upgrade need
+add_action( 'init', 'xmlsf_maybe_upgrade', 9 );
+
+// main plugin init
 add_action( 'init', 'xmlsf_init' );
 
 register_activation_hook( __FILE__, 'xmlsf_activate' );
