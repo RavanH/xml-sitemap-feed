@@ -44,7 +44,7 @@ class XMLSF_Admin_Notices extends XMLSF_Admin_Controller
 
 	public static function notice_wpseo_date_redirect()
 	{
-		if ( !in_array( 'date_redirect', get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ) ) ) {
+		if ( !in_array( 'wpseo_date_redirect', get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ) ) ) {
 			include XMLSF_DIR . '/views/admin/notice-wpseo-date-redirect.php';
 		}
 	}
@@ -53,6 +53,20 @@ class XMLSF_Admin_Notices extends XMLSF_Admin_Controller
 	{
 		if ( !in_array( 'wpseo_sitemap', get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ) ) ) {
 			include XMLSF_DIR . '/views/admin/notice-wpseo-sitemap.php';
+		}
+	}
+
+	public static function notice_seopress_date_redirect()
+	{
+		if ( !in_array( 'seopress_date_redirect', get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ) ) ) {
+			include XMLSF_DIR . '/views/admin/notice-seopress-date-redirect.php';
+		}
+	}
+
+	public static function notice_seopress_sitemap()
+	{
+		if ( !in_array( 'seopress_sitemap', get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ) ) ) {
+			include XMLSF_DIR . '/views/admin/notice-seopress-sitemap.php';
 		}
 	}
 }
