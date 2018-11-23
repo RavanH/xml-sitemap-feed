@@ -47,6 +47,7 @@ class XMLSF_Admin_Controller
 		if ( ( !is_multisite() && current_user_can( 'manage_options' ) ) || is_super_admin() )
 			add_action( 'admin_init', array( $this, 'static_files' ) );
 		add_action( 'admin_init', array( $this, 'check_plugin_conflicts' ) );
+		add_action( 'admin_init', array( $this, 'check_theme_conflicts' ) );
 	}
 
 	/**
@@ -405,6 +406,17 @@ class XMLSF_Admin_Controller
 	}
 
 	/**
+	 * Check for conflicting themes and their settings
+	 */
+	public function check_theme_conflicts()
+	{
+		// Catch Box Pro feed redirect
+		if ( function_exists( 'catchbox_is_feed_url_present' ) && catchbox_is_feed_url_present(null) ) {
+			add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_catchbox_feed_redirect' ) );
+		}
+	}
+
+	/**
 	 * Check for conflicting plugins and their settings
 	 */
 	public function check_plugin_conflicts()
@@ -510,6 +522,8 @@ class XMLSF_Admin_Controller
 				$this->check_static_files();
 				if ( empty( self::$static_files ) )
 					add_action( 'admin_notices', array('XMLSF_Admin_Notices','static_files_none_found') );
+
+				$this->check_theme_conflicts();
 
 				$this->check_plugin_conflicts();
 

@@ -287,7 +287,7 @@ Bugfix release.
 == Changelog ==
 
 = 5.1 =
-* SEOPress incompatibility admin messages
+* SEOPress and Catch Box incompatibility admin messages
 * bbPress compatibility
 TODO better bbPress compat: "Update the Last Changed date on each new comment" for topics (on forum pages) and replies on topic pages
 

@@ -42,6 +42,14 @@ class XMLSF_Admin_Notices extends XMLSF_Admin_Controller
 		}
 	}
 
+	public static function notice_catchbox_feed_redirect()
+	{
+		if ( !in_array( 'catchbox_feed_redirect', get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ) ) ) {
+			include XMLSF_DIR . '/views/admin/notice-catchbox-feed-redirect.php';
+		}
+	}
+
+
 	public static function notice_wpseo_date_redirect()
 	{
 		if ( !in_array( 'wpseo_date_redirect', get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ) ) ) {
