@@ -290,6 +290,7 @@ Bugfix release.
 * SEOPress and Catch Box incompatibility admin messages
 * bbPress compatibility
 TODO better bbPress compat: "Update the Last Changed date on each new comment" for topics (on forum pages) and replies on topic pages
+* FIX failing last modified date for taxonomy sitemaps
 
 = 5.0.7 =
 * Allowed domains back to Settings > Reading

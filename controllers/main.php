@@ -131,26 +131,41 @@ function xmlsf_do_pings( $new_status, $old_status, $post ) {
  */
 function update_term_modified_meta( $new_status, $old_status, $post ) {
 
-	$taxonomies = get_option( 'xmlsf_taxonomies' );
+error_log($old_status . ' > ' . $new_status);
 
-	if ( empty( $taxonomies ) )
+	// bail out on inactive post types
+	$xmlsf_post_types = get_option( 'xmlsf_post_types' );
+	if ( ! array_key_exists($post->post_type, $xmlsf_post_types) || empty( $xmlsf_post_types[$post->post_type]['active'] ) )
 		return;
 
-	// are we not publishing or unpublishing?
-	if ( $old_status == $new_status || $old_status != 'publish' && $new_status != 'publish' )
+	// bail out when not publishing or unpublishing or editing a live post
+	// note: prepend " $old_status == $new_status || " to exclude live editong too
+	if ( $new_status != 'publish' && $old_status != 'publish' )
 		return;
 
-	$term_ids = array();
-	foreach ( $taxonomies as $tax_name ) {
-		$terms = wp_get_post_terms( $post->ID, $tax_name, array( 'fields' => 'ids' ));
-		if ( !is_wp_error($terms) ) {
-			$term_ids = array_merge( $term_ids, $terms );
-		}
+	$taxonomy_settings = (array) get_option( 'xmlsf_taxonomy_settings' );
+	$taxonomies = array();
+
+	if ( ! empty( $taxonomy_settings['active'] ) ) {
+		if ( ! function_exists('xmlsf_public_taxonomies') )
+			include XMLSF_DIR . '/models/public/sitemap.php';
+
+		$taxonomies =  empty( get_option( 'xmlsf_taxonomies' ) ) ? xmlsf_public_taxonomies() :  get_option( 'xmlsf_taxonomies' );
 	}
 
-	$time = date('Y-m-d H:i:s');
+	if ( ! empty( $taxonomies ) ) {
+		$term_ids = array();
+		foreach ( (array) $taxonomies as $tax_name ) {
+			$terms = wp_get_post_terms( $post->ID, $tax_name, array( 'fields' => 'ids' ));
+			if ( !is_wp_error($terms) ) {
+				$term_ids = array_merge( $term_ids, $terms );
+			}
+		}
 
-	foreach( $term_ids as $id ) {
-		update_term_meta( $id, 'term_modified_gmt', $time );
+		$time = date('Y-m-d H:i:s');
+
+		foreach( $term_ids as $id ) {
+			update_term_meta( $id, 'term_modified_gmt', $time );
+		}
 	}
 }
