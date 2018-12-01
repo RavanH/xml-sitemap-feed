@@ -56,7 +56,7 @@ function xmlsf_do_pings( $new_status, $old_status, $post ) {
 
 			// Google ?
 			if ( in_array( 'google', $ping ) ) {
-				// check if we did not ping already within the last hour
+				// check if we did not ping already within the last 5 minutes
 				if ( false === get_transient('xmlsf_ping_google_sitemap_news') ) {
 					// Ping !
 					$uri = add_query_arg( 'sitemap', urlencode( trailingslashit( get_bloginfo( 'url' ) ) . $sitemaps['sitemap-news'] ), 'https://www.google.com/ping' );
