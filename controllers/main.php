@@ -131,8 +131,6 @@ function xmlsf_do_pings( $new_status, $old_status, $post ) {
  */
 function update_term_modified_meta( $new_status, $old_status, $post ) {
 
-error_log($old_status . ' > ' . $new_status);
-
 	// bail out on inactive post types
 	$xmlsf_post_types = get_option( 'xmlsf_post_types' );
 	if ( ! array_key_exists($post->post_type, $xmlsf_post_types) || empty( $xmlsf_post_types[$post->post_type]['active'] ) )
