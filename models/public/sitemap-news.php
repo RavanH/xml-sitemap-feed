@@ -37,7 +37,7 @@ function xmlsf_news_filter_no_news_limits( $limits ) {
  *
  * @return mixed
  */
-function xmlsf_sitemap_news_filter_request( $request ) {
+function xmlsf_sitemap_news_parse_request( $request ) {
 
 	// prepare for news and return modified request
 	$options = get_option( 'xmlsf_news_tags' );

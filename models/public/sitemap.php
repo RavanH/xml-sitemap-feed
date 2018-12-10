@@ -375,7 +375,7 @@ function xmlsf_set_terms_args( $args ) {
  *
  * @return mixed
  */
-function xmlsf_sitemap_filter_request( $request ) {
+function xmlsf_sitemap_parse_request( $request ) {
 
 	$feed = explode( '-' ,$request['feed'], 3 );
 

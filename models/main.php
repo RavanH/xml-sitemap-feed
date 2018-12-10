@@ -49,12 +49,12 @@ function xmlsf_filter_request( $request ) {
 
 			require_once XMLSF_DIR . '/controllers/public/sitemap-news.php';
 			require_once XMLSF_DIR . '/models/public/sitemap-news.php';
-			$request = xmlsf_sitemap_news_filter_request( $request );
+			$request = xmlsf_sitemap_news_parse_request( $request );
 		} else {
 			require_once XMLSF_DIR . '/controllers/public/sitemap.php';
 			require_once XMLSF_DIR . '/models/public/sitemap.php';
 			xmlsf_feed_templates();
-			$request = xmlsf_sitemap_filter_request( $request );
+			$request = xmlsf_sitemap_parse_request( $request );
 		}
 
 	endif;
