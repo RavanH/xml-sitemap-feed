@@ -300,8 +300,8 @@ function xmlsf_get_priority( $sitemap = 'post_type', $term = '' ) {
 			}
 
 			// increase by relative comment count
-			if ( $post->comment_count > 0 && $priority <= 0.9 ) {
-				$priority += 0.1 + ( 0.9 - $priority ) * $post->comment_count / wp_count_comments($post->post_type)->approved;
+			if ( $post->comment_count > 0 && $priority < 1 ) {
+				$priority += 0.1 + ( 1 - $priority ) * $post->comment_count / wp_count_comments($post->post_type)->approved;
 			}
 		}
 
