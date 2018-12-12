@@ -434,6 +434,31 @@ function xmlsf_sitemap_parse_request( $request ) {
 }
 
 /**
+ * Get archives from wp_cache
+ *
+ * @param string $post_type
+ * @param string $type
+ *
+ * @return array
+ */
+function xmlsf_cache_get_archives( $query ) {
+	global $wpdb;
+
+	$key = md5($query);
+	$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
+
+	if ( !isset( $cache[ $key ] ) ) {
+		$arcresults = $wpdb->get_results($query);
+		$cache[ $key ] = $arcresults;
+		wp_cache_set( 'xmlsf_get_archives', $cache, 'general' );
+	} else {
+		$arcresults = $cache[ $key ];
+	}
+	
+	return $arcresults;
+}
+
+/**
  * Get archives
  *
  * @param string $post_type
@@ -447,47 +472,30 @@ function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
 
 	if ( 'monthly' == $type ) :
 
-		$query = "SELECT YEAR(post_date) AS `year`, LPAD(MONTH(post_date),2,'0') AS `month`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY post_date DESC";
-		$key = md5($query);
-		$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
+		$query = "SELECT YEAR(post_date) as `year`, LPAD(MONTH(post_date),2,'0') as `month`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY post_date DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
 
-		if ( !isset( $cache[ $key ] ) ) {
-			$arcresults = $wpdb->get_results($query);
-			$cache[ $key ] = $arcresults;
-			wp_cache_set( 'xmlsf_get_archives', $cache, 'general' );
-		} else {
-			$arcresults = $cache[ $key ];
-		}
-
-		if ( $arcresults ) {
-			foreach ( (array) $arcresults as $arcresult ) {
-				$return[$arcresult->year.$arcresult->month] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year . $arcresult->month );
-			}
+		foreach ( (array) $arcresults as $arcresult ) {
+			$return[$arcresult->year.$arcresult->month] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year . $arcresult->month );
 		};
 
 	elseif ( 'yearly' == $type ) :
 
-		$query = "SELECT YEAR(post_date) AS `year`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date) ORDER BY post_date DESC";
-		$key = md5($query);
-		$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
+		$query = "SELECT YEAR(post_date) as `year`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date) ORDER BY post_date DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
 
-		if ( !isset( $cache[ $key ] ) ) {
-			$arcresults = $wpdb->get_results($query);
-			$cache[ $key ] = $arcresults;
-			wp_cache_set( 'xmlsf_get_archives', $cache, 'general' );
-		} else {
-			$arcresults = $cache[ $key ];
-		}
-
-		if ( $arcresults ) {
-			foreach ( (array) $arcresults as $arcresult) {
-				$return[$arcresult->year] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year );
-			}
+		foreach ( (array) $arcresults as $arcresult ) {
+			$return[$arcresult->year] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year );
 		};
 
 	else :
 
-		$return[0] = xmlsf_get_index_url('posttype', $post_type); // $sitemap = 'home', $type = false, $param = false
+		$query = "SELECT count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' ORDER BY post_date DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		if ( $arcresults ) {
+			$return[] = xmlsf_get_index_url( 'posttype', $post_type ); // $sitemap = 'home', $type = false, $param = false
+		};
 
 	endif;
 
