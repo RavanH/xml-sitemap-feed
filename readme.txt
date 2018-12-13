@@ -292,6 +292,7 @@ Bugfix release.
 TODO better bbPress compat: "Update the Last Changed date on each new comment" for topics (on forum pages) and replies on topic pages
 * FIX failing last modified date for taxonomy sitemaps
 * FIX sitemap showing when only private posts
+* Admin interface improvements: highlighting and scroll
 
 = 5.0.7 =
 * Allowed domains back to Settings > Reading

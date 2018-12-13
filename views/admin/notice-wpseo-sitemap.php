@@ -8,7 +8,7 @@
 				__('XML Sitemap & Google News','xml-sitemap-feed'),
 				'<a href="' . admin_url('admin.php') . '?page=wpseo_dashboard#top#features">' . translate('Features','wordpress-seo') . '</a>',
 				__('XML Sitemap Index','xml-sitemap-feed'),
-				'<a href="' . admin_url('options-reading.php') . '#blog_public">' . translate('Reading Settings') . '</a>'
+				'<a href="' . admin_url('options-reading.php') . '#xmlsf_sitemaps">' . translate('Reading Settings') . '</a>'
 			);
 		?>
     </p>

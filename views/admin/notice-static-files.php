@@ -6,7 +6,7 @@
         <?php printf( /* translators: %1$s number of files, %2$s is Reading Settings URL */ _n(
             'The following static file has been found. Either delete it or disable the conflicting <a href="%2$s">sitemap</a>.',
             'The following %1$s static files have been found. Either delete them or disable the conflicting <a href="%2$s">sitemaps</a>.',
-            $number,'xml-sitemap-feed'), number_format_i18n($number), admin_url('options-reading.php') . '#blog_public' ); ?>
+            $number,'xml-sitemap-feed'), number_format_i18n($number), admin_url('options-reading.php') . '#xmlsf_sitemaps' ); ?>
     </p>
 	<form action="" method="post">
 		<?php wp_nonce_field( XMLSF_BASENAME.'-notice', '_xmlsf_notice_nonce' ); ?>

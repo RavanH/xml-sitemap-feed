@@ -53,7 +53,7 @@ function xmlsf_nginx_helper_purge_urls( $urls = array(), $redis = false ) {
 // plugin action links
 
 function xmlsf_add_action_link( $links ) {
-	$settings_link = '<a href="' . admin_url('options-reading.php') . '#blog_public">' . translate('Settings') . '</a>';
+	$settings_link = '<a href="' . admin_url('options-reading.php') . '#xmlsf_sitemaps">' . translate('Settings') . '</a>';
 	array_unshift( $links, $settings_link );
 	return $links;
 }

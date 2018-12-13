@@ -12,5 +12,12 @@
         <input type="checkbox" name="xmlsf_ping[]" id="xmlsf_ping_bing" value="bing"<?php echo checked( is_array($options) && in_array('bing',$options), true, false); ?> />
 		<?php _e('Bing & Yahoo','xml-sitemap-feed'); ?>
 	</label>
-
 </fieldset>
+<script>
+jQuery( 'document' ).ready( function( $ ) {
+	if ( window.location.hash === '#xmlsf_ping' ) {
+		$( '#xmlsf_ping' ).closest( 'td' ).addClass( 'highlight' );
+		$( 'html, body' ).animate( { scrollTop: $("#xmlsf_ping").offset().top-40 }, 800 );
+	}
+} );
+</script>
