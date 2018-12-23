@@ -454,7 +454,7 @@ function xmlsf_cache_get_archives( $query ) {
 	} else {
 		$arcresults = $cache[ $key ];
 	}
-	
+
 	return $arcresults;
 }
 
@@ -493,7 +493,7 @@ function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
 		$query = "SELECT count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' ORDER BY post_date DESC";
 		$arcresults = xmlsf_cache_get_archives( $query );
 
-		if ( $arcresults ) {
+		if ( is_object($arcresults[0]) && $arcresults[0]->posts > 0 ) {
 			$return[] = xmlsf_get_index_url( 'posttype', $post_type ); // $sitemap = 'home', $type = false, $param = false
 		};
 
