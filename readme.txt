@@ -288,8 +288,7 @@ Bugfix release.
 
 = 5.1 =
 * SEOPress and Catch Box incompatibility admin messages
-* bbPress compatibility
-TODO better bbPress compat: "Update the Last Changed date on each new comment" for topics (on forum pages) and replies on topic pages
+* FIX bbPress incompatibility
 * FIX failing last modified date for taxonomy sitemaps
 * FIX sitemap showing when only private posts
 * Admin interface improvements: highlighting and scroll
