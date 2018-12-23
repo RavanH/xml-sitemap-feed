@@ -293,6 +293,8 @@ TODO better bbPress compat: "Update the Last Changed date on each new comment" 
 * FIX failing last modified date for taxonomy sitemaps
 * FIX sitemap showing when only private posts
 * Admin interface improvements: highlighting and scroll
+* Upgrade routines in own class only to be included when needed
+* Moved metabox methods to dedicated classes
 
 = 5.0.7 =
 * Allowed domains back to Settings > Reading

@@ -19,6 +19,89 @@ class XMLSF_Admin_Sitemap
     {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
+		add_action( 'save_post', array( $this, 'save_metadata' ) );
+	}
+
+	/**
+	* META BOXES
+	*/
+
+	/* Adds a XML Sitemap box to the side column */
+	public function add_meta_box()
+	{
+		$post_types = get_option( 'xmlsf_post_types' );
+		if ( !is_array( $post_types ) ) return;
+
+		foreach ( $post_types as $post_type => $settings ) {
+			// Only include metaboxes on post types that are included
+			if ( isset( $settings["active"] ) )
+				add_meta_box(
+					'xmlsf_section',
+					__( 'XML Sitemap', 'xml-sitemap-feed' ),
+					array( $this, 'meta_box' ),
+					$post_type,
+					'side',
+					'low'
+				);
+		}
+	}
+
+	public function meta_box( $post )
+	{
+		// Use nonce for verification
+		wp_nonce_field( XMLSF_BASENAME, '_xmlsf_nonce' );
+
+		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
+		$exclude = get_post_meta( $post->ID, '_xmlsf_exclude', true );
+		$priority = get_post_meta( $post->ID, '_xmlsf_priority', true );
+		$disabled = false;
+
+		// disable options and (visibly) set excluded to true for private posts
+		if ( 'private' == $post->post_status ) {
+			$disabled = true;
+			$exclude = true;
+		}
+
+		// disable options and (visibly) set priority to 1 for front page
+		if ( $post->ID == get_option('page_on_front') ) {
+			$disabled = true;
+			$exclude = false;
+			$priority = '1'; // force priority to 1 for front page
+		}
+
+		$description = sprintf(
+			__('Leave empty for automatic Priority as configured on %1$s > %2$s.','xml-sitemap-feed'),
+			translate('Settings'),
+			'<a href="' . admin_url('options-general.php') . '?page=xmlsf">' . __('XML Sitemap','xml-sitemap-feed') . '</a>'
+		);
+
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/meta-box.php';
+	}
+
+	/* When the post is saved, save our meta data */
+	public function save_metadata( $post_id )
+	{
+		if ( !isset($post_id) )
+			$post_id = (int)$_REQUEST['post_ID'];
+
+		if ( !current_user_can( 'edit_post', $post_id ) || !isset($_POST['_xmlsf_nonce']) || !wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME) )
+			return;
+
+		// _xmlsf_priority
+		if ( empty($_POST['xmlsf_priority']) && '0' !== $_POST['xmlsf_priority'] ) {
+			delete_post_meta($post_id, '_xmlsf_priority');
+		} else {
+			update_post_meta($post_id, '_xmlsf_priority', XMLSF_Admin_Sitemap_Sanitize::priority($_POST['xmlsf_priority']) );
+		}
+
+		// _xmlsf_exclude
+		if ( isset($_POST['xmlsf_exclude']) && $_POST['xmlsf_exclude'] != '' ) {
+			update_post_meta($post_id, '_xmlsf_exclude', $_POST['xmlsf_exclude']);
+		} else {
+			delete_post_meta($post_id, '_xmlsf_exclude');
+		}
 	}
 
 	/**

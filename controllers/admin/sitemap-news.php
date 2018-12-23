@@ -19,7 +19,61 @@ class XMLSF_Admin_Sitemap_News
     {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
+		add_action( 'save_post', array( $this, 'save_metadata' ) );
     }
+
+	/**
+	* META BOXES
+	*/
+
+	/* Adds a News Sitemap box to the side column */
+	public function add_meta_box()
+	{
+		$news_tags = get_option('xmlsf_news_tags');
+		$news_post_types = !empty($news_tags['post_type']) && is_array($news_tags['post_type']) ? $news_tags['post_type'] : array('post');
+
+		foreach ( $news_post_types as $post_type ) {
+      // Only include metabox on post types that are included
+			add_meta_box(
+				'xmlsf_news_section',
+				__( 'Google News', 'xml-sitemap-feed' ),
+				array( $this, 'meta_box' ),
+				$post_type,
+				'side'
+			);
+		}
+	}
+
+	public function meta_box( $post )
+	{
+		// Use nonce for verification
+		wp_nonce_field( XMLSF_BASENAME, '_xmlsf_news_nonce' );
+
+		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
+		$exclude = 'private' == $post->post_status || get_post_meta( $post->ID, '_xmlsf_news_exclude', true );
+		$disabled = 'private' == $post->post_status;
+
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/meta-box-news.php';
+	}
+
+	/* When the post is saved, save our meta data */
+	public function save_metadata( $post_id )
+	{
+		if ( !isset($post_id) )
+			$post_id = (int)$_REQUEST['post_ID'];
+
+		if ( !current_user_can( 'edit_post', $post_id ) || !isset($_POST['_xmlsf_news_nonce']) || !wp_verify_nonce($_POST['_xmlsf_news_nonce'], XMLSF_BASENAME) )
+			return;
+
+		// _xmlsf_news_exclude
+		if ( isset($_POST['xmlsf_news_exclude']) && $_POST['xmlsf_news_exclude'] != '' ) {
+			update_post_meta($post_id, '_xmlsf_news_exclude', $_POST['xmlsf_news_exclude']);
+		} else {
+			delete_post_meta($post_id, '_xmlsf_news_exclude');
+		}
+	}
 
 	/**
      * Add options page

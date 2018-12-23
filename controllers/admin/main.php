@@ -43,7 +43,6 @@ class XMLSF_Admin_Controller
 		add_action( 'admin_init', array( $this, 'transients_actions' ) );
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
-		add_action( 'admin_init', array( $this, 'register_meta_boxes' ) );
 		if ( ( !is_multisite() && current_user_can( 'manage_options' ) ) || is_super_admin() )
 			add_action( 'admin_init', array( $this, 'static_files' ) );
 		add_action( 'admin_init', array( $this, 'check_plugin_conflicts' ) );
@@ -198,149 +197,6 @@ class XMLSF_Admin_Controller
 	}
 
 	/**
-	* META BOXES
-	*/
-
-	/**
-	 * Register settings and add settings fields
-	 */
-
-	public function register_meta_boxes()
-	{
-		$sitemaps = (array) get_option( 'xmlsf_sitemaps' );
-
-		if ( isset($sitemaps['sitemap-news']) ) {
-      		// post meta box
-      		add_action( 'add_meta_boxes', array($this,'add_meta_box_news') );
-		}
-
-		if ( isset($sitemaps['sitemap']) ) {
-			// post meta box
-			add_action( 'add_meta_boxes', array($this,'add_meta_box') );
-		}
-
-		if ( isset($sitemaps['sitemap']) || isset($sitemaps['sitemap-news']) ) {
-	        // save post meta box settings
-	        add_action( 'save_post', array($this,'save_metadata') );
-		}
-	}
-
-	/* Adds a XML Sitemap box to the side column */
-	public function add_meta_box ()
-	{
-		$post_types = get_option( 'xmlsf_post_types' );
-		if ( !is_array( $post_types ) ) return;
-
-		foreach ( $post_types as $post_type => $settings ) {
-			// Only include metaboxes on post types that are included
-			if ( isset( $settings["active"] ) )
-				add_meta_box(
-					'xmlsf_section',
-					__( 'XML Sitemap', 'xml-sitemap-feed' ),
-					array( $this, 'meta_box' ),
-					$post_type,
-					'side',
-					'low'
-				);
-		}
-	}
-
-	public function meta_box( $post )
-	{
-		// Use nonce for verification
-		wp_nonce_field( XMLSF_BASENAME, '_xmlsf_nonce' );
-
-		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
-		$exclude = get_post_meta( $post->ID, '_xmlsf_exclude', true );
-		$priority = get_post_meta( $post->ID, '_xmlsf_priority', true );
-		$disabled = false;
-
-		// disable options and (visibly) set excluded to true for private posts
-		if ( 'private' == $post->post_status ) {
-			$disabled = true;
-			$exclude = true;
-		}
-
-		// disable options and (visibly) set priority to 1 for front page
-		if ( $post->ID == get_option('page_on_front') ) {
-			$disabled = true;
-			$exclude = false;
-			$priority = '1'; // force priority to 1 for front page
-		}
-
-		$description = sprintf(
-			__('Leave empty for automatic Priority as configured on %1$s > %2$s.','xml-sitemap-feed'),
-			translate('Settings'),
-			'<a href="' . admin_url('options-general.php') . '?page=xmlsf">' . __('XML Sitemap','xml-sitemap-feed') . '</a>'
-		);
-
-		// The actual fields for data entry
-		include XMLSF_DIR . '/views/admin/meta-box.php';
-	}
-
-	/* Adds a News Sitemap box to the side column */
-	public function add_meta_box_news ()
-	{
-		$news_tags = get_option('xmlsf_news_tags');
-		$news_post_types = !empty($news_tags['post_type']) && is_array($news_tags['post_type']) ? $news_tags['post_type'] : array('post');
-
-		foreach ( $news_post_types as $post_type ) {
-      // Only include metabox on post types that are included
-			add_meta_box(
-				'xmlsf_news_section',
-				__( 'Google News', 'xml-sitemap-feed' ),
-				array($this,'meta_box_news'),
-				$post_type,
-				'side'
-			);
-		}
-	}
-
-	public function meta_box_news( $post )
-	{
-		// Use nonce for verification
-		wp_nonce_field( XMLSF_BASENAME, '_xmlsf_nonce' );
-
-		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
-		$exclude = 'private' == $post->post_status || get_post_meta( $post->ID, '_xmlsf_news_exclude', true );
-		$disabled = 'private' == $post->post_status;
-
-		// The actual fields for data entry
-		include XMLSF_DIR . '/views/admin/meta-box-news.php';
-	}
-
-	/* When the post is saved, save our meta data */
-	public function save_metadata( $post_id )
-	{
-		if ( !isset($post_id) )
-			$post_id = (int)$_REQUEST['post_ID'];
-
-		if ( !current_user_can( 'edit_post', $post_id ) || !isset($_POST['_xmlsf_nonce']) || !wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME) )
-			return;
-
-		// _xmlsf_priority
-		if ( empty($_POST['xmlsf_priority']) && '0' !== $_POST['xmlsf_priority'] ) {
-			delete_post_meta($post_id, '_xmlsf_priority');
-		} else {
-			update_post_meta($post_id, '_xmlsf_priority', XMLSF_Admin_Sitemap_Sanitize::priority($_POST['xmlsf_priority']) );
-		}
-
-		// _xmlsf_exclude
-		if ( isset($_POST['xmlsf_exclude']) && $_POST['xmlsf_exclude'] != '' ) {
-			update_post_meta($post_id, '_xmlsf_exclude', $_POST['xmlsf_exclude']);
-		} else {
-			delete_post_meta($post_id, '_xmlsf_exclude');
-		}
-
-		// _xmlsf_news_exclude
-		if ( isset($_POST['xmlsf_news_exclude']) && $_POST['xmlsf_news_exclude'] != '' ) {
-			update_post_meta($post_id, '_xmlsf_news_exclude', $_POST['xmlsf_news_exclude']);
-		} else {
-			delete_post_meta($post_id, '_xmlsf_news_exclude');
-		}
-	}
-
-	/**
 	 * Clear settings
 	 */
 	public function clear_settings()
@@ -422,6 +278,10 @@ class XMLSF_Admin_Controller
 	public function check_plugin_conflicts()
 	{
 		$sitemaps = get_option( 'xmlsf_sitemaps', array() );
+
+		// TODO:
+		// W3TC static files 404 exclusion rules
+		// Google (XML) Sitemaps Generator Plugin for WordPress and Google News sitemap incompatibility
 
 		// WP SEO Plugin conflict notices
 		if ( ! empty( $sitemaps['sitemap'] ) && is_plugin_active('wordpress-seo/wp-seo.php') ) {
