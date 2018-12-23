@@ -102,5 +102,7 @@ function xmlsf_activate() {
 function xmlsf_deactivate() {
 	delete_transient( 'xmlsf_flush_rewrite_rules' );
 	delete_transient( 'xmlsf_check_static_files' );
+	// remove filter and flush rules
+	remove_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 1, 1 );
 	flush_rewrite_rules();
 }
