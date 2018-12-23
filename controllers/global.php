@@ -6,6 +6,13 @@
 
 function xmlsf_init() {
 
+	// Upgrade/install, maybe...
+	$db_version = get_option( 'xmlsf_version', 0 );
+	if ( ! version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
+		require XMLSF_DIR . '/controllers/upgrade.php';
+		new XMLSitemapFeed_Upgrade( $db_version );
+	}
+
 	if ( is_admin() ) {
 		require XMLSF_DIR . '/controllers/admin/main.php';
 	}
@@ -71,24 +78,6 @@ function xmlsf_rewrite_rules( $rewrite_rules ) {
 	}
 
 	return $rewrite_rules;
-}
-
-/**
- * Upgrade/install, maybe...
- *
- * @since 5.0
- * @return void
- */
-function xmlsf_maybe_upgrade() {
-	$db_version = get_option( 'xmlsf_version', 0 );
-
-	if ( version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
-		return;
-	}
-
-	require XMLSF_DIR . '/controllers/upgrade.php';
-
-	new XMLSitemapFeed_Upgrade( $db_version );
 }
 
 /**
