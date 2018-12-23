@@ -66,8 +66,9 @@ class XMLSitemapFeed_Uninstall {
 		delete_option('xmlsf_domains');
 		delete_option('xmlsf_news_tags');
 
-		// make rewrite rules update at the appropriate time
-		delete_option('rewrite_rules');
+		// remove filter and flush rules
+		remove_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 1, 1 );
+		flush_rewrite_rules();
 
 		// Kilroy was here
 		if ( defined('WP_DEBUG') && WP_DEBUG ) {

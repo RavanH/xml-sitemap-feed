@@ -13,10 +13,7 @@ class XMLSitemapFeed_Upgrade {
 	 */
 	function __construct( $db_version = null )
 	{
-		// don't flush rules from init as Polylang chokes on that
-		// just remove the db option and let WP regenerate them when ready...
-		delete_option( 'rewrite_rules' );
-		// ... but make sure rules are regenerated when admin is visited.
+		// make sure rules are regenerated when admin is visited.
 		set_transient( 'xmlsf_flush_rewrite_rules', '' );
 		// static files checking
 		set_transient( 'xmlsf_check_static_files', '' );

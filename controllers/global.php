@@ -56,17 +56,21 @@ function xmlsf_init() {
  *
  * @return void
  */
-function xmlsf_rewrite_rules() {
+function xmlsf_rewrite_rules( $rewrite_rules ) {
 	global $wp_rewrite;
 
 	$sitemaps = get_option( 'xmlsf_sitemaps' );
 
 	if ( isset($sitemaps['sitemap']) ) {
 		/* One rule to ring them all */
-		add_rewrite_rule('sitemap(-[a-z0-9_\-]+)?\.([0-9]+\.)?xml$', $wp_rewrite->index . '?feed=sitemap$matches[1]&m=$matches[2]', 'top');
+		//add_rewrite_rule('sitemap(-[a-z0-9_\-]+)?\.([0-9]+\.)?xml$', $wp_rewrite->index . '?feed=sitemap$matches[1]&m=$matches[2]', 'top');
+		return array_merge( array( 'sitemap(-[a-z0-9_\-]+)?\.([0-9]+\.)?xml$' => $wp_rewrite->index . '?feed=sitemap$matches[1]&m=$matches[2]' ), $rewrite_rules );
 	} elseif ( isset($sitemaps['sitemap-news']) ) {
-		add_rewrite_rule('sitemap-news\.xml$', $wp_rewrite->index . '?feed=sitemap-news', 'top');
+		//add_rewrite_rule('sitemap-news\.xml$', $wp_rewrite->index . '?feed=sitemap-news', 'top');
+		return array_merge( array( 'sitemap-news\.xml$' => $wp_rewrite->index . '?feed=sitemap-news' ), $rewrite_rules );
 	}
+
+	return $rewrite_rules;
 }
 
 /**
@@ -95,7 +99,6 @@ function xmlsf_maybe_upgrade() {
  */
 
 function xmlsf_activate() {
-	delete_option( 'rewrite_rules' );
 	set_transient( 'xmlsf_flush_rewrite_rules', '' );
 	set_transient( 'xmlsf_check_static_files', '' );
 }
