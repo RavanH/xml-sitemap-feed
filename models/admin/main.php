@@ -27,7 +27,7 @@ function xmlsf_nginx_helper_purge_urls( $urls = array(), $redis = false ) {
 			$urls[] = '/sitemap-home.xml';
 			$urls[] = '/sitemap-custom.xml';
 
-			include_once XMLSF_DIR . '/models/public/sitemap.php';
+			require_once XMLSF_DIR . '/models/public/sitemap.php';
 
 			// add public post types sitemaps
 			$post_types = get_option( 'xmlsf_post_types' );

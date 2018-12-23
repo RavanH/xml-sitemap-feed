@@ -110,8 +110,8 @@ class XMLSF_Admin_Sitemap
     public function public_taxonomies()
 	{
 		if ( !isset( $this->public_taxonomies ) ) {
-			if ( ! function_exists('xmlsf_public_taxonomies') )
-				include XMLSF_DIR . '/models/public/sitemap.php';
+			require_once XMLSF_DIR . '/models/public/sitemap.php';
+			
 			$this->public_taxonomies = xmlsf_public_taxonomies();
 		}
 

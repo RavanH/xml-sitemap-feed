@@ -145,8 +145,7 @@ function update_term_modified_meta( $new_status, $old_status, $post ) {
 	$taxonomies = array();
 
 	if ( ! empty( $taxonomy_settings['active'] ) ) {
-		if ( ! function_exists('xmlsf_public_taxonomies') )
-			include XMLSF_DIR . '/models/public/sitemap.php';
+		require_once XMLSF_DIR . '/models/public/sitemap.php';
 
 		$taxonomies =  empty( get_option( 'xmlsf_taxonomies' ) ) ? xmlsf_public_taxonomies() :  get_option( 'xmlsf_taxonomies' );
 	}

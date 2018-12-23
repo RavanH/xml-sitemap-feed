@@ -14,8 +14,8 @@ function xmlsf_filter_request( $request ) {
 		// make sure we have the proper locale setting for calculations
 		setlocale( LC_NUMERIC, 'C' );
 
-		require_once XMLSF_DIR . '/controllers/public/shared.php';
-		require_once XMLSF_DIR . '/models/public/shared.php';
+		require XMLSF_DIR . '/controllers/public/shared.php';
+		require XMLSF_DIR . '/models/public/shared.php';
 
 		// set the sitemap conditional flag
 		xmlsf()->is_sitemap = true;
@@ -47,11 +47,11 @@ function xmlsf_filter_request( $request ) {
 			// set the news sitemap conditional flag
 			xmlsf()->is_news = true;
 
-			require_once XMLSF_DIR . '/controllers/public/sitemap-news.php';
-			require_once XMLSF_DIR . '/models/public/sitemap-news.php';
+			require XMLSF_DIR . '/controllers/public/sitemap-news.php';
+			require XMLSF_DIR . '/models/public/sitemap-news.php';
 			$request = xmlsf_sitemap_news_parse_request( $request );
 		} else {
-			require_once XMLSF_DIR . '/controllers/public/sitemap.php';
+			require XMLSF_DIR . '/controllers/public/sitemap.php';
 			require_once XMLSF_DIR . '/models/public/sitemap.php';
 			xmlsf_feed_templates();
 			$request = xmlsf_sitemap_parse_request( $request );
