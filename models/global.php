@@ -11,6 +11,7 @@ function xmlsf_robots_txt( $output ) {
 
 	$sitemaps = get_option( 'xmlsf_sitemaps' );
 
+	// PRE
 	$pre = '# XML Sitemap & Google News version ' . XMLSF_VERSION . ' - https://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
 	if ( '1' != get_option('blog_public') )
 		$pre .= '# XML Sitemaps are disabled because of this site\'s privacy settings.' . PHP_EOL;
@@ -21,7 +22,12 @@ function xmlsf_robots_txt( $output ) {
 			$pre .= 'Sitemap: ' . $url . $pretty . PHP_EOL;
 	$pre .= PHP_EOL;
 
+	// DEFAULT
+	if ( substr($output, -1) !== PHP_EOL ) $output .= PHP_EOL;
+
+	// POST
 	$post = get_option('xmlsf_robots');
+	if ( $post !== '' ) $post .= PHP_EOL;
 
 	return $pre . $output . $post;
 }
