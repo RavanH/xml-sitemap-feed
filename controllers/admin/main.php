@@ -283,7 +283,7 @@ class XMLSF_Admin_Controller
 		// W3TC static files 404 exclusion rules
 		// Google (XML) Sitemaps Generator Plugin for WordPress and Google News sitemap incompatibility
 
-		// WP SEO Plugin conflict notices
+		// WP SEO conflict notices
 		if ( ! empty( $sitemaps['sitemap'] ) && is_plugin_active('wordpress-seo/wp-seo.php') ) {
 			// check date archive redirection
 			$wpseo_titles = get_option( 'wpseo_titles' );
@@ -303,7 +303,7 @@ class XMLSF_Admin_Controller
 			}
 		}
 
-		// WP SEO Plugin conflict notices
+		// SEOPress conflict notices
 		if ( ! empty( $sitemaps['sitemap'] ) && is_plugin_active('wp-seopress/seopress.php') ) {
 
 			// check date archive redirection
@@ -318,7 +318,7 @@ class XMLSF_Admin_Controller
 					}
 				}
 			}
-			// check wpseo sitemap option
+			// check seopress sitemap option
 			$seopress_xml_sitemap = get_option( 'seopress_xml_sitemap_option_name' );
 			if ( ! empty( $seopress_toggle['toggle-xml-sitemap'] ) && !empty( $seopress_xml_sitemap['seopress_xml_sitemap_general_enable'] ) ) {
 				add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_seopress_sitemap' ) );
