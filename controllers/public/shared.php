@@ -32,3 +32,19 @@ function xmlsf_usage() {
 		require XMLSF_DIR . '/views/_usage.php';
 	}
 }
+
+/**
+ * Try to turn on ob_gzhandler output compression
+ */
+function xmlsf_ob_gzhandler() {
+	in_array('ob_gzhandler', ob_list_handlers())
+	|| ob_get_contents()
+	|| ini_get("zlib.output_compression")
+	|| ( isset($_SERVER['HTTP_X_VARNISH']) && is_numeric($_SERVER['HTTP_X_VARNISH']) )
+	|| ob_start("ob_gzhandler");
+
+	if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
+		$status = in_array('ob_gzhandler', ob_list_handlers()) ? 'ENABLED' : 'DISABLED';
+		error_log('GZhandler output buffer compression '.$status);
+	}
+}

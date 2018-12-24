@@ -39,6 +39,12 @@ function xmlsf_news_filter_no_news_limits( $limits ) {
  */
 function xmlsf_sitemap_news_parse_request( $request ) {
 
+	// check for gz request
+	if ( substr($request['feed'], -3) == '.gz' ) {
+		$request['feed'] = substr($request['feed'], 0, -3);
+		xmlsf_ob_gzhandler();
+	}
+
 	// prepare for news and return modified request
 	$options = get_option( 'xmlsf_news_tags' );
 	$post_types = is_array($options) && !empty($options['post_type']) ? $options['post_type'] : array('post');

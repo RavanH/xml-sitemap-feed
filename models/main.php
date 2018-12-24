@@ -43,7 +43,7 @@ function xmlsf_filter_request( $request ) {
 		// bbPress
 		remove_filter( 'bbp_request', 'bbp_request_feed_trap' );
 
-		if ( $request['feed'] == 'sitemap-news' ) {
+		if ( strpos($request['feed'],'sitemap-news') === 0 ) {
 			// set the news sitemap conditional flag
 			xmlsf()->is_news = true;
 
