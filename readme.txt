@@ -294,6 +294,7 @@ Bugfix release.
 * Admin interface improvements: highlighting and scroll
 * Upgrade routines in own class only to be included when needed
 * Moved metabox methods to dedicated classes
+* NEW Respond to .gz request with ob_gzhandler output buffering
 
 = 5.0.7 =
 * Allowed domains back to Settings > Reading
