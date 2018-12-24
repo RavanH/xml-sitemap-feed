@@ -83,7 +83,7 @@ require XMLSF_DIR . '/controllers/global.php';
 add_action( 'init', 'xmlsf_init' );
 
 // add rewrite rules
-add_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 1, 1 );
+add_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 99, 1 );
 
 register_activation_hook( __FILE__, 'xmlsf_activate' );
 
