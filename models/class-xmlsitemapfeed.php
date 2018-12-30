@@ -255,6 +255,7 @@ class XMLSitemapFeed {
 	 * @return array
 	 */
 	public function disabled_taxonomies() {
-		return $this->disabled_taxonomies;
+		return apply_filters( 'xmlsf_disabled_taxonomies', $this->disabled_taxonomies );
 	}
+
 }

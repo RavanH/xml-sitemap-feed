@@ -38,6 +38,8 @@ define( 'XMLSF_VERSION', '5.0.96' );
  *							 XML Sitemap context. Passes variable $post_id; must return true or false.
  *  xmlsf_news_excluded   -> Filters the response when checking the post for exclusion flags in
  *							 Google News sitemap context. Passes variable $post_id; must return true or false.
+ *  xmlsf_disabled_taxonomies -> Filters the taxonomies that should be unavailable for sitemaps
+ *                               Passes an array of taxonomies to exclude; must return an array.
  *  the_title_xmlsitemap  -> Filters the Google News publication name and title, plus
  *                           the Image title and caption tags.
  *  xmlsf_custom_urls     -> Filters the custom urls array
