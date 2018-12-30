@@ -40,19 +40,19 @@ $have_posts = false;
 // loop away!
 if ( have_posts() ) :
     while ( have_posts() ) :
-	the_post();
+		the_post();
 
-	// check if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
-	// or if post meta says "exclude me please"
-	if ( apply_filters(
-		 	'xmlsf_news_excluded',
-		 	get_post_meta( $post->ID, '_xmlsf_news_exclude', true ),
-		 	$post->ID
-		 ) || !xmlsf_is_allowed_domain( get_permalink() ) )
-		continue;
+		// check if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
+		// or if post meta says "exclude me please"
+		if ( apply_filters(
+			 	'xmlsf_news_excluded',
+			 	get_post_meta( $post->ID, '_xmlsf_news_exclude', true ),
+			 	$post->ID
+			 ) || !xmlsf_is_allowed_domain( get_permalink() ) )
+			continue;
 
-	$have_posts = true;
-	?>
+		$have_posts = true;
+		?>
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
 		<news:news>
@@ -64,39 +64,30 @@ if ( have_posts() ) :
 						echo apply_filters( 'the_title_xmlsitemap', XMLSF_GOOGLE_NEWS_NAME );
 					else
 						echo apply_filters( 'the_title_xmlsitemap', get_bloginfo('name') ); ?></news:name>
-				<news:language><?php echo xmlsf_get_language($post->ID); ?></news:language>
+				<news:language><?php echo xmlsf_get_language( $post->ID ); ?></news:language>
 			</news:publication>
 			<news:publication_date><?php
 				echo mysql2date('Y-m-d\TH:i:s+00:00', $post->post_date_gmt, false); ?></news:publication_date>
 			<news:title><?php echo apply_filters( 'the_title_xmlsitemap', get_the_title() ); ?></news:title>
-
 <?php do_action( 'xmlsf_news_tags_after' ); ?>
 		</news:news>
 <?php
-	if ( !empty($options['image']) ) :
-		foreach ( xmlsf_get_images('news') as $image ) {
-			if ( empty($image['loc']) )
-				continue;
-	?>
+		if ( !empty($options['image']) ) :
+			foreach ( xmlsf_get_images('news') as $image ) {
+				if ( empty($image['loc']) )
+					continue;
+		?>
 		<image:image>
 			<image:loc><?php echo utf8_uri_encode( $image['loc'] ); ?></image:loc>
-<?php
-		if ( !empty($image['title']) ) {
-		?>
+<?php 			if ( !empty($image['title']) ) { ?>
 			<image:title><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $image['title']); ?>]]></image:title>
-<?php
-		}
-		if ( !empty($image['caption']) ) {
-		?>
+<?php 			}
+				if ( !empty($image['caption']) ) { ?>
 			<image:caption><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $image['caption']); ?>]]></image:caption>
-<?php
-		}
-		?>
+<?php 			} ?>
 		</image:image>
-<?php
-		}
-	endif;
-	?>
+<?php 		}
+		endif; ?>
 	</url>
 <?php
     endwhile;
