@@ -7,10 +7,15 @@ class XMLSF_Admin_Sitemap_News
      */
     private $screen_id;
 
-    /**
+	/**
      * Holds the values to be used in the fields callbacks
      */
     private $options;
+
+	/**
+     * Advanced module available?
+     */
+    private $advanced = false;
 
     /**
      * Start up
@@ -97,6 +102,8 @@ class XMLSF_Admin_Sitemap_News
     {
 		$this->options = get_option( 'xmlsf_news_tags', array() );
 
+		$this->advanced = is_plugin_active('xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php');
+
 		// SECTION
 		add_settings_section( 'news_sitemap_section', /* '<a name="xmlnf"></a>'.__('Google News Sitemap','xml-sitemap-feed') */ '', '', 'xmlsf-news' );
 
@@ -115,7 +122,16 @@ class XMLSF_Admin_Sitemap_News
 			}
 		}
 
+		// Images
 		add_settings_field( 'xmlsf_news_image', translate('Images'), array( $this,'image_field' ), 'xmlsf-news', 'news_sitemap_section' );
+
+		// Keywords
+		add_settings_field( 'xmlsf_news_keywords', __('Keywords', 'xml-sitemap-feed' ), array( $this,'keywords_field' ), 'xmlsf-news', 'news_sitemap_section' );
+
+		// Stock tickers
+		add_settings_field( 'xmlsf_news_stock_tickers', __('Stock tickers', 'xml-sitemap-feed' ), array( $this,'stock_tickers_field' ), 'xmlsf-news', 'news_sitemap_section' );
+
+		// Source labels - deprecated
 		add_settings_field( 'xmlsf_news_labels', __('Source labels', 'xml-sitemap-feed' ), array($this,'labels_field'), 'xmlsf-news', 'news_sitemap_section' );
 
 		$options = (array) get_option( 'xmlsf_sitemaps' );
@@ -165,6 +181,17 @@ class XMLSF_Admin_Sitemap_News
 		) );
 
 		ob_start();
+		include XMLSF_DIR . '/views/admin/help-tab-news-categories.php';
+		include XMLSF_DIR . '/views/admin/help-tab-support.php';
+		$content = ob_get_clean();
+
+		$screen->add_help_tab( array(
+			'id'      => 'sitemap-news-categories',
+			'title'   => translate('Categories'),
+			'content' => $content
+		) );
+
+		ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-news-images.php';
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();
@@ -176,13 +203,24 @@ class XMLSF_Admin_Sitemap_News
 		) );
 
 		ob_start();
-		include XMLSF_DIR . '/views/admin/help-tab-news-categories.php';
+		include XMLSF_DIR . '/views/admin/help-tab-news-keywords.php';
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
-			'id'      => 'sitemap-news-categories',
-			'title'   => translate('Categories'),
+			'id'      => 'sitemap-news-keywords',
+			'title'   => __( 'Keywords', 'xml-sitemap-feed' ),
+			'content' => $content
+		) );
+
+		ob_start();
+		include XMLSF_DIR . '/views/admin/help-tab-news-stocktickers.php';
+		include XMLSF_DIR . '/views/admin/help-tab-support.php';
+		$content = ob_get_clean();
+
+		$screen->add_help_tab( array(
+			'id'      => 'sitemap-news-stocktickers',
+			'title'   => __( 'Stock tickers', 'xml-sitemap-feed' ),
 			'content' => $content
 		) );
 
@@ -248,12 +286,22 @@ class XMLSF_Admin_Sitemap_News
 	}
 
 	public function image_field() {
-		$options = get_option( 'xmlsf_news_tags' );
-
-		$image = !empty( $options['image'] ) ? $options['image'] : '';
+		$image = !empty( $this->options['image'] ) ? $this->options['image'] : '';
 
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-news-image.php';
+	}
+
+	public function keywords_field() {
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/field-news-keywords.php';
+	}
+
+	public function stock_tickers_field() {
+		$stock_tickers = apply_filters( 'xmlsf_news_enable_stock_tickers', '' );
+
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/field-news-stocktickers.php';
 	}
 
 	public function labels_field() {

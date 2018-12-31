@@ -295,6 +295,7 @@ Bugfix release.
 * Upgrade routines in own class only to be included when needed
 * Moved metabox methods to dedicated classes
 * NEW Respond to .gz request with ob_gzhandler output buffering
+* NEW filters xmlsf_disabled_taxonomies, xmlsf_news_keywords, xmlsf_news_stock_tickers
 
 = 5.0.7 =
 * Allowed domains back to Settings > Reading
