@@ -291,6 +291,7 @@ Bugfix release.
 * FIX bbPress incompatibility
 * FIX failing last modified date for taxonomy sitemaps
 * FIX sitemap showing when only private posts
+* FIX possible sitemaps for no longer existing post types in index
 * Admin interface improvements: highlighting and scroll
 * Upgrade routines in own class only to be included when needed
 * Moved metabox methods to dedicated classes
