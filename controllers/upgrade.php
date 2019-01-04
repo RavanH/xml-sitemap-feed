@@ -164,6 +164,12 @@ class XMLSitemapFeed_Upgrade {
 			delete_option( 'xmlsf_version' );
 		}
 
+		if ( version_compare( '5.1', $db_version, '>' ) ) {
+			delete_transient('xmlsf_ping_google_sitemap_news');
+			delete_transient('xmlsf_ping_google_sitemap');
+			delete_transient('xmlsf_ping_bing_sitemap');
+		}
+
 		if ( defined('WP_DEBUG') && WP_DEBUG ) {
 			error_log('XML Sitemap Feeds upgraded from '.$db_version.' to '.XMLSF_VERSION);
 		}

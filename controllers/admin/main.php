@@ -391,6 +391,16 @@ class XMLSF_Admin_Controller
 				add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_nonce_fail') );
 			}
 		}
+
+		if ( isset( $_POST['xmlsf-flush-rewrite-rules'] ) ) {
+			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+				// flush rewrite rules
+				flush_rewrite_rules();
+				add_settings_error( 'flush_admin_notice', 'flush_admin_notice', __('WordPress rewrite rules have been flushed.','xml-sitemap-feed'), 'updated' );
+			} else {
+				add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_nonce_fail') );
+			}
+		}
 	}
 
 	public function notices_actions()

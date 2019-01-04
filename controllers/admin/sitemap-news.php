@@ -23,10 +23,48 @@ class XMLSF_Admin_Sitemap_News
     public function __construct()
     {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
+		add_action( 'admin_init', array( $this, 'tools_actions' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_metadata' ) );
     }
+
+	public function tools_actions()
+	{
+		if ( isset( $_POST['xmlsf-ping-sitemap-news'] ) ) {
+			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+
+				$sitemaps = get_option( 'xmlsf_sitemaps' );
+				$result = xmlsf_ping( 'google', $sitemaps['sitemap-news'], 5 * MINUTE_IN_SECONDS );
+
+				switch( $result ) {
+					case 200:
+					$msg = sprintf( /* Translators: Search engine / Service name */ __( 'Pinged %s with success.', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ) );
+					$type = 'updated';
+					break;
+
+					case 999:
+					$msg = sprintf( /* Translators: Search engine / Service name, interval number */ __( 'Ping %s skipped: Sitemap already sent within the last %d minutes.', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ), 5 );
+					$type = 'notice-warning';
+					break;
+
+					case '':
+					$msg = sprintf( translate('Oops: %s'), translate('Something went wrong.') );
+					$type = 'error';
+					break;
+
+					default:
+					$msg = sprintf( /* Translators: Search engine / Service name, response code number */ __( 'Ping %s failed with response code: %d', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ), $result );
+					$type = 'error';
+				}
+
+				add_settings_error( 'ping_admin_notice', 'ping_admin_notice', $msg, $type );
+
+			} else {
+				add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_nonce_fail') );
+			}
+		}
+	}
 
 	/**
 	* META BOXES

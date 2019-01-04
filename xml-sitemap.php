@@ -57,6 +57,8 @@ define( 'XMLSF_VERSION', '5.0.100' );
  *	xmlsf_news_post_types -> Filters the post types array for the Google News sitemap settings page.
  *
  *  ACTIONS
+ *  xmlsf_ping            -> Fires hen a search engine has been pinged. Carries three arguments:
+ *                           (1) search engine name (google|bing), (2) sitemap name and (3) ping repsonse code
  *  xmlsf_news_tags_after -> Fired inside the Google News Sitemap loop at the end of the news
  *                           tags, just before each closing </news:news> is generated. Can be used to
  *                           echo custom tags or trigger another action in the background.

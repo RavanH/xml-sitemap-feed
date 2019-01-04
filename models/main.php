@@ -14,7 +14,6 @@ function xmlsf_filter_request( $request ) {
 		// make sure we have the proper locale setting for calculations
 		setlocale( LC_NUMERIC, 'C' );
 
-		require XMLSF_DIR . '/controllers/public/shared.php';
 		require XMLSF_DIR . '/models/public/shared.php';
 
 		// set the sitemap conditional flag
@@ -47,13 +46,10 @@ function xmlsf_filter_request( $request ) {
 			// set the news sitemap conditional flag
 			xmlsf()->is_news = true;
 
-			require XMLSF_DIR . '/controllers/public/sitemap-news.php';
 			require XMLSF_DIR . '/models/public/sitemap-news.php';
 			$request = xmlsf_sitemap_news_parse_request( $request );
 		} else {
-			require XMLSF_DIR . '/controllers/public/sitemap.php';
 			require_once XMLSF_DIR . '/models/public/sitemap.php';
-			xmlsf_feed_templates();
 			$request = xmlsf_sitemap_parse_request( $request );
 		}
 
@@ -77,33 +73,45 @@ function xmlsf_untrailingslash( $request ) {
 }
 
 /**
- * Filter sitemap post types
+ * Ping
  *
- * @since 5.0
- * @param $post_types array
- * @return array
+ * @since 5.1
+ * @param $se google|bing
+ * @param $sitemap sitemap
+ * @param $interval seconds
+ * @return string ping response|999 (postponed)
  */
-function xmlsf_filter_post_types( $post_types ) {
-	foreach ( array('attachment','reply') as $post_type ) {
-		if ( isset( $post_types[$post_type]) )
-			unset( $post_types[$post_type] );
+function xmlsf_ping( $se, $sitemap, $interval ) {
+	if ( 'google' == $se ) {
+		$url = 'https://www.google.com/ping';
+	} elseif ( 'bing' == $se ) {
+		$url = 'https://www.bing.com/ping';
+	} else {
+		return '';
 	}
 
-	return array_filter( $post_types );
-}
+	// check if we did not ping already within the interval
+	if ( false === get_transient( 'xmlsf_ping_'.$se.'_'.$sitemap ) ) {
+		$uri = add_query_arg( 'sitemap', urlencode( trailingslashit( get_bloginfo( 'url' ) ) . $sitemap ), $url );
 
-/**
- * Filter news post types
- *
- * @since 5.0
- * @param $post_types array
- * @return array
- */
-function xmlsf_news_filter_post_types( $post_types ) {
-	foreach ( array('attachment','page','reply') as $post_type ) {
-		if ( isset( $post_types[$post_type]) )
-			unset( $post_types[$post_type] );
+		// Ping !
+		$response = wp_remote_request( $uri );
+		$code = wp_remote_retrieve_response_code( $response );
+		if ( 200 === $code ) {
+			set_transient( 'xmlsf_ping_'.$se.'_'.$sitemap, '', $interval );
+		}
+
+		if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
+			error_log( 'Pinged '. $uri .' with response code: ' . $code );
+		}
+	} else {
+		$code = 999;
+		if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
+			error_log( 'Ping '. $se .' skipped.' );
+		}
 	}
 
-	return array_filter( $post_types );
+	do_action('xmlsf_ping', $se, $sitemap, $code );
+
+	return $code;
 }

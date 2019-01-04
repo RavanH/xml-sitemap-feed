@@ -40,7 +40,15 @@
 		<h3><span class="dashicons dashicons-admin-tools"></span> <?php echo translate('Tools'); ?></h3>
 		<form action="" method="post">
 			<?php wp_nonce_field( XMLSF_BASENAME.'-help', '_xmlsf_help_nonce' ); ?>
-			<input type="submit" name="xmlsf-check-conflicts" class="button button-small" value="<?php _e( 'Check for conflicts', 'xml-sitemap-feed' ); ?>" />
+			<p>
+				<input type="submit" name="xmlsf-check-conflicts" class="button button-small" value="<?php _e( 'Check for conflicts', 'xml-sitemap-feed' ); ?>" />
+			</p>
+			<p>
+				<input type="submit" name="xmlsf-flush-rewrite-rules" class="button button-small" value="<?php _e( 'Flush rewrite rules', 'xml-sitemap-feed' ); ?>" />
+			</p>
+			<p>
+				<input type="submit" name="xmlsf-ping-sitemap-news" class="button button-small" value="<?php _e( 'Ping Google News', 'xml-sitemap-feed' ); ?>" />
+			</p>
 		</form>
 
 		<?php include XMLSF_DIR . '/views/admin/sidebar-help.php'; ?>
