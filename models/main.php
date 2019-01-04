@@ -42,6 +42,12 @@ function xmlsf_filter_request( $request ) {
 		// bbPress
 		remove_filter( 'bbp_request', 'bbp_request_feed_trap' );
 
+		// check for gz request
+		if ( substr($request['feed'], -3) == '.gz' ) {
+			$request['feed'] = substr($request['feed'], 0, -3);
+			xmlsf_ob_gzhandler();
+		}
+
 		if ( strpos($request['feed'],'sitemap-news') === 0 ) {
 			// set the news sitemap conditional flag
 			xmlsf()->is_news = true;

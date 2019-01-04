@@ -377,12 +377,6 @@ function xmlsf_set_terms_args( $args ) {
  */
 function xmlsf_sitemap_parse_request( $request ) {
 
-	// check for gz request
-	if ( substr($request['feed'], -3) == '.gz' ) {
-		$request['feed'] = substr($request['feed'], 0, -3);
-		xmlsf_ob_gzhandler();
-	}
-
 	$feed = explode( '-' ,$request['feed'], 3 );
 
 	if ( !isset( $feed[1] ) ) return $request;
