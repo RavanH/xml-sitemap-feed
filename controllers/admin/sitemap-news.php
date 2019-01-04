@@ -111,11 +111,10 @@ class XMLSF_Admin_Sitemap_News
 			return;
 
 		// _xmlsf_news_exclude
-		if ( isset($_POST['xmlsf_news_exclude']) && $_POST['xmlsf_news_exclude'] != '' ) {
-			update_post_meta($post_id, '_xmlsf_news_exclude', $_POST['xmlsf_news_exclude']);
-		} else {
+		if ( empty($_POST['xmlsf_news_exclude']) )
 			delete_post_meta($post_id, '_xmlsf_news_exclude');
-		}
+		else
+			update_post_meta($post_id, '_xmlsf_news_exclude', $_POST['xmlsf_news_exclude']);
 	}
 
 	/**

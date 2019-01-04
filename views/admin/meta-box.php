@@ -1,8 +1,8 @@
 <p>
     <label>
         <?php _e('Priority','xml-sitemap-feed'); ?>
-		<input type="number" step="0.1" min="0" max="1" name="xmlsf_priority" id="xmlsf_priority" value="<?php echo $priority; ?>" class="small-text"<?php echo disabled( $disabled, true, false )?> />
-    </label> 
+		<input type="number" step="0.1" min="0.1" max="1" name="xmlsf_priority" id="xmlsf_priority" value="<?php echo $priority; ?>" class="small-text"<?php echo disabled( $disabled, true, false )?> />
+    </label>
     <span class="description">
         <?php echo $description; ?>
 	</span>

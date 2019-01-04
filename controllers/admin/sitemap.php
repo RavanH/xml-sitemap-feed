@@ -133,18 +133,16 @@ class XMLSF_Admin_Sitemap
 			return;
 
 		// _xmlsf_priority
-		if ( empty($_POST['xmlsf_priority']) && '0' !== $_POST['xmlsf_priority'] ) {
+		if ( empty($_POST['xmlsf_priority']) )
 			delete_post_meta($post_id, '_xmlsf_priority');
-		} else {
+		else
 			update_post_meta($post_id, '_xmlsf_priority', XMLSF_Admin_Sitemap_Sanitize::priority($_POST['xmlsf_priority']) );
-		}
 
 		// _xmlsf_exclude
-		if ( isset($_POST['xmlsf_exclude']) && $_POST['xmlsf_exclude'] != '' ) {
-			update_post_meta($post_id, '_xmlsf_exclude', $_POST['xmlsf_exclude']);
-		} else {
+		if ( empty($_POST['xmlsf_exclude']) )
 			delete_post_meta($post_id, '_xmlsf_exclude');
-		}
+		else
+			update_post_meta($post_id, '_xmlsf_exclude', $_POST['xmlsf_exclude']);
 	}
 
 	/**
