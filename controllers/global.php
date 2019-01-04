@@ -17,67 +17,49 @@ function xmlsf_init() {
 		require XMLSF_DIR . '/controllers/admin/main.php';
 	}
 
+	$sitemaps = get_option( 'xmlsf_sitemaps' );
 	// include sitemaps if any enabled
-	if ( get_option( 'xmlsf_sitemaps' ) ) {
-
-		// include main controller functions
-		require XMLSF_DIR . '/controllers/main.php';
-
-		add_action( 'clean_post_cache', 'xmlsf_clean_post_cache', 99, 2 );
-
-		// PINGING
-		add_action( 'transition_post_status', 'xmlsf_do_pings', 10, 3 );
-
-		// Update term meta lastmod date
-		add_action( 'transition_post_status', 'update_term_modified_meta', 10, 3 );
-
-		// include main model functions
+	if ( $sitemaps ) {
+		// main model functions
 		require XMLSF_DIR . '/models/main.php';
+
+		// force remove url trailing slash
+		add_filter( 'user_trailingslashit', 'xmlsf_untrailingslash' );
 
 		// MAIN REQUEST filter
 		add_filter( 'request', 'xmlsf_filter_request', 1 );
 
-		// force remove url trailing slash
-		add_filter( 'user_trailingslashit', 'xmlsf_untrailingslash' );
+		// main controller functions
+		require XMLSF_DIR . '/controllers/main.php';
+
+		// include and instantiate class
+		xmlsf();
+
+		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
+			require XMLSF_DIR . '/models/sitemap-news.php';
+			add_filter( 'xmlsf_news_post_types', 'xmlsf_news_filter_post_types' );
+			//add_filter( 'request', 'xmlsf_news_filter_request', 2 );
+
+			require XMLSF_DIR . '/controllers/sitemap-news.php';
+		}
+
+		if ( ! empty( $sitemaps['sitemap'] ) ) {
+			require XMLSF_DIR . '/models/sitemap.php';
+			add_filter( 'xmlsf_post_types', 'xmlsf_filter_post_types' );
+			//add_filter( 'request', 'xmlsf_sitemap_filter_request', 3 );
+
+			require XMLSF_DIR . '/controllers/sitemap.php';
+			new XMLSF_Sitemap_Controller( $sitemaps['sitemap'] );
+		}
 
 		// common sitemap element filters
 		add_filter( 'the_title_xmlsitemap', 'strip_tags' );
 		add_filter( 'the_title_xmlsitemap', 'ent2ncr', 8 );
 		add_filter( 'the_title_xmlsitemap', 'esc_html' );
-
-		add_filter( 'xmlsf_news_post_types', 'xmlsf_news_filter_post_types' );
-		add_filter( 'xmlsf_post_types', 'xmlsf_filter_post_types' );
-
-		// include and instantiate class
-		xmlsf();
 	}
 
 	// add robots.txt filter
 	add_filter( 'robots_txt', 'xmlsf_robots_txt', 9 );
-}
-
-/**
- * Add sitemap rewrite rules
- *
- * @uses object $wp_rewrite
- *
- * @return void
- */
-function xmlsf_rewrite_rules( $rewrite_rules ) {
-	global $wp_rewrite;
-
-	$sitemaps = get_option( 'xmlsf_sitemaps' );
-
-	if ( isset($sitemaps['sitemap']) ) {
-		/* One rule to ring them all */
-		//add_rewrite_rule('sitemap(-[a-z0-9_\-]+)?\.([0-9]+\.)?xml$', $wp_rewrite->index . '?feed=sitemap$matches[1]&m=$matches[2]', 'top');
-		return array_merge( array( 'sitemap(\-[a-z0-9_\-]+)?(\.[0-9]+)?\.xml(\.gz)?$' => $wp_rewrite->index . '?feed=sitemap$matches[1]$matches[3]&m=$matches[2]' ), $rewrite_rules );
-	} elseif ( isset($sitemaps['sitemap-news']) ) {
-		//add_rewrite_rule('sitemap-news\.xml$', $wp_rewrite->index . '?feed=sitemap-news', 'top');
-		return array_merge( array( 'sitemap-news\.xml(\.gz)?$' => $wp_rewrite->index . '?feed=sitemap-news$matches[1]' ), $rewrite_rules );
-	}
-
-	return $rewrite_rules;
 }
 
 /**

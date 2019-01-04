@@ -1,6 +1,50 @@
 <?php
 
 /**
+ * Get instantiated sitemap class
+ *
+ * @since 5.0
+ * @global XMLSitemapFeed $xmlsf
+ * @return XMLSitemapFeed object
+ */
+function xmlsf() {
+	global $xmlsf;
+
+	if ( ! isset( $xmlsf ) ) {
+		if ( ! class_exists( 'XMLSitemapFeed' ) )
+			require XMLSF_DIR . '/models/class-xmlsitemapfeed.php';
+
+		$xmlsf = new XMLSitemapFeed();
+	}
+
+	return $xmlsf;
+}
+
+/**
+ * Add sitemap rewrite rules
+ *
+ * @global object $wp_rewrite
+ * @param array $rewrite_rules
+ * @return array $rewrite_rules
+ */
+function xmlsf_rewrite_rules( $rewrite_rules ) {
+	global $wp_rewrite;
+
+	$sitemaps = get_option( 'xmlsf_sitemaps' );
+
+	if ( isset($sitemaps['sitemap']) ) {
+		/* One rule to ring them all */
+		//add_rewrite_rule('sitemap(-[a-z0-9_\-]+)?\.([0-9]+\.)?xml$', $wp_rewrite->index . '?feed=sitemap$matches[1]&m=$matches[2]', 'top');
+		return array_merge( array( 'sitemap(\-[a-z0-9_\-]+)?(\.[0-9]+)?\.xml(\.gz)?$' => $wp_rewrite->index . '?feed=sitemap$matches[1]$matches[3]&m=$matches[2]' ), $rewrite_rules );
+	} elseif ( isset($sitemaps['sitemap-news']) ) {
+		//add_rewrite_rule('sitemap-news\.xml$', $wp_rewrite->index . '?feed=sitemap-news', 'top');
+		return array_merge( array( 'sitemap-news\.xml(\.gz)?$' => $wp_rewrite->index . '?feed=sitemap-news$matches[1]' ), $rewrite_rules );
+	}
+
+	return $rewrite_rules;
+}
+
+/**
  * Filter robots.txt rules
  *
  * @param $output
@@ -30,26 +74,6 @@ function xmlsf_robots_txt( $output ) {
 	if ( $post !== '' ) $post .= PHP_EOL;
 
 	return $pre . $output . $post;
-}
-
-/**
- * Get instantiated sitemap class
- *
- * @since 5.0
- * @global XMLSitemapFeed $xmlsf
- * @return XMLSitemapFeed object
- */
-function xmlsf() {
-	global $xmlsf;
-
-	if ( ! isset( $xmlsf ) ) {
-		if ( ! class_exists( 'XMLSitemapFeed' ) )
-			require XMLSF_DIR . '/models/class-xmlsitemapfeed.php';
-
-		$xmlsf = new XMLSitemapFeed();
-	}
-
-	return $xmlsf;
 }
 
 /* -------------------------------------

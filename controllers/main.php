@@ -1,36 +1,6 @@
 <?php
 
 /**
- * Cache delete on clean_post_cache
- *
- * @param $post_ID
- * @param $post
- */
-function xmlsf_clean_post_cache( $post_ID, $post ) {
-	// are we moving the post in or out of published status?
-	wp_cache_delete('xmlsf_get_archives', 'general');
-
-	// TODO get year / month here to delete specific keys too !!!!
-	$m = mysql2date('Ym',$post->post_date_gmt, false);
-	$y = substr($m, 0, 4);
-
-	// clear possible last post modified cache keys
-	wp_cache_delete( 'lastpostmodified:gmt', 'timeinfo' ); // should be handled by WP core?
-	wp_cache_delete( 'lastpostmodified'.$y.':gmt', 'timeinfo' );
-	wp_cache_delete( 'lastpostmodified'.$m.':gmt', 'timeinfo' );
-	wp_cache_delete( 'lastpostmodified'.$y.':gmt:'.$post->post_type, 'timeinfo' );
-	wp_cache_delete( 'lastpostmodified'.$m.':gmt:'.$post->post_type, 'timeinfo' );
-
-	// clear possible last post date cache keys
-	wp_cache_delete( 'lastpostdate:gmt', 'timeinfo' );
-	wp_cache_delete( 'lastpostdate:gmt:'.$post->post_type, 'timeinfo' );
-
-	// clear possible fist post date cache keys
-	wp_cache_delete( 'firstpostdate:gmt', 'timeinfo' );
-	wp_cache_delete( 'firstpostdate:gmt:'.$post->post_type, 'timeinfo' );
-}
-
-/**
  * Do pings, hooked to transition post status
  *
  * @param $new_status
@@ -49,120 +19,71 @@ function xmlsf_do_pings( $new_status, $old_status, $post ) {
 		return;
 
 	if ( isset( $sitemaps['sitemap-news'] ) ) {
-
 		// check if we've got a post type that is included in our news sitemap
+		// TODO also check category if needed
 		$news_tags = get_option('xmlsf_news_tags');
-		if ( !empty($news_tags['post_type']) && is_array($news_tags['post_type']) && in_array($post->post_type,$news_tags['post_type']) ) {
-
-			// Google ?
-			if ( in_array( 'google', $ping ) ) {
-				// check if we did not ping already within the last 5 minutes
-				if ( false === get_transient('xmlsf_ping_google_sitemap_news') ) {
-					// Ping !
-					$uri = add_query_arg( 'sitemap', urlencode( trailingslashit( get_bloginfo( 'url' ) ) . $sitemaps['sitemap-news'] ), 'https://www.google.com/ping' );
-					$response = wp_remote_request( $uri );
-					$code = wp_remote_retrieve_response_code( $response );
-					if ( 200 === $code ) {
-						set_transient( 'xmlsf_ping_google_sitemap_news', $sitemaps['sitemap-news'], 5 * MINUTE_IN_SECONDS );
-					} elseif ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-						error_log( 'Ping to '. $uri .' failed with response code: ' . $code );
-					}
-				} elseif ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-					error_log( 'Ping skipped: previous News Sitemap was sent to Google less than ' . 5 * MINUTE_IN_SECONDS . ' seconds ago.' );
-				}
-			}
-
-			// Bing ?
-			// nope...
+		if ( ! empty( $news_tags['post_type'] ) && in_array( $post->post_type, (array) $news_tags['post_type'] ) ) {
+			xmlsf_ping( 'google', $sitemaps['sitemap-news'], 5 * MINUTE_IN_SECONDS );
 		}
 	}
 
 	if ( isset( $sitemaps['sitemap'] ) ) {
-
 		// check if we've got a post type that is included in our sitemap
 		$post_types = get_option( 'xmlsf_post_types' );
 		if ( is_array( $post_types ) && array_key_exists( $post->post_type, $post_types ) ) {
 
-			// Google ?
-			if ( in_array( 'google', $ping ) ) {
-				// check if we did not ping already within the last hour
-				if ( false === get_transient('xmlsf_ping_google_sitemap') ) {
-					// Ping !
-					$uri = add_query_arg( 'sitemap', urlencode( trailingslashit( get_bloginfo( 'url' ) ) . $sitemaps['sitemap'] ), 'https://www.google.com/ping' );
-					$response = wp_remote_request( $uri );
-					$code = wp_remote_retrieve_response_code( $response );
-					if ( 200 === $code ) {
-						set_transient( 'xmlsf_ping_google_sitemap', $sitemaps['sitemap'], HOUR_IN_SECONDS );
-					} elseif ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-						error_log( 'Ping to '. $uri .' failed with response code: ' . $code );
-					}
-				} elseif ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-					error_log( 'Ping skipped: previous XML Sitemap was sent to Google less than ' . HOUR_IN_SECONDS . ' seconds ago.' );
-				}
-			}
-
-			// Bing ?
-			if ( in_array( 'bing', $ping ) ) {
-				// check if we did not ping already within the last hour
-				if ( false === get_transient('xmlsf_ping_bing_sitemap') ) {
-					// Ping !
-					$uri = add_query_arg( 'sitemap', urlencode( trailingslashit( get_bloginfo( 'url' ) ) . $sitemaps['sitemap'] ), 'https://www.bing.com/ping' );
-					$response = wp_remote_request( $uri );
-					$code = wp_remote_retrieve_response_code( $response );
-					if ( 200 === $code ) {
-						set_transient( 'xmlsf_ping_bing_sitemap', $sitemaps['sitemap'], HOUR_IN_SECONDS );
-					} elseif ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-						error_log( 'Ping to '. $uri .' failed with response code: ' . $code );
-					}
-				} elseif ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-					error_log( 'Ping skipped: previous XML Sitemap was sent to Bing less than ' . HOUR_IN_SECONDS . ' seconds ago.' );
-				}
+			foreach ( $ping as $se ) {
+				xmlsf_ping( $se, $sitemaps['sitemap'], HOUR_IN_SECONDS );
 			}
 		}
 	}
 }
 
 /**
- * Update term modified meta, hooked to transition post status
- *
- * @param $new_status
- * @param $old_status
- * @param $post
+ * WPML: switch language
+ * @see https://wpml.org/wpml-hook/wpml_post_language_details/
  */
-function update_term_modified_meta( $new_status, $old_status, $post ) {
-
-	// bail out on inactive post types
-	$xmlsf_post_types = get_option( 'xmlsf_post_types' );
-	if ( ! array_key_exists($post->post_type, $xmlsf_post_types) || empty( $xmlsf_post_types[$post->post_type]['active'] ) )
-		return;
-
-	// bail out when not publishing or unpublishing or editing a live post
-	// note: prepend " $old_status == $new_status || " to exclude live editong too
-	if ( $new_status != 'publish' && $old_status != 'publish' )
-		return;
-
-	$taxonomy_settings = (array) get_option( 'xmlsf_taxonomy_settings' );
-	$taxonomies = array();
-
-	if ( ! empty( $taxonomy_settings['active'] ) ) {
-		require_once XMLSF_DIR . '/models/public/sitemap.php';
-
-		$taxonomies =  empty( get_option( 'xmlsf_taxonomies' ) ) ? xmlsf_public_taxonomies() :  get_option( 'xmlsf_taxonomies' );
+function xmlsf_wpml_language_switcher() {
+	global $sitepress, $post;
+	if ( isset( $sitepress ) ) {
+		$post_language = apply_filters( 'wpml_post_language_details', NULL, $post->ID );
+		$sitepress->switch_lang( $post_language['language_code'] );
 	}
+}
 
-	if ( ! empty( $taxonomies ) ) {
-		$term_ids = array();
-		foreach ( (array) $taxonomies as $tax_name ) {
-			$terms = wp_get_post_terms( $post->ID, $tax_name, array( 'fields' => 'ids' ));
-			if ( !is_wp_error($terms) ) {
-				$term_ids = array_merge( $term_ids, $terms );
-			}
-		}
+/**
+ * Generator info
+ */
+function xmlsf_generator() {
+	$date = date('Y-m-d\TH:i:s+00:00');
 
-		$time = date('Y-m-d H:i:s');
+	require XMLSF_DIR . '/views/_generator.php';
+}
 
-		foreach( $term_ids as $id ) {
-			update_term_meta( $id, 'term_modified_gmt', $time );
-		}
+/**
+ * Usage info for debugging
+ */
+function xmlsf_usage() {
+	if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
+		$num = get_num_queries();
+		$mem = function_exists('memory_get_peak_usage') ? round(memory_get_peak_usage()/1024/1024,2) : 0;
+
+		require XMLSF_DIR . '/views/_usage.php';
+	}
+}
+
+/**
+ * Try to turn on ob_gzhandler output compression
+ */
+function xmlsf_ob_gzhandler() {
+	in_array('ob_gzhandler', ob_list_handlers())
+	|| ob_get_contents()
+	|| ini_get("zlib.output_compression")
+	|| ( isset($_SERVER['HTTP_X_VARNISH']) && is_numeric($_SERVER['HTTP_X_VARNISH']) )
+	|| ob_start("ob_gzhandler");
+
+	if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
+		$status = in_array('ob_gzhandler', ob_list_handlers()) ? 'ENABLED' : 'DISABLED';
+		error_log('GZhandler output buffer compression '.$status);
 	}
 }

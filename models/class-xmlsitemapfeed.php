@@ -234,8 +234,6 @@ class XMLSitemapFeed {
 		return $this->blog_language;
 	}
 
-
-
 	/**
 	 * Get scheme
 	 * @return string
