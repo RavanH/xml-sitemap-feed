@@ -227,6 +227,7 @@ class XMLSF_Admin_Controller
 	public function delete_static_files()
 	{
 		if ( empty($_POST['xmlsf-delete']) ) {
+			add_settings_error( 'static_files', 'none_selected', __('No files selected for deletion!','xml-sitemap-feed'), 'notice-warning' );
 			return;
 		}
 
@@ -314,7 +315,7 @@ class XMLSF_Admin_Controller
 			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
 				$this->clear_settings( 'sitemap' );
 			} else {
-				add_settings_error( 'clear_settings', 'clear_settings', translate('Security check failed.') );
+				add_settings_error( 'clear_settings', 'clear_settings_failed', translate('Security check failed.') );
 			}
 		}
 
@@ -322,7 +323,7 @@ class XMLSF_Admin_Controller
 			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
 				$this->clear_settings( 'sitemap-news' );
 			} else {
-				add_settings_error( 'clear_settings', 'clear_settings', translate('Security check failed.') );
+				add_settings_error( 'clear_settings', 'clear_settings_failed', translate('Security check failed.') );
 			}
 		}
 
@@ -330,7 +331,7 @@ class XMLSF_Admin_Controller
 			if ( isset( $_POST['_xmlsf_notice_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_notice_nonce'], XMLSF_BASENAME.'-notice' ) ) {
 				$this->delete_static_files();
 			} else {
-				add_settings_error( 'delete_files', 'delete_files', translate('Security check failed.') );
+				add_settings_error( 'delete_files', 'delete_files_failed', translate('Security check failed.') );
 			}
 		}
 
@@ -344,7 +345,7 @@ class XMLSF_Admin_Controller
 				if ( empty( self::$static_files ) )
 					add_settings_error( 'static_files_notice', 'static_files', __('No conflicting static files found.','xml-sitemap-feed'), 'notice-info');
 			} else {
-				add_settings_error( 'check_conflicts', 'check_conflicts', translate('Security check failed.') );
+				add_settings_error( 'check_conflicts', 'check_conflicts_failed', translate('Security check failed.') );
 			}
 		}
 
@@ -354,7 +355,7 @@ class XMLSF_Admin_Controller
 				flush_rewrite_rules();
 				add_settings_error( 'flush_admin_notice', 'flush_admin_notice', __('WordPress rewrite rules have been flushed.','xml-sitemap-feed'), 'updated' );
 			} else {
-				add_settings_error( 'flush_rewrite_rules', 'flush_rewrite_rules', translate('Security check failed.') );
+				add_settings_error( 'flush_rewrite_rules', 'flush_rewrite_rules_failed', translate('Security check failed.') );
 			}
 		}
 	}
@@ -363,12 +364,12 @@ class XMLSF_Admin_Controller
 	{
 		self::$dismissed = (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
 
-		if ( isset( $_POST['xmlsf-dismiss'] ) ) {
+		if ( isset( $_POST['xmlsf-dismiss-submit'] ) && isset( $_POST['xmlsf-dismiss'] ) ) {
 			if ( isset( $_POST['_xmlsf_notice_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_notice_nonce'], XMLSF_BASENAME.'-notice' ) ) {
 				add_user_meta( get_current_user_id(), 'xmlsf_dismissed', $_POST['xmlsf-dismiss'], false );
 				self::$dismissed[] = $_POST['xmlsf-dismiss'];
 			} else {
-				add_settings_error( 'dismiss_notice', 'dismiss_notice', translate('Security check failed.') );
+				add_settings_error( 'dismiss_notice', 'dismiss_notice_failed', translate('Security check failed.') );
 			}
 		}
 	}
