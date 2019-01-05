@@ -30,40 +30,40 @@ define( 'XMLSF_VERSION', '5.0.911' );
  *  AVAILABLE HOOKS
  * --------------------
  *
- *  FILTERS
- *  xmlsf_defaults        -> Filters the default array values for different option groups.
- * 	xmlsf_allowed_domain  -> Filters the response when checking the url against allowed domains.
- *                           Passes variable $url; must return true or false.
- *  xmlsf_excluded        -> Filters the response when checking the post for exclusion flags in
- *							 XML Sitemap context. Passes variable $post_id; must return true or false.
- *  xmlsf_news_excluded   -> Filters the response when checking the post for exclusion flags in
- *							 Google News sitemap context. Passes variable $post_id; must return true or false.
- *  xmlsf_news_keywords   -> Filters the news keywords array
- *  xmlsf_news_stock_tickers  -> Filters the news stock tickers array
- *  xmlsf_disabled_taxonomies -> Filters the taxonomies that should be unavailable for sitemaps
- *                               Passes an array of taxonomies to exclude; must return an array.
- *  the_title_xmlsitemap  -> Filters the Google News publication name and title, plus
- *                           the Image title and caption tags.
- *  xmlsf_custom_urls     -> Filters the custom urls array
- *  xmlsf_custom_sitemaps -> Filters the custom sitemaps array
- *  xmlsf_post_language   -> Filters the post language tag used in the news sitemap.
- *                           Passes variable $post_id; must return a 2 or 3 letter
- *                           language ISO 639 code with the exception of zh-cn and zh-tw.
- *	xmlsf_post_types      -> Filters the post types array for the XML sitemaps index.
- *	xmlsf_post_priority   -> Filters a post priority value. Passes variables $priority and $post->ID.
- *							 Must return a float value between 0.1 and 1.0
- *	xmlsf_term_priority   -> Filters a taxonomy term priority value. Passes variables $priority and $term->slug.
- *							 Must return a float value between 0.1 and 1.0
- *	xmlsf_news_post_types -> Filters the post types array for the Google News sitemap settings page.
+ *	FILTERS
+ *	xmlsf_defaults				-> Filters the default array values for different option groups.
+ *	xmlsf_allowed_domain		-> Filters the response when checking the url against allowed domains.
+ *								   Passes variable $url; must return true or false.
+ *	xmlsf_excluded				-> Filters the response when checking the post for exclusion flags in
+ *								   XML Sitemap context. Passes variable $post_id; must return true or false.
+ *	xmlsf_news_excluded			-> Filters the response when checking the post for exclusion flags in
+ *								   Google News sitemap context. Passes variable $post_id; must return true or false.
+ *	xmlsf_news_keywords			-> Filters the news keywords array
+ *	xmlsf_news_stock_tickers	-> Filters the news stock tickers array
+ *	xmlsf_disabled_taxonomies	-> Filters the taxonomies that should be unavailable for sitemaps
+ *								   Passes an array of taxonomies to exclude; must return an array.
+ *	the_title_xmlsitemap		-> Filters the Google News publication name and title, plus
+ *								   the Image title and caption tags.
+ *	xmlsf_custom_urls			-> Filters the custom urls array
+ *	xmlsf_custom_sitemaps		-> Filters the custom sitemaps array
+ *	xmlsf_post_language			-> Filters the post language tag used in the news sitemap.
+ *								   Passes variable $post_id; must return a 2 or 3 letter
+ *								   language ISO 639 code with the exception of zh-cn and zh-tw.
+ *	xmlsf_post_types			-> Filters the post types array for the XML sitemaps index.
+ *	xmlsf_post_priority			-> Filters a post priority value. Passes variables $priority and $post->ID.
+ *								   Must return a float value between 0.1 and 1.0
+ *	xmlsf_term_priority			-> Filters a taxonomy term priority value. Passes variables $priority and $term->slug.
+ *								   Must return a float value between 0.1 and 1.0
+ *	xmlsf_news_post_types		-> Filters the post types array for the Google News sitemap settings page.
  *
- *  ACTIONS
- *  xmlsf_ping            -> Fires hen a search engine has been pinged. Carries three arguments:
- *                           (1) search engine name (google|bing), (2) sitemap name and (3) ping repsonse code
- *  xmlsf_news_tags_after -> Fired inside the Google News Sitemap loop at the end of the news
- *                           tags, just before each closing </news:news> is generated. Can be used to
- *                           echo custom tags or trigger another action in the background.
- *	xmlsf_news_settings_before -> Fired before the Google News Sitemap settings form
- *	xmlsf_news_settings_after  -> Fired after the Google News Sitemap settings form
+ *	ACTIONS
+ *	xmlsf_ping					-> Fires hen a search engine has been pinged. Carries three arguments:
+ *								   (1) search engine name (google|bing), (2) sitemap name and (3) ping repsonse code
+ *	xmlsf_news_tags_after		-> Fired inside the Google News Sitemap loop at the end of the news
+ *								   tags, just before each closing </news:news> is generated. Can be used to
+ *								   echo custom tags or trigger another action in the background.
+ *	xmlsf_news_settings_before	-> Fired before the Google News Sitemap settings form
+ *	xmlsf_news_settings_after	-> Fired after the Google News Sitemap settings form
  *
  * --------------------
  *  AVAILABLE FUNCTIONS

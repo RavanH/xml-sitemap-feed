@@ -10,14 +10,20 @@
 		<?php printf( /* translators: Writing Settings URL */ __( 'For ping options, go to %s.', 'xml-sitemap-feed' ), '<a href="'.admin_url('options-writing.php').'#xmlsf_ping">'.translate('Writing Settings').'</a>' ); ?>
 	</p>
 
-	<?php do_action('xmlsf_news_settings_before'); ?>
+	<nav class="nav-tab-wrapper">
+		<a href="?page=xmlsf_news&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>"><?php echo translate('General'); ?></a>
+		<a href="?page=xmlsf_news&tab=advanced" class="nav-tab <?php echo $active_tab == 'advanced' ? 'nav-tab-active' : ''; ?>"><?php echo translate('Advanced'); ?></a>
+		<?php do_action('xmlsf_news_nav_tabs'); ?>
+	</nav>
 
 	<div class="main">
 		<form method="post" action="options.php">
 
-			<?php settings_fields( 'xmlsf-news' ); ?>
+			<?php do_action('xmlsf_news_settings_before'); ?>
 
-			<?php do_settings_sections( 'xmlsf-news' ); ?>
+			<?php settings_fields( 'xmlsf_news_'.$active_tab ); ?>
+
+			<?php do_settings_sections( 'xmlsf_news_'.$active_tab ); ?>
 
 			<?php do_action('xmlsf_news_settings_after'); ?>
 
