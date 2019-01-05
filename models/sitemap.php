@@ -8,10 +8,8 @@
  * @return array
  */
 function xmlsf_filter_post_types( $post_types ) {
-	foreach ( array('attachment','reply') as $post_type ) {
-		if ( isset( $post_types[$post_type]) )
-			unset( $post_types[$post_type] );
-	}
+	// Always exclude attachment and reply post types (bbpress)
+	unset( $post_types['attachment'], $post_types['reply'] );
 
 	return array_filter( $post_types );
 }

@@ -161,20 +161,6 @@ class XMLSitemapFeed {
 				'domains' => ''
 			);
 
-			$post_types = apply_filters( 'xmlsf_post_types', get_post_types(array('public'=>true,'_builtin'=>false),'names') );
-
-			// append public post_types defaults
-			if ( is_array($post_types) )
-				foreach ( $post_types as $name )
-					$this->defaults['post_types'][$name] = array(
-						//'name' => $name,
-						'active' => '',
-						'archive' => '',
-						'priority' => '0.5',
-						'dynamic_priority' => '',
-						'tags' => array( 'image' => 'attached' )
-					);
-
 		endif;
 
 		if ( $key ) {
