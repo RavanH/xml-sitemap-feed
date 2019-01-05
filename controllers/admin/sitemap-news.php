@@ -1,6 +1,6 @@
 <?php
 
-class XMLSF_Admin_Sitemap_News
+class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 {
 	/**
      * Holds the values to be used in the fields callbacks
@@ -59,10 +59,10 @@ class XMLSF_Admin_Sitemap_News
 					$type = 'error';
 				}
 
-				add_settings_error( 'ping_admin_notice', 'ping_admin_notice', $msg, $type );
+				add_settings_error( 'ping_sitemap', 'ping_sitemap', $msg, $type );
 
 			} else {
-				add_action( 'admin_notices', array('XMLSF_Admin_Notices','notice_nonce_fail') );
+				add_settings_error( 'ping_sitemap', 'ping_sitemap', translate('Security check failed.') );
 			}
 		}
 	}

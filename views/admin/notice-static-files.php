@@ -11,7 +11,7 @@
 	<form action="" method="post">
 		<?php wp_nonce_field( XMLSF_BASENAME.'-notice', '_xmlsf_notice_nonce' ); ?>
 		<ul>
-			<?php foreach (parent::$static_files as $name => $file) { ?>
+			<?php foreach ( $static_files as $name => $file) { ?>
 			<li>
 				<label><input type="checkbox" name="xmlsf-delete[]" value="<?php echo $name; ?>" /> <strong><?php echo $name; ?></strong> (<?php echo $file; ?>)</label>
 			</li>

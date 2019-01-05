@@ -53,7 +53,7 @@ class XMLSitemapFeed_Uninstall {
 	function uninstall($blog_id = false)
 	{
 		// remove plugin settings
-		delete_option('xmlsf_static_files');
+		delete_transient('xmlsf_static_files');
 		delete_option('xmlsf_version');
 		delete_option('xmlsf_sitemaps');
 		delete_option('xmlsf_post_types');
