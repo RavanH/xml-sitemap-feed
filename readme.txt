@@ -298,7 +298,6 @@ Bugfix release.
 * NEW Respond to .gz requests (with ob_gzhandler output buffering if needed)
 * NEW filters xmlsf_disabled_taxonomies, xmlsf_news_keywords, xmlsf_news_stock_tickers
 * NEW Tools: Ping search engines and Flush rewrite rules
-TODO admin notices >> add_settings_error
 
 = 5.0.7 =
 * Allowed domains back to Settings > Reading
