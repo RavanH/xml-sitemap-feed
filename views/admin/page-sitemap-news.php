@@ -19,13 +19,13 @@
 	<div class="main">
 		<form method="post" action="options.php">
 
-			<?php do_action('xmlsf_news_settings_before'); ?>
+			<?php do_action('xmlsf_news_settings_'.$active_tab.'_before'); ?>
 
 			<?php settings_fields( 'xmlsf_news_'.$active_tab ); ?>
 
 			<?php do_settings_sections( 'xmlsf_news_'.$active_tab ); ?>
 
-			<?php do_action('xmlsf_news_settings_after'); ?>
+			<?php do_action('xmlsf_news_settings_'.$active_tab.'_after'); ?>
 
 			<?php submit_button(); ?>
 

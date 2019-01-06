@@ -20,7 +20,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		// advanced tab options
-		add_action( 'xmlsf_news_settings_before', 'xmlsf_news_section_advanced_intro' );
+		add_action( 'xmlsf_news_settings_advanced_before', 'xmlsf_news_section_advanced_intro' );
 		add_action( 'xmlsf_news_add_settings', array( $this, 'advanced_settings_fields' ) );
 
 		// TOOLS ACTIONS
