@@ -79,12 +79,7 @@ class XMLSF_Admin_Sanitize
 			if ( !empty($new['sitemap-news']) && empty($old['sitemap-news'] ) ) {
 				// check news tag settings
 				if ( !get_option( 'xmlsf_news_tags' ) ) {
-					add_option( 'xmlsf_news_tags', array(
-						'name' => '',
-						'post_type' => array('post'),
-						'categories' => '',
-						'image' => 'featured'
-					) );
+					add_option( 'xmlsf_news_tags', xmlsf()->default_news_tags );
 				}
 			}
 		}

@@ -208,8 +208,11 @@ class XMLSF_Admin_Controller
 	 */
 	public function clear_settings( $sitemap = '' )
 	{
-		$defaults = xmlsf()->defaults();
-		unset($defaults['sitemaps']);
+		$defaults = 'sitemap-news' == $sitemap ? array(
+			'news_tags' => xmlsf()->default_news_tags
+		) : xmlsf()->defaults();
+
+		unset( $defaults['sitemaps'] );
 
 		foreach ( $defaults as $option => $settings ) {
 			update_option( 'xmlsf_' . $option, $settings );
@@ -217,7 +220,7 @@ class XMLSF_Admin_Controller
 
 		delete_transient( 'xmlsf_static_files' );
 
-		add_settings_error( 'notice_clear_settings', 'notice_clear_settings', __('All XML Sitemap & Google News settings reset to the plugin defaults.','xml-sitemap-feed'), 'updated' );
+		add_settings_error( 'notice_clear_settings', 'notice_clear_settings', __('Settings reset to the plugin defaults.','xml-sitemap-feed'), 'updated' );
 	}
 
 	/**
@@ -311,17 +314,9 @@ class XMLSF_Admin_Controller
 
 	public function tools_actions()
 	{
-		if ( isset( $_POST['xmlsf-clear-settings'] ) ) {
+		if ( isset( $_POST['xmlsf-clear-settings-submit'] ) && isset( $_POST['xmlsf-clear-settings'] ) ) {
 			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
-				$this->clear_settings( 'sitemap' );
-			} else {
-				add_settings_error( 'clear_settings', 'clear_settings_failed', translate('Security check failed.') );
-			}
-		}
-
-		if ( isset( $_POST['xmlsf-news-clear-settings'] ) ) {
-			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
-				$this->clear_settings( 'sitemap-news' );
+				$this->clear_settings( $_POST['xmlsf-clear-settings'] );
 			} else {
 				add_settings_error( 'clear_settings', 'clear_settings_failed', translate('Security check failed.') );
 			}

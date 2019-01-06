@@ -9,6 +9,17 @@ class XMLSitemapFeed {
 	private $defaults = array();
 
 	/**
+	 * Defaults
+	 * @var array
+	 */
+	public $default_news_tags = array(
+		'name' => '',
+		'post_type' => array('post'),
+		'categories' => '',
+		'image' => 'featured'
+	);
+
+	/**
 	 * Front pages
 	 *
 	 * @var null/array $frontpages
@@ -146,7 +157,7 @@ class XMLSitemapFeed {
 				),
 				'taxonomies' => '',
 				'taxonomy_settings' => array(
-					'active' => '1',
+					'active' => '',
 					'priority' => '0.3',
 					'dynamic_priority' => '1',
 					'term_limit' => '5000'

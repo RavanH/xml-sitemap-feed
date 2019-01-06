@@ -46,13 +46,14 @@
 				<input type="submit" name="xmlsf-check-conflicts" class="button button-small" value="<?php _e( 'Check for conflicts', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
-				<input type="submit" name="xmlsf-clear-settings" class="button button-small" value="<?php _e( 'Reset XML sitemaps', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm('<?php _e('Clear all XML Sitemap & Google News Sitemap settings.','xml-sitemap-feed'); ?> <?php _e('This will revert all your sitemap settings to the plugin defaults.','xml-sitemap-feed'); ?>\n\n<?php echo translate('Are you sure you want to do this?'); ?>')" />
-			</p>
-			<p>
 				<input type="submit" name="xmlsf-flush-rewrite-rules" class="button button-small" value="<?php _e( 'Flush rewrite rules', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
 				<input type="submit" name="xmlsf-ping-sitemap" class="button button-small" value="<?php _e( 'Ping search engines', 'xml-sitemap-feed' ); ?>" />
+			</p>
+			<p>
+				<input type="hidden" name="xmlsf-clear-settings" value="sitemap" />
+				<input type="submit" name="xmlsf-clear-settings-submit" class="button button-small" value="<?php _e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm('<?php _e('This will revert your sitemap settings to the plugin defaults.','xml-sitemap-feed'); ?>\n\n<?php echo translate('Are you sure you want to do this?'); ?>')" />
 			</p>
 		</form>
 
