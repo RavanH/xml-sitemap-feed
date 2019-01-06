@@ -13,19 +13,19 @@
 	<nav class="nav-tab-wrapper">
 		<a href="?page=xmlsf_news&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>"><?php echo translate('General'); ?></a>
 		<a href="?page=xmlsf_news&tab=advanced" class="nav-tab <?php echo $active_tab == 'advanced' ? 'nav-tab-active' : ''; ?>"><?php echo translate('Advanced'); ?></a>
-		<?php do_action('xmlsf_news_nav_tabs'); ?>
+		<?php do_action( 'xmlsf_news_nav_tabs', $active_tab ); ?>
 	</nav>
 
 	<div class="main">
 		<form method="post" action="options.php">
 
-			<?php do_action('xmlsf_news_settings_'.$active_tab.'_before'); ?>
+			<?php do_action( 'xmlsf_news_settings_before', $active_tab ); ?>
 
 			<?php settings_fields( 'xmlsf_news_'.$active_tab ); ?>
 
 			<?php do_settings_sections( 'xmlsf_news_'.$active_tab ); ?>
 
-			<?php do_action('xmlsf_news_settings_'.$active_tab.'_after'); ?>
+			<?php do_action( 'xmlsf_news_settings_after', $active_tab ); ?>
 
 			<?php submit_button(); ?>
 

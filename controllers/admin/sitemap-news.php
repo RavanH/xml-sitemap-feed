@@ -20,7 +20,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		// advanced tab options
-		add_action( 'xmlsf_news_settings_advanced_before', 'xmlsf_news_section_advanced_intro' );
+		add_action( 'xmlsf_news_settings_before', 'xmlsf_news_section_advanced_intro' );
 		add_action( 'xmlsf_news_add_settings', array( $this, 'advanced_settings_fields' ) );
 
 		// TOOLS ACTIONS
@@ -195,6 +195,9 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 
 		// Stock tickers
 		add_settings_field( 'xmlsf_news_stock_tickers', __('Stock tickers', 'xml-sitemap-feed' ), array( $this,'stock_tickers_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
+
+		// Ping log
+		add_settings_field( 'xmlsf_news_ping_log', __('Ping log', 'xml-sitemap-feed' ), array( $this,'ping_log_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
 	}
 
 	/**
@@ -356,6 +359,11 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 		include XMLSF_DIR . '/views/admin/field-news-stocktickers.php';
 	}
 
+	public function ping_log_field() {
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/field-news-ping-log.php';
+	}
+
 	public function labels_field() {
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-news-labels.php';
@@ -365,6 +373,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 
 new XMLSF_Admin_Sitemap_News();
 
-function xmlsf_news_section_advanced_intro() {
-	include XMLSF_DIR . '/views/admin/section-advanced-intro.php';
+function xmlsf_news_section_advanced_intro( $active_tab = '' ) {
+	if ( 'advanced' == $active_tab )
+		include XMLSF_DIR . '/views/admin/section-advanced-intro.php';
 }
