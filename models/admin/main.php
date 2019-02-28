@@ -1,55 +1,5 @@
 <?php
 
-/**
- * Nginx helper purge urls
- * adds sitemap urls to the purge array.
- *
- * @param $urls array
- * @param $redis bool|false
- *
- * @return $urls array
- */
-function xmlsf_nginx_helper_purge_urls( $urls = array(), $redis = false ) {
-
-	if ( $redis ) {
-		// wildcard allowed, this makes everything simple
-		$urls[] = '/sitemap*.xml';
-	} else {
-		// no wildcard, go through the motions
-		$sitemaps = get_option( 'xmlsf_sitemaps' );
-
-		if ( !empty( $sitemaps['sitemap-news'] ) ) {
-			$urls[] = '/sitemap-news.xml';
-		}
-
-		if ( !empty( $sitemaps['sitemap'] ) ) {
-			$urls[] = '/sitemap.xml';
-			$urls[] = '/sitemap-home.xml';
-			$urls[] = '/sitemap-custom.xml';
-
-			require_once XMLSF_DIR . '/models/public/sitemap.php';
-
-			// add public post types sitemaps
-			$post_types = get_option( 'xmlsf_post_types' );
-			if ( is_array($post_types) )
-				foreach ( $post_types as $post_type => $settings ) {
-					$archive = !empty($settings['archive']) ? $settings['archive'] : '';
-					foreach ( xmlsf_get_archives($post_type,$archive) as $url )
-						 $urls[] = parse_url( $url, PHP_URL_PATH);
-				};
-
-			// add public post taxonomies sitemaps
-			$taxonomies = get_option('xmlsf_taxonomies');
-			if ( is_array($taxonomies) )
-				foreach ( $taxonomies as $taxonomy ) {
-					$urls[] = parse_url( xmlsf_get_index_url('taxonomy',$taxonomy), PHP_URL_PATH);
-				};
-		}
-	}
-
-	return $urls;
-}
-
 // plugin action links
 
 function xmlsf_add_action_link( $links ) {

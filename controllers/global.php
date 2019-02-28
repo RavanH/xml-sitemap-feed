@@ -29,6 +29,9 @@ function xmlsf_init() {
 		// MAIN REQUEST filter
 		add_filter( 'request', 'xmlsf_filter_request', 1 );
 
+		// NGINX HELPER PURGE URLS
+		add_filter( 'rt_nginx_helper_purge_urls', 'xmlsf_nginx_helper_purge_urls', 10, 2 );
+
 		// main controller functions
 		require XMLSF_DIR . '/controllers/main.php';
 

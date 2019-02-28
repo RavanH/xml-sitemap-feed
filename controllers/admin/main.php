@@ -39,9 +39,6 @@ class XMLSF_Admin_Controller
 			require XMLSF_DIR . '/controllers/admin/sitemap-news.php';
 		}
 
-		// NGINX HELPER PURGE URLS
-		add_filter( 'rt_nginx_helper_purge_urls', 'xmlsf_nginx_helper_purge_urls', 10, 2 );
-
 		// ACTION LINK
 		add_filter( 'plugin_action_links_' . XMLSF_BASENAME, 'xmlsf_add_action_link' );
 
