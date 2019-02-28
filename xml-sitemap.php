@@ -12,7 +12,7 @@ Author URI: http://status301.net/
 
 define( 'XMLSF_VERSION', '5.0.912' );
 
-/*  Copyright 2018 RavanH
+/*  Copyright 2019 RavanH
     http://status301.net/
     mailto: ravanhagen@gmail.com
 
