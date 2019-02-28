@@ -29,7 +29,7 @@
     ?>
 	<span class="description">
         &nbsp;&ndash;&nbsp;
-        <a href="<?php echo admin_url('options-general.php'); ?>?page=xmlsf-news" id="xmlsf_news_link"><?php echo translate('Settings'); ?></a> |
+        <a href="<?php echo admin_url('options-general.php'); ?>?page=xmlsf_news" id="xmlsf_news_link"><?php echo translate('Settings'); ?></a> |
         <a href="<?php echo $news_url; ?>" target="_blank"><?php echo translate('View'); ?></a>
     </span>
     <?php } ?>
