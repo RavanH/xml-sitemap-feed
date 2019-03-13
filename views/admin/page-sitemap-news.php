@@ -57,7 +57,7 @@
 			</p>
 			<p>
 				<input type="hidden" name="xmlsf-clear-settings" value="sitemap-news" />
-				<input type="submit" name="xmlsf-clear-settings-submit" class="button button-small" value="<?php _e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm('<?php _e('This will revert your sitemap settings to the plugin defaults.','xml-sitemap-feed'); ?>\n\n<?php echo translate('Are you sure you want to do this?'); ?>')" />
+				<input type="submit" name="xmlsf-clear-settings-submit" class="button button-small button-link-delete" value="<?php _e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm('<?php _e('This will revert your sitemap settings to the plugin defaults.','xml-sitemap-feed'); ?>\n\n<?php echo translate('Are you sure you want to do this?'); ?>')" />
 			</p>
 		</form>
 

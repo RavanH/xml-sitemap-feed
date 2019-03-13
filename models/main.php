@@ -95,20 +95,19 @@ function xmlsf_ping( $se, $sitemap, $interval ) {
 	} else {
 		return '';
 	}
+	$url = add_query_arg( 'sitemap', urlencode( trailingslashit( get_bloginfo( 'url' ) ) . $sitemap ), $url );
 
 	// check if we did not ping already within the interval
 	if ( false === get_transient( 'xmlsf_ping_'.$se.'_'.$sitemap ) ) {
-		$uri = add_query_arg( 'sitemap', urlencode( trailingslashit( get_bloginfo( 'url' ) ) . $sitemap ), $url );
-
 		// Ping !
-		$response = wp_remote_request( $uri );
+		$response = wp_remote_request( $url );
 		$code = wp_remote_retrieve_response_code( $response );
 		if ( 200 === $code ) {
 			set_transient( 'xmlsf_ping_'.$se.'_'.$sitemap, '', $interval );
 		}
 
 		if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-			error_log( 'Pinged '. $uri .' with response code: ' . $code );
+			error_log( 'Pinged '. $url .' with response code: ' . $code );
 		}
 	} else {
 		$code = 999;
@@ -117,7 +116,7 @@ function xmlsf_ping( $se, $sitemap, $interval ) {
 		}
 	}
 
-	do_action('xmlsf_ping', $se, $sitemap, $code );
+	do_action( 'xmlsf_ping', $se, $sitemap, $url, $code );
 
 	return $code;
 }
