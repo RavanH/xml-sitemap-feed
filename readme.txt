@@ -54,6 +54,16 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Options to: set a different News Publication Name, include custom post types or limit inclusion to certain post categories.
 * Pings both Google and Bing on new publications.
 
+= Pro Features =
+
+**[Google News Advanced](https://premium.status301.net/downloads/google-news-advanced/)**
+
+* Multiple post types - Include more than one post type in the same News Sitemap.
+* Keywords - Add the keywords tag to your News Sitemap. Keywords can be created from Tags, Categories or a dedicated Keywords taxonomy.
+* Stock tickers - Add stock tickers tag to your News Sitemap. A dedicated Stock Tickers taxonomy will be available to manage them.
+* Ping log - Keep a log of the latest pings to Google with exact date and response status.
+
+
 = Privacy / GDPR =
 
 This plugin does not collect any user or visitor data nor set browser cookies. Using this plugin should not impact your site privacy policy in any way.
