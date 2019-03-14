@@ -11,7 +11,7 @@
   <p>
     <label>
       <?php _e('Maximum log entries','xml-sitemap-feed'); ?>
-      <input type="number" step="1" min="0" max="10000" id="xmlsf_news_ping_log_max" value="1000" class="medium-text" />
+      <input type="number" step="1" min="0" max="10000" id="xmlsf_news_ping_log_max" value="1000" class="medium-text" disabled="disabled" />
     </label>
   </p>
 	<p class="description">
