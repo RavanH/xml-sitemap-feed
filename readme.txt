@@ -286,6 +286,9 @@ New filter and action hooks. Bugfixes and admin UI improvements.
 
 == Changelog ==
 
+= 5.1.1 =
+* FIX options page not found.
+
 = 5.1 =
 * SEOPress and Catch Box incompatibility admin messages
 * FIX bbPress incompatibility
