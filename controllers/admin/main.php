@@ -27,14 +27,14 @@ class XMLSF_Admin_Controller
 		require XMLSF_DIR . '/models/admin/main.php';
 		require XMLSF_DIR . '/controllers/admin/notices.php';
 
-		$sitemaps = (array) get_option( 'xmlsf_sitemaps' );
+		$this->sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
-		if ( isset($sitemaps['sitemap']) ) {
+		if ( isset($this->sitemaps['sitemap']) ) {
 			require XMLSF_DIR . '/models/admin/sitemap.php';
 			require XMLSF_DIR . '/controllers/admin/sitemap.php';
 		}
 
-		if ( isset($sitemaps['sitemap-news']) ) {
+		if ( isset($this->sitemaps['sitemap-news']) ) {
 			require XMLSF_DIR . '/models/admin/sitemap-news.php';
 			require XMLSF_DIR . '/controllers/admin/sitemap-news.php';
 		}
@@ -44,7 +44,7 @@ class XMLSF_Admin_Controller
 
 		add_action( 'admin_init', array( $this, 'notices_actions' ) );
 		add_action( 'admin_init', array( $this, 'transients_actions' ) );
-		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_init', array( $this, 'register_settings' ), 0 );
 
 		// ACTIONS & CHECKS
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
@@ -63,14 +63,12 @@ class XMLSF_Admin_Controller
 
 	public function register_settings()
 	{
-		$sitemaps = (array) get_option( 'xmlsf_sitemaps' );
-
 		// sitemaps
 		register_setting( 'reading', 'xmlsf_sitemaps', array('XMLSF_Admin_Sanitize','sitemaps_settings') );
 		add_settings_field( 'xmlsf_sitemaps', __('Enable XML sitemaps','xml-sitemap-feed'), array($this,'sitemaps_settings_field'), 'reading' );
 
 		// custom domains, only when any sitemap is active
-		if ( isset($sitemaps['sitemap']) || isset($sitemaps['sitemap-news']) ) {
+		if ( isset($this->sitemaps['sitemap']) || isset($this->sitemaps['sitemap-news']) ) {
 			register_setting( 'reading', 'xmlsf_domains', array('XMLSF_Admin_Sanitize','domains_settings') );
 			add_settings_field( 'xmlsf_domains', __('Allowed domains','xml-sitemap-feed'), array($this,'domains_settings_field'), 'reading' );
 		}
@@ -86,7 +84,7 @@ class XMLSF_Admin_Controller
 		}
 
 		// ping, only when any sitemap is active
-		if ( isset($sitemaps['sitemap']) || isset($sitemaps['sitemap-news']) ) {
+		if ( isset($this->sitemaps['sitemap']) || isset($this->sitemaps['sitemap-news']) ) {
 			register_setting( 'writing', 'xmlsf_ping', array('XMLSF_Admin_Sanitize','ping_settings') );
 			add_settings_field( 'xmlsf_ping', __('Ping Services','xml-sitemap-feed'), array($this,'ping_settings_field'), 'writing' );
 			add_action( 'load-options-writing.php', array($this,'ping_settings_help') );
@@ -142,8 +140,6 @@ class XMLSF_Admin_Controller
 	{
 		if ( 1 == get_option('blog_public') ) :
 
-			$options = (array) get_option( 'xmlsf_sitemaps' );
-
 			// The actual fields for data entry
 			include XMLSF_DIR . '/views/admin/field-sitemaps.php';
 
@@ -160,7 +156,7 @@ class XMLSF_Admin_Controller
 
 	public function domains_settings_field()
 	{
-		$domains = get_option('xmlsf_domains');
+		$domains = get_option( 'xmlsf_domains' );
 		if ( !is_array($domains) ) $domains = array();
 
 		// The actual fields for data entry
@@ -277,9 +273,8 @@ class XMLSF_Admin_Controller
 	public function check_static_files()
 	{
 		$home_path = trailingslashit( get_home_path() );
-		$sitemaps = get_option( 'xmlsf_sitemaps' );
 		self::$static_files = array();
-		$check_for = is_array($sitemaps) ? $sitemaps : array();
+		$check_for = $this->sitemaps;
 		if ( get_option('xmlsf_robots') ) {
 			$check_for['robots'] = 'robots.txt';
 		}

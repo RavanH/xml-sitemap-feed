@@ -3,12 +3,12 @@
         <?php _e('Enable XML sitemaps','xml-sitemap-feed'); ?>
     </legend>
 	<label>
-        <input type="checkbox" name="xmlsf_sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="sitemap.xml"<?php echo checked(isset($options['sitemap']), true, false); ?> />
+        <input type="checkbox" name="xmlsf_sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="sitemap.xml"<?php echo checked(isset($this->sitemaps['sitemap']), true, false); ?> />
         <?php _e('XML Sitemap Index','xml-sitemap-feed'); ?>
     </label>
 
-    <?php if ( isset($options['sitemap']) ) {
-        $sitemap_url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap' : $options['sitemap'] );
+    <?php if ( isset($this->sitemaps['sitemap']) ) {
+        $sitemap_url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap' : $this->sitemaps['sitemap'] );
     ?>
     <span class="description">
         &nbsp;&ndash;&nbsp;
@@ -20,12 +20,12 @@
     <br>
 
 	<label>
-        <input type="checkbox" name="xmlsf_sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="sitemap-news.xml"<?php echo checked(isset($options['sitemap-news']), true, false); ?> />
+        <input type="checkbox" name="xmlsf_sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="sitemap-news.xml"<?php echo checked(isset($this->sitemaps['sitemap-news']), true, false); ?> />
         <?php _e('Google News Sitemap','xml-sitemap-feed'); ?>
     </label>
 
-    <?php if (isset($options['sitemap-news'])) {
-        $news_url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap-news' : $options['sitemap-news'] );
+    <?php if (isset($this->sitemaps['sitemap-news'])) {
+        $news_url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap-news' : $this->sitemaps['sitemap-news'] );
     ?>
 	<span class="description">
         &nbsp;&ndash;&nbsp;
