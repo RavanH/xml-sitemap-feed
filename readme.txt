@@ -289,15 +289,16 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.1 =
+= 5.1.1 =
 
-New filter and action hooks. Bugfixes and admin UI improvements.
+Bugfix release: options page and news pings.
 
 
 == Changelog ==
 
 = 5.1.1 =
-* FIX options page not found.
+* FIX options page not found
+* FIX news sitemap only ping
 
 = 5.1 =
 * SEOPress and Catch Box incompatibility admin messages
