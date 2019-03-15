@@ -27,43 +27,44 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 
 	public function tools_actions()
 	{
-		if ( isset( $_POST['xmlsf-ping-sitemap'] ) ) {
-			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+		if ( ! isset( $_POST['xmlsf-ping-sitemap'] ) )
+      return;
 
-				$sitemaps = get_option( 'xmlsf_sitemaps' );
+		if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
 
-				foreach ( array('google','bing') as $se ) {
-					$result = xmlsf_ping( $se, $sitemaps['sitemap'], HOUR_IN_SECONDS );
+			$sitemaps = get_option( 'xmlsf_sitemaps' );
 
-					$se_name = 'google' == $se ? __('Google','xml-sitemap-feed') : __('Bing & Yahoo','xml-sitemap-feed');
+			foreach ( array('google','bing') as $se ) {
+				$result = xmlsf_ping( $se, $sitemaps['sitemap'], HOUR_IN_SECONDS );
 
-					switch( $result ) {
-						case 200:
-						$msg = sprintf( /* Translators: Search engine / Service name */ __( 'Pinged %s with success.', 'xml-sitemap-feed' ), $se_name );
-						$type = 'updated';
-						break;
+				$se_name = 'google' == $se ? __('Google','xml-sitemap-feed') : __('Bing & Yahoo','xml-sitemap-feed');
 
-						case 999:
-						$msg = sprintf( /* Translators: Search engine / Service name, interval number */ __( 'Ping %s skipped: Sitemap already sent within the last %d minutes.', 'xml-sitemap-feed' ), $se_name, 60 );
-						$type = 'notice-warning';
-						break;
+				switch( $result ) {
+					case 200:
+					$msg = sprintf( /* Translators: Search engine / Service name */ __( 'Pinged %s with success.', 'xml-sitemap-feed' ), $se_name );
+					$type = 'updated';
+					break;
 
-						case '':
-						$msg = sprintf( translate('Oops: %s'), translate('Something went wrong.') );
-						$type = 'error';
-						break;
+					case 999:
+					$msg = sprintf( /* Translators: Search engine / Service name, interval number */ __( 'Ping %s skipped: Sitemap already sent within the last %d minutes.', 'xml-sitemap-feed' ), $se_name, 60 );
+					$type = 'notice-warning';
+					break;
 
-						default:
-						$msg = sprintf( /* Translators: Search engine / Service name, response code number */ __( 'Ping %s failed with response code: %d', 'xml-sitemap-feed' ), $se_name, $result );
-						$type = 'error';
-					}
+					case '':
+					$msg = sprintf( translate('Oops: %s'), translate('Something went wrong.') );
+					$type = 'error';
+					break;
 
-					add_settings_error( 'ping_sitemap', 'ping_sitemap', $msg, $type );
+					default:
+					$msg = sprintf( /* Translators: Search engine / Service name, response code number */ __( 'Ping %s failed with response code: %d', 'xml-sitemap-feed' ), $se_name, $result );
+					$type = 'error';
 				}
 
-			} else {
-				add_settings_error( 'ping_sitemap', 'ping_sitemap', translate('Security check failed.') );
+				add_settings_error( 'ping_sitemap', 'ping_sitemap', $msg, $type );
 			}
+
+		} else {
+			add_settings_error( 'ping_sitemap', 'ping_sitemap', translate('Security check failed.') );
 		}
 	}
 
@@ -83,7 +84,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 				$wpseo_titles = get_option( 'wpseo_titles' );
 				if ( !empty( $wpseo_titles['disable-date'] ) ) {
 					// check if Split by option is set anywhere
-					foreach ( (array) get_option( 'xmlsf_post_types' ) as $type => $settings ) {
+					foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
 						if ( is_array( $settings ) && !empty( $settings['archive'] ) ) {
 							add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_wpseo_date_redirect' ) );
 							break;
@@ -110,7 +111,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 				$seopress_titles = get_option( 'seopress_titles_option_name' );
 				if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) ) {
 					// check if Split by option is set anywhere
-					foreach ( (array) get_option( 'xmlsf_post_types' ) as $type => $settings ) {
+					foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
 						if ( is_array( $settings ) && !empty( $settings['archive'] ) ) {
 							add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_seopress_date_redirect' ) );
 							break;
@@ -272,8 +273,8 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 
 		$active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'post_types';
 
-		$options = (array) get_option( 'xmlsf_sitemaps' );
-		$url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap' : $options['sitemap'] );
+		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
+		$url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() || empty($sitemaps['sitemap']) ? '?feed=sitemap' : $sitemaps['sitemap'] );
 
 		include XMLSF_DIR . '/views/admin/page-sitemap.php';
     }
@@ -360,7 +361,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 
 		$count = wp_count_posts( $obj->name );
 
-		$options = get_option('xmlsf_post_types');
+		$options = get_option( 'xmlsf_post_types' );
 
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-sitemap-post-type.php';
@@ -393,7 +394,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 	}
 
 	public function urls_settings_field() {
-		$urls = get_option('xmlsf_urls');
+		$urls = get_option( 'xmlsf_urls' );
 		$lines = array();
 
 		if( is_array($urls) && !empty($urls) ) {

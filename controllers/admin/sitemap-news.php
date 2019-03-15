@@ -76,7 +76,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 	/* Adds a News Sitemap box to the side column */
 	public function add_meta_box()
 	{
-		$news_tags = get_option('xmlsf_news_tags');
+		$news_tags = get_option( 'xmlsf_news_tags' );
 		$news_post_types = !empty($news_tags['post_type']) && is_array($news_tags['post_type']) ? $news_tags['post_type'] : array('post');
 
 		// Only include metabox on post types that are included
@@ -147,9 +147,10 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
    */
   public function settings_page()
   {
-    $this->options = get_option( 'xmlsf_news_tags', array() );
-		$options = (array) get_option( 'xmlsf_sitemaps' );
-		$url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap-news' : $options['sitemap-news'] );
+    $this->options = (array) get_option( 'xmlsf_news_tags', array() );
+
+		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
+		$url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() || empty($sitemaps['sitemap-news']) ? '?feed=sitemap-news' : $sitemaps['sitemap-news'] );
 
 		$active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'general';
 
