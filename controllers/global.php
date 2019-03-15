@@ -41,15 +41,14 @@ function xmlsf_init() {
 		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
 			require XMLSF_DIR . '/models/sitemap-news.php';
 			add_filter( 'xmlsf_news_post_types', 'xmlsf_news_filter_post_types' );
-			//add_filter( 'request', 'xmlsf_news_filter_request', 2 );
 
 			require XMLSF_DIR . '/controllers/sitemap-news.php';
-		}
+			new XMLSF_Sitemap_News_Controller( $sitemaps['sitemap-news'] );
+	}
 
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
 			require XMLSF_DIR . '/models/sitemap.php';
 			add_filter( 'xmlsf_post_types', 'xmlsf_filter_post_types' );
-			//add_filter( 'request', 'xmlsf_sitemap_filter_request', 3 );
 
 			require XMLSF_DIR . '/controllers/sitemap.php';
 			new XMLSF_Sitemap_Controller( $sitemaps['sitemap'] );

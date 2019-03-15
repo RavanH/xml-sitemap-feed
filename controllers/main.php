@@ -1,45 +1,6 @@
 <?php
 
 /**
- * Do pings, hooked to transition post status
- *
- * @param $new_status
- * @param $old_status
- * @param $post
- */
-function xmlsf_do_pings( $new_status, $old_status, $post ) {
-	// are we publishing?
-	if ( $old_status == 'publish' || $new_status != 'publish' )
-		return;
-
-	$sitemaps = get_option( 'xmlsf_sitemaps' );
-	$ping = get_option( 'xmlsf_ping' );
-
-	if ( !is_array($sitemaps) || empty($sitemaps) || !is_array($ping) || empty($ping) )
-		return;
-
-	if ( isset( $sitemaps['sitemap-news'] ) ) {
-		// check if we've got a post type that is included in our news sitemap
-		// TODO also check category if needed
-		$news_tags = get_option('xmlsf_news_tags');
-		if ( ! empty( $news_tags['post_type'] ) && in_array( $post->post_type, (array) $news_tags['post_type'] ) ) {
-			xmlsf_ping( 'google', $sitemaps['sitemap-news'], 5 * MINUTE_IN_SECONDS );
-		}
-	}
-
-	if ( isset( $sitemaps['sitemap'] ) ) {
-		// check if we've got a post type that is included in our sitemap
-		$post_types = get_option( 'xmlsf_post_types' );
-		if ( is_array( $post_types ) && array_key_exists( $post->post_type, $post_types ) ) {
-
-			foreach ( $ping as $se ) {
-				xmlsf_ping( $se, $sitemaps['sitemap'], HOUR_IN_SECONDS );
-			}
-		}
-	}
-}
-
-/**
  * WPML: switch language
  * @see https://wpml.org/wpml-hook/wpml_post_language_details/
  */
