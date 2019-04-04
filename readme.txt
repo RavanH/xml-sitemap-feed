@@ -296,6 +296,9 @@ Bugfix release: options page and news pings.
 
 == Changelog ==
 
+= 5.1.2 =
+* Plugin support and rate links on plugins page
+
 = 5.1.1 =
 * FIX options page not found
 * FIX news sitemap only ping

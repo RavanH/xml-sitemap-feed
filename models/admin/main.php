@@ -8,6 +8,20 @@ function xmlsf_add_action_link( $links ) {
 	return $links;
 }
 
+function xmlsf_plugin_meta_links( $links, $file ) {
+  $support_link = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/">' . __('Support','xml-sitemap-feed') . '</a>';
+  $rate_link = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/?filter=5#new-post">' . __('Rate ★★★★★','xml-sitemap-feed') . '</a>';
+
+  if ( $file == XMLSF_BASENAME ) {
+    $links[] = $support_link;
+    $links[] = $rate_link;
+  }
+
+  return $links;
+}
+
+// sanitization
+
 class XMLSF_Admin_Sanitize
 {
 

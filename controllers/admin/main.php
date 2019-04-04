@@ -41,6 +41,7 @@ class XMLSF_Admin_Controller
 
 		// ACTION LINK
 		add_filter( 'plugin_action_links_' . XMLSF_BASENAME, 'xmlsf_add_action_link' );
+		add_filter( 'plugin_row_meta', 'xmlsf_plugin_meta_links', 10, 2);
 
 		add_action( 'admin_init', array( $this, 'notices_actions' ) );
 		add_action( 'admin_init', array( $this, 'transients_actions' ) );

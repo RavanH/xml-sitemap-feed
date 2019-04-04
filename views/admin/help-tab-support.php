@@ -8,7 +8,7 @@
 	<?php printf (
 		/* translators: Review page URL and Translation page URL on WordPress.org */
 		__( 'If you would like to contribute and share with the rest of the WordPress community, please consider writing a quick <a href="%1$s" target="_blank">Review</a> or help out with <a href="%2$s" target="_blank">Translating</a>!', 'xml-sitemap-feed' ),
-		'https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/', 'https://translate.wordpress.org/projects/wp-plugins/xml-sitemap-feed'
+		'https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/?filter=5#new-post', 'https://translate.wordpress.org/projects/wp-plugins/xml-sitemap-feed'
 	); ?>
 	<?php printf (
 		/* translators: Github project URL */
