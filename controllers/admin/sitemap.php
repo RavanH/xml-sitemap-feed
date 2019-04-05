@@ -19,7 +19,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
     {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
-		add_action( 'admin_init', array( $this, 'check_plugin_conflicts' ) );
+		add_action( 'admin_init', array( $this, 'check_plugin_conflicts' ), 11 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_metadata' ) );

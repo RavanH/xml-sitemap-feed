@@ -20,7 +20,7 @@ function xmlsf_filter_request( $request ) {
 		xmlsf()->is_sitemap = true;
 
 		// REPSONSE HEADERS filtering
-		add_filter( 'wp_headers', 'xmlsf_headers');
+		add_filter( 'wp_headers', 'xmlsf_headers' );
 
 		// modify request parameters
 		$request['post_status'] = 'publish';
