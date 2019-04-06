@@ -300,8 +300,8 @@ function xmlsf_get_priority( $sitemap = 'post_type', $term = '' ) {
 			}
 
 			// increase by relative comment count
-			if ( $post->comment_count > 0 && $priority < 1 ) {
-				$priority += 0.1 + ( 1 - $priority ) * $post->comment_count / wp_count_comments($post->post_type)->approved;
+			if ( $post->comment_count > 0 && $priority < 1 && xmlsf()->comment_count > 0 ) {
+				$priority += 0.1 + ( 1 - $priority ) * $post->comment_count / xmlsf()->comment_count;
 			}
 		}
 
@@ -393,8 +393,10 @@ function xmlsf_sitemap_parse_request( $request ) {
 			if ( is_array($options) && !empty($options[$feed[2]]['dynamic_priority']) ) {
 				// last posts or page modified date in Unix seconds
 				xmlsf()->lastmodified = mysql2date( 'U', get_lastpostmodified('gmt',$feed[2]), false );
-				// uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
+				// calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
 				xmlsf()->timespan = xmlsf()->lastmodified - mysql2date( 'U', get_firstpostdate('gmt',$feed[2]), false );
+				// total post type comment count
+				xmlsf()->comment_count = wp_count_comments($post->post_type)->approved;
 			};
 
 			// setup filter

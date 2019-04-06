@@ -296,6 +296,9 @@ Bugfix release.
 
 == Changelog ==
 
+= 5.1.3 =
+* FIX: possible division by zero
+
 = 5.1.2 =
 * FIX: admin notice dismiss button failing
 * FIX: date archive redirect notice showing for inactive post types

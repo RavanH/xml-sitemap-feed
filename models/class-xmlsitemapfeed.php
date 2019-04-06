@@ -101,6 +101,13 @@ class XMLSitemapFeed {
 	public $timespan = 0;
 
 	/**
+	 * Post type total approved comment count
+	 *
+	 * @var int $comment_count
+	 */
+	public $comment_count = 0;
+
+	/**
 	 * Blog pages
 	 *
 	 * @var null/array $blogpages
