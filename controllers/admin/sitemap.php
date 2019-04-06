@@ -85,7 +85,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 				if ( !empty( $wpseo_titles['disable-date'] ) ) {
 					// check if Split by option is set anywhere
 					foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
-						if ( is_array( $settings ) && !empty( $settings['archive'] ) ) {
+						if ( !empty( $settings['active'] ) && !empty( $settings['archive'] ) ) {
 							add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_wpseo_date_redirect' ) );
 							break;
 						}
@@ -112,7 +112,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 				if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) ) {
 					// check if Split by option is set anywhere
 					foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
-						if ( is_array( $settings ) && !empty( $settings['archive'] ) ) {
+						if ( !empty( $settings['active'] ) && !empty( $settings['archive'] ) ) {
 							add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_seopress_date_redirect' ) );
 							break;
 						}

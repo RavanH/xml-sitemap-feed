@@ -289,14 +289,16 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.1.1 =
+= 5.1.2 =
 
-Bugfix release: options page and news pings.
+Bugfix release.
 
 
 == Changelog ==
 
 = 5.1.2 =
+* FIX: admin notice dismiss button failing
+* FIX: date archive redirect notice showing for inactive post types
 * Plugin support and rate links on plugins page
 
 = 5.1.1 =
