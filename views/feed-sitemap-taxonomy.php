@@ -24,7 +24,7 @@ if ( is_array($terms) ) :
 	<url>
 		<loc><?php echo get_term_link( $term ); ?></loc>
 	 	<priority><?php echo xmlsf_get_term_priority( $term ); ?></priority>
-<?php if ( $lastmod = xmlsf_get_lastmod('taxonomy',$term) ) { ?>
+<?php if ( $lastmod = xmlsf_get_term_modified( $term ) ) { ?>
 		<lastmod><?php echo $lastmod; ?></lastmod>
 <?php } ?>
 	</url>

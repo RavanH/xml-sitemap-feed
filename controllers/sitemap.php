@@ -122,11 +122,11 @@ class XMLSF_Sitemap_Controller
 	 */
 	public function update_term_modified_meta( $new_status, $old_status, $post ) {
 
-		// bail out on inactive post types
+		// bail on inactive post types
 		if ( ! array_key_exists($post->post_type, $this->post_types) || empty( $this->post_types[$post->post_type]['active'] ) )
 			return;
 
-		// bail out when not publishing or unpublishing or editing a live post
+		// bail when not publishing or unpublishing or editing a live post
 		// note: prepend " $old_status == $new_status || " to exclude live editong too
 		if ( $new_status != 'publish' && $old_status != 'publish' )
 			return;
@@ -197,45 +197,4 @@ function xmlsf_load_template_taxonomy() {
  */
 function xmlsf_load_template_custom() {
 	load_template( XMLSF_DIR . '/views/feed-sitemap-custom.php' );
-}
-
-/* -------------------------------------
- *      MISSING WORDPRESS FUNCTIONS
- * ------------------------------------- */
-
-/**
- * Retrieve the date that the first post/page was published.
- * Variation of function get_lastpostdate, uses _get_post_time
- *
- * The server timezone is the default and is the difference between GMT and
- * server time. The 'blog' value is the date when the last post was posted. The
- * 'gmt' is when the last post was posted in GMT formatted date.
- *
- * @uses apply_filters() Calls 'get_firstpostdate' filter
- * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
- * @param string $post_type Post type to check.
- * @return string The date of the last post.
- */
-if( !function_exists('get_firstpostdate') ) {
- function get_firstpostdate($timezone = 'server', $post_type = 'any') {
-	return apply_filters( 'get_firstpostdate', _get_post_time( $timezone, 'date', $post_type, 'first' ), $timezone );
- }
-}
-
-/**
- * Retrieve last post/page modified date depending on timezone.
- * Variation of function get_lastpostmodified, uses _get_post_time
- *
- * The server timezone is the default and is the difference between GMT and
- * server time. The 'blog' value is the date when the last post was posted. The
- * 'gmt' is when the last post was posted in GMT formatted date.
- *
- * @uses apply_filters() Calls 'get_lastmodified' filter
- * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
- * @return string The date of the oldest modified post.
- */
-if( !function_exists('get_lastmodified') ) {
- function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '' ) {
-	return apply_filters( 'get_lastmodified', _get_post_time( $timezone, 'modified', $post_type, 'last', $m ), $timezone );
- }
 }

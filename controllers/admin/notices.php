@@ -11,9 +11,7 @@ class XMLSF_Admin_Notices extends XMLSF_Admin_Controller
 	public static function notice_static_files()
 	{
 		$number = count( parent::$static_files );
-		if ( 0 == $number ) return;
-		
-		$static_files = parent::$static_files;
+		if ( ! $number ) return;
 
 		include XMLSF_DIR . '/views/admin/notice-static-files.php';
 	}

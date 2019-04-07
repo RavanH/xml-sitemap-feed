@@ -66,3 +66,30 @@ function xmlsf_public_taxonomies() {
 
 	return $tax_array;
 }
+
+/**
+ * Santize priority value
+ * Expects proper locale setting for calculations: setlocale( LC_NUMERIC, 'C' );
+ *
+ * Returns a float within the set limits.
+ *
+ * @since 5.2
+ * @param float $priority
+ * @param float $min
+ * @param float $max
+ * @return float
+ */
+function xmlsf_sanitize_priority( $priority, $min = 0, $max = 1 ) {
+
+	$priority = (float) $priority;
+	$min = (float) $min;
+	$max = (float) $max;
+
+	if ( $priority <= $min ) {
+		return number_format( $min, 1 );
+	} elseif ( $priority >= $max ) {
+		return number_format( $max, 1 );
+	} else {
+		return number_format( $priority, 1 );
+	}
+}

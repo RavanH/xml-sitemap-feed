@@ -26,8 +26,6 @@ function xmlsf_filter_request( $request ) {
 		$request['post_status'] = 'publish';
 		$request['no_found_rows'] = true; // found rows calc is slow and only needed for pagination
 		//$request['cache_results'] = false;
-		$request['update_post_term_cache'] = false; // or do we need this for taxonoy sitemaps?
-		//$request['update_post_meta_cache'] = false;
 
 		// PLUGIN COMPATIBILITIES
 		// Polylang

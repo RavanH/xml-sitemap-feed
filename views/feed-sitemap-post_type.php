@@ -52,7 +52,7 @@ if ( have_posts() ) :
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
 		<priority><?php echo xmlsf_get_post_priority(); ?></priority>
-<?php if ( $lastmod = xmlsf_get_lastmod() ) { ?>
+<?php if ( $lastmod = xmlsf_get_post_modified() ) { ?>
 		<lastmod><?php echo $lastmod; ?></lastmod>
 <?php } ?>
 <?php

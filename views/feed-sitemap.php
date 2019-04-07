@@ -44,7 +44,7 @@ endif;
 foreach ( xmlsf_get_taxonomies() as $taxonomy ) : ?>
 	<sitemap>
 		<loc><?php echo xmlsf_get_index_url('taxonomy',$taxonomy); ?></loc>
-<?php if ( $lastmod = xmlsf_get_lastmod('taxonomy',$taxonomy) ) { ?>
+<?php if ( $lastmod = xmlsf_get_taxonomy_modified( $taxonomy ) ) { ?>
 		<lastmod><?php echo $lastmod; ?></lastmod>
 <?php } ?>
 	</sitemap>

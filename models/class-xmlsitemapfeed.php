@@ -148,7 +148,7 @@ class XMLSitemapFeed {
 						'priority' => '0.7',
 						'dynamic_priority' => '1',
 						'tags' => array(
-							'image' => 'attached'
+							'image' => 'featured'
 							/*'video' => ''*/
 						)
 					),
@@ -157,7 +157,7 @@ class XMLSitemapFeed {
 						'priority' => '0.5',
 						'dynamic_priority' => '',
 						'tags' => array(
-							'image' => 'attached'
+							'image' => 'featured'
 							/*'video' => ''*/
 						)
 					)

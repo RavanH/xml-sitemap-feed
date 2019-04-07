@@ -6,6 +6,12 @@
 class XMLSF_Admin_Controller
 {
 	/**
+	 * Sitemaps settings
+	 * @var array
+	 */
+	private $sitemaps = array();
+
+	/**
 	 * Static files conflicting with this plugin
 	 * @var array
 	 */
@@ -281,7 +287,7 @@ class XMLSF_Admin_Controller
 		}
 
 		foreach ( $check_for as $name => $pretty ) {
-			if ( file_exists( $home_path . $pretty ) ) {
+			if ( ! empty( $pretty ) && file_exists( $home_path . $pretty ) ) {
 				self::$static_files[$pretty] = $home_path . $pretty;
 			}
 		}

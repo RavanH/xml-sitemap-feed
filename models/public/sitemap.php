@@ -26,19 +26,6 @@ function xmlsf_get_index_url( $sitemap = 'home', $type = false, $param = false )
 }
 
 /**
- * Get last modified date
- *
- * @param string $sitemap
- * @param string $term
- *
- * @return string|bool date|false
- */
-function xmlsf_get_lastmod( $sitemap = 'post_type', $term = '' ) {
-	$modified = trim( mysql2date( 'Y-m-d\TH:i:s+00:00', xmlsf_modified( $sitemap, $term ), false ) );
-	return !empty($modified) ? $modified : false;
-}
-
-/**
  * Get root pages data
  * @return array
  */
@@ -176,108 +163,116 @@ function xmlsf_is_home( $post_id ) {
 }
 
 /**
- * Modified
+ * Post Modified
  *
- * @param string $sitemap
- * @param string $term
+ * @return string GMT date
+ */
+function xmlsf_get_post_modified() {
+	global $post;
+
+	// if blog or home page then simply look for last post date
+	if ( $post->post_type == 'page' && xmlsf_is_home($post->ID) ) {
+		return get_lastpostmodified('gmt');
+	}
+
+	$lastmod = get_post_modified_time( 'Y-m-d H:i:s', true, $post->ID );
+
+	$options = get_option('xmlsf_post_types');
+
+	if ( is_array($options) && !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
+		$lastcomment = get_comments( array(
+			'status' => 'approve',
+			'number' => 1,
+			'post_id' => $post->ID,
+		) );
+
+		if ( isset($lastcomment[0]->comment_date_gmt) )
+			if ( mysql2date( 'U', $lastcomment[0]->comment_date_gmt, false ) > mysql2date( 'U', $lastmod, false ) )
+				$lastmod = $lastcomment[0]->comment_date_gmt;
+	}
+
+	// make sure lastmod is not older than publication date (happens on scheduled posts)
+	if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($lastmod) ) {
+		$lastmod = $post->post_date_gmt;
+	};
+
+	return trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) );
+}
+
+/**
+ * Term Modified
+ *
+ * @param object $term
  *
  * @return string
  */
-function xmlsf_modified( $sitemap = 'post_type', $term = '' ) {
-	$lastmod = '';
+function xmlsf_get_term_modified( $term ) {
 
-	if ( 'post_type' == $sitemap ) :
-		global $post;
+	$lastmod = get_term_meta( $term->term_id, 'term_modified_gmt', true );
 
-		// if blog page then look for last post date
-		if ( $post->post_type == 'page' && xmlsf_is_home($post->ID) ) {
-			return get_lastpostmodified('gmt');
-		}
-
-		$lastmod = get_post_modified_time( 'Y-m-d H:i:s', true, $post->ID );
-
-		$options = get_option('xmlsf_post_types');
-
-		if ( is_array($options) && !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
-			$lastcomment = get_comments( array(
-				'status' => 'approve',
-				'number' => 1,
-				'post_id' => $post->ID,
-			) );
-
-			if ( isset($lastcomment[0]->comment_date_gmt) )
-				if ( mysql2date( 'U', $lastcomment[0]->comment_date_gmt, false ) > mysql2date( 'U', $lastmod, false ) )
-					$lastmod = $lastcomment[0]->comment_date_gmt;
-		}
-
-		// make sure lastmod is not older than publication date (happens on scheduled posts)
-		if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($lastmod) ) {
-			$lastmod = $post->post_date_gmt;
-		};
- 
-	elseif ( 'taxonomy' == $sitemap ) :
-
-		if ( is_object($term) ) {
-			$lastmod = get_term_meta( $term->term_id, 'term_modified_gmt', true );
-
-			if ( empty($lastmod) ) {
-				// get the latest post in this taxonomy item, to use its post_date as lastmod
-				$posts = get_posts (
+	if ( empty($lastmod) ) {
+		// get the latest post in this taxonomy item, to use its post_date as lastmod
+		$posts = get_posts (
+			array(
+				'post_type' => 'any',
+				'numberposts' => 1,
+				'no_found_rows' => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'update_cache' => false,
+				'tax_query' => array(
 					array(
-						'post_type' => 'any',
-						'numberposts' => 1,
-						'no_found_rows' => true,
-						'update_post_meta_cache' => false,
-						'update_post_term_cache' => false,
-						'update_cache' => false,
-						'tax_query' => array(
-							array(
-								'taxonomy' => $term->taxonomy,
-								'field' => 'slug',
-								'terms' => $term->slug
-							)
-						)
+						'taxonomy' => $term->taxonomy,
+						'field' => 'slug',
+						'terms' => $term->slug
 					)
-				);
-				$lastmod = isset($posts[0]->post_date_gmt) ? $posts[0]->post_date_gmt : '';
-				// get post date here, not modified date because we're only
-				// concerned about new entries on the (first) taxonomy page
+				)
+			)
+		);
+		$lastmod = isset($posts[0]->post_date_gmt) ? $posts[0]->post_date_gmt : '';
+		// get post date here, not modified date because we're only
+		// concerned about new entries on the (first) taxonomy page
 
-				update_term_meta( $term->term_id, 'term_modified_gmt', $lastmod );
-			}
-		} else {
+		update_term_meta( $term->term_id, 'term_modified_gmt', $lastmod );
+	}
 
-			$obj = get_taxonomy($term);
+	return trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) );
+}
 
-			$lastmodified = array();
-			foreach ( (array)$obj->object_type as $object_type ) {
-				$lastmodified[] = get_lastpostdate( 'gmt', $object_type );
-				// get post date here, not modified date because we're only
-				// concerned about new entries on the (first) taxonomy page
-			}
+/**
+ * Taxonmy Modified
+ *
+ * @param string $taxonomy
+ *
+ * @return string
+ */
+function xmlsf_get_taxonomy_modified( $taxonomy ) {
 
-			sort($lastmodified);
-			$lastmodified = array_filter($lastmodified);
-			$lastmod = end( $lastmodified );
-		};
+	$obj = get_taxonomy( $taxonomy );
 
-	endif;
+	$lastmodified = array();
+	foreach ( (array)$obj->object_type as $object_type ) {
+		$lastmodified[] = get_lastpostdate( 'gmt', $object_type );
+		// get last post date here, not modified date because we're only
+		// concerned about new entries on the (first) taxonomy page
+	}
 
-	return $lastmod;
+	sort( $lastmodified );
+	$lastmodified = array_filter( $lastmodified );
+	$lastmod = end( $lastmodified );
+
+	return trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) );
 }
 
 /**
  * Get post priority
  *
- * @return floatval
+ * @return float
  */
 function xmlsf_get_post_priority() {
-
 	// locale LC_NUMERIC should be set to C for these calculations
 	// it is assumed to be done at the request filter
 	//setlocale( LC_NUMERIC, 'C' );
-
-	$priority = 0.5;
 
 	global $post;
 	$options = get_option( 'xmlsf_post_types' );
@@ -302,15 +297,8 @@ function xmlsf_get_post_priority() {
 
 	$priority = apply_filters( 'xmlsf_post_priority', $priority, $post->ID );
 
-	// a final check for limits
-	if ( (float) $priority < 0.1 ) {
-		$priority = 0.1;
-	}
-	if ( (float) $priority > 1 ) {
-		$priority = 1;
-	}
-
-	return round( (float) $priority, 1 );
+	// a final check for limits and round it
+	return xmlsf_sanitize_priority( $priority, 0.1, 1 );
 }
 
 /**
@@ -318,15 +306,13 @@ function xmlsf_get_post_priority() {
  *
  * @param WP_Term|string $term
  *
- * @return floatval
+ * @return float
  */
 function xmlsf_get_term_priority( $term = '' ) {
 
 	// locale LC_NUMERIC should be set to C for these calculations
 	// it is assumed to be done at the request filter
 	//setlocale( LC_NUMERIC, 'C' );
-
-	$priority = 0.5;
 
 	$options = get_option( 'xmlsf_taxonomy_settings' );
 	$priority = isset( $options['priority'] ) && is_numeric( $options['priority'] ) ? floatval( $options['priority'] ) : 0.5 ;
@@ -342,15 +328,8 @@ function xmlsf_get_term_priority( $term = '' ) {
 
 	$priority = apply_filters( 'xmlsf_term_priority', $priority, $term->slug );
 
-	// a final check for limits
-	if ( (float) $priority < 0.1 ) {
-		$priority = 0.1;
-	}
-	if ( (float) $priority > 1 ) {
-		$priority = 1;
-	}
-
-	return round( (float) $priority, 1 );
+	// a final check for limits and round it
+	return xmlsf_sanitize_priority( $priority, 0.1, 1 );
 }
 
 /**
@@ -413,7 +392,7 @@ function xmlsf_sitemap_parse_request( $request ) {
 				// calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
 				xmlsf()->timespan = xmlsf()->lastmodified - mysql2date( 'U', get_firstpostdate('gmt',$feed[2]), false );
 				// total post type comment count
-				xmlsf()->comment_count = wp_count_comments($post->post_type)->approved;
+				xmlsf()->comment_count = wp_count_comments($feed[2])->approved;
 			};
 
 			// setup filter
@@ -591,6 +570,12 @@ if( !function_exists('_get_post_time') ) {
 
 	$order = ( $which == 'last' ) ? 'DESC' : 'ASC';
 
+	/* CODE SUGGESTION BY Frédéric Demarle
+   * to make this language aware:
+  "SELECT post_{$field}_gmt FROM $wpdb->posts" . PLL()->model->post->join_clause()
+  ."WHERE post_status = 'publish' AND post_type IN ({$post_types})" . PLL()->model->post->where_clause( $lang )
+  . ORDER BY post_{$field}_gmt DESC LIMIT 1
+  */
 	switch ( $timezone ) {
 		case 'gmt':
 			$date = $wpdb->get_var("SELECT post_{$field}_gmt FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
@@ -613,10 +598,40 @@ if( !function_exists('_get_post_time') ) {
     return false;
  }
 }
-/* CODE SUGGESTION BY Frédéric Demarle
- * to make this language aware.
 
-"SELECT post_{$field}_gmt FROM $wpdb->posts" . PLL()->model->post->join_clause()
-."WHERE post_status = 'publish' AND post_type IN ({$post_types})" . PLL()->model->post->where_clause( $lang )
-. ORDER BY post_{$field}_gmt DESC LIMIT 1
-*/
+/**
+ * Retrieve the date that the first post/page was published.
+ * Variation of function get_lastpostdate, uses _get_post_time
+ *
+ * The server timezone is the default and is the difference between GMT and
+ * server time. The 'blog' value is the date when the last post was posted. The
+ * 'gmt' is when the last post was posted in GMT formatted date.
+ *
+ * @uses apply_filters() Calls 'get_firstpostdate' filter
+ * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
+ * @param string $post_type Post type to check.
+ * @return string The date of the last post.
+ */
+if( !function_exists('get_firstpostdate') ) {
+ function get_firstpostdate($timezone = 'server', $post_type = 'any') {
+	return apply_filters( 'get_firstpostdate', _get_post_time( $timezone, 'date', $post_type, 'first' ), $timezone );
+ }
+}
+
+/**
+ * Retrieve last post/page modified date depending on timezone.
+ * Variation of function get_lastpostmodified, uses _get_post_time
+ *
+ * The server timezone is the default and is the difference between GMT and
+ * server time. The 'blog' value is the date when the last post was posted. The
+ * 'gmt' is when the last post was posted in GMT formatted date.
+ *
+ * @uses apply_filters() Calls 'get_lastmodified' filter
+ * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
+ * @return string The date of the oldest modified post.
+ */
+if( !function_exists('get_lastmodified') ) {
+ function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '' ) {
+	return apply_filters( 'get_lastmodified', _get_post_time( $timezone, 'modified', $post_type, 'last', $m ), $timezone );
+ }
+}
