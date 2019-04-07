@@ -267,14 +267,11 @@ function xmlsf_modified( $sitemap = 'post_type', $term = '' ) {
 }
 
 /**
- * Get priority
- *
- * @param string $sitemap
- * @param WP_Term|string $term
+ * Get post priority
  *
  * @return floatval
  */
-function xmlsf_get_priority( $sitemap = 'post_type', $term = '' ) {
+function xmlsf_get_post_priority() {
 
 	// locale LC_NUMERIC should be set to C for these calculations
 	// it is assumed to be done at the request filter
@@ -282,48 +279,68 @@ function xmlsf_get_priority( $sitemap = 'post_type', $term = '' ) {
 
 	$priority = 0.5;
 
-	if ( 'post_type' == $sitemap ) :
+	global $post;
+	$options = get_option( 'xmlsf_post_types' );
+	$priority = isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ? floatval($options[$post->post_type]['priority']) : 0.5;
 
-		global $post;
-		$options = get_option( 'xmlsf_post_types' );
-		$priority = isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ? floatval($options[$post->post_type]['priority']) : 0.5;
+	if ( $priority_meta = get_metadata( 'post', $post->ID, '_xmlsf_priority', true ) ) {
+		$priority = floatval(str_replace(',','.',$priority_meta));
+	} elseif ( !empty($options[$post->post_type]['dynamic_priority']) ) {
+		$post_modified = mysql2date('U',$post->post_modified_gmt, false);
 
-		if ( $priority_meta = get_metadata( 'post', $post->ID, '_xmlsf_priority', true ) ) {
-			$priority = floatval(str_replace(',','.',$priority_meta));
-		} elseif ( !empty($options[$post->post_type]['dynamic_priority']) ) {
-			$post_modified = mysql2date('U',$post->post_modified_gmt, false);
-
-			// reduce by age
-			// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
-			if ( !is_sticky($post->ID) && !xmlsf_is_home($post->ID) && xmlsf()->timespan > 0 ) {
-				$priority -= $priority * ( xmlsf()->lastmodified - $post_modified ) / xmlsf()->timespan;
-			}
-
-			// increase by relative comment count
-			if ( $post->comment_count > 0 && $priority < 1 && xmlsf()->comment_count > 0 ) {
-				$priority += 0.1 + ( 1 - $priority ) * $post->comment_count / xmlsf()->comment_count;
-			}
+		// reduce by age
+		// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
+		if ( !is_sticky($post->ID) && !xmlsf_is_home($post->ID) && xmlsf()->timespan > 0 ) {
+			$priority -= $priority * ( xmlsf()->lastmodified - $post_modified ) / xmlsf()->timespan;
 		}
 
-		$priority = apply_filters( 'xmlsf_post_priority', $priority, $post->ID );
+		// increase by relative comment count
+		if ( $post->comment_count > 0 && $priority < 1 && xmlsf()->comment_count > 0 ) {
+			$priority += 0.1 + ( 1 - $priority ) * $post->comment_count / xmlsf()->comment_count;
+		}
+	}
 
-	elseif ( 'taxonomy' == $sitemap ) :
+	$priority = apply_filters( 'xmlsf_post_priority', $priority, $post->ID );
 
-		$options = get_option( 'xmlsf_taxonomy_settings' );
-		$priority = isset( $options['priority'] ) && is_numeric( $options['priority'] ) ? floatval( $options['priority'] ) : 0.5 ;
+	// a final check for limits
+	if ( (float) $priority < 0.1 ) {
+		$priority = 0.1;
+	}
+	if ( (float) $priority > 1 ) {
+		$priority = 1;
+	}
 
-		if ( !empty($options['dynamic_priority']) && $priority > 0.1 && is_object($term) ) {
-			// set first and highest term post count as maximum
-			if ( null == xmlsf()->taxonomy_termmaxposts ) {
-				xmlsf()->taxonomy_termmaxposts = $term->count;
-			}
+	return round( (float) $priority, 1 );
+}
 
-			$priority -= ( xmlsf()->taxonomy_termmaxposts - $term->count ) * ( $priority - 0.1 ) / xmlsf()->taxonomy_termmaxposts;
+/**
+ * Get taxonomy priority
+ *
+ * @param WP_Term|string $term
+ *
+ * @return floatval
+ */
+function xmlsf_get_term_priority( $term = '' ) {
+
+	// locale LC_NUMERIC should be set to C for these calculations
+	// it is assumed to be done at the request filter
+	//setlocale( LC_NUMERIC, 'C' );
+
+	$priority = 0.5;
+
+	$options = get_option( 'xmlsf_taxonomy_settings' );
+	$priority = isset( $options['priority'] ) && is_numeric( $options['priority'] ) ? floatval( $options['priority'] ) : 0.5 ;
+
+	if ( !empty($options['dynamic_priority']) && $priority > 0.1 && is_object($term) ) {
+		// set first and highest term post count as maximum
+		if ( null == xmlsf()->taxonomy_termmaxposts ) {
+			xmlsf()->taxonomy_termmaxposts = $term->count;
 		}
 
-		$priority = apply_filters( 'xmlsf_term_priority', $priority, $term->slug );
+		$priority -= ( xmlsf()->taxonomy_termmaxposts - $term->count ) * ( $priority - 0.1 ) / xmlsf()->taxonomy_termmaxposts;
+	}
 
-	endif;
+	$priority = apply_filters( 'xmlsf_term_priority', $priority, $term->slug );
 
 	// a final check for limits
 	if ( (float) $priority < 0.1 ) {
