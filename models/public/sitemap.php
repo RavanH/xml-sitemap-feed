@@ -214,7 +214,7 @@ function xmlsf_modified( $sitemap = 'post_type', $term = '' ) {
 		if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($lastmod) ) {
 			$lastmod = $post->post_date_gmt;
 		};
-
+ 
 	elseif ( 'taxonomy' == $sitemap ) :
 
 		if ( is_object($term) ) {
