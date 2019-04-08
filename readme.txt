@@ -298,6 +298,7 @@ Bugfix release.
 
 = 5.1.3 =
 * FIX: possible division by zero
+* FIX: update_term_modified_meta
 
 = 5.1.2 =
 * FIX: admin notice dismiss button failing

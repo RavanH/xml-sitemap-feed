@@ -121,13 +121,12 @@ class XMLSF_Sitemap_Controller
 	 * @param $post
 	 */
 	public function update_term_modified_meta( $new_status, $old_status, $post ) {
-
 		// bail on inactive post types
 		if ( ! array_key_exists($post->post_type, $this->post_types) || empty( $this->post_types[$post->post_type]['active'] ) )
 			return;
 
 		// bail when not publishing or unpublishing or editing a live post
-		// note: prepend " $old_status == $new_status || " to exclude live editong too
+		// note: prepend " $old_status == $new_status || " to exclude live editing too
 		if ( $new_status != 'publish' && $old_status != 'publish' )
 			return;
 
@@ -144,8 +143,8 @@ class XMLSF_Sitemap_Controller
 			$taxonomies = xmlsf_public_taxonomies();
 
 		$term_ids = array();
-		foreach ( (array) $taxonomies as $tax_name ) {
-			$terms = wp_get_post_terms( $post->ID, $tax_name, array( 'fields' => 'ids' ));
+		foreach ( (array) $taxonomies as $slug => $name ) {
+			$terms = wp_get_post_terms( $post->ID, $slug, array( 'fields' => 'ids' ));
 			if ( !is_wp_error($terms) ) {
 				$term_ids = array_merge( $term_ids, $terms );
 			}
