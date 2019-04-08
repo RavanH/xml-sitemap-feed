@@ -75,9 +75,8 @@ if ( have_posts() ) :
 		</news:news>
 <?php
 		if ( !empty($options['image']) ) :
-			foreach ( xmlsf_get_images('news') as $image ) {
-				if ( empty($image['loc']) )
-					continue;
+			foreach ( xmlsf_news_get_images( $options['image'] ) as $image ) {
+				if ( empty($image['loc']) ) continue;
 		?>
 		<image:image>
 			<image:loc><?php echo utf8_uri_encode( $image['loc'] ); ?></image:loc>

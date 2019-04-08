@@ -76,6 +76,51 @@ function xmlsf_sitemap_news_parse_request( $request ) {
 }
 
 /**
+ * Get images
+ *
+ * @param string $which
+ *
+ * @return array
+ */
+function xmlsf_news_get_images( $which ) {
+	global $post;
+	$images = array();
+
+	if ( 'attached' == $which ) {
+		$args = array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => 1, 'post_status' =>'inherit', 'post_parent' => $post->ID );
+		$attachments = get_posts($args);
+		if ( ! empty( $attachments[0] ) ) {
+			$url = wp_get_attachment_image_url( $attachments[0]->ID, 'full' );
+			$url = xmlsf_get_absolute_url( $url );
+			if ( !empty($url) ) {
+				$images[] = array(
+					'loc' => esc_attr( esc_url_raw( $url ) ),
+					'title' => apply_filters( 'the_title_xmlsitemap', $attachments[0]->post_title ),
+					'caption' => apply_filters( 'the_title_xmlsitemap', $attachments[0]->post_excerpt )
+					// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
+				);
+			}
+		}
+	} elseif ( 'featured' == $which ) {
+		if ( has_post_thumbnail( $post->ID ) ) {
+			$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
+			$url = wp_get_attachment_image_url( get_post_thumbnail_id( $post->ID ), 'full' );
+			$url = xmlsf_get_absolute_url( $url );
+			if ( !empty($url) ) {
+				$images[] = array(
+					'loc' => esc_attr( esc_url_raw( $url ) ),
+					'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
+					'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
+					// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
+				);
+			}
+		}
+	}
+
+	return $images;
+}
+
+/**
  * Get language used in News Sitemap
  *
  * @param $post_id
