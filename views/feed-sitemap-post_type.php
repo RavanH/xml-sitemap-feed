@@ -47,7 +47,7 @@ if ( have_posts() ) :
 		 ) || !xmlsf_is_allowed_domain( get_permalink() ) )
 		continue;
 
-	$have_posts = true;
+	$did_posts = true;
 	?>
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
@@ -57,21 +57,21 @@ if ( have_posts() ) :
 <?php } ?>
 <?php
 	if ( !empty($image) ) :
-		foreach ( xmlsf_get_images() as $image ) {
-			if ( empty($image['loc']) )
+		foreach ( xmlsf_get_post_images( $image ) as $img_data ) {
+			if ( empty($img_data['loc']) )
 				continue;
 	?>
 		<image:image>
-			<image:loc><?php echo utf8_uri_encode( $image['loc'] ); ?></image:loc>
+			<image:loc><?php echo utf8_uri_encode( $img_data['loc'] ); ?></image:loc>
 <?php
-		if ( !empty($image['title']) ) {
+		if ( !empty($img_data['title']) ) {
 		?>
-			<image:title><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $image['title']); ?>]]></image:title>
+			<image:title><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $img_data['title']); ?>]]></image:title>
 <?php
 		}
-		if ( !empty($image['caption']) ) {
+		if ( !empty($img_data['caption']) ) {
 		?>
-			<image:caption><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $image['caption']); ?>]]></image:caption>
+			<image:caption><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $img_data['caption']); ?>]]></image:caption>
 <?php
 		}
 		?>
@@ -85,7 +85,7 @@ if ( have_posts() ) :
     endwhile;
 endif;
 
-if ( !$have_posts ) :
+if ( ! $did_posts ) :
 	// No posts done? Then do at least the homepage to prevent error message in GWT.
 	?>
 	<url>

@@ -333,6 +333,53 @@ function xmlsf_get_term_priority( $term = '' ) {
 }
 
 /**
+ * Get post images
+ *
+ * @param string $which
+ *
+ * @return array
+ */
+function xmlsf_get_post_images( $which ) {
+	global $post;
+	$images = array();
+
+	if ( 'attached' == $which ) {
+		$args = array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => -1, 'post_status' =>'inherit', 'post_parent' => $post->ID );
+		$attachments = get_posts($args);
+		if ( $attachments ) {
+			foreach ( $attachments as $attachment ) {
+				$url = wp_get_attachment_image_url( $attachment->ID, 'full' );
+				$url = xmlsf_get_absolute_url( $url );
+				if ( !empty($url) ) {
+					$images[] = array(
+						'loc' => esc_attr( esc_url_raw( $url ) ),
+						'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
+						'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
+						// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
+					);
+				}
+			}
+		}
+	} elseif ( 'featured' == $which ) {
+		if ( has_post_thumbnail( $post->ID ) ) {
+			$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
+			$url = wp_get_attachment_image_url( get_post_thumbnail_id( $post->ID ), 'full' );
+			$url = xmlsf_get_absolute_url( $url );
+			if ( !empty($url) ) {
+				$images[] =  array(
+					'loc' => esc_attr( esc_url_raw( $url ) ),
+					'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
+					'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
+					// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
+				);
+			}
+		}
+	}
+
+	return $images;
+}
+
+/**
  * Filter limits
  * override default feed limit
  * @return string

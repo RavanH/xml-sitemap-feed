@@ -16,61 +16,6 @@ function xmlsf_headers( $headers ) {
 }
 
 /**
- * Get images
- *
- * @param string $sitemap
- *
- * @return array|bool
- */
-function xmlsf_get_images( $sitemap = '' ) {
-	global $post;
-	$images = array();
-
-	if ( 'news' == $sitemap ) {
-		$options = get_option('xmlsf_news_tags');
-		$which = isset($options['image']) ? $options['image'] : '';
-	} else {
-		$options = get_option('xmlsf_post_types');
-		$which = is_array($options) && isset($options[$post->post_type]['tags']['image']) ? $options[$post->post_type]['tags']['image'] : '';
-	}
-
-	if ( 'attached' == $which ) {
-		$args = array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => -1, 'post_status' =>'inherit', 'post_parent' => $post->ID );
-		$attachments = get_posts($args);
-		if ( $attachments ) {
-			foreach ( $attachments as $attachment ) {
-				$url = wp_get_attachment_image_url( $attachment->ID, 'full' );
-				$url = xmlsf_get_absolute_url( $url );
-				if ( !empty($url) ) {
-					$images[] = array(
-						'loc' => esc_attr( esc_url_raw( $url ) ),
-						'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
-						'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
-						// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
-					);
-				}
-			}
-		}
-	} elseif ( 'featured' == $which ) {
-		if ( has_post_thumbnail( $post->ID ) ) {
-			$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
-			$url = wp_get_attachment_image_url( get_post_thumbnail_id( $post->ID ), 'full' );
-			$url = xmlsf_get_absolute_url( $url );
-			if ( !empty($url) ) {
-				$images[] =  array(
-					'loc' => esc_attr( esc_url_raw( $url ) ),
-					'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
-					'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
-					// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
-				);
-			}
-		}
-	}
-
-	return $images;
-}
-
-/**
  * Get absolute URL
  * Converts path or protocol relative URLs to absolute ones.
  *
