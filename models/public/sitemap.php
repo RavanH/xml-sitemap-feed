@@ -23,6 +23,7 @@ function xmlsf_get_index_url( $sitemap = 'home', $type = false, $param = false )
 	}
 
 	return esc_url( trailingslashit( home_url() ) . $name );
+
 }
 
 /**
@@ -30,8 +31,10 @@ function xmlsf_get_index_url( $sitemap = 'home', $type = false, $param = false )
  * @return array
  */
 function xmlsf_get_root_data() {
+
 	// language roots
 	global $sitepress;
+
 	// Polylang and WPML compat
 	if ( function_exists('pll_the_languages') && function_exists('pll_home_url') ) {
 		$languages = pll_the_languages( array( 'raw' => 1 ) );
@@ -67,6 +70,7 @@ function xmlsf_get_root_data() {
 	// TODO custom post type root pages here
 
 	return $data;
+
 }
 
 /**
@@ -77,6 +81,7 @@ function xmlsf_get_root_data() {
  * @return array
  */
 function xmlsf_do_tags( $type = 'post' ) {
+
 	$post_types = get_option( 'xmlsf_post_types' );
 
 	// make sure it's an array we are returning
@@ -85,6 +90,7 @@ function xmlsf_do_tags( $type = 'post' ) {
 		is_array($post_types) &&
 		!empty($post_types[$type]['tags'])
 	) ? (array) $post_types[$type]['tags'] : array();
+
 }
 
 /**
@@ -92,16 +98,20 @@ function xmlsf_do_tags( $type = 'post' ) {
  * @return array
  */
 function xmlsf_get_frontpages() {
+
 	if ( null === xmlsf()->frontpages ) :
+
 		$frontpages = array();
 		if ( 'page' == get_option('show_on_front') ) {
 			$frontpage = (int) get_option('page_on_front');
 			$frontpages = array_merge( (array) $frontpage, xmlsf_get_translations($frontpage) );
 		}
 		xmlsf()->frontpages = $frontpages;
+
 	endif;
 
 	return xmlsf()->frontpages;
+
 }
 
 /**
@@ -112,24 +122,31 @@ function xmlsf_get_frontpages() {
  * @return array
  */
 function xmlsf_get_translations( $post_id ) {
+
+	global $sitepress;
 	$translation_ids = array();
 
-	// WPML compat
-	global $sitepress;
 	// Polylang compat
 	if ( function_exists('pll_get_post_translations') ) {
+
 		$translations = pll_get_post_translations($post_id);
+
 		foreach ( $translations as $slug => $id ) {
 			if ( $post_id != $id ) $translation_ids[] = $id;
 		}
+
+	// WPML compat
 	} elseif ( is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'get_object_id') ) {
+
 		foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term ) {
 			$id = $sitepress->get_object_id($post_id,'page',false,$term);
 			if ( $post_id != $id ) $translation_ids[] = $id;
 		}
+
 	}
 
 	return $translation_ids;
+
 }
 
 /**
@@ -137,6 +154,7 @@ function xmlsf_get_translations( $post_id ) {
  * @return array
  */
 function xmlsf_get_blogpages() {
+
 	if ( null === xmlsf()->blogpages ) :
 		$blogpages = array();
 		if ( 'page' == get_option('show_on_front') ) {
@@ -149,6 +167,7 @@ function xmlsf_get_blogpages() {
 	endif;
 
 	return xmlsf()->blogpages;
+
 }
 
 /**
@@ -168,27 +187,33 @@ function xmlsf_is_home( $post_id ) {
  * @return string GMT date
  */
 function xmlsf_get_post_modified() {
+
 	global $post;
 
 	// if blog or home page then simply look for last post date
 	if ( $post->post_type == 'page' && xmlsf_is_home($post->ID) ) {
-		return get_lastpostmodified('gmt');
-	}
 
-	$lastmod = get_post_modified_time( 'Y-m-d H:i:s', true, $post->ID );
+		$lastmod = get_lastpostmodified( 'gmt' );
 
-	$options = get_option('xmlsf_post_types');
+	} else {
 
-	if ( is_array($options) && !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
-		$lastcomment = get_comments( array(
-			'status' => 'approve',
-			'number' => 1,
-			'post_id' => $post->ID,
-		) );
+		$lastmod = $post->post_modified_gmt;
 
-		if ( isset($lastcomment[0]->comment_date_gmt) )
-			if ( mysql2date( 'U', $lastcomment[0]->comment_date_gmt, false ) > mysql2date( 'U', $lastmod, false ) )
-				$lastmod = $lastcomment[0]->comment_date_gmt;
+		// maybe update lastmod to latest comment
+		$options = get_option( 'xmlsf_post_types' );
+
+		if ( is_array($options) && !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
+			$lastcomment = get_comments( array(
+				'status' => 'approve',
+				'number' => 1,
+				'post_id' => $post->ID,
+			) );
+
+			if ( isset($lastcomment[0]->comment_date_gmt) )
+				if ( mysql2date( 'U', $lastcomment[0]->comment_date_gmt, false ) > mysql2date( 'U', $lastmod, false ) )
+					$lastmod = $lastcomment[0]->comment_date_gmt;
+		}
+
 	}
 
 	// make sure lastmod is not older than publication date (happens on scheduled posts)
@@ -196,7 +221,8 @@ function xmlsf_get_post_modified() {
 		$lastmod = $post->post_date_gmt;
 	};
 
-	return trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) );
+	return ! empty( $lastmod ) ? trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) ) : false;
+
 }
 
 /**
@@ -207,10 +233,14 @@ function xmlsf_get_post_modified() {
  * @return string
  */
 function xmlsf_get_term_modified( $term ) {
+	/*
+	* Getting ALL meta here because if checking for single key, we cannot
+	* distiguish between empty value or non-exisiting key as both return ''.
+	*/
+	$meta = get_term_meta( $term->term_id );
 
-	$lastmod = get_term_meta( $term->term_id, 'term_modified_gmt', true );
+	if ( ! array_key_exists( 'term_modified_gmt', $meta ) ) {
 
-	if ( empty($lastmod) ) {
 		// get the latest post in this taxonomy item, to use its post_date as lastmod
 		$posts = get_posts (
 			array(
@@ -234,9 +264,15 @@ function xmlsf_get_term_modified( $term ) {
 		// concerned about new entries on the (first) taxonomy page
 
 		update_term_meta( $term->term_id, 'term_modified_gmt', $lastmod );
+
+	} else {
+
+		$lastmod = $meta['term_modified_gmt'][0]; // only get one
+
 	}
 
-	return trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) );
+	return ! empty( $lastmod ) ? trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) ) : false;
+
 }
 
 /**
@@ -262,6 +298,7 @@ function xmlsf_get_taxonomy_modified( $taxonomy ) {
 	$lastmod = end( $lastmodified );
 
 	return trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) );
+
 }
 
 /**
@@ -278,9 +315,12 @@ function xmlsf_get_post_priority() {
 	$options = get_option( 'xmlsf_post_types' );
 	$priority = isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ? floatval($options[$post->post_type]['priority']) : 0.5;
 
-	if ( $priority_meta = get_metadata( 'post', $post->ID, '_xmlsf_priority', true ) ) {
+	if ( $priority_meta = get_post_meta( $post->ID, '_xmlsf_priority', true ) ) {
+
 		$priority = floatval(str_replace(',','.',$priority_meta));
+
 	} elseif ( !empty($options[$post->post_type]['dynamic_priority']) ) {
+
 		$post_modified = mysql2date('U',$post->post_modified_gmt, false);
 
 		// reduce by age
@@ -293,12 +333,14 @@ function xmlsf_get_post_priority() {
 		if ( $post->comment_count > 0 && $priority < 1 && xmlsf()->comment_count > 0 ) {
 			$priority += 0.1 + ( 1 - $priority ) * $post->comment_count / xmlsf()->comment_count;
 		}
+
 	}
 
 	$priority = apply_filters( 'xmlsf_post_priority', $priority, $post->ID );
 
 	// a final check for limits and round it
 	return xmlsf_sanitize_priority( $priority, 0.1, 1 );
+
 }
 
 /**
@@ -315,6 +357,7 @@ function xmlsf_get_term_priority( $term = '' ) {
 	//setlocale( LC_NUMERIC, 'C' );
 
 	$options = get_option( 'xmlsf_taxonomy_settings' );
+
 	$priority = isset( $options['priority'] ) && is_numeric( $options['priority'] ) ? floatval( $options['priority'] ) : 0.5 ;
 
 	if ( !empty($options['dynamic_priority']) && $priority > 0.1 && is_object($term) ) {
@@ -330,6 +373,7 @@ function xmlsf_get_term_priority( $term = '' ) {
 
 	// a final check for limits and round it
 	return xmlsf_sanitize_priority( $priority, 0.1, 1 );
+
 }
 
 /**
@@ -340,43 +384,37 @@ function xmlsf_get_term_priority( $term = '' ) {
  * @return array
  */
 function xmlsf_get_post_images( $which ) {
+
 	global $post;
 	$images = array();
 
-	if ( 'attached' == $which ) {
-		$args = array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => -1, 'post_status' =>'inherit', 'post_parent' => $post->ID );
-		$attachments = get_posts($args);
-		if ( $attachments ) {
-			foreach ( $attachments as $attachment ) {
-				$url = wp_get_attachment_image_url( $attachment->ID, 'full' );
-				$url = xmlsf_get_absolute_url( $url );
-				if ( !empty($url) ) {
-					$images[] = array(
-						'loc' => esc_attr( esc_url_raw( $url ) ),
-						'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
-						'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
-						// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
-					);
-				}
-			}
+	/*
+	* Getting ALL meta here because if checking for single key, we cannot
+	* distiguish between empty value or non-exisiting key as both return ''.
+	*/
+	$meta = get_post_meta( $post->ID );
+
+	if ( ! array_key_exists( '_xmlsf_image_'.$which, $meta ) ) {
+
+		// populate attached images data here
+		$images = (array) xmlsf_images_data( $post, $which );
+
+		// and save it as meta data
+		// note: add_post_meta will clear the meta cache, not update it!
+		foreach ( $images as $data ) {
+			add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
 		}
-	} elseif ( 'featured' == $which ) {
-		if ( has_post_thumbnail( $post->ID ) ) {
-			$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
-			$url = wp_get_attachment_image_url( get_post_thumbnail_id( $post->ID ), 'full' );
-			$url = xmlsf_get_absolute_url( $url );
-			if ( !empty($url) ) {
-				$images[] =  array(
-					'loc' => esc_attr( esc_url_raw( $url ) ),
-					'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
-					'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
-					// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
-				);
-			}
-		}
+
+	} else {
+
+		// do this as 'else' otherwise get_post_meta will cause extra db queuries
+		// after add_post_meta has run in the 'if' above (see note)...
+		$images = get_post_meta( $post->ID, '_xmlsf_image_'.$which );
+
 	}
 
-	return $images;
+	return (array) apply_filters( 'xmlsf_post_images_'.$which, $images );
+
 }
 
 /**
@@ -487,6 +525,7 @@ function xmlsf_sitemap_parse_request( $request ) {
  * @return array
  */
 function xmlsf_cache_get_archives( $query ) {
+
 	global $wpdb;
 
 	$key = md5($query);
@@ -501,6 +540,7 @@ function xmlsf_cache_get_archives( $query ) {
 	}
 
 	return $arcresults;
+
 }
 
 /**
@@ -512,6 +552,7 @@ function xmlsf_cache_get_archives( $query ) {
  * @return array
  */
 function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
+
 	global $wpdb;
 	$return = array();
 
@@ -545,6 +586,7 @@ function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
 	endif;
 
 	return $return;
+
 }
 
 /* -------------------------------------
@@ -564,6 +606,7 @@ function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
  */
 if( !function_exists('_get_post_time') ) {
  function _get_post_time( $timezone, $field, $post_type = 'any', $which = 'last', $m = '' ) {
+
 	global $wpdb;
 
 	if ( !in_array( $field, array( 'date', 'modified' ) ) ) {
@@ -643,6 +686,7 @@ if( !function_exists('_get_post_time') ) {
     }
 
     return false;
+
  }
 }
 
@@ -661,7 +705,9 @@ if( !function_exists('_get_post_time') ) {
  */
 if( !function_exists('get_firstpostdate') ) {
  function get_firstpostdate($timezone = 'server', $post_type = 'any') {
+
 	return apply_filters( 'get_firstpostdate', _get_post_time( $timezone, 'date', $post_type, 'first' ), $timezone );
+
  }
 }
 
@@ -679,6 +725,8 @@ if( !function_exists('get_firstpostdate') ) {
  */
 if( !function_exists('get_lastmodified') ) {
  function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '' ) {
+
 	return apply_filters( 'get_lastmodified', _get_post_time( $timezone, 'modified', $post_type, 'last', $m ), $timezone );
+
  }
 }

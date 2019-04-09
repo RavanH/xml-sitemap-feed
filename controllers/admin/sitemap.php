@@ -2,21 +2,21 @@
 
 class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 {
-    /**
-     * Holds the values to be used in the fields callbacks
-     */
-    private $screen_id;
+  /**
+   * Holds the values to be used in the fields callbacks
+   */
+  private $screen_id;
 
 	/**
-     * Holds the public taxonomies array
-     */
-    private $public_taxonomies;
+   * Holds the public taxonomies array
+   */
+  private $public_taxonomies;
 
-    /**
-     * Start up
-     */
-    public function __construct()
-    {
+  /**
+   * Start up
+   */
+  public function __construct()
+  {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
 		add_action( 'admin_init', array( $this, 'check_plugin_conflicts' ), 11 );
@@ -210,9 +210,9 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 	}
 
 	/**
-     * Gets public taxonomies
-     */
-    public function public_taxonomies()
+   * Gets public taxonomies
+   */
+  public function public_taxonomies()
 	{
 		if ( !isset( $this->public_taxonomies ) ) {
 			require_once XMLSF_DIR . '/models/public/sitemap.php';
@@ -224,25 +224,25 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 	}
 
 	/**
-     * Add options page
-     */
-    public function add_settings_page()
+   * Add options page
+   */
+  public function add_settings_page()
 	{
-        // This page will be under "Settings"
-        $this->screen_id = add_options_page(
-			__('XML Sitemap','xml-sitemap-feed'),
-            __('XML Sitemap','xml-sitemap-feed'),
-            'manage_options',
-            'xmlsf',
-            array( $this, 'settings_page' )
-        );
-    }
+    // This page will be under "Settings"
+    $this->screen_id = add_options_page(
+      __('XML Sitemap','xml-sitemap-feed'),
+      __('XML Sitemap','xml-sitemap-feed'),
+      'manage_options',
+      'xmlsf',
+      array( $this, 'settings_page' )
+    );
+  }
 
-    /**
-     * Options page callback
-     */
-    public function settings_page()
-    {
+  /**
+   * Options page callback
+   */
+  public function settings_page()
+  {
 		// SECTIONS & SETTINGS
 		// post_types
 		add_settings_section( 'xml_sitemap_post_types_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_post_types' );
@@ -277,13 +277,13 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 		$url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() || empty($sitemaps['sitemap']) ? '?feed=sitemap' : $sitemaps['sitemap'] );
 
 		include XMLSF_DIR . '/views/admin/page-sitemap.php';
-    }
+  }
 
-    /**
-     * Register and add settings
-     */
-    public function register_settings()
-    {
+  /**
+   * Register and add settings
+   */
+  public function register_settings()
+  {
 		// Help tab
 		add_action( 'load-'.$this->screen_id, array($this,'help_tab') );
 
@@ -296,7 +296,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 		register_setting( 'xmlsf_advanced', 'xmlsf_urls', array('XMLSF_Admin_Sitemap_Sanitize','custom_urls_settings') );
 		// custom sitemaps
 		register_setting( 'xmlsf_advanced', 'xmlsf_custom_sitemaps', array('XMLSF_Admin_Sitemap_Sanitize','custom_sitemaps_settings') );
-    }
+  }
 
 	/**
 	* XML SITEMAP SECTION
@@ -393,7 +393,8 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 		include XMLSF_DIR . '/views/admin/field-sitemap-custom.php';
 	}
 
-	public function urls_settings_field() {
+	public function urls_settings_field()
+  {
 		$urls = get_option( 'xmlsf_urls' );
 		$lines = array();
 

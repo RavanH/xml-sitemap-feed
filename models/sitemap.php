@@ -51,17 +51,19 @@ function xmlsf_get_taxonomies() {
  * @return array
  */
 function xmlsf_public_taxonomies() {
+
 	$tax_array = array();
 
 	foreach ( (array) get_option( 'xmlsf_post_types' ) as $post_type => $settings ) {
+
 		if ( empty($settings['active']) ) continue;
 
-		$taxonomies = get_object_taxonomies( $post_type, 'objects' );
 		// check each tax public flag and term count and append name to array
-		foreach ( $taxonomies as $taxonomy ) {
+		foreach ( get_object_taxonomies( $post_type, 'objects' ) as $taxonomy ) {
 			if ( !empty( $taxonomy->public ) && !in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) )
 				$tax_array[$taxonomy->name] = $taxonomy->label;
 		}
+
 	}
 
 	return $tax_array;
@@ -92,4 +94,65 @@ function xmlsf_sanitize_priority( $priority, $min = 0, $max = 1 ) {
 	} else {
 		return number_format( $priority, 1 );
 	}
+}
+
+/**
+ * Get post attached | featured image(s)
+ *
+ * @param object $post
+ * @param string $which
+ *
+ * @return array|string
+ */
+function xmlsf_images_data( $post, $which ) {
+	$attachments = array();
+
+	if ( 'featured' == $which ) {
+
+		if ( has_post_thumbnail( $post->ID ) ) {
+			$featured = get_post( get_post_thumbnail_id( $post->ID ) );
+			if ( is_object($featured) ) {
+				$attachments[] = $featured;
+			}
+		}
+
+	} elseif ( 'attached' == $which ) {
+
+		$args = array(
+			'post_type' => 'attachment',
+			'post_mime_type' => 'image',
+			'numberposts' => -1,
+			'post_status' =>'inherit',
+			'post_parent' => $post->ID
+		);
+
+		$attachments = get_posts( $args );
+
+	}
+
+	if ( empty( $attachments ) ) return '';
+
+	// gather all data
+	$images_data = array();
+
+	foreach ( $attachments as $attachment ) {
+
+		$url = wp_get_attachment_url( $attachment->ID );
+
+		if ( !empty($url) ) {
+
+			$url = esc_attr( esc_url_raw( $url ) );
+
+			$images_data[$url] = array(
+				'loc' => $url,
+				'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
+				'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
+				// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
+			);
+
+		}
+
+	}
+
+	return ! empty( $images_data ) ? $images_data : '';
 }

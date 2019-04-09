@@ -33,6 +33,9 @@ class XMLSF_Sitemap_Controller
 		// Update term meta lastmod date
 		add_action( 'transition_post_status', array($this,'update_term_modified_meta'), 10, 3 );
 
+		// Update images post meta
+		add_action( 'transition_post_status', array($this,'update_post_images_meta'), 10, 3 );
+
 		// PINGING
 		add_action( 'transition_post_status', array($this,'do_pings'), 10, 3 );
 
@@ -63,7 +66,8 @@ class XMLSF_Sitemap_Controller
 	 * @param $old_status
 	 * @param $post
 	 */
-	public function do_pings( $new_status, $old_status, $post ) {
+	public function do_pings( $new_status, $old_status, $post )
+	{
 		// are we publishing?
 		if ( $old_status == 'publish' || $new_status != 'publish' )
 			return;
@@ -89,7 +93,8 @@ class XMLSF_Sitemap_Controller
 	 * @param $post_ID
 	 * @param $post
 	 */
-	public function clean_post_cache( $post_ID, $post ) {
+	public function clean_post_cache( $post_ID, $post )
+	{
 		// are we moving the post in or out of published status?
 		wp_cache_delete( 'xmlsf_get_archives', 'general' );
 
@@ -120,14 +125,10 @@ class XMLSF_Sitemap_Controller
 	 * @param $old_status
 	 * @param $post
 	 */
-	public function update_term_modified_meta( $new_status, $old_status, $post ) {
-		// bail on inactive post types
+	public function update_term_modified_meta( $new_status, $old_status, $post )
+	{
+		// bail on inactive post type
 		if ( ! array_key_exists($post->post_type, $this->post_types) || empty( $this->post_types[$post->post_type]['active'] ) )
-			return;
-
-		// bail when not publishing or unpublishing or editing a live post
-		// note: prepend " $old_status == $new_status || " to exclude live editing too
-		if ( $new_status != 'publish' && $old_status != 'publish' )
 			return;
 
 		$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
@@ -135,8 +136,6 @@ class XMLSF_Sitemap_Controller
 		// bail if no taxonomies activated
 		if ( ! is_array($taxonomy_settings) || empty( $taxonomy_settings['active'] ) )
 			return;
-
-		require_once XMLSF_DIR . '/models/public/sitemap.php';
 
 		$taxonomies = get_option( 'xmlsf_taxonomies' );
 		if ( empty( $taxonomies ) )
@@ -154,6 +153,36 @@ class XMLSF_Sitemap_Controller
 
 		foreach( $term_ids as $id ) {
 			update_term_meta( $id, 'term_modified_gmt', $time );
+		}
+	}
+
+	/**
+	 * Update post images meta, hooked to transition post status
+	 *
+	 * @since 5.2
+	 *
+	 * @param $new_status
+	 * @param $old_status
+	 * @param $post
+	 */
+	public function update_post_images_meta( $new_status, $old_status, $post )
+	{
+		// bail when...
+		if ( $new_status != 'publish' // not publishing or unpublishing
+			|| ! array_key_exists($post->post_type, $this->post_types) // inactive post type
+			|| empty( $this->post_types[$post->post_type]['active'] ) // inactive post type
+			|| empty( $this->post_types[$post->post_type]['tags']['image'] ) // no image tags active
+		) return;
+
+		$which = $this->post_types[$post->post_type]['tags']['image'];
+
+		// delete old image meta data
+		delete_post_meta( $post->ID, '_xmlsf_image_'.$which );
+
+		// get fresh image(s) data
+		foreach ( (array) xmlsf_images_data( $post, $this->post_types[$post->post_type]['tags']['image'] ) as $data ) {
+			// and save it as meta data
+			add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
 		}
 	}
 

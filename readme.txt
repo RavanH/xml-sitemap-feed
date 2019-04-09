@@ -289,14 +289,16 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.1.2 =
+= 5.2 =
 
-Bugfix release.
+Huge query reduction by using meta data and meta cache. Some bugfixes.
 
 
 == Changelog ==
 
-= 5.1.3 =
+= 5.2 =
+* TODO news sitemap options text: "first attached image"
+* Image query optimization and meta caching
 * FIX: possible division by zero
 * FIX: update_term_modified_meta
 
