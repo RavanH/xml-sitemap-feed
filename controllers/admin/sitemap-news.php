@@ -195,9 +195,6 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
   			}
   		}
 
-  		// Images
-  		add_settings_field( 'xmlsf_news_image', translate('Images'), array( $this,'image_field' ), 'xmlsf_news_general', 'news_sitemap_general_section' );
-
   		// Source labels - deprecated
   		add_settings_field( 'xmlsf_news_labels', __('Source labels', 'xml-sitemap-feed' ), array($this,'labels_field'), 'xmlsf_news_general', 'news_sitemap_general_section' );
     }
@@ -343,14 +340,6 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-news-categories.php';
-	}
-
-	public function image_field()
-  {
-		$image = !empty( $this->options['image'] ) ? $this->options['image'] : '';
-
-		// The actual fields for data entry
-		include XMLSF_DIR . '/views/admin/field-news-image.php';
 	}
 
 	public function keywords_field()

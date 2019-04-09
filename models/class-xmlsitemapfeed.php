@@ -9,14 +9,13 @@ class XMLSitemapFeed {
 	private $defaults = array();
 
 	/**
-	 * Defaults
+	 * News defaults
 	 * @var array
 	 */
 	public $default_news_tags = array(
 		'name' => '',
 		'post_type' => array('post'),
-		'categories' => '',
-		'image' => 'featured'
+		'categories' => ''
 	);
 
 	/**

@@ -297,7 +297,7 @@ Huge query reduction by using meta data and meta cache. Some bugfixes.
 == Changelog ==
 
 = 5.2 =
-* TODO news sitemap options text: "first attached image"
+* TODO uninstall remove all meta data!
 * Image query optimization and meta caching
 * FIX: possible division by zero
 * FIX: update_term_modified_meta

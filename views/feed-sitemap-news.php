@@ -8,30 +8,13 @@
 if ( ! defined( 'WPINC' ) ) die;
 
 $options = get_option('xmlsf_news_tags');
-if ( !is_array($options) ) $options = array();
 
-if ( !empty($options['image']) ) {
-	$image_xmlns = '	xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'.PHP_EOL;
-	$image_schema = '
-		http://www.google.com/schemas/sitemap-image/1.1
-		http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd';
-} else {
-	$image_xmlns = '';
-	$image_schema = '';
-}
-
-echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
-<?xml-stylesheet type="text/xsl" href="' . plugins_url('views/styles/sitemap-news.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION . '"?>
-'; ?>
+?>
+<?xml version="1.0" encoding="<?php echo get_bloginfo('charset'); ?>"?>
+<?xml-stylesheet type="text/xsl" href="<?php echo plugins_url('views/styles/sitemap-news.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION; ?>"?>
 <?php xmlsf_generator(); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-	xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
-<?php echo $image_xmlns; ?>
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd
-		http://www.google.com/schemas/sitemap-news/0.9
-		http://www.google.com/schemas/sitemap-news/0.9/sitemap-news.xsd<?php echo $image_schema; ?>">
+	xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
 <?php
 
 // set empty news sitemap flag
@@ -73,22 +56,6 @@ if ( have_posts() ) :
 			<news:stock_tickers><?php echo implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ); ?></news:stock_tickers>
 <?php do_action( 'xmlsf_news_tags_after' ); ?>
 		</news:news>
-<?php
-		if ( !empty($options['image']) ) :
-			foreach ( xmlsf_news_get_images( $options['image'] ) as $image ) {
-				if ( empty($image['loc']) ) continue;
-		?>
-		<image:image>
-			<image:loc><?php echo utf8_uri_encode( $image['loc'] ); ?></image:loc>
-<?php 			if ( !empty($image['title']) ) { ?>
-			<image:title><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $image['title']); ?>]]></image:title>
-<?php 			}
-				if ( !empty($image['caption']) ) { ?>
-			<image:caption><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $image['caption']); ?>]]></image:caption>
-<?php 			} ?>
-		</image:image>
-<?php 		}
-		endif; ?>
 	</url>
 <?php
     endwhile;

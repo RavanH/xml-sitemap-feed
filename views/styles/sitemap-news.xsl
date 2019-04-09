@@ -26,7 +26,6 @@
 				<th>#</th>
 				<th>Title</th>
 				<th>Language</th>
-				<th>Image(s)</th>
 				<th>Keyword(s)</th>
 				<th>Stock(s)</th>
 				<th>Publication Date (GMT)</th>
@@ -40,7 +39,6 @@
 					<a href="{$itemURL}"><xsl:value-of select="news:news/news:title"/></a>
 				</td>
 				<td><xsl:value-of select="news:news/news:publication/news:language"/></td>
-				<td><xsl:value-of select="count(image:image)"/></td>
 				<td><xsl:value-of select="news:news/news:keywords"/></td>
 				<td><xsl:value-of select="news:news/news:stock_tickers"/></td>
 				<td><xsl:value-of select="concat(substring(news:news/news:publication_date,0,11),concat(' ', substring(news:news/news:publication_date,12,8)))"/></td>
