@@ -59,9 +59,9 @@ class XMLSitemapFeed_Uninstall {
     // posts meta
   	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
   	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
-    $wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_last_comment_gmt' ) );
+    $wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
   	// terms meta
-  	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified_gmt' ) );
+  	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
 
     // remove transients
     delete_transient( 'xmlsf_flush_rewrite_rules' );

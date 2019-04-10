@@ -43,7 +43,7 @@ function xmlsf_get_root_data() {
 				$url = pll_home_url( $language['slug'] );
 				$data[$url] = array(
 					'priority' => '1.0',
-					'lastmod' => mysql2date( 'Y-m-d\TH:i:s+00:00', get_lastpostdate('gmt'), false )
+					'lastmod' => mysql2date( 'c', get_lastpostdate('blog') )
 					// TODO make lastmod date language specific
 				);
 			}
@@ -53,7 +53,7 @@ function xmlsf_get_root_data() {
 			$url = $sitepress->language_url($term);
 			$data[$url] = array(
 				'priority' => '1.0',
-				'lastmod' => mysql2date( 'Y-m-d\TH:i:s+00:00', get_lastpostdate('gmt'), false )
+				'lastmod' => mysql2date( 'c', get_lastpostdate('blog') )
 				// TODO make lastmod date language specific
 			);
 		}
@@ -62,7 +62,7 @@ function xmlsf_get_root_data() {
 		$data = array(
 			trailingslashit( home_url() ) => array(
 				'priority' => '1.0',
-				'lastmod' => mysql2date( 'Y-m-d\TH:i:s+00:00', get_lastpostdate('gmt'), false )
+				'lastmod' => mysql2date( 'c', get_lastpostdate('blog') )
 			)
 		);
 	}
@@ -193,15 +193,15 @@ function xmlsf_get_post_modified() {
 	// if blog or home page then simply look for last post date
 	if ( $post->post_type == 'page' && xmlsf_is_home($post->ID) ) {
 
-		$lastmod = get_lastpostmodified( 'gmt' );
+		$lastmod = get_lastpostmodified( 'blog' );
 
 	} else {
 
-		$lastmod = $post->post_modified_gmt;
+		$lastmod = $post->post_modified;
 
 		// make sure lastmod is not older than publication date (happens on scheduled posts)
-		if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($lastmod) ) {
-			$lastmod = $post->post_date_gmt;
+		if ( isset( $post->post_date ) && strtotime( $post->post_date ) > strtotime( $lastmod ) ) {
+			$lastmod = $post->post_date;
 		};
 
 		// maybe update lastmod to latest comment
@@ -215,7 +215,7 @@ function xmlsf_get_post_modified() {
 			*/
 			$meta = get_post_meta( $post->ID );
 
-			if ( ! array_key_exists( '_xmlsf_last_comment_gmt', $meta ) ) {
+			if ( ! array_key_exists( '_xmlsf_comment_date', $meta ) ) {
 
 				$comments = get_comments( array(
 					'status' => 'approve',
@@ -223,22 +223,22 @@ function xmlsf_get_post_modified() {
 					'post_id' => $post->ID,
 				) );
 
-				$lastcomment = isset( $comments[0]->comment_date_gmt ) ? $comments[0]->comment_date_gmt : '';
-				update_post_meta( $post->ID, '_xmlsf_last_comment_gmt', $lastcomment );
+				$lastcomment = isset( $comments[0]->comment_date ) ? $comments[0]->comment_date : '';
+				update_post_meta( $post->ID, '_xmlsf_comment_date', $lastcomment );
 
 			} else {
 
-				$lastcomment = get_post_meta( $post->ID, '_xmlsf_last_comment_gmt', true ); // only get one
+				$lastcomment = get_post_meta( $post->ID, '_xmlsf_comment_date', true ); // only get one
 
 			}
 
-			if ( ! empty( $lastcomment ) && mysql2date( 'U', $lastcomment, false ) > mysql2date( 'U', $lastmod, false ) )
+			if ( ! empty( $lastcomment ) && strtotime( $lastcomment ) > strtotime( $lastmod ) )
 				$lastmod = $lastcomment;
 		}
 
 	}
 
-	return ! empty( $lastmod ) ? trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) ) : false;
+	return ! empty( $lastmod ) ? mysql2date( 'c', $lastmod ) : false;
 
 }
 
@@ -256,17 +256,22 @@ function xmlsf_get_term_modified( $term ) {
 	*/
 	$meta = get_term_meta( $term->term_id );
 
-	if ( ! array_key_exists( 'term_modified_gmt', $meta ) ) {
+	if ( ! array_key_exists( 'term_modified', $meta ) ) {
 
 		// get the latest post in this taxonomy item, to use its post_date as lastmod
 		$posts = get_posts (
 			array(
 				'post_type' => 'any',
-				'numberposts' => 1,
+				'post_status' => 'publish',
+				'ignore_sticky_posts' => true,
+				'posts_per_page' => 1,
 				'no_found_rows' => true,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 				'update_cache' => false,
+				'lang' => '',
+				'has_password' => false,
+				'suppress_filters' => true,
 				'tax_query' => array(
 					array(
 						'taxonomy' => $term->taxonomy,
@@ -276,19 +281,19 @@ function xmlsf_get_term_modified( $term ) {
 				)
 			)
 		);
-		$lastmod = isset($posts[0]->post_date_gmt) ? $posts[0]->post_date_gmt : '';
+		$lastmod = isset($posts[0]->post_date) ? $posts[0]->post_date : '';
 		// get post date here, not modified date because we're only
 		// concerned about new entries on the (first) taxonomy page
 
-		update_term_meta( $term->term_id, 'term_modified_gmt', $lastmod );
+		update_term_meta( $term->term_id, 'term_modified', $lastmod );
 
 	} else {
 
-		$lastmod = get_term_meta( $term->term_id, 'term_modified_gmt', true ); // only get one
+		$lastmod = get_term_meta( $term->term_id, 'term_modified', true ); // only get one
 
 	}
 
-	return ! empty( $lastmod ) ? trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) ) : false;
+	return ! empty( $lastmod ) ? mysql2date( 'c', $lastmod ) : false;
 
 }
 
@@ -305,7 +310,7 @@ function xmlsf_get_taxonomy_modified( $taxonomy ) {
 
 	$lastmodified = array();
 	foreach ( (array)$obj->object_type as $object_type ) {
-		$lastmodified[] = get_lastpostdate( 'gmt', $object_type );
+		$lastmodified[] = get_lastpostdate( 'blog', $object_type );
 		// get last post date here, not modified date because we're only
 		// concerned about new entries on the (first) taxonomy page
 	}
@@ -314,7 +319,7 @@ function xmlsf_get_taxonomy_modified( $taxonomy ) {
 	$lastmodified = array_filter( $lastmodified );
 	$lastmod = end( $lastmodified );
 
-	return trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) );
+	return mysql2date( 'c', $lastmod );
 
 }
 
@@ -338,7 +343,7 @@ function xmlsf_get_post_priority() {
 
 	} elseif ( !empty($options[$post->post_type]['dynamic_priority']) ) {
 
-		$post_modified = mysql2date('U',$post->post_modified_gmt, false);
+		$post_modified = mysql2date('U',$post->post_modified, false);
 
 		// reduce by age
 		// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
@@ -490,9 +495,9 @@ function xmlsf_sitemap_parse_request( $request ) {
 			// prepare priority calculation
 			if ( is_array($options) && !empty($options[$feed[2]]['dynamic_priority']) ) {
 				// last posts or page modified date in Unix seconds
-				xmlsf()->lastmodified = mysql2date( 'U', get_lastpostmodified('gmt',$feed[2]), false );
+				xmlsf()->lastmodified = mysql2date( 'U', get_lastpostmodified('blog',$feed[2]), false );
 				// calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
-				xmlsf()->timespan = xmlsf()->lastmodified - mysql2date( 'U', get_firstpostdate('gmt',$feed[2]), false );
+				xmlsf()->timespan = xmlsf()->lastmodified - mysql2date( 'U', get_firstpostdate('blog',$feed[2]), false );
 				// total post type comment count
 				xmlsf()->comment_count = wp_count_comments($feed[2])->approved;
 			};

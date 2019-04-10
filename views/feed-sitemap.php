@@ -17,7 +17,7 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 		http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
 	<sitemap>
 		<loc><?php echo xmlsf_get_index_url('home'); ?></loc>
-		<lastmod><?php echo mysql2date('Y-m-d\TH:i:s+00:00', get_lastpostdate( 'gmt' ), false); ?></lastmod>
+		<lastmod><?php echo mysql2date( 'c', get_lastpostdate( 'blog' ) ); ?></lastmod>
 	</sitemap>
 <?php
 // add rules for public post types
@@ -33,7 +33,7 @@ if ( is_array($post_types) ) :
 ?>
 	<sitemap>
 		<loc><?php echo $url; ?></loc>
-		<lastmod><?php echo mysql2date('Y-m-d\TH:i:s+00:00', get_lastmodified( 'gmt', $post_type, $m ), false); ?></lastmod>
+		<lastmod><?php echo mysql2date( 'c', get_lastmodified( 'blog', $post_type, $m ) ); ?></lastmod>
 	</sitemap>
 <?php
 		}

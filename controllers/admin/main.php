@@ -360,9 +360,9 @@ class XMLSF_Admin_Controller
 				// posts meta
 		  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
 		  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
-		    $wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_last_comment_gmt' ) );
+		    $wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
 		  	// terms meta
-		  	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified_gmt' ) );
+		  	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
 				add_settings_error( 'clear_meta_notice', 'clear_meta_notice', __('Sitemap meta data has been cleared from the database.','xml-sitemap-feed'), 'updated' );
 			} else {
 				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );

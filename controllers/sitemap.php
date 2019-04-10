@@ -103,7 +103,7 @@ class XMLSF_Sitemap_Controller
 		wp_cache_delete( 'xmlsf_get_archives', 'general' );
 
 		// TODO get year / month here to delete specific keys too !!!!
-		$m = mysql2date( 'Ym', $post->post_date_gmt, false );
+		$m = mysql2date( 'Ym', $post->post_date, false );
 		$y = substr( $m, 0, 4 );
 
 		// clear possible last post modified cache keys
@@ -156,7 +156,7 @@ class XMLSF_Sitemap_Controller
 		$time = date('Y-m-d H:i:s');
 
 		foreach( $term_ids as $id ) {
-			update_term_meta( $id, 'term_modified_gmt', $time );
+			update_term_meta( $id, 'term_modified', $time );
 		}
 	}
 
@@ -212,7 +212,7 @@ class XMLSF_Sitemap_Controller
 		) return;
 		error_log('transition_comment_status');
 		// update comment meta data
-		update_post_meta( $comment->comment_post_ID, '_xmlsf_last_comment_gmt', $comment->comment_date_gmt );
+		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date', $comment->comment_date );
 	}
 
 	/**
@@ -237,7 +237,7 @@ class XMLSF_Sitemap_Controller
 		) return;
 
 		// update comment meta data
-		update_post_meta( $commentdata['comment_post_ID'], '_xmlsf_last_comment_gmt', $commentdata['comment_date_gmt'] );
+		update_post_meta( $commentdata['comment_post_ID'], '_xmlsf_comment_date', $commentdata['comment_date'] );
 	}
 
 }

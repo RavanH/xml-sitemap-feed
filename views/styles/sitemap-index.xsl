@@ -22,7 +22,7 @@
 			<tr class="high">
 				<th>#</th>
 				<th>XML Sitemap</th>
-				<th>Last Changed (UTC)</th>
+				<th>Last Changed</th>
 			</tr>
 <xsl:variable name="lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
 <xsl:variable name="upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>

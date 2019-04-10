@@ -22,7 +22,7 @@
 				<th>#</th>
 				<th>URL</th>
 				<th>Priority</th>
-				<th>Last Changed (UTC)</th>
+				<th>Last Changed</th>
 			</tr>
 <xsl:variable name="lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
 <xsl:variable name="upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>

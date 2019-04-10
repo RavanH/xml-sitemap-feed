@@ -9,7 +9,7 @@
  * @return string
  */
 function xmlsf_news_filter_where( $where = '' ) {
-	return $where . ' AND post_date_gmt > \'' . date('Y-m-d H:i:s', strtotime('-48 hours')) . '\'';
+	return $where . ' AND post_date_gmt > \'' . gmdate( 'Y-m-d H:i:s', strtotime('-48 hours') ) . '\'';
 }
 
 /**
@@ -51,7 +51,7 @@ function xmlsf_sitemap_news_parse_request( $request ) {
 	// set up query filters
 	$live = false;
 	foreach ($post_types as $post_type) {
-		if ( get_lastpostdate('gmt', $post_type) > date('Y-m-d H:i:s', strtotime('-48 hours')) ) {
+		if ( strtotime( get_lastpostdate( 'gmt', $post_type ) ) > strtotime( gmdate( 'Y-m-d H:i:s', strtotime('-48 hours') ) ) ) {
 			$live = true;
 			break;
 		}

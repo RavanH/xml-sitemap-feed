@@ -27,7 +27,7 @@
 				<th>Language</th>
 				<th>Keyword(s)</th>
 				<th>Stock(s)</th>
-				<th>Publication Date (UTC)</th>
+				<th>Publication Date</th>
 			</tr>
 <xsl:variable name="lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
 <xsl:variable name="upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>

@@ -99,9 +99,9 @@ function xmlsf_deactivate() {
 	// posts meta
 	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
 	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
-	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_last_comment_gmt' ) );
+	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
 	// terms meta
-	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified_gmt' ) );
+	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
 
 	// remove filter and flush rules
 	remove_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 1, 1 );

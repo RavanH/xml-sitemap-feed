@@ -16,7 +16,7 @@ function xmlsf_wpml_language_switcher() {
  * Generator info
  */
 function xmlsf_generator() {
-	$date = date('Y-m-d\TH:i:s+00:00');
+	$date = date( 'c' );
 
 	require XMLSF_DIR . '/views/_generator.php';
 }
