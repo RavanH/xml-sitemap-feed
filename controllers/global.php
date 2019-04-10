@@ -13,10 +13,6 @@ function xmlsf_init() {
 		new XMLSitemapFeed_Upgrade( $db_version );
 	}
 
-	if ( is_admin() ) {
-		require XMLSF_DIR . '/controllers/admin/main.php';
-	}
-
 	$sitemaps = get_option( 'xmlsf_sitemaps' );
 	// include sitemaps if any enabled
 	if ( $sitemaps ) {

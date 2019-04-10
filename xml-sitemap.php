@@ -86,6 +86,10 @@ require XMLSF_DIR . '/models/global.php';
 
 require XMLSF_DIR . '/controllers/global.php';
 
+if ( is_admin() ) {
+  require XMLSF_DIR . '/controllers/admin/global.php';
+}
+
 // main plugin init
 add_action( 'init', 'xmlsf_init' );
 
