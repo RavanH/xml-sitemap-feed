@@ -199,27 +199,44 @@ function xmlsf_get_post_modified() {
 
 		$lastmod = $post->post_modified_gmt;
 
+		// make sure lastmod is not older than publication date (happens on scheduled posts)
+		if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($lastmod) ) {
+			$lastmod = $post->post_date_gmt;
+		};
+
 		// maybe update lastmod to latest comment
 		$options = get_option( 'xmlsf_post_types' );
 
 		if ( is_array($options) && !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
-			$lastcomment = get_comments( array(
-				'status' => 'approve',
-				'number' => 1,
-				'post_id' => $post->ID,
-			) );
 
-			if ( isset($lastcomment[0]->comment_date_gmt) )
-				if ( mysql2date( 'U', $lastcomment[0]->comment_date_gmt, false ) > mysql2date( 'U', $lastmod, false ) )
-					$lastmod = $lastcomment[0]->comment_date_gmt;
+			/*
+			* Getting ALL meta here because if checking for single key, we cannot
+			* distiguish between empty value or non-exisiting key as both return ''.
+			*/
+			$meta = get_post_meta( $post->ID );
+
+			if ( ! array_key_exists( '_xmlsf_last_comment_gmt', $meta ) ) {
+
+				$comments = get_comments( array(
+					'status' => 'approve',
+					'number' => 1,
+					'post_id' => $post->ID,
+				) );
+
+				$lastcomment = isset( $comments[0]->comment_date_gmt ) ? $comments[0]->comment_date_gmt : '';
+				update_post_meta( $post->ID, '_xmlsf_last_comment_gmt', $lastcomment );
+
+			} else {
+
+				$lastcomment = get_post_meta( $post->ID, '_xmlsf_last_comment_gmt', true ); // only get one
+
+			}
+
+			if ( ! empty( $lastcomment ) && mysql2date( 'U', $lastcomment, false ) > mysql2date( 'U', $lastmod, false ) )
+				$lastmod = $lastcomment;
 		}
 
 	}
-
-	// make sure lastmod is not older than publication date (happens on scheduled posts)
-	if ( isset($post->post_date_gmt) && strtotime($post->post_date_gmt) > strtotime($lastmod) ) {
-		$lastmod = $post->post_date_gmt;
-	};
 
 	return ! empty( $lastmod ) ? trim( mysql2date( 'Y-m-d\TH:i:s+00:00', $lastmod, false ) ) : false;
 
@@ -267,7 +284,7 @@ function xmlsf_get_term_modified( $term ) {
 
 	} else {
 
-		$lastmod = $meta['term_modified_gmt'][0]; // only get one
+		$lastmod = get_term_meta( $term->term_id, 'term_modified_gmt', true ); // only get one
 
 	}
 

@@ -291,14 +291,15 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 = 5.2 =
 
-Huge query reduction by using meta data and meta cache. Some bugfixes.
+Major query reduction and speed improvements. Some bugfixes.
 
 
 == Changelog ==
 
 = 5.2 =
-* TODO uninstall remove all meta data!
 * Image query optimization and meta caching
+* Last comment date meta caching
+* Removed ignored image tag from news sitemap
 * FIX: possible division by zero
 * FIX: update_term_modified_meta
 

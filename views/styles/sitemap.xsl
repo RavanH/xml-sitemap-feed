@@ -24,7 +24,7 @@
 				<th>URL</th>
 				<th># Images</th>
 				<th>Priority</th>
-				<th>Last Changed</th>
+				<th>Last Changed (GMT)</th>
 			</tr>
 <xsl:variable name="lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
 <xsl:variable name="upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>

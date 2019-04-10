@@ -36,6 +36,10 @@ class XMLSF_Sitemap_Controller
 		// Update images post meta
 		add_action( 'transition_post_status', array($this,'update_post_images_meta'), 10, 3 );
 
+		// Update last comment date post meta
+		add_action( 'transition_comment_status', array($this,'transition_comment_status'), 10, 3 );
+		add_action( 'comment_post', array($this,'comment_post'), 10, 3 ); // when comment is not held for moderation
+
 		// PINGING
 		add_action( 'transition_post_status', array($this,'do_pings'), 10, 3 );
 
@@ -184,6 +188,56 @@ class XMLSF_Sitemap_Controller
 			// and save it as meta data
 			add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
 		}
+	}
+
+	/**
+	 * Update post comment meta, hooked to transition comment status
+	 *
+	 * @since 5.2
+	 *
+	 * @param $new_status
+	 * @param $old_status
+	 * @param $comment
+	 */
+	public function transition_comment_status( $new_status, $old_status, $comment )
+	{
+		// bail when not publishing
+		if ( $new_status != 'approved' ) return;
+
+		$post_type = get_post_type( $comment->comment_post_ID );
+
+		// bail when...
+		if ( ! array_key_exists($post_type, $this->post_types) // inactive post type
+			|| empty( $this->post_types[$post_type]['update_lastmod_on_comments'] ) // comments date irrelevant
+		) return;
+		error_log('transition_comment_status');
+		// update comment meta data
+		update_post_meta( $comment->comment_post_ID, '_xmlsf_last_comment_gmt', $comment->comment_date_gmt );
+	}
+
+	/**
+	 * Update post comment meta, hooked to transition comment status
+	 *
+	 * @since 5.2
+	 *
+	 * @param $new_status
+	 * @param $old_status
+	 * @param $comment
+	 */
+	public function comment_post( $comment_ID, $comment_approved, $commentdata )
+	{
+		// bail when not published
+		if ( $comment_approved !== 1 ) return;
+
+		$post_type = get_post_type( $commentdata['comment_post_ID'] );
+
+		// bail when...
+		if ( ! array_key_exists($post_type, $this->post_types) // inactive post type
+			|| empty( $this->post_types[$post_type]['update_lastmod_on_comments'] ) // comments date irrelevant
+		) return;
+
+		// update comment meta data
+		update_post_meta( $commentdata['comment_post_ID'], '_xmlsf_last_comment_gmt', $commentdata['comment_date_gmt'] );
 	}
 
 }
