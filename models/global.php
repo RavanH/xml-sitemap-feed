@@ -35,7 +35,7 @@ function xmlsf_rewrite_rules( $rewrite_rules ) {
 	if ( isset($sitemaps['sitemap']) ) {
 		/* One rule to ring them all */
 		//add_rewrite_rule('sitemap(-[a-z0-9_\-]+)?\.([0-9]+\.)?xml$', $wp_rewrite->index . '?feed=sitemap$matches[1]&m=$matches[2]', 'top');
-		return array_merge( array( 'sitemap(\-[a-z0-9_\-]+)?(\.[0-9]+)?\.xml(\.gz)?$' => $wp_rewrite->index . '?feed=sitemap$matches[1]$matches[3]&m=$matches[2]' ), $rewrite_rules );
+		return array_merge( array( 'sitemap(?:_index)?(\-[a-z0-9\-_]+)?(\.[0-9]+)?\.xml(\.gz)?$' => $wp_rewrite->index . '?feed=sitemap$matches[1]$matches[3]&m=$matches[2]' ), $rewrite_rules );
 	} elseif ( isset($sitemaps['sitemap-news']) ) {
 		//add_rewrite_rule('sitemap-news\.xml$', $wp_rewrite->index . '?feed=sitemap-news', 'top');
 		return array_merge( array( 'sitemap-news\.xml(\.gz)?$' => $wp_rewrite->index . '?feed=sitemap-news$matches[1]' ), $rewrite_rules );
