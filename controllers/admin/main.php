@@ -317,7 +317,7 @@ class XMLSF_Admin_Controller
 			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
 				$this->clear_settings( $_POST['xmlsf-clear-settings'] );
 			} else {
-				add_settings_error( 'clear_settings', 'clear_settings_failed', translate('Security check failed.') );
+				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}
 		}
 
@@ -325,7 +325,7 @@ class XMLSF_Admin_Controller
 			if ( isset( $_POST['_xmlsf_notice_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_notice_nonce'], XMLSF_BASENAME.'-notice' ) ) {
 				$this->delete_static_files();
 			} else {
-				add_settings_error( 'delete_files', 'delete_files_failed', translate('Security check failed.') );
+				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}
 		}
 
@@ -339,7 +339,7 @@ class XMLSF_Admin_Controller
 				if ( empty( self::$static_files ) )
 					add_settings_error( 'static_files_notice', 'static_files', __('No conflicting static files found.','xml-sitemap-feed'), 'notice-info');
 			} else {
-				add_settings_error( 'check_conflicts', 'check_conflicts_failed', translate('Security check failed.') );
+				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}
 		}
 
@@ -349,7 +349,23 @@ class XMLSF_Admin_Controller
 				flush_rewrite_rules();
 				add_settings_error( 'flush_admin_notice', 'flush_admin_notice', __('WordPress rewrite rules have been flushed.','xml-sitemap-feed'), 'updated' );
 			} else {
-				add_settings_error( 'flush_rewrite_rules', 'flush_rewrite_rules_failed', translate('Security check failed.') );
+				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
+			}
+		}
+
+		if ( isset( $_POST['xmlsf-clear-meta'] ) ) {
+			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+				// remove metadata
+				global $wpdb;
+				// posts meta
+		  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
+		  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
+		    $wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_last_comment_gmt' ) );
+		  	// terms meta
+		  	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified_gmt' ) );
+				add_settings_error( 'clear_meta_notice', 'clear_meta_notice', __('Sitemap meta data has been cleared from the database.','xml-sitemap-feed'), 'updated' );
+			} else {
+				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}
 		}
 	}
@@ -363,7 +379,7 @@ class XMLSF_Admin_Controller
 				add_user_meta( get_current_user_id(), 'xmlsf_dismissed', $_POST['xmlsf-dismiss'], false );
 				self::$dismissed[] = $_POST['xmlsf-dismiss'];
 			} else {
-				add_settings_error( 'dismiss_notice', 'dismiss_notice_failed', translate('Security check failed.') );
+				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}
 		}
 	}

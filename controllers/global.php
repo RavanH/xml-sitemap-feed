@@ -93,7 +93,18 @@ function xmlsf_activate() {
 function xmlsf_deactivate() {
 	delete_transient( 'xmlsf_flush_rewrite_rules' );
 	delete_transient( 'xmlsf_check_static_files' );
+
+	// remove metadata
+	global $wpdb;
+	// posts meta
+	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
+	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
+	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_last_comment_gmt' ) );
+	// terms meta
+	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified_gmt' ) );
+
 	// remove filter and flush rules
 	remove_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 1, 1 );
+	// how to unset add_feed() ?
 	flush_rewrite_rules();
 }
