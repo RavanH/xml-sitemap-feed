@@ -18,10 +18,9 @@ if ( !empty($image) ) {
 	$image_xmlns = '';
 	$image_schema = '';
 }
-
-echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
-<?xml-stylesheet type="text/xsl" href="' . plugins_url('views/styles/sitemap.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION . '"?>
-'; ?>
+?>
+<?xml version="1.0" encoding="<?php echo get_bloginfo('charset'); ?>"?>
+<?xml-stylesheet type="text/xsl" href="<?php echo plugins_url('views/styles/sitemap.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION; ?>"?>
 <?php xmlsf_generator(); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 <?php echo $image_xmlns; ?>
@@ -35,17 +34,17 @@ $have_posts = false;
 
 // loop away!
 if ( have_posts() ) :
-    while ( have_posts() ) :
-	the_post();
+	while ( have_posts() ) :
+		the_post();
 
-	// check if page is in the exclusion list (like front page or post meta)
-	// or if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
-	if ( apply_filters(
-			'xmlsf_excluded',
-			get_post_meta( $post->ID, '_xmlsf_exclude', true ),
-			$post->ID
-		 ) || !xmlsf_is_allowed_domain( get_permalink() ) )
-		continue;
+		// check if page is in the exclusion list (like front page or post meta)
+		// or if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
+		if ( apply_filters(
+				'xmlsf_excluded',
+				get_post_meta( $post->ID, '_xmlsf_exclude', true ),
+				$post->ID
+			 ) || !xmlsf_is_allowed_domain( get_permalink() ) )
+			continue;
 
 	$did_posts = true;
 	?>
@@ -56,33 +55,33 @@ if ( have_posts() ) :
 		<lastmod><?php echo $lastmod; ?></lastmod>
 <?php } ?>
 <?php
-	if ( !empty($image) ) :
-		foreach ( xmlsf_get_post_images( $image ) as $img_data ) {
-			if ( empty($img_data['loc']) )
-				continue;
+		if ( !empty($image) ) :
+			foreach ( xmlsf_get_post_images( $image ) as $img_data ) {
+				if ( empty($img_data['loc']) )
+					continue;
 	?>
 		<image:image>
 			<image:loc><?php echo utf8_uri_encode( $img_data['loc'] ); ?></image:loc>
 <?php
-		if ( !empty($img_data['title']) ) {
+			if ( !empty($img_data['title']) ) {
 		?>
 			<image:title><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $img_data['title']); ?>]]></image:title>
 <?php
-		}
-		if ( !empty($img_data['caption']) ) {
+			}
+			if ( !empty($img_data['caption']) ) {
 		?>
 			<image:caption><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $img_data['caption']); ?>]]></image:caption>
 <?php
-		}
+			}
 		?>
 		</image:image>
 <?php
-		}
-	endif;
+			}
+		endif;
 ?>
  	</url>
 <?php
-    endwhile;
+  endwhile;
 endif;
 
 if ( ! $did_posts ) :

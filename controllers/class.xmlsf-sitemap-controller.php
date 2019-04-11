@@ -210,7 +210,7 @@ class XMLSF_Sitemap_Controller
 		if ( ! array_key_exists($post_type, $this->post_types) // inactive post type
 			|| empty( $this->post_types[$post_type]['update_lastmod_on_comments'] ) // comments date irrelevant
 		) return;
-		error_log('transition_comment_status');
+		
 		// update comment meta data
 		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date', $comment->comment_date );
 	}
