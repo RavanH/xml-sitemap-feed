@@ -25,12 +25,11 @@ class XMLSF_Admin_Controller
 
 	/**
 	 * CONSTRUCTOR
-	 * Runs on init
 	 */
 
 	function __construct()
 	{
-		require XMLSF_DIR . '/models/admin/main.php';
+		require XMLSF_DIR . '/models/admin/shared.php';
 		require XMLSF_DIR . '/controllers/admin/notices.php';
 
 		$this->sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );

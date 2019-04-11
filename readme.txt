@@ -124,7 +124,7 @@ Installed alongside [WordPress MU Sitewide Tags Pages](http://wordpress.org/plug
 
 = Uninstallation =
 
-Upon uninstalling the plugin from the Admin > Plugins page, most plugins options will be cleared from the database. Only specific per post settings like post priority or explude option, and taxonomy term lastmod dates will remain dormant in the database. See notes in the uninstall.php file.
+Upon uninstalling the plugin from the Admin > Plugins page, plugin options and meta data will be cleared from the database. See notes in the uninstall.php file.
 
 On multisite, the uninstall.php *can* loop through all sites in the network to perform the uninstalltion process for each site. However, this does not scale for large networks so it *only* does a per-site uninstallation when `define('XMLSF_MULTISITE_UNINSTALL', true);` is explicitly set in wp-config.php.
 
@@ -299,6 +299,7 @@ Major query reduction and speed improvements. Some bugfixes.
 = 5.2 =
 * Image query optimization and meta caching
 * Last comment date meta caching
+* Lastmod and publication dates in local time
 * Removed ignored image tag from news sitemap
 * FIX: possible division by zero
 * FIX: update_term_modified_meta
