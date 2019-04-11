@@ -14,7 +14,7 @@ function xmlsf_filter_request( $request ) {
 		// make sure we have the proper locale setting for calculations
 		setlocale( LC_NUMERIC, 'C' );
 
-		require XMLSF_DIR . '/models/public/shared.php';
+		require XMLSF_DIR . '/models/functions.public-shared.php';
 
 		// set the sitemap conditional flag
 		xmlsf()->is_sitemap = true;
@@ -50,10 +50,10 @@ function xmlsf_filter_request( $request ) {
 			// set the news sitemap conditional flag
 			xmlsf()->is_news = true;
 
-			require XMLSF_DIR . '/models/public/sitemap-news.php';
+			require XMLSF_DIR . '/models/functions.public-sitemap-news.php';
 			$request = xmlsf_sitemap_news_parse_request( $request );
 		} else {
-			require_once XMLSF_DIR . '/models/public/sitemap.php';
+			require XMLSF_DIR . '/models/functions.public-sitemap.php';
 			$request = xmlsf_sitemap_parse_request( $request );
 		}
 
@@ -145,8 +145,6 @@ function xmlsf_nginx_helper_purge_urls( $urls = array(), $redis = false ) {
 			$urls[] = '/sitemap.xml';
 			$urls[] = '/sitemap-home.xml';
 			$urls[] = '/sitemap-custom.xml';
-
-			require_once XMLSF_DIR . '/models/public/sitemap.php';
 
 			// add public post types sitemaps
 			$post_types = get_option( 'xmlsf_post_types' );

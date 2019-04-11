@@ -29,19 +29,19 @@ class XMLSF_Admin_Controller
 
 	function __construct()
 	{
-		require XMLSF_DIR . '/models/admin/shared.php';
-		require XMLSF_DIR . '/controllers/admin/notices.php';
+		require XMLSF_DIR . '/models/functions.admin.php';
+		require XMLSF_DIR . '/controllers/class.xmlsf-admin-notices.php';
 
 		$this->sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
 		if ( isset($this->sitemaps['sitemap']) ) {
-			require XMLSF_DIR . '/models/admin/sitemap.php';
-			require XMLSF_DIR . '/controllers/admin/sitemap.php';
+			require XMLSF_DIR . '/models/class.xmlsf-admin-sitemap-sanitize.php';
+			require XMLSF_DIR . '/controllers/class.xmlsf-admin-sitemap.php';
 		}
 
 		if ( isset($this->sitemaps['sitemap-news']) ) {
-			require XMLSF_DIR . '/models/admin/sitemap-news.php';
-			require XMLSF_DIR . '/controllers/admin/sitemap-news.php';
+			require XMLSF_DIR . '/models/class.xmlsf-admin-sitemap-news-sanitize.php';
+			require XMLSF_DIR . '/controllers/class.xmlsf-admin-sitemap-news.php';
 		}
 
 		// ACTION LINK
@@ -54,8 +54,7 @@ class XMLSF_Admin_Controller
 
 		// ACTIONS & CHECKS
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
-		if ( ( !is_multisite() && current_user_can( 'manage_options' ) ) || is_super_admin() )
-			add_action( 'admin_init', array( $this, 'static_files' ) );
+		add_action( 'admin_init', array( $this, 'static_files' ) );
 		add_action( 'admin_init', array( $this, 'check_theme_conflicts' ) );
 	}
 
@@ -265,6 +264,8 @@ class XMLSF_Admin_Controller
 	 */
 	public function static_files()
 	{
+		if ( ( !is_multisite() && current_user_can( 'manage_options' ) ) || is_super_admin() ) return;
+
 		if ( null === self::$static_files )
 			self::$static_files = get_transient( 'xmlsf_static_files' );
 

@@ -200,7 +200,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 		if ( empty($_POST['xmlsf_priority']) )
 			delete_post_meta($post_id, '_xmlsf_priority');
 		else
-			update_post_meta($post_id, '_xmlsf_priority', XMLSF_Admin_Sitemap_Sanitize::priority($_POST['xmlsf_priority']) );
+      update_post_meta($post_id, '_xmlsf_priority', xmlsf_sanitize_priority( $_POST['xmlsf_priority'] ) );
 
 		// _xmlsf_exclude
 		if ( empty($_POST['xmlsf_exclude']) )
@@ -215,8 +215,6 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
   public function public_taxonomies()
 	{
 		if ( !isset( $this->public_taxonomies ) ) {
-			require_once XMLSF_DIR . '/models/public/sitemap.php';
-
 			$this->public_taxonomies = xmlsf_public_taxonomies();
 		}
 

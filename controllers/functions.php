@@ -17,7 +17,7 @@ function xmlsf_init() {
 	// include sitemaps if any enabled
 	if ( $sitemaps ) {
 		// main model functions
-		require XMLSF_DIR . '/models/main.php';
+		require XMLSF_DIR . '/models/functions.shared.php';
 
 		// force remove url trailing slash
 		add_filter( 'user_trailingslashit', 'xmlsf_untrailingslash' );
@@ -29,16 +29,16 @@ function xmlsf_init() {
 		add_filter( 'rt_nginx_helper_purge_urls', 'xmlsf_nginx_helper_purge_urls', 10, 2 );
 
 		// main controller functions
-		require XMLSF_DIR . '/controllers/main.php';
+		require XMLSF_DIR . '/controllers/functions.shared.php';
 
 		// include and instantiate class
 		xmlsf();
 
 		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-			require XMLSF_DIR . '/models/sitemap-news.php';
+			require XMLSF_DIR . '/models/functions.sitemap-news.php';
 			add_filter( 'xmlsf_news_post_types', 'xmlsf_news_filter_post_types' );
 
-			require XMLSF_DIR . '/controllers/sitemap-news.php';
+			require XMLSF_DIR . '/controllers/class.xmlsf-sitemap-news-controller.php';
 			new XMLSF_Sitemap_News_Controller( $sitemaps['sitemap-news'] );
 
 			// add feed type, news can now be accessed via /feed/sitemap-news too
@@ -46,10 +46,10 @@ function xmlsf_init() {
 		}
 
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
-			require XMLSF_DIR . '/models/sitemap.php';
+			require XMLSF_DIR . '/models/functions.sitemap.php';
 			add_filter( 'xmlsf_post_types', 'xmlsf_filter_post_types' );
 
-			require XMLSF_DIR . '/controllers/sitemap.php';
+			require XMLSF_DIR . '/controllers/class.xmlsf-sitemap-controller.php';
 			new XMLSF_Sitemap_Controller( $sitemaps['sitemap'] );
 
 			// add feed type, index can now be accessed via /feed/sitemap too

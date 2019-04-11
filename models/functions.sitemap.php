@@ -15,6 +15,78 @@ function xmlsf_filter_post_types( $post_types ) {
 }
 
 /**
+ * Get index url
+ *
+ * @param string $sitemap
+ * @param string $type
+ * @param string $parm
+ *
+ * @return string
+ */
+function xmlsf_get_index_url( $sitemap = 'home', $type = false, $param = false ) {
+
+	if ( xmlsf()->plain_permalinks() ) {
+		$name = '?feed=sitemap-'.$sitemap;
+		$name .= $type ? '-'.$type : '';
+		$name .= $param ? '&m='.$param : '';
+	} else {
+		$name = 'sitemap-'.$sitemap;
+		$name .= $type ? '-'.$type : '';
+		$name .= $param ? '.'.$param : '';
+		$name .= '.xml';
+	}
+
+	return esc_url( trailingslashit( home_url() ) . $name );
+
+}
+
+/**
+ * Get archives
+ *
+ * @param string $post_type
+ * @param string $type
+ *
+ * @return array
+ */
+function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
+
+	global $wpdb;
+	$return = array();
+
+	if ( 'monthly' == $type ) :
+
+		$query = "SELECT YEAR(post_date) as `year`, LPAD(MONTH(post_date),2,'0') as `month`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY post_date DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		foreach ( (array) $arcresults as $arcresult ) {
+			$return[$arcresult->year.$arcresult->month] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year . $arcresult->month );
+		};
+
+	elseif ( 'yearly' == $type ) :
+
+		$query = "SELECT YEAR(post_date) as `year`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date) ORDER BY post_date DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		foreach ( (array) $arcresults as $arcresult ) {
+			$return[$arcresult->year] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year );
+		};
+
+	else :
+
+		$query = "SELECT count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' ORDER BY post_date DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		if ( is_object($arcresults[0]) && $arcresults[0]->posts > 0 ) {
+			$return[] = xmlsf_get_index_url( 'posttype', $post_type ); // $sitemap = 'home', $type = false, $param = false
+		};
+
+	endif;
+
+	return $return;
+
+}
+
+/**
  * Get taxonomies
  * Returns an array of taxonomy names to be included in the index
  *
