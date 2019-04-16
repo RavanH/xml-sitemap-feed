@@ -25,7 +25,6 @@ function xmlsf_filter_request( $request ) {
 		// modify request parameters
 		$request['post_status'] = 'publish';
 		$request['no_found_rows'] = true; // found rows calc is slow and only needed for pagination
-		//$request['cache_results'] = false;
 
 		// PLUGIN COMPATIBILITIES
 		// Polylang

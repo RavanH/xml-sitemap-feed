@@ -462,16 +462,16 @@ function xmlsf_sitemap_parse_request( $request ) {
 
 		case 'posttype':
 
-			if ( !isset( $feed[2] ) ) break;
+			if ( ! isset( $feed[2] ) ) break;
 
-			$options = get_option( 'xmlsf_post_types' );
+			$options = (array) get_option( 'xmlsf_post_types', array() );
 
 			// prepare priority calculation
-			if ( is_array($options) && !empty($options[$feed[2]]['dynamic_priority']) ) {
+			if ( ! empty($options[$feed[2]]['dynamic_priority']) ) {
 				// last posts or page modified date in Unix seconds
-				xmlsf()->lastmodified = mysql2date( 'U', get_lastpostmodified('blog',$feed[2]), false );
+				xmlsf()->lastmodified = mysql2date( 'U', get_lastpostmodified( 'blog', $feed[2]), false );
 				// calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
-				xmlsf()->timespan = xmlsf()->lastmodified - mysql2date( 'U', get_firstpostdate('blog',$feed[2]), false );
+				xmlsf()->timespan = xmlsf()->lastmodified - mysql2date( 'U', get_firstpostdate( 'blog', $feed[2]), false );
 				// total post type comment count
 				xmlsf()->comment_count = wp_count_comments($feed[2])->approved;
 			};
@@ -483,6 +483,13 @@ function xmlsf_sitemap_parse_request( $request ) {
 			$request['orderby'] = 'modified';
 			$request['is_date'] = false;
 
+			// prepare query var to take care of modified-since response header
+			if ( ! empty($options[$feed[2]]['update_lastmod_on_comments']) ) {
+				$request['withcomments'] = true;
+			} else {
+				$request['withoutcomments'] = true;
+			}
+			
 			break;
 
 		case 'taxonomy':

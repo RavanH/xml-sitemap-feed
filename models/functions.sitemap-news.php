@@ -13,5 +13,5 @@ function xmlsf_news_filter_post_types( $post_types ) {
 			unset( $post_types[$post_type] );
 	}
 
-	return array_filter( $post_types );
+	return array_filter( (array) $post_types );
 }

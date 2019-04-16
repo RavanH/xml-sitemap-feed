@@ -21,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) die;
 	</sitemap>
 <?php
 // add rules for public post types
-$post_types = apply_filters( 'xmlsf_post_types', get_option( 'xmlsf_post_types' ) );
+$post_types = apply_filters( 'xmlsf_post_types', (array) get_option( 'xmlsf_post_types', array() ) );
 if ( is_array($post_types) ) :
 	foreach ( $post_types as $post_type => $settings ) {
 		if ( empty($settings['active']) || ! post_type_exists( $post_type ) )
