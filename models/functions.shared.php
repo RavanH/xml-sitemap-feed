@@ -9,6 +9,9 @@
  */
 function xmlsf_filter_request( $request ) {
 
+	// short-circuit if request has already been filtered
+	if ( xmlsf()->request_filtered ) return $request;
+
 	if ( isset($request['feed']) && strpos($request['feed'],'sitemap') === 0 ) :
 
 		// make sure we have the proper locale setting for calculations
