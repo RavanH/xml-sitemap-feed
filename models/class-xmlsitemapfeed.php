@@ -131,7 +131,6 @@ class XMLSitemapFeed {
 	 */
 	public function defaults( $key = false )
 	{
-
 		if ( empty($this->defaults) ) :
 
 			// sitemaps
