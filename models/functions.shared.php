@@ -17,6 +17,7 @@ function xmlsf_filter_request( $request ) {
 		// make sure we have the proper locale setting for calculations
 		setlocale( LC_NUMERIC, 'C' );
 
+		// include shared functions
 		require_once XMLSF_DIR . '/models/functions.public-shared.php';
 
 		// set the sitemap conditional flag
@@ -24,6 +25,11 @@ function xmlsf_filter_request( $request ) {
 
 		// REPSONSE HEADERS filtering
 		add_filter( 'wp_headers', 'xmlsf_headers' );
+
+		// Remove filters to prevent stuff like cdn urls for xml stylesheet and images
+		remove_all_filters( 'plugins_url' );
+		remove_all_filters( 'wp_get_attachment_url' );
+		remove_all_filters( 'image_downsize' );
 
 		// modify request parameters
 		$request['post_status'] = 'publish';
