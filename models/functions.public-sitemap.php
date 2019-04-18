@@ -479,13 +479,6 @@ function xmlsf_sitemap_parse_request( $request ) {
 			$request['orderby'] = 'modified';
 			$request['is_date'] = false;
 
-			// prepare query var to take care of modified-since response header
-			if ( ! empty($options[$feed[2]]['update_lastmod_on_comments']) ) {
-				$request['withcomments'] = true;
-			} else {
-				$request['withoutcomments'] = true;
-			}
-
 			break;
 
 		case 'taxonomy':

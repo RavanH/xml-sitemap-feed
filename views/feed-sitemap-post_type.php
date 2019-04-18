@@ -38,13 +38,11 @@ if ( have_posts() ) :
 		the_post();
 
 		// check if page is in the exclusion list (like front page or post meta)
-		// or if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
-		if ( apply_filters(
-				'xmlsf_excluded',
-				get_post_meta( $post->ID, '_xmlsf_exclude', true ),
-				$post->ID
-			 ) || !xmlsf_is_allowed_domain( get_permalink() ) )
-			continue;
+		// or if we are dealing with an external URL :: Thanks to Francois Deschenes :)
+		if ( $post->ID == get_option('page_on_front')
+			|| apply_filters( 'xmlsf_excluded', get_post_meta( $post->ID, '_xmlsf_exclude', true ), $post->ID )
+			|| !xmlsf_is_allowed_domain( get_permalink() )
+		) continue;
 
 	$did_posts = true;
 	?>

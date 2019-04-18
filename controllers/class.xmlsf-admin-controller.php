@@ -264,7 +264,7 @@ class XMLSF_Admin_Controller
 	 */
 	public function static_files()
 	{
-		if ( ( !is_multisite() && current_user_can( 'manage_options' ) ) || is_super_admin() ) return;
+		if ( ( is_multisite() && ! is_super_admin() ) || ! current_user_can( 'manage_options' ) ) return;
 
 		if ( null === self::$static_files )
 			self::$static_files = get_transient( 'xmlsf_static_files' );
