@@ -89,6 +89,27 @@ function xmlsf_get_frontpages() {
 }
 
 /**
+ * Get blog_pages
+ * @return array
+ */
+function xmlsf_get_blogpages() {
+
+	if ( null === xmlsf()->blogpages ) :
+		$blogpages = array();
+		if ( 'page' == get_option('show_on_front') ) {
+			$blogpage = (int) get_option('page_for_posts');
+			if ( !empty($blogpage) ) {
+				$blogpages = array_merge( (array) $blogpage, xmlsf_get_translations($blogpage) );
+			}
+		}
+		xmlsf()->blogpages = $blogpages;
+	endif;
+
+	return xmlsf()->blogpages;
+
+}
+
+/**
  * Get translations
  *
  * @param $post_id
@@ -124,38 +145,6 @@ function xmlsf_get_translations( $post_id ) {
 }
 
 /**
- * Get blog_pages
- * @return array
- */
-function xmlsf_get_blogpages() {
-
-	if ( null === xmlsf()->blogpages ) :
-		$blogpages = array();
-		if ( 'page' == get_option('show_on_front') ) {
-			$blogpage = (int) get_option('page_for_posts');
-			if ( !empty($blogpage) ) {
-				$blogpages = array_merge( (array) $blogpage, xmlsf_get_translations($blogpage) );
-			}
-		}
-		xmlsf()->blogpages = $blogpages;
-	endif;
-
-	return xmlsf()->blogpages;
-
-}
-
-/**
- * Is home?
- *
- * @param $post_id
- *
- * @return bool
- */
-function xmlsf_is_home( $post_id ) {
-	return in_array( $post_id, xmlsf_get_blogpages() ) || in_array( $post_id, xmlsf_get_frontpages() );
-}
-
-/**
  * Post Modified
  *
  * @return string GMT date
@@ -165,7 +154,7 @@ function xmlsf_get_post_modified() {
 	global $post;
 
 	// if blog or home page then simply look for last post date
-	if ( $post->post_type == 'page' && xmlsf_is_home($post->ID) ) {
+	if ( $post->post_type == 'page' && ( in_array( $post->ID, xmlsf_get_blogpages() ) || in_array( $post->ID, xmlsf_get_frontpages() ) ) ) {
 
 		$lastmod = get_lastpostmodified( 'blog' );
 
@@ -304,14 +293,18 @@ function xmlsf_get_taxonomy_modified( $taxonomy ) {
  */
 function xmlsf_get_post_priority() {
 	// locale LC_NUMERIC should be set to C for these calculations
-	// it is assumed to be done at the request filter
+	// it is assumed to be done once at the request filter
 	//setlocale( LC_NUMERIC, 'C' );
 
 	global $post;
 	$options = get_option( 'xmlsf_post_types' );
 	$priority = isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ? floatval($options[$post->post_type]['priority']) : 0.5;
 
-	if ( $priority_meta = get_post_meta( $post->ID, '_xmlsf_priority', true ) ) {
+	if ( in_array( $post->ID, xmlsf_get_frontpages() ) ) {
+
+		$priority = 1;
+
+	} elseif ( $priority_meta = get_post_meta( $post->ID, '_xmlsf_priority', true ) ) {
 
 		$priority = floatval(str_replace(',','.',$priority_meta));
 
@@ -321,7 +314,7 @@ function xmlsf_get_post_priority() {
 
 		// reduce by age
 		// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
-		if ( !is_sticky($post->ID) && !xmlsf_is_home($post->ID) && xmlsf()->timespan > 0 ) {
+		if ( xmlsf()->timespan > 0 && ! is_sticky( $post->ID ) && ! in_array( $post->ID, xmlsf_get_blogpages() ) ) {
 			$priority -= $priority * ( xmlsf()->lastmodified - $post_modified ) / xmlsf()->timespan;
 		}
 
