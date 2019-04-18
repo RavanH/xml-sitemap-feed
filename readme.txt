@@ -303,6 +303,7 @@ Major DB query reduction and speed improvements. Some bugfixes.
 * Last comment date meta caching
 * Lastmod and publication dates in local time
 * Removed ignored image tag from news sitemap
+* Max memory limit for post type and taxonomy term sitemaps
 * FIX: array_filter() expects parameter 1 to be array
 * FIX: possible division by zero
 * FIX: update_term_modified_meta

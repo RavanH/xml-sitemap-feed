@@ -27,7 +27,8 @@ function xmlsf_generator() {
 function xmlsf_usage() {
 	if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
 		$num = get_num_queries();
-		$mem = function_exists('memory_get_peak_usage') ? round(memory_get_peak_usage()/1024/1024,2) : 0;
+		$mem = function_exists('memory_get_peak_usage') ? round( memory_get_peak_usage()/1024/1024, 2 ) . 'M' : false;
+		$limit = ini_get('memory_limit');
 
 		require XMLSF_DIR . '/views/_usage.php';
 	}

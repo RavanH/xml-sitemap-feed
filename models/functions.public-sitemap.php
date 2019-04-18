@@ -464,6 +464,9 @@ function xmlsf_sitemap_parse_request( $request ) {
 
 			if ( ! isset( $feed[2] ) ) break;
 
+			// try to raise memory limit, context added for filters
+			wp_raise_memory_limit( 'sitemap-posttype-'.$feed[2] );
+
 			$options = (array) get_option( 'xmlsf_post_types', array() );
 
 			// prepare priority calculation
@@ -489,12 +492,15 @@ function xmlsf_sitemap_parse_request( $request ) {
 			} else {
 				$request['withoutcomments'] = true;
 			}
-			
+
 			break;
 
 		case 'taxonomy':
 
 			if ( !isset( $feed[2] ) ) break;
+
+			// try to raise memory limit, context added for filters
+			wp_raise_memory_limit( 'sitemap-taxonomy-'.$feed[2] );
 
 			// WPML compat
 			global $sitepress;
