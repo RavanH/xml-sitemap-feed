@@ -54,8 +54,7 @@ class XMLSF_Admin_Controller
 
 		// ACTIONS & CHECKS
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
-		if ( ( !is_multisite() && current_user_can( 'manage_options' ) ) || is_super_admin() )
-			add_action( 'admin_init', array( $this, 'static_files' ) );
+		add_action( 'admin_init', array( $this, 'static_files' ) );
 		add_action( 'admin_init', array( $this, 'check_theme_conflicts' ) );
 	}
 
@@ -265,6 +264,9 @@ class XMLSF_Admin_Controller
 	 */
 	public function static_files()
 	{
+		if ( ! current_user_can( 'manage_options' ) || ( is_multisite() && ! is_super_admin() ) ) 
+			return;
+
 		if ( null === self::$static_files )
 			self::$static_files = get_transient( 'xmlsf_static_files' );
 
