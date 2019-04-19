@@ -38,14 +38,20 @@ function xmlsf_usage() {
  * Try to turn on ob_gzhandler output compression
  */
 function xmlsf_ob_gzhandler() {
-	in_array('ob_gzhandler', ob_list_handlers())
-	|| ob_get_contents()
-	|| ini_get("zlib.output_compression")
-	|| ( isset($_SERVER['HTTP_X_VARNISH']) && is_numeric($_SERVER['HTTP_X_VARNISH']) )
+	( isset($_SERVER['HTTP_X_VARNISH']) && is_numeric($_SERVER['HTTP_X_VARNISH']) )
+	|| false === ini_set( 'zlib.output_compression', '1' )
+	|| ob_get_length()
+	|| in_array('ob_gzhandler', ob_list_handlers())
 	|| ob_start("ob_gzhandler");
 
 	if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-		$status = in_array('ob_gzhandler', ob_list_handlers()) ? 'ENABLED' : 'DISABLED';
-		error_log('GZhandler output buffer compression '.$status);
+		// zlib
+		$zlib = ini_get( 'zlib.output_compression' ) ? 'ENABLED' : 'DISABLED';
+		error_log('Zlib output compression '.$zlib);
+
+		// ob_gzhandler
+		$gz = in_array('ob_gzhandler', ob_list_handlers()) ? 'ENABLED' : 'DISABLED';
+		error_log('GZhandler output buffer compression '.$gz);
 	}
+
 }
