@@ -84,7 +84,7 @@ class XMLSitemapFeed_Uninstall {
 		delete_option('xmlsf_news_tags');
 
 		// remove filter and flush rules
-		remove_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 1, 1 );
+		remove_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 99 );
 		flush_rewrite_rules();
 
 		// Kilroy was here

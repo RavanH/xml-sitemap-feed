@@ -102,7 +102,7 @@ function xmlsf_deactivate() {
 	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
 
 	// remove filter and flush rules
-	remove_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 1, 1 );
+	remove_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 99 );
 	// how to unset add_feed() ?
 	flush_rewrite_rules();
 }
