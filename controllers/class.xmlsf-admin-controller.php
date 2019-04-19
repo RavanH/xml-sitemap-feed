@@ -387,18 +387,12 @@ class XMLSF_Admin_Controller
 	public function transients_actions()
 	{
 		// CATCH TRANSIENT for flushing rewrite rules after the sitemaps setting has changed
-		if ( delete_transient('xmlsf_flush_rewrite_rules') ) {
-			flush_rewrite_rules();
-			if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-				error_log('Rewrite rules flushed by XML Sitemap Feeds.');
-			}
-		}
+		delete_transient('xmlsf_flush_rewrite_rules') && flush_rewrite_rules();
 
 		// CATCH TRANSIENT for static file check
-		if ( delete_transient('xmlsf_check_static_files') ) {
-			$this->check_static_files();
-		}
+		delete_transient('xmlsf_check_static_files') && $this->check_static_files();
 	}
+
 }
 
 new XMLSF_Admin_Controller();
