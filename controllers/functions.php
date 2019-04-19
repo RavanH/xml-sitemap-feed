@@ -31,6 +31,8 @@ function xmlsf_init() {
 		// main controller functions
 		require XMLSF_DIR . '/controllers/functions.shared.php';
 
+		add_action( 'xmlsf_ping', 'xmlsf_debug_ping', 9, 4 );
+
 		// include and instantiate class
 		xmlsf();
 

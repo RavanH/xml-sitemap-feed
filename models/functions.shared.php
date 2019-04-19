@@ -91,7 +91,7 @@ function xmlsf_untrailingslash( $request ) {
  * @param $se google|bing
  * @param $sitemap sitemap
  * @param $interval seconds
- * @return string ping response|999 (postponed)
+ * @return string ping response|999 (skipped)
  */
 function xmlsf_ping( $se, $sitemap, $interval ) {
 	if ( 'google' == $se ) {
@@ -111,15 +111,9 @@ function xmlsf_ping( $se, $sitemap, $interval ) {
 		if ( 200 === $code ) {
 			set_transient( 'xmlsf_ping_'.$se.'_'.$sitemap, '', $interval );
 		}
-
-		if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-			error_log( 'Pinged '. $url .' with response code: ' . $code );
-		}
 	} else {
+		// Skip !
 		$code = 999;
-		if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-			error_log( 'Ping '. $se .' skipped.' );
-		}
 	}
 
 	do_action( 'xmlsf_ping', $se, $sitemap, $url, $code );
