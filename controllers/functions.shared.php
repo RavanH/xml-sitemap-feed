@@ -37,12 +37,14 @@ function xmlsf_usage() {
 /**
  * Try to turn on ob_gzhandler output compression
  */
-function xmlsf_ob_gzhandler() {
+function xmlsf_output_compression() {
+	// try to enable zlib.output_compression or fall back to output buffering with ob_gzhandler
 	( isset($_SERVER['HTTP_X_VARNISH']) && is_numeric($_SERVER['HTTP_X_VARNISH']) )
-	|| false === ini_set( 'zlib.output_compression', '1' )
+	|| ini_get( 'zlib.output_compression' )
+	|| '' === ini_set( 'zlib.output_compression', '1' )
 	|| ob_get_length()
 	|| in_array('ob_gzhandler', ob_list_handlers())
-	|| ob_start("ob_gzhandler");
+	|| ob_start('ob_gzhandler');
 
 	if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
 		// zlib
@@ -53,7 +55,6 @@ function xmlsf_ob_gzhandler() {
 		$gz = in_array('ob_gzhandler', ob_list_handlers()) ? 'ENABLED' : 'DISABLED';
 		error_log('GZhandler output buffer compression '.$gz);
 	}
-
 }
 
 /**

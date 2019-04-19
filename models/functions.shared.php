@@ -51,7 +51,7 @@ function xmlsf_filter_request( $request ) {
 		// check for gz request
 		if ( substr($request['feed'], -3) == '.gz' ) {
 			$request['feed'] = substr($request['feed'], 0, -3);
-			xmlsf_ob_gzhandler();
+			xmlsf_output_compression();
 		}
 
 		if ( strpos($request['feed'],'sitemap-news') === 0 ) {
