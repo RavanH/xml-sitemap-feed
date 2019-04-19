@@ -9,7 +9,7 @@ if ( ! defined( 'WPINC' ) ) die;
 
 ?>
 <?xml version="1.0" encoding="<?php echo get_bloginfo('charset'); ?>"?>
-<?xml-stylesheet type="text/xsl" href="<?php echo plugins_url('views/styles/sitemap-index.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION; ?>"?>
+<?xml-stylesheet type="text/xsl" href="<?php echo plugins_url('assets/styles/sitemap-index.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION; ?>"?>
 <?php xmlsf_generator(); ?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
