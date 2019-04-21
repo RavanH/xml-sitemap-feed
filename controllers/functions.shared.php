@@ -39,12 +39,14 @@ function xmlsf_usage() {
  */
 function xmlsf_output_compression() {
 	// try to enable zlib.output_compression or fall back to output buffering with ob_gzhandler
-	( isset($_SERVER['HTTP_X_VARNISH']) && is_numeric($_SERVER['HTTP_X_VARNISH']) )
-	|| ini_get( 'zlib.output_compression' )
-	|| '' === ini_set( 'zlib.output_compression', '1' )
-	|| ob_get_length()
-	|| in_array('ob_gzhandler', ob_list_handlers())
-	|| ob_start('ob_gzhandler');
+	if ( false !== ini_set( 'zlib.output_compression', 'On' ) )
+		// if zlib.output_compression turned on, then make sure to remove wp_ob_end_flush_all
+		remove_action( 'shutdown', 'wp_ob_end_flush_all', 1 );
+	else {
+		ob_get_length()
+		|| in_array('ob_gzhandler', ob_list_handlers())
+		|| ob_start('ob_gzhandler');
+	}
 
 	if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
 		// zlib
