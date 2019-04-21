@@ -306,6 +306,7 @@ Major DB query reduction and speed improvements. Some bugfixes.
 * Max memory limit for post type and taxonomy term sitemaps
 * Prevent CDN file urls
 * Zlib before GZhandler on .gz request
+* FIX: traditional and simplified Chinese with WPML
 * FIX: redundant front page url
 * FIX: array_filter() expects parameter 1 to be array
 * FIX: possible division by zero
