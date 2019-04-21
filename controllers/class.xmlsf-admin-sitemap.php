@@ -22,7 +22,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 		add_action( 'admin_init', array( $this, 'check_plugin_conflicts' ), 11 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
-		add_action( 'save_post', array( $this, 'save_metadata' ) );
+		add_action( 'transition_post_status', array( $this, 'save_metadata' ), 9, 3 ); // must run before pings, hooked at priority 11
 	}
 
 	public function tools_actions()
@@ -188,25 +188,27 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 	}
 
 	/* When the post is saved, save our meta data */
-	public function save_metadata( $post_id )
+	public function save_metadata( $new_status, $old_status, $post )
 	{
-		if ( !isset($post_id) )
-			$post_id = (int)$_REQUEST['post_ID'];
-
-		if ( !current_user_can( 'edit_post', $post_id ) || !isset($_POST['_xmlsf_nonce']) || !wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME) )
-			return;
+    // bail when...
+		if (
+			// post revision or autosave
+			wp_is_post_revision( $post->ID ) || wp_is_post_autosave( $post->ID ) ||
+			// action not allowed
+			! current_user_can( 'edit_post', $post->ID ) || ! isset($_POST['_xmlsf_nonce']) || !wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME)
+    ) return;
 
 		// _xmlsf_priority
-		if ( empty($_POST['xmlsf_priority']) )
-			delete_post_meta($post_id, '_xmlsf_priority');
+		if ( empty( $_POST['xmlsf_priority'] ) )
+			delete_post_meta( $post->ID, '_xmlsf_priority' );
 		else
-      update_post_meta($post_id, '_xmlsf_priority', xmlsf_sanitize_priority( $_POST['xmlsf_priority'] ) );
+      update_post_meta( $post->ID, '_xmlsf_priority', xmlsf_sanitize_priority( $_POST['xmlsf_priority'] ) );
 
 		// _xmlsf_exclude
-		if ( empty($_POST['xmlsf_exclude']) )
-			delete_post_meta($post_id, '_xmlsf_exclude');
+		if ( empty( $_POST['xmlsf_exclude'] ) )
+			delete_post_meta( $post->ID, '_xmlsf_exclude' );
 		else
-			update_post_meta($post_id, '_xmlsf_exclude', $_POST['xmlsf_exclude']);
+			update_post_meta( $post->ID, '_xmlsf_exclude', '1' );
 	}
 
 	/**

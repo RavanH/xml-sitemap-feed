@@ -41,7 +41,7 @@ class XMLSF_Sitemap_Controller
 		add_action( 'comment_post', array($this,'comment_post'), 10, 3 ); // when comment is not held for moderation
 
 		// PINGING
-		add_action( 'transition_post_status', array($this,'do_pings'), 10, 3 );
+		add_action( 'transition_post_status', array($this,'do_pings'), 11, 3 ); // must run after post meta data hanling hooked at proirity 9
 
 		// FEED TEMPLATES
 		add_action( 'do_feed_sitemap', 'xmlsf_load_template_index', 10, 1 );
@@ -49,13 +49,14 @@ class XMLSF_Sitemap_Controller
 		add_action( 'do_feed_sitemap-home', 'xmlsf_load_template_home', 10, 1 );
 		add_action( 'do_feed_sitemap-custom', 'xmlsf_load_template_custom', 10, 1 );
 
-		$this->post_types = get_option( 'xmlsf_post_types' );
+		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
 
 		if ( is_array($this->post_types) ) {
 			foreach ( $this->post_types as $post_type => $settings ) {
 				if ( !empty($settings['active']) )
+					// FEED TEMPLATES
 					add_action( 'do_feed_sitemap-posttype-'.$post_type, 'xmlsf_load_template', 10, 1 );
-			}
+				}
 		}
 
 		foreach ( xmlsf_get_taxonomies() as $name ) {
@@ -71,25 +72,23 @@ class XMLSF_Sitemap_Controller
 	 * @param $post
 	 */
 	public function do_pings( $new_status, $old_status, $post )
-	{
-		// are we publishing?
-		if ( $old_status == 'publish' || $new_status != 'publish' )
-			return;
+ 	{
+		// bail when...
+		if (
+			// already published or not publishing
+			$old_status == 'publish' || $new_status != 'publish' ||
+			// inactive post type
+			! array_key_exists( $post->post_type, (array) $this->post_types ) ||
+			// excluded post
+			! empty( $_POST['xmlsf_exclude'] ) || get_post_meta( $post->ID, '_xmlsf_exclude', true )
+		) return;
 
-		$ping = get_option( 'xmlsf_ping' );
-
-		if ( empty( $ping ) )
-			return;
-
-		// check if we've got a post type that is included in our sitemap
-		$post_types = get_option( 'xmlsf_post_types' );
-		if ( array_key_exists( $post->post_type, (array) $this->post_types ) ) {
-
-			foreach ( $ping as $se ) {
-				xmlsf_ping( $se, $this->sitemap, HOUR_IN_SECONDS );
-			}
+		$ping = (array) get_option( 'xmlsf_ping', array() );
+		// PING !
+		foreach ( $ping as $se ) {
+			xmlsf_ping( $se, $this->sitemap, HOUR_IN_SECONDS );
 		}
-	}
+ 	}
 
 	/**
 	 * Cache delete on clean_post_cache
@@ -131,9 +130,13 @@ class XMLSF_Sitemap_Controller
 	 */
 	public function update_term_modified_meta( $new_status, $old_status, $post )
 	{
-		// bail on inactive post type
-		if ( ! array_key_exists($post->post_type, $this->post_types) || empty( $this->post_types[$post->post_type]['active'] ) )
-			return;
+		// bail when...
+		if (
+			// no status transition or not moving in or out of 'publish' status
+			$old_status == $new_status || ( 'publish' != $new_status && 'publish' != $old_status ) ||
+			// inactive post type
+			! array_key_exists($post->post_type, $this->post_types) || empty( $this->post_types[$post->post_type]['active'] )
+		) return;
 
 		$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
 
@@ -172,10 +175,13 @@ class XMLSF_Sitemap_Controller
 	public function update_post_images_meta( $new_status, $old_status, $post )
 	{
 		// bail when...
-		if ( $new_status != 'publish' // not publishing or unpublishing
-			|| ! array_key_exists($post->post_type, $this->post_types) // inactive post type
-			|| empty( $this->post_types[$post->post_type]['active'] ) // inactive post type
-			|| empty( $this->post_types[$post->post_type]['tags']['image'] ) // no image tags active
+		if (
+			// not publishing or updating
+			$new_status != 'publish' ||
+			// inactive post type
+			! array_key_exists($post->post_type, $this->post_types) || empty( $this->post_types[$post->post_type]['active'] ) ||
+			// no image tags active
+			empty( $this->post_types[$post->post_type]['tags']['image'] )
 		) return;
 
 		$which = $this->post_types[$post->post_type]['tags']['image'];
@@ -201,8 +207,8 @@ class XMLSF_Sitemap_Controller
 	 */
 	public function transition_comment_status( $new_status, $old_status, $comment )
 	{
-		// bail when not publishing
-		if ( $new_status != 'approved' ) return;
+		// bail when not publishing or unpublishing
+		if ( $old_status == $new_status || ( $new_status != 'approved' && $old_status != 'approved' ) ) return;
 
 		$post_type = get_post_type( $comment->comment_post_ID );
 
@@ -210,7 +216,7 @@ class XMLSF_Sitemap_Controller
 		if ( ! array_key_exists($post_type, $this->post_types) // inactive post type
 			|| empty( $this->post_types[$post_type]['update_lastmod_on_comments'] ) // comments date irrelevant
 		) return;
-		
+
 		// update comment meta data
 		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date', $comment->comment_date );
 	}
