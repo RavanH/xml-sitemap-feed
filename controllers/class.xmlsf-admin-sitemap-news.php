@@ -14,7 +14,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
   {
 		// META
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
-		add_action( 'transition_post_status', array( $this, 'save_metadata' ), 9, 3 ); // must run before pings, hooked at priority 11
+		add_action( 'save_post', array( $this, 'save_metadata' ) );
 
 		// SETTINGS
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
@@ -105,21 +105,23 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 	}
 
 	/* When the post is saved, save our meta data */
-	public function save_metadata( $new_status, $old_status, $post )
+	public function save_metadata( $post_id )
 	{
-    // bail when...
 		if (
-			// post revision or autosave
-			wp_is_post_revision( $post->ID ) || wp_is_post_autosave( $post->ID ) ||
-			// action not allowed
-			! current_user_can( 'edit_post', $post->ID ) || ! isset($_POST['_xmlsf_news_nonce']) || !wp_verify_nonce($_POST['_xmlsf_news_nonce'], XMLSF_BASENAME)
+      // first poll for empty post array, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
+      // then verify nonce
+      empty($_POST) || !isset($_POST['_xmlsf_nonce']) || !wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME) ||
+      // user not allowed
+      !current_user_can( 'edit_post', $post_id ) ||
+      // post revision or autosave
+      wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id )
     ) return;
 
 		// _xmlsf_news_exclude
 		if ( empty($_POST['xmlsf_news_exclude']) )
-			delete_post_meta( $post->ID, '_xmlsf_news_exclude' );
+			delete_post_meta( $post_id, '_xmlsf_news_exclude' );
 		else
-			update_post_meta( $post->ID, '_xmlsf_news_exclude', '1' );
+			update_post_meta( $post_id, '_xmlsf_news_exclude', '1' );
 	}
 
 	/**

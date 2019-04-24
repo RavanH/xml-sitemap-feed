@@ -41,7 +41,7 @@ class XMLSF_Sitemap_Controller
 		add_action( 'comment_post', array($this,'comment_post'), 10, 3 ); // when comment is not held for moderation
 
 		// PINGING
-		add_action( 'transition_post_status', array($this,'do_pings'), 11, 3 ); // must run after post meta data hanling hooked at proirity 9
+		add_action( 'transition_post_status', array($this,'do_pings'), 10, 3 );
 
 		// FEED TEMPLATES
 		add_action( 'do_feed_sitemap', 'xmlsf_load_template_index', 10, 1 );

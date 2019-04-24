@@ -27,7 +27,7 @@ class XMLSF_Sitemap_News_Controller
 		$this->sitemap = $sitemap;
 
 		// PINGING
-		add_action( 'transition_post_status', array($this,'do_ping'), 11, 3 ); // must run after post meta data hanling hooked at proirity 9
+		add_action( 'transition_post_status', array( $this, 'do_ping' ), 10, 3 );
 
 		// FEED TEMPLATES
 		add_action( 'do_feed_sitemap-news', 'xmlsf_news_load_template', 10, 1 );

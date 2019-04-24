@@ -22,7 +22,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 		add_action( 'admin_init', array( $this, 'check_plugin_conflicts' ), 11 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
-		add_action( 'transition_post_status', array( $this, 'save_metadata' ), 9, 3 ); // must run before pings, hooked at priority 11
+		add_action( 'save_post', array( $this, 'save_metadata' ) );
 	}
 
 	public function tools_actions()
@@ -160,49 +160,51 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 		wp_nonce_field( XMLSF_BASENAME, '_xmlsf_nonce' );
 
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
-		$checked = ! empty( get_post_meta( $post->ID, '_xmlsf_exclude', true ) );
+		$exclude = get_post_meta( $post->ID, '_xmlsf_exclude', true );
 		$priority = get_post_meta( $post->ID, '_xmlsf_priority', true );
 		$disabled = false;
 
 		// disable options and (visibly) set excluded to true for private posts
 		if ( 'private' == $post->post_status ) {
 			$disabled = true;
-			$checked = true;
+			$exclude = true;
 		}
 
 		// disable options and (visibly) set priority to 1 for front page
 		if ( $post->ID == get_option('page_on_front') ) {
 			$disabled = true;
-			$checked = false;
+			$exclude = false;
 			$priority = '1'; // force priority to 1 for front page
 		}
+
+		$description = sprintf(
+			__('Leave empty for automatic Priority as configured on %1$s > %2$s.','xml-sitemap-feed'),
+			translate('Settings'),
+			'<a href="' . admin_url('options-general.php') . '?page=xmlsf">' . __('XML Sitemap','xml-sitemap-feed') . '</a>'
+		);
 
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/meta-box.php';
 	}
 
 	/* When the post is saved, save our meta data */
-	public function save_metadata( $new_status, $old_status, $post )
+	public function save_metadata( $post_id )
 	{
-    // bail when...
-		if (
-			// post revision or autosave
-			wp_is_post_revision( $post->ID ) || wp_is_post_autosave( $post->ID ) ||
-			// action not allowed
-			! current_user_can( 'edit_post', $post->ID ) || ! isset($_POST['_xmlsf_nonce']) || !wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME)
-    ) return;
+    // poll for empty post array, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
+		if ( empty($_POST) || !current_user_can( 'edit_post', $post_id ) || !isset($_POST['_xmlsf_nonce']) || !wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME) )
+			return;
 
 		// _xmlsf_priority
-		if ( empty( $_POST['xmlsf_priority'] ) )
-			delete_post_meta( $post->ID, '_xmlsf_priority' );
+		if ( empty($_POST['xmlsf_priority']) )
+			delete_post_meta($post_id, '_xmlsf_priority');
 		else
-      update_post_meta( $post->ID, '_xmlsf_priority', xmlsf_sanitize_priority( $_POST['xmlsf_priority'] ) );
+      update_post_meta($post_id, '_xmlsf_priority', xmlsf_sanitize_priority( $_POST['xmlsf_priority'] ) );
 
 		// _xmlsf_exclude
-		if ( empty( $_POST['xmlsf_exclude'] ) )
-			delete_post_meta( $post->ID, '_xmlsf_exclude' );
+		if ( empty($_POST['xmlsf_exclude']) )
+			delete_post_meta($post_id, '_xmlsf_exclude');
 		else
-			update_post_meta( $post->ID, '_xmlsf_exclude', '1' );
+			update_post_meta($post_id, '_xmlsf_exclude', $_POST['xmlsf_exclude']);
 	}
 
 	/**
