@@ -160,28 +160,22 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 		wp_nonce_field( XMLSF_BASENAME, '_xmlsf_nonce' );
 
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form
-		$exclude = get_post_meta( $post->ID, '_xmlsf_exclude', true );
+		$checked = ! empty( get_post_meta( $post->ID, '_xmlsf_exclude', true ) );
 		$priority = get_post_meta( $post->ID, '_xmlsf_priority', true );
 		$disabled = false;
 
 		// disable options and (visibly) set excluded to true for private posts
 		if ( 'private' == $post->post_status ) {
 			$disabled = true;
-			$exclude = true;
+			$checked = true;
 		}
 
 		// disable options and (visibly) set priority to 1 for front page
 		if ( $post->ID == get_option('page_on_front') ) {
 			$disabled = true;
-			$exclude = false;
+			$checked = false;
 			$priority = '1'; // force priority to 1 for front page
 		}
-
-		$description = sprintf(
-			__('Leave empty for automatic Priority as configured on %1$s > %2$s.','xml-sitemap-feed'),
-			translate('Settings'),
-			'<a href="' . admin_url('options-general.php') . '?page=xmlsf">' . __('XML Sitemap','xml-sitemap-feed') . '</a>'
-		);
 
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/meta-box.php';

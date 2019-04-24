@@ -73,14 +73,14 @@ class XMLSF_Sitemap_Controller
 	 */
 	public function do_pings( $new_status, $old_status, $post )
  	{
-		// bail when...
+		// bail out when...
 		if (
 			// already published or not publishing
 			$old_status == 'publish' || $new_status != 'publish' ||
+			// REST API call without new post data, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
+			empty( $_POST ) || ! empty( $_POST['xmlsf_exclude'] ) ||
 			// inactive post type
-			! array_key_exists( $post->post_type, (array) $this->post_types ) ||
-			// excluded post
-			! empty( $_POST['xmlsf_exclude'] ) || get_post_meta( $post->ID, '_xmlsf_exclude', true )
+			! array_key_exists( $post->post_type, (array) $this->post_types )
 		) return;
 
 		$ping = (array) get_option( 'xmlsf_ping', array() );

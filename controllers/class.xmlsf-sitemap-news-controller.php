@@ -42,19 +42,20 @@ class XMLSF_Sitemap_News_Controller
 	 */
 	public function do_ping( $new_status, $old_status, $post )
 	{
-		$news_tags = (array) get_option('xmlsf_news_tags');
-
-		// bail when...
+		// bail out when...
 		if (
 			// already published or not publishing
 			$old_status == 'publish' || $new_status != 'publish' ||
+			// REST API call without new post data, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
+			empty( $_POST ) || ! empty( $_POST['_xmlsf_news_exclude'] ) ||
 			// google ping not activated
-			! in_array( 'google', (array) get_option( 'xmlsf_ping' ) ) ||
-			// inactive post type
-			empty( $news_tags['post_type'] ) || ! in_array( $post->post_type, (array) $news_tags['post_type'] ) ||
-			// excluded post
-			! empty( $_POST['_xmlsf_news_exclude'] ) || get_post_meta( $post->ID, '_xmlsf_news_exclude', true )
+			! in_array( 'google', (array) get_option( 'xmlsf_ping' ) )
 		) return;
+
+		$news_tags = (array) get_option('xmlsf_news_tags');
+
+		// is this an active post type?
+		if ( empty( $news_tags['post_type'] ) || ! in_array( $post->post_type, (array) $news_tags['post_type'] ) ) return;
 
 		// are categories limited and is not in correct category?
 		if ( ! empty( $news_tags['categories'] ) ) {
