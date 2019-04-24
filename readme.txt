@@ -293,7 +293,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 = 5.2 =
 
-Major DB query reduction and speed improvements. Some bugfixes.
+Major DB query reduction and speed improvements. Bugfixes.
 
 
 == Changelog ==
@@ -306,6 +306,7 @@ Major DB query reduction and speed improvements. Some bugfixes.
 * Max memory limit for post type and taxonomy term sitemaps
 * Prevent CDN file urls
 * Zlib before GZhandler on .gz request
+* FIX: don't ping for excluded posts
 * FIX: traditional and simplified Chinese with WPML
 * FIX: redundant front page url
 * FIX: array_filter() expects parameter 1 to be array

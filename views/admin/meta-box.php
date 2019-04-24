@@ -13,7 +13,7 @@
 </p>
 <p>
   <label>
-    <input type="checkbox" name="xmlsf_exclude" id="xmlsf_exclude" value="1"<?php checked( $checked ); disabled( $disabled ); ?> />
+    <input type="checkbox" name="xmlsf_exclude" id="xmlsf_exclude" value="1"<?php checked( !empty($exclude) ); disabled( $disabled ); ?> />
 		<?php _e('Exclude from XML Sitemap','xml-sitemap-feed'); ?>
   </label>
 </p>

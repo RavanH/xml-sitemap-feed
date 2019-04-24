@@ -42,15 +42,23 @@ class XMLSF_Sitemap_News_Controller
 	 */
 	public function do_ping( $new_status, $old_status, $post )
 	{
-		// bail out when...
-		if (
-			// already published or not publishing
-			$old_status == 'publish' || $new_status != 'publish' ||
-			// REST API call without new post data, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
-			empty( $_POST ) || ! empty( $_POST['_xmlsf_news_exclude'] ) ||
-			// google ping not activated
-			! in_array( 'google', (array) get_option( 'xmlsf_ping' ) )
-		) return;
+		// bail out when already published or not publishing
+		if ( $old_status == 'publish' || $new_status != 'publish' ) return;
+
+		// bail out when REST API call without new post data, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) return;
+
+		// bail out when Google ping not checked
+		if ( ! in_array( 'google', (array) get_option( 'xmlsf_ping' ) ) ) return;
+
+		// we're saving from post edit screen
+		if ( ! empty( $_POST ) && 'editpost' == $_POST['action'] ) {
+			// bail out when exclude field is checked
+			if ( ! empty( $_POST['_xmlsf_news_exclude'] ) ) return;
+		} else {
+			// bail out when exclude meta data is present
+			if ( ! empty( get_post_meta( $post->ID, '_xmlsf_news_exclude' ) ) ) return;
+		}
 
 		$news_tags = (array) get_option('xmlsf_news_tags');
 

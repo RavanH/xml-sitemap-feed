@@ -73,15 +73,23 @@ class XMLSF_Sitemap_Controller
 	 */
 	public function do_pings( $new_status, $old_status, $post )
  	{
-		// bail out when...
-		if (
-			// already published or not publishing
-			$old_status == 'publish' || $new_status != 'publish' ||
-			// REST API call without new post data, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
-			empty( $_POST ) || ! empty( $_POST['xmlsf_exclude'] ) ||
-			// inactive post type
-			! array_key_exists( $post->post_type, (array) $this->post_types )
-		) return;
+		// bail out when already published or not publishing
+		if ( $old_status == 'publish' || $new_status != 'publish' ) return;
+
+		// bail out when REST API call without new post data, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) return;
+
+		// bail out when inactive post type
+		if ( ! array_key_exists( $post->post_type, (array) $this->post_types ) ) return;
+
+		// we're saving from post edit screen (f.e. 'inline-save' would be from quick edit)
+		if ( ! empty( $_POST ) && 'editpost' == $_POST['action'] ) {
+			// bail out when exclude field is checked
+			if ( ! empty( $_POST['_xmlsf_news_exclude'] ) ) return;
+		} else {
+			// bail out when exclude meta data is present
+			if ( ! empty( get_post_meta( $post->ID, '_xmlsf_news_exclude' ) ) ) return;
+		}
 
 		$ping = (array) get_option( 'xmlsf_ping', array() );
 		// PING !
