@@ -168,32 +168,11 @@ function xmlsf_get_post_modified() {
 		};
 
 		// maybe update lastmod to latest comment
-		$options = get_option( 'xmlsf_post_types' );
+		$options = (array) get_option( 'xmlsf_post_types', array() );
 
-		if ( is_array($options) && !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
-
-			/*
-			* Getting ALL meta here because if checking for single key, we cannot
-			* distiguish between empty value or non-exisiting key as both return ''.
-			*/
-			$meta = get_post_meta( $post->ID );
-
-			if ( ! array_key_exists( '_xmlsf_comment_date', $meta ) ) {
-
-				$comments = get_comments( array(
-					'status' => 'approve',
-					'number' => 1,
-					'post_id' => $post->ID,
-				) );
-
-				$lastcomment = isset( $comments[0]->comment_date ) ? $comments[0]->comment_date : '';
-				update_post_meta( $post->ID, '_xmlsf_comment_date', $lastcomment );
-
-			} else {
-
-				$lastcomment = get_post_meta( $post->ID, '_xmlsf_comment_date', true ); // only get one
-
-			}
+		if ( !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
+			// assuming post meta data has been primed here
+			$lastcomment = get_post_meta( $post->ID, '_xmlsf_comment_date', true ); // only get one
 
 			if ( ! empty( $lastcomment ) && strtotime( $lastcomment ) > strtotime( $lastmod ) )
 				$lastmod = $lastcomment;
@@ -213,48 +192,9 @@ function xmlsf_get_post_modified() {
  * @return string
  */
 function xmlsf_get_term_modified( $term ) {
-	/*
-	* Getting ALL meta here because if checking for single key, we cannot
-	* distiguish between empty value or non-exisiting key as both return ''.
-	*/
-	$meta = get_term_meta( $term->term_id );
 
-	if ( ! array_key_exists( 'term_modified', $meta ) ) {
-
-		// get the latest post in this taxonomy item, to use its post_date as lastmod
-		$posts = get_posts (
-			array(
-				'post_type' => 'any',
-				'post_status' => 'publish',
-				'ignore_sticky_posts' => true,
-				'posts_per_page' => 1,
-				'no_found_rows' => true,
-				'update_post_meta_cache' => false,
-				'update_post_term_cache' => false,
-				'update_cache' => false,
-				'lang' => '',
-				'has_password' => false,
-				'suppress_filters' => true,
-				'tax_query' => array(
-					array(
-						'taxonomy' => $term->taxonomy,
-						'field' => 'slug',
-						'terms' => $term->slug
-					)
-				)
-			)
-		);
-		$lastmod = isset($posts[0]->post_date) ? $posts[0]->post_date : '';
-		// get post date here, not modified date because we're only
-		// concerned about new entries on the (first) taxonomy page
-
-		update_term_meta( $term->term_id, 'term_modified', $lastmod );
-
-	} else {
-
-		$lastmod = get_term_meta( $term->term_id, 'term_modified', true ); // only get one
-
-	}
+	// assuming term meta has been primed here
+	$lastmod = get_term_meta( $term->term_id, 'term_modified', true ); // only get one
 
 	return ! empty( $lastmod ) ? mysql2date( 'c', $lastmod ) : false;
 
@@ -373,37 +313,12 @@ function xmlsf_get_term_priority( $term = '' ) {
  * @return array
  */
 function xmlsf_get_post_images( $which ) {
-
 	global $post;
-	$images = array();
 
-	/*
-	* Getting ALL meta here because if checking for single key, we cannot
-	* distiguish between empty value or non-exisiting key as both return ''.
-	*/
-	$meta = get_post_meta( $post->ID );
-
-	if ( ! array_key_exists( '_xmlsf_image_'.$which, $meta ) ) {
-
-		// populate attached images data here
-		$images = (array) xmlsf_images_data( $post, $which );
-
-		// and save it as meta data
-		// note: add_post_meta will clear the meta cache, not update it!
-		foreach ( $images as $data ) {
-			add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
-		}
-
-	} else {
-
-		// do this as 'else' otherwise get_post_meta will cause extra db queuries
-		// after add_post_meta has run in the 'if' above (see note)...
-		$images = get_post_meta( $post->ID, '_xmlsf_image_'.$which );
-
-	}
+	// assuming images post meta has been primed here
+	$images = get_post_meta( $post->ID, '_xmlsf_image_'.$which );
 
 	return (array) apply_filters( 'xmlsf_post_images_'.$which, $images );
-
 }
 
 /**

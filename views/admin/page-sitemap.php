@@ -53,6 +53,7 @@
 			</p>
 			<p>
 				<input type="submit" name="xmlsf-clear-meta" class="button button-small" value="<?php _e( 'Clear sitemap meta', 'xml-sitemap-feed' ); ?>" />
+				<input type="submit" name="xmlsf-prime-meta" class="button button-small" value="<?php _e( 'Prime sitemap meta', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
 				<input type="hidden" name="xmlsf-clear-settings" value="sitemap" />

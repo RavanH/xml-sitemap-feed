@@ -174,7 +174,7 @@ function xmlsf_sanitize_priority( $priority, $min = 0, $max = 1 ) {
  * @param object $post
  * @param string $which
  *
- * @return array|string
+ * @return array
  */
 function xmlsf_images_data( $post, $which ) {
 	$attachments = array();
@@ -202,7 +202,7 @@ function xmlsf_images_data( $post, $which ) {
 
 	}
 
-	if ( empty( $attachments ) ) return '';
+	if ( empty( $attachments ) ) return array();
 
 	// gather all data
 	$images_data = array();
@@ -226,5 +226,30 @@ function xmlsf_images_data( $post, $which ) {
 
 	}
 
-	return ! empty( $images_data ) ? $images_data : '';
+	return $images_data;
+}
+
+/**
+ * Get instantiated sitemap controller class
+ *
+ * @since 5.2
+ * @global XMLSF_Sitemap_Controller $xmlsf_sitemap_controller
+ * @return XMLSF_Sitemap_Controller object
+ */
+function xmlsf_sitemap_controller( $sitemap = null ) {
+	global $xmlsf_sitemap_controller;
+
+	if ( ! isset( $xmlsf_sitemap_controller ) ) {
+		if ( ! class_exists( 'XMLSF_Sitemap_Controller' ) )
+			require XMLSF_DIR . '/controllers/class.xmlsf-sitemap-controller.php';
+
+		if ( empty($sitemap) ) {
+			$sitemaps = get_option( 'xmlsf_sitemaps' );
+			$sitemap = $sitemaps['sitemap'];
+		}
+		
+		$xmlsf_sitemap_controller = new XMLSF_Sitemap_Controller( $sitemap );
+	}
+
+	return $xmlsf_sitemap_controller;
 }

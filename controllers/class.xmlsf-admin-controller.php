@@ -368,6 +368,18 @@ class XMLSF_Admin_Controller
 				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}
 		}
+
+		if ( isset( $_POST['xmlsf-prime-meta'] ) ) {
+			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+				// prime metadata
+				xmlsf_sitemap_controller()->prime_post_meta();
+
+				add_settings_error( 'prime_meta_notice', 'prime_meta_notice', __('All sitemap meta data has been rebuilt.','xml-sitemap-feed'), 'updated' );
+			} else {
+				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
+			}
+		}
+
 	}
 
 	public function notices_actions()

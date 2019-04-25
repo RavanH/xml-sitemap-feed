@@ -37,8 +37,8 @@ class XMLSF_Sitemap_Controller
 		add_action( 'transition_post_status', array($this,'update_post_images_meta'), 10, 3 );
 
 		// Update last comment date post meta
-		add_action( 'transition_comment_status', array($this,'transition_comment_status'), 10, 3 );
-		add_action( 'comment_post', array($this,'comment_post'), 10, 3 ); // when comment is not held for moderation
+		add_action( 'transition_comment_status', array($this,'update_post_comment_meta'), 10, 3 );
+		add_action( 'comment_post', array($this,'update_post_comment_meta_cp'), 10, 3 ); // when comment is not held for moderation
 
 		// PINGING
 		add_action( 'transition_post_status', array($this,'do_pings'), 10, 3 );
@@ -200,7 +200,7 @@ class XMLSF_Sitemap_Controller
 		delete_post_meta( $post->ID, '_xmlsf_image_'.$which );
 
 		// get fresh image(s) data
-		foreach ( (array) xmlsf_images_data( $post, $this->post_types[$post->post_type]['tags']['image'] ) as $data ) {
+		foreach ( xmlsf_images_data( $post, $which ) as $data ) {
 			// and save it as meta data
 			add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
 		}
@@ -211,11 +211,11 @@ class XMLSF_Sitemap_Controller
 	 *
 	 * @since 5.2
 	 *
-	 * @param $new_status
-	 * @param $old_status
-	 * @param $comment
+	 * @param string $new_status
+	 * @param string $old_status
+	 * @param object $comment
 	 */
-	public function transition_comment_status( $new_status, $old_status, $comment )
+	public function update_post_comment_meta( $new_status, $old_status, $comment )
 	{
 		// bail when not publishing or unpublishing
 		if ( $old_status == $new_status || ( $new_status != 'approved' && $old_status != 'approved' ) ) return;
@@ -236,11 +236,11 @@ class XMLSF_Sitemap_Controller
 	 *
 	 * @since 5.2
 	 *
-	 * @param $new_status
-	 * @param $old_status
-	 * @param $comment
+	 * @param int $comment_ID
+	 * @param int $comment_approved
+	 * @param array $commentdata
 	 */
-	public function comment_post( $comment_ID, $comment_approved, $commentdata )
+	public function update_post_comment_meta_cp( $comment_ID, $comment_approved, $commentdata )
 	{
 		// bail when not published
 		if ( $comment_approved !== 1 ) return;
@@ -254,6 +254,83 @@ class XMLSF_Sitemap_Controller
 
 		// update comment meta data
 		update_post_meta( $commentdata['comment_post_ID'], '_xmlsf_comment_date', $commentdata['comment_date'] );
+	}
+
+	/**
+	 * Prime term meta data
+	 *
+	 * @since 5.2
+	 *
+	 * @param string $post_type
+	 * @param intval|null $m
+	 */
+	public function prime_term_meta( $taxonomy = 'any' )
+	{
+		// try to raise memory limit, context added for filters
+		wp_raise_memory_limit( 'sitemap-taxonomy-'.$taxonomy );
+	}
+
+	/**
+	 * Prime post images and comment meta data
+	 *
+	 * @since 5.2
+	 *
+	 * @param string $post_type
+	 * @param intval|null $m
+	 */
+	public function prime_post_meta( $post_type = 'any', $m = null )
+	{
+		// get our posts
+		if ( !is_admin() && is_sitemap() ) {
+			// we're a sitemap, so let's work with main query here
+			global $wp_query;
+			$posts = is_object($wp_query) ? $wp_query->$posts : array();
+		} else {
+			$args = array(
+				'post_type' => $post_type,
+				'numberposts' => -1,
+				'lang' => '',
+				'has_password' => false,
+				'update_cache' => false
+			);
+			if ( is_numeric($m) ) $args['m'] = intval($m);
+			$posts = get_posts( $args );
+
+			// try to raise memory limit, context added for filters
+			wp_raise_memory_limit( 'sitemap-posttype-'.$post_type );
+		}
+
+		foreach ( $posts as $post ) {
+			if ( ! array_key_exists($post->post_type, $this->post_types) ) continue;
+
+			// Update images meta
+			delete_post_meta( $post->ID, '_xmlsf_image_featured' );
+			delete_post_meta( $post->ID, '_xmlsf_image_attached' );
+
+			if ( !empty($this->post_types[$post->post_type]['tags']['image']) ) {
+				$which = $this->post_types[$post->post_type]['tags']['image'];
+
+				// populate images and add as meta data
+				foreach ( xmlsf_images_data( $post, $which ) as $data ) {
+					add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
+				}
+			}
+
+			// Update last comment date meta
+			if ( ! empty($this->post_types[$post->post_type]['update_lastmod_on_comments']) ) {
+				// get latest post comment
+				$comments = get_comments( array(
+					'status' => 'approve',
+					'number' => 1,
+					'post_id' => $post->ID,
+				) );
+
+				if ( isset( $comments[0]->comment_date ) )
+					update_post_meta( $post->ID, '_xmlsf_comment_date', $comments[0]->comment_date );
+				else
+					delete_post_meta( $post->ID, '_xmlsf_comment_date' );
+			}
+		}
 	}
 
 }
