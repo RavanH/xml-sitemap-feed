@@ -250,17 +250,6 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 		) );
 
 		ob_start();
-		include XMLSF_DIR . '/views/admin/help-tab-news-images.php';
-		include XMLSF_DIR . '/views/admin/help-tab-support.php';
-		$content = ob_get_clean();
-
-		$screen->add_help_tab( array(
-			'id'      => 'sitemap-news-images',
-			'title'   => translate('Images'),
-			'content' => $content
-		) );
-
-		ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-news-keywords.php';
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();
