@@ -46,7 +46,9 @@ class XMLSF_Sitemap_News_Controller
 		if ( $old_status == 'publish' || $new_status != 'publish' ) return;
 
 		// bail out when REST API call without new post data, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
-		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) return;
+		// NO ! Don't bail out now because there will be no other chance as long as bug is not fixed...
+		// ... we'll have to make do without $_POST data so potentially incorrect get_post_meta() information.
+		//if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) return;
 
 		// bail out when Google ping not checked
 		if ( ! in_array( 'google', (array) get_option( 'xmlsf_ping' ) ) ) return;
@@ -56,15 +58,17 @@ class XMLSF_Sitemap_News_Controller
 			// bail out when exclude field is checked
 			if ( ! empty( $_POST['_xmlsf_news_exclude'] ) ) return;
 		} else {
-			// bail out when exclude meta data is present
+			// fall back on exclude meta data from DB whic may be outdated (see bug)
 			if ( ! empty( get_post_meta( $post->ID, '_xmlsf_news_exclude' ) ) ) return;
 		}
 
 		$news_tags = (array) get_option('xmlsf_news_tags');
 
+		error_log('6');
 		// is this an active post type?
 		if ( empty( $news_tags['post_type'] ) || ! in_array( $post->post_type, (array) $news_tags['post_type'] ) ) return;
 
+		error_log('7');
 		// are categories limited and is not in correct category?
 		if ( ! empty( $news_tags['categories'] ) ) {
 			$cats = wp_get_post_categories( $post->ID, array( 'fields' => 'ids' ) );

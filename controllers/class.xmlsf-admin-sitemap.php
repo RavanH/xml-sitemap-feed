@@ -191,13 +191,10 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 	public function save_metadata( $post_id )
 	{
 		if (
-      // poll for empty post array, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
-      // then verify nonce
-      empty($_POST) || !isset($_POST['_xmlsf_nonce']) || !wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME) ||
+      // verify nonce
+      ! isset($_POST['_xmlsf_nonce']) || ! wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME) ||
       // user not allowed
-      ! current_user_can( 'edit_post', $post_id ) ||
-      // post revision or autosave
-      wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id )
+      ! current_user_can( 'edit_post', $post_id )
     ) return;
 
 		// _xmlsf_priority

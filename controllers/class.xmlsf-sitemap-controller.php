@@ -77,7 +77,9 @@ class XMLSF_Sitemap_Controller
 		if ( $old_status == 'publish' || $new_status != 'publish' ) return;
 
 		// bail out when REST API call without new post data, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
-		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) return;
+		// NO ! Don't bail out now because there will be no other chance as long as bug is not fixed...
+		// ... we'll have to make do without $_POST data so potentially incorrect get_post_meta() information.
+		//if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) return;
 
 		// bail out when inactive post type
 		if ( ! array_key_exists( $post->post_type, (array) $this->post_types ) ) return;
@@ -85,10 +87,10 @@ class XMLSF_Sitemap_Controller
 		// we're saving from post edit screen (f.e. 'inline-save' would be from quick edit)
 		if ( ! empty( $_POST ) && 'editpost' == $_POST['action'] ) {
 			// bail out when exclude field is checked
-			if ( ! empty( $_POST['_xmlsf_news_exclude'] ) ) return;
+			if ( ! empty( $_POST['_xmlsf_exclude'] ) ) return;
 		} else {
-			// bail out when exclude meta data is present
-			if ( ! empty( get_post_meta( $post->ID, '_xmlsf_news_exclude' ) ) ) return;
+			// fall back on exclude meta data from DB whic may be outdated (see bug)
+			if ( ! empty( get_post_meta( $post->ID, '_xmlsf_exclude' ) ) ) return;
 		}
 
 		$ping = (array) get_option( 'xmlsf_ping', array() );
