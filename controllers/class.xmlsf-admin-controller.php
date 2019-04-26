@@ -373,8 +373,11 @@ class XMLSF_Admin_Controller
 			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
 				// prime metadata
 				xmlsf_sitemap_controller()->prime_post_meta();
+				// TODO split this into post types, and maybe into months?
 
-				add_settings_error( 'prime_meta_notice', 'prime_meta_notice', __('All sitemap meta data has been rebuilt.','xml-sitemap-feed'), 'updated' );
+				// TODO consider same approach for term meta
+
+				add_settings_error( 'prime_meta_notice', 'prime_meta_notice', __('Sitemap meta data has been rebuilt.','xml-sitemap-feed'), 'updated' );
 			} else {
 				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}

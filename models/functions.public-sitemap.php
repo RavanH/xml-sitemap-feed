@@ -193,8 +193,46 @@ function xmlsf_get_post_modified() {
  */
 function xmlsf_get_term_modified( $term ) {
 
-	// assuming term meta has been primed here
-	$lastmod = get_term_meta( $term->term_id, 'term_modified', true ); // only get one
+	/*
+	* Getting ALL meta here because if checking for single key, we cannot
+	* distiguish between empty value or non-exisiting key as both return ''.
+	*/
+	$meta = get_term_meta( $term->term_id );
+
+	if ( ! array_key_exists( 'term_modified', $meta ) ) {
+
+		// get the latest post in this taxonomy item, to use its post_date as lastmod
+		$posts = get_posts (
+			array(
+				'post_type' => 'any',
+				'post_status' => 'publish',
+				'posts_per_page' => 1,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'update_cache' => false,
+				'lang' => '',
+				'has_password' => false,
+				'tax_query' => array(
+					array(
+						'taxonomy' => $term->taxonomy,
+						'field' => 'slug',
+						'terms' => $term->slug
+					)
+				)
+			)
+		);
+
+		$lastmod = isset($posts[0]->post_date) ? $posts[0]->post_date : '';
+		// get post date here, not modified date because we're only
+		// concerned about new entries on the (first) taxonomy page
+
+		add_term_meta( $term->term_id, 'term_modified', $lastmod );
+
+	} else {
+
+		$lastmod = get_term_meta( $term->term_id, 'term_modified', true ); // only get one
+
+	}
 
 	return ! empty( $lastmod ) ? mysql2date( 'c', $lastmod ) : false;
 

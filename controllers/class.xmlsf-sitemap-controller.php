@@ -257,26 +257,12 @@ class XMLSF_Sitemap_Controller
 	}
 
 	/**
-	 * Prime term meta data
-	 *
-	 * @since 5.2
-	 *
-	 * @param string $post_type
-	 * @param intval|null $m
-	 */
-	public function prime_term_meta( $taxonomy = 'any' )
-	{
-		// try to raise memory limit, context added for filters
-		wp_raise_memory_limit( 'sitemap-taxonomy-'.$taxonomy );
-	}
-
-	/**
 	 * Prime post images and comment meta data
 	 *
 	 * @since 5.2
 	 *
-	 * @param string $post_type
-	 * @param intval|null $m
+	 * @param string $post_type Post type slug
+	 * @param intval|null $m Year and month: YYYYMM
 	 */
 	public function prime_post_meta( $post_type = 'any', $m = null )
 	{
@@ -297,22 +283,25 @@ class XMLSF_Sitemap_Controller
 			$posts = get_posts( $args );
 
 			// try to raise memory limit, context added for filters
-			wp_raise_memory_limit( 'sitemap-posttype-'.$post_type );
+			//wp_raise_memory_limit( 'sitemap-posttype-'.$post_type ); // already on admin...
 		}
 
 		foreach ( $posts as $post ) {
 			if ( ! array_key_exists($post->post_type, $this->post_types) ) continue;
 
 			// Update images meta
-			delete_post_meta( $post->ID, '_xmlsf_image_featured' );
-			delete_post_meta( $post->ID, '_xmlsf_image_attached' );
+			//delete_post_meta( $post->ID, '_xmlsf_image_featured' );
+			//delete_post_meta( $post->ID, '_xmlsf_image_attached' );
 
 			if ( !empty($this->post_types[$post->post_type]['tags']['image']) ) {
 				$which = $this->post_types[$post->post_type]['tags']['image'];
 
+				$stored = (array) get_post_meta( $post->ID, '_xmlsf_image_'.$which );
+
 				// populate images and add as meta data
 				foreach ( xmlsf_images_data( $post, $which ) as $data ) {
-					add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
+					if ( ! in_array( $data, $stored ) )
+						add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
 				}
 			}
 
@@ -327,8 +316,8 @@ class XMLSF_Sitemap_Controller
 
 				if ( isset( $comments[0]->comment_date ) )
 					update_post_meta( $post->ID, '_xmlsf_comment_date', $comments[0]->comment_date );
-				else
-					delete_post_meta( $post->ID, '_xmlsf_comment_date' );
+				//else
+					//delete_post_meta( $post->ID, '_xmlsf_comment_date' );
 			}
 		}
 	}
