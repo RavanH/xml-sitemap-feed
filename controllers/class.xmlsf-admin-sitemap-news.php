@@ -1,6 +1,6 @@
 <?php
 
-class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
+class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 {
 	/**
    * Holds the values to be used in the fields callbacks

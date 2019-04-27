@@ -3,7 +3,7 @@
  *      XMLSF Admin CLASS
  * ------------------------------ */
 
-class XMLSF_Admin_Controller
+class XMLSF_Admin
 {
 	/**
 	 * Sitemaps settings
@@ -396,4 +396,4 @@ class XMLSF_Admin_Controller
 
 }
 
-new XMLSF_Admin_Controller();
+new XMLSF_Admin();
