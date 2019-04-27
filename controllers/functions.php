@@ -9,7 +9,7 @@ function xmlsf_init() {
 	// Upgrade/install, maybe...
 	$db_version = get_option( 'xmlsf_version', 0 );
 	if ( ! version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
-		require XMLSF_DIR . '/controllers/upgrade.php';
+		require_once XMLSF_DIR . '/upgrade.php';
 		new XMLSitemapFeed_Upgrade( $db_version );
 	}
 
