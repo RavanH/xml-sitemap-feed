@@ -56,6 +56,8 @@ class XMLSitemapFeed_Upgrade {
 	 */
 	function upgrade( $db_version )
 	{
+		global $wpdb;
+
 		if ( version_compare( '4.4', $db_version, '>' ) ) {
 			// remove robots.txt rules blocking stylesheets
 			if ( $robot_rules = get_option( 'xmlsf_robots' ) ) {
@@ -168,6 +170,11 @@ class XMLSitemapFeed_Upgrade {
 			delete_transient('xmlsf_ping_google_sitemap_news');
 			delete_transient('xmlsf_ping_google_sitemap');
 			delete_transient('xmlsf_ping_bing_sitemap');
+		}
+
+		if ( version_compare( '5.2', $db_version, '>' ) ) {
+			// remove term meta term_modified_gmt
+			$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified_gmt' ) );
 		}
 
 		if ( defined('WP_DEBUG') && WP_DEBUG ) {
