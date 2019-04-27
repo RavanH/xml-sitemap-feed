@@ -9,7 +9,7 @@ if ( ! defined( 'WPINC' ) ) die;
 
 extract ( xmlsf_do_tags( get_query_var('post_type') ) );
 
-xmlsf_sitemap_controller()->prefetch_posts_meta();
+xmlsf_sitemap()->prefetch_posts_meta();
 
 if ( !empty($image) ) {
 	$image_xmlns = '	xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'.PHP_EOL;

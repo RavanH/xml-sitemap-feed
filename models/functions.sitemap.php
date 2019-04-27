@@ -233,23 +233,23 @@ function xmlsf_images_data( $post, $which ) {
  * Get instantiated sitemap controller class
  *
  * @since 5.2
- * @global XMLSF_Sitemap_Controller $xmlsf_sitemap_controller
- * @return XMLSF_Sitemap_Controller object
+ * @global XMLSF_Sitemap $xmlsf_sitemap
+ * @return XMLSF_Sitemap object
  */
-function xmlsf_sitemap_controller( $sitemap = null ) {
-	global $xmlsf_sitemap_controller;
+function xmlsf_sitemap( $sitemap = null ) {
+	global $xmlsf_sitemap;
 
-	if ( ! isset( $xmlsf_sitemap_controller ) ) {
-		if ( ! class_exists( 'XMLSF_Sitemap_Controller' ) )
-			require XMLSF_DIR . '/controllers/class.xmlsf-sitemap-controller.php';
+	if ( ! isset( $xmlsf_sitemap ) ) {
+		if ( ! class_exists( 'XMLSF_Sitemap' ) )
+			require XMLSF_DIR . '/controllers/class.xmlsf-sitemap.php';
 
 		if ( empty($sitemap) ) {
 			$sitemaps = get_option( 'xmlsf_sitemaps' );
 			$sitemap = $sitemaps['sitemap'];
 		}
-		
-		$xmlsf_sitemap_controller = new XMLSF_Sitemap_Controller( $sitemap );
+
+		$xmlsf_sitemap = new XMLSF_Sitemap( $sitemap );
 	}
 
-	return $xmlsf_sitemap_controller;
+	return $xmlsf_sitemap;
 }

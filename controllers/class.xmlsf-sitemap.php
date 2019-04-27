@@ -4,7 +4,7 @@
  *      XMLSF Controller CLASS
  * ------------------------------ */
 
-class XMLSF_Sitemap_Controller
+class XMLSF_Sitemap
 {
 	/**
 	 * Sitemap index name

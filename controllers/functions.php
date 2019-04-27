@@ -51,7 +51,7 @@ function xmlsf_init() {
 			require XMLSF_DIR . '/models/functions.sitemap.php';
 			add_filter( 'xmlsf_post_types', 'xmlsf_filter_post_types' );
 
-			xmlsf_sitemap_controller( $sitemaps['sitemap'] );
+			xmlsf_sitemap( $sitemaps['sitemap'] );
 
 			// add feed type, index can now be accessed via /feed/sitemap too
 			add_feed( 'sitemap', 'xmlsf_load_template_index' );
