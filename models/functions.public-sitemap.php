@@ -41,8 +41,6 @@ function xmlsf_get_root_data() {
 		);
 	}
 
-	// TODO custom post type root pages here
-
 	return $data;
 
 }

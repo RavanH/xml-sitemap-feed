@@ -83,6 +83,7 @@ function xmlsf_sitemap_news_parse_request( $request ) {
  *
  * @return array
  */
+/*
 function xmlsf_news_get_images( $which ) {
 	global $post;
 	$images = array();
@@ -120,6 +121,7 @@ function xmlsf_news_get_images( $which ) {
 
 	return $images;
 }
+*/
 
 /**
  * Get language used in News Sitemap
