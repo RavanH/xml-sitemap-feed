@@ -314,23 +314,19 @@ class XMLSF_Admin_Controller
 	public function tools_actions()
 	{
 		if ( isset( $_POST['xmlsf-clear-settings-submit'] ) && isset( $_POST['xmlsf-clear-settings'] ) ) {
-			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+			if ( xmlsf_verify_nonce('help') ) {
 				$this->clear_settings( $_POST['xmlsf-clear-settings'] );
-			} else {
-				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}
 		}
 
 		if ( isset( $_POST['xmlsf-delete-submit'] ) ) {
-			if ( isset( $_POST['_xmlsf_notice_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_notice_nonce'], XMLSF_BASENAME.'-notice' ) ) {
+			if ( xmlsf_verify_nonce('help') ) {
 				$this->delete_static_files();
-			} else {
-				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}
 		}
 
 		if ( isset( $_POST['xmlsf-check-conflicts'] ) ) {
-			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+			if ( xmlsf_verify_nonce('help') ) {
 				// reset ignored warnings
 				delete_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
 				self::$dismissed = array();
@@ -338,48 +334,40 @@ class XMLSF_Admin_Controller
 				$this->check_static_files();
 				if ( empty( self::$static_files ) )
 					add_settings_error( 'static_files_notice', 'static_files', __('No conflicting static files found.','xml-sitemap-feed'), 'notice-info');
-			} else {
-				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}
 		}
 
 		if ( isset( $_POST['xmlsf-flush-rewrite-rules'] ) ) {
-			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+			if ( xmlsf_verify_nonce('help') ) {
 				// flush rewrite rules
 				flush_rewrite_rules();
 				add_settings_error( 'flush_admin_notice', 'flush_admin_notice', __('WordPress rewrite rules have been flushed.','xml-sitemap-feed'), 'updated' );
-			} else {
-				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}
 		}
 
-		if ( isset( $_POST['xmlsf-clear-meta'] ) ) {
-			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+		if ( isset( $_POST['xmlsf-clear-term-meta'] ) ) {
+			if ( xmlsf_verify_nonce('help') ) {
 				// remove metadata
 				global $wpdb;
-				// posts meta
-		  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
-		  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
-		    $wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
 		  	// terms meta
 		  	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
-				add_settings_error( 'clear_meta_notice', 'clear_meta_notice', __('Sitemap meta data has been cleared from the database.','xml-sitemap-feed'), 'updated' );
-			} else {
-				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
+				add_settings_error( 'clear_meta_notice', 'clear_meta_notice', __('Sitemap term meta cache has been cleared.','xml-sitemap-feed'), 'updated' );
 			}
 		}
 
-		if ( isset( $_POST['xmlsf-prime-meta'] ) ) {
-			if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
-				// prime metadata
-				xmlsf_sitemap_controller()->prime_post_meta();
-				// TODO split this into post types, and maybe into months?
+		if ( isset( $_POST['xmlsf-clear-post-meta'] ) ) {
+			if ( xmlsf_verify_nonce('help') ) {
+				// remove metadata
+				global $wpdb;
+				// images meta
+		  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
+		  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
+				update_option( 'xmlsf_images_meta_primed', array() );
+				// comments meta
+		    $wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
+				update_option( 'xmlsf_comments_meta_primed', array() );
 
-				// TODO consider same approach for term meta
-
-				add_settings_error( 'prime_meta_notice', 'prime_meta_notice', __('Sitemap meta data has been rebuilt.','xml-sitemap-feed'), 'updated' );
-			} else {
-				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
+				add_settings_error( 'clear_meta_notice', 'clear_meta_notice', __('Sitemap post meta caches have been cleared.','xml-sitemap-feed'), 'updated' );
 			}
 		}
 
@@ -390,11 +378,9 @@ class XMLSF_Admin_Controller
 		self::$dismissed = (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
 
 		if ( isset( $_POST['xmlsf-dismiss-submit'] ) && isset( $_POST['xmlsf-dismiss'] ) ) {
-			if ( isset( $_POST['_xmlsf_notice_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_notice_nonce'], XMLSF_BASENAME.'-notice' ) ) {
+			if ( xmlsf_verify_nonce('notice') ) {
 				add_user_meta( get_current_user_id(), 'xmlsf_dismissed', $_POST['xmlsf-dismiss'], false );
 				self::$dismissed[] = $_POST['xmlsf-dismiss'];
-			} else {
-				add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
 			}
 		}
 	}

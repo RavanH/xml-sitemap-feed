@@ -33,40 +33,35 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 
 	public function tools_actions()
 	{
-		if ( ! isset( $_POST['xmlsf-ping-sitemap-news'] ) )
+		if ( ! isset( $_POST['xmlsf-ping-sitemap-news'] ) || ! xmlsf_verify_nonce('help') )
       return;
 
-		if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+		$sitemaps = get_option( 'xmlsf_sitemaps' );
+		$result = xmlsf_ping( 'google', $sitemaps['sitemap-news'], 5 * MINUTE_IN_SECONDS );
 
-			$sitemaps = get_option( 'xmlsf_sitemaps' );
-			$result = xmlsf_ping( 'google', $sitemaps['sitemap-news'], 5 * MINUTE_IN_SECONDS );
+		switch( $result ) {
+			case 200:
+			$msg = sprintf( /* Translators: Search engine / Service name */ __( 'Pinged %s with success.', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ) );
+			$type = 'updated';
+			break;
 
-			switch( $result ) {
-				case 200:
-				$msg = sprintf( /* Translators: Search engine / Service name */ __( 'Pinged %s with success.', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ) );
-				$type = 'updated';
-				break;
+			case 999:
+			$msg = sprintf( /* Translators: Search engine / Service name, interval number */ __( 'Ping %s skipped: Sitemap already sent within the last %d minutes.', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ), 5 );
+			$type = 'notice-warning';
+			break;
 
-				case 999:
-				$msg = sprintf( /* Translators: Search engine / Service name, interval number */ __( 'Ping %s skipped: Sitemap already sent within the last %d minutes.', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ), 5 );
-				$type = 'notice-warning';
-				break;
+			case '':
+			$msg = sprintf( translate('Oops: %s'), translate('Something went wrong.') );
+			$type = 'error';
+			break;
 
-				case '':
-				$msg = sprintf( translate('Oops: %s'), translate('Something went wrong.') );
-				$type = 'error';
-				break;
-
-				default:
-				$msg = sprintf( /* Translators: Search engine / Service name, response code number */ __( 'Ping %s failed with response code: %d', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ), $result );
-				$type = 'error';
-			}
-
-			add_settings_error( 'ping_sitemap', 'ping_sitemap', $msg, $type );
-
-		} else {
-			add_settings_error( 'ping_sitemap', 'ping_sitemap', translate('Security check failed.') );
+			default:
+			$msg = sprintf( /* Translators: Search engine / Service name, response code number */ __( 'Ping %s failed with response code: %d', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ), $result );
+			$type = 'error';
 		}
+
+		add_settings_error( 'ping_sitemap', 'ping_sitemap', $msg, $type );
+
 	}
 
 	/**
