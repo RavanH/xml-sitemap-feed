@@ -16,7 +16,7 @@ class XMLSF_Sitemap_Controller
 	 * Post types included in sitemap index
 	 * @var array
 	 */
-	private $post_types;
+	private $post_types = array();
 
 	/**
 	 * CONSTRUCTOR
@@ -199,11 +199,8 @@ class XMLSF_Sitemap_Controller
 		// delete old image meta data
 		delete_post_meta( $post->ID, '_xmlsf_image_'.$which );
 
-		// get fresh image(s) data
-		foreach ( xmlsf_images_data( $post, $which ) as $data ) {
-			// and save it as meta data
-			add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
-		}
+		$this->_add_images_meta( $post, $which );
+
 	}
 
 	/**
@@ -257,69 +254,122 @@ class XMLSF_Sitemap_Controller
 	}
 
 	/**
-	 * Prime post images and comment meta data
+	 * Prefetch all queried posts image and comment meta data
 	 *
 	 * @since 5.2
-	 *
-	 * @param string $post_type Post type slug
-	 * @param intval|null $m Year and month: YYYYMM
+	 * @uses global $wp_query
 	 */
-	public function prime_post_meta( $post_type = 'any', $m = null )
+	public function prefetch_posts_meta()
 	{
-		// get our posts
-		if ( !is_admin() && is_sitemap() ) {
-			// we're a sitemap, so let's work with main query here
-			global $wp_query;
-			$posts = is_object($wp_query) ? $wp_query->$posts : array();
-		} else {
-			$args = array(
-				'post_type' => $post_type,
-				'numberposts' => -1,
-				'lang' => '',
-				'has_password' => false,
-				'update_cache' => false
-			);
-			if ( is_numeric($m) ) $args['m'] = intval($m);
-			$posts = get_posts( $args );
+		if ( ! is_sitemap() ) return;
 
-			// try to raise memory limit, context added for filters
-			//wp_raise_memory_limit( 'sitemap-posttype-'.$post_type ); // already on admin...
-		}
+		global $wp_query;
 
-		foreach ( $posts as $post ) {
-			if ( ! array_key_exists($post->post_type, $this->post_types) ) continue;
+		$post_type = $wp_query->get( 'post_type' );
 
-			// Update images meta
-			//delete_post_meta( $post->ID, '_xmlsf_image_featured' );
-			//delete_post_meta( $post->ID, '_xmlsf_image_attached' );
+		if ( ! isset($this->post_types[$post_type]) ) return;
 
-			if ( !empty($this->post_types[$post->post_type]['tags']['image']) ) {
-				$which = $this->post_types[$post->post_type]['tags']['image'];
+		$y = $wp_query->get( 'year' );
+		$m = $wp_query->get( 'm' );
+		if ( empty($m) ) $m = 'all';
 
-				$stored = (array) get_post_meta( $post->ID, '_xmlsf_image_'.$which );
+		// if image tag active then prefetch images
+		if (
+			isset($this->post_types[$post_type]['tags']) &&
+			is_array( $this->post_types[$post_type]['tags'] ) &&
+			!empty( $this->post_types[$post_type]['tags']['image'] )
+		) {
+			$primed = (array) get_option( 'xmlsf_images_meta_primed', array() );
 
-				// populate images and add as meta data
-				foreach ( xmlsf_images_data( $post, $which ) as $data ) {
-					if ( ! in_array( $data, $stored ) )
-						add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
+			if (
+				! isset( $primed[$post_type] ) ||
+				! is_array( $primed[$post_type] ) ||
+				(
+					! in_array( $m, $primed[$post_type] ) &&
+					! in_array( $y, $primed[$post_type] ) &&
+					! in_array( 'all', $primed[$post_type] )
+				)
+			) {
+				// prime images meta data
+				foreach ( $wp_query->posts as $post ) {
+					$this->_add_images_meta( $post, $this->post_types[$post_type]['tags']['image'] );
 				}
-			}
 
-			// Update last comment date meta
-			if ( ! empty($this->post_types[$post->post_type]['update_lastmod_on_comments']) ) {
-				// get latest post comment
-				$comments = get_comments( array(
-					'status' => 'approve',
-					'number' => 1,
-					'post_id' => $post->ID,
-				) );
+				// add query to primed array
+				$primed[$post_type][] = $m;
 
-				if ( isset( $comments[0]->comment_date ) )
-					update_post_meta( $post->ID, '_xmlsf_comment_date', $comments[0]->comment_date );
-				//else
-					//delete_post_meta( $post->ID, '_xmlsf_comment_date' );
+				// update
+				update_option( 'xmlsf_images_meta_primed', $primed );
 			}
 		}
+
+		// if update_lastmod_on_comments active then prefetch comments
+		if ( !empty($this->post_types[$post_type]['update_lastmod_on_comments']) ) {
+			$primed = (array) get_option( 'xmlsf_comments_meta_primed', array() );
+
+			if (
+				! isset( $primed[$post_type] ) ||
+				! is_array( $primed[$post_type] ) ||
+				(
+					! in_array( $m, $primed[$post_type] ) &&
+					! in_array( $y, $primed[$post_type] ) &&
+					! in_array( 'all', $primed[$post_type] )
+				)
+			) {
+				// prime comment meta data
+				foreach ( $wp_query->posts as $post ) {
+					$this->_add_comment_meta( $post );
+				}
+
+				// add query to primed array
+				$primed[$post_type][] = $m;
+
+				// update
+				update_option( 'xmlsf_comments_meta_primed', $primed );
+			}
+		}
+
+	}
+
+	/**
+	 * Set posts images meta data
+	 *
+	 * @since 5.2
+	 * @param array $post Post object
+	 * @param string $which
+	 */
+	private function _add_images_meta( $post, $which )
+	{
+		if ( ! is_object($post) || ! isset( $post->ID ) ) return;
+
+		$stored = (array) get_post_meta( $post->ID, '_xmlsf_image_'.$which );
+
+		// populate images and add as meta data
+		foreach ( xmlsf_images_data( $post, $which ) as $data ) {
+			if ( ! in_array( $data, $stored ) )
+				add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
+		}
+	}
+
+	/**
+	 * Set post comment meta data
+	 *
+	 * @since 5.2
+	 * @param array $post Post object
+	 */
+	private function _add_comment_meta( $post )
+	{
+		if ( ! is_object( $post ) || ! isset( $post->ID ) ) return;
+
+		// get latest post comment
+		$comments = get_comments( array(
+			'status' => 'approve',
+			'number' => 1,
+			'post_id' => $post->ID,
+		) );
+
+		if ( isset( $comments[0]->comment_date ) )
+			update_post_meta( $post->ID, '_xmlsf_comment_date', $comments[0]->comment_date );
 	}
 
 }

@@ -9,6 +9,8 @@ if ( ! defined( 'WPINC' ) ) die;
 
 extract ( xmlsf_do_tags( get_query_var('post_type') ) );
 
+xmlsf_sitemap_controller()->prefetch_posts_meta();
+
 if ( !empty($image) ) {
 	$image_xmlns = '	xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'.PHP_EOL;
 	$image_schema = '
@@ -54,7 +56,7 @@ if ( have_posts() ) :
 <?php } ?>
 <?php
 		if ( !empty($image) ) :
-			foreach ( xmlsf_get_post_images( $image ) as $img_data ) {
+			foreach ( get_post_meta( $post->ID, '_xmlsf_image_'.$image ) as $img_data ) {
 				if ( empty($img_data['loc']) )
 					continue;
 	?>
@@ -82,7 +84,7 @@ if ( have_posts() ) :
   endwhile;
 endif;
 
-if ( ! $did_posts ) :
+if ( empty( $did_posts ) ) :
 	// No posts done? Then do at least the homepage to prevent error message in GWT.
 	?>
 	<url>
