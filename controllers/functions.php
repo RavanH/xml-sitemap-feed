@@ -40,8 +40,8 @@ function xmlsf_init() {
 			require XMLSF_DIR . '/models/functions.sitemap-news.php';
 			add_filter( 'xmlsf_news_post_types', 'xmlsf_news_filter_post_types' );
 
-			require XMLSF_DIR . '/controllers/class.xmlsf-sitemap-news-controller.php';
-			new XMLSF_Sitemap_News_Controller( $sitemaps['sitemap-news'] );
+			require XMLSF_DIR . '/controllers/class.xmlsf-sitemap-news.php';
+			new XMLSF_Sitemap_News( $sitemaps['sitemap-news'] );
 
 			// add feed type, news can now be accessed via /feed/sitemap-news too
 			add_feed( 'sitemap-news', 'xmlsf_news_load_template' );

@@ -3,7 +3,7 @@
  *      XMLSF Controller CLASS
  * ------------------------------ */
 
-class XMLSF_Sitemap_News_Controller
+class XMLSF_Sitemap_News
 {
 	/**
 	 * Sitemap index name
