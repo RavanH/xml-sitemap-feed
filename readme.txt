@@ -312,7 +312,7 @@ Major DB query reduction and speed improvements. Bugfixes.
 * FIX: array_filter() expects parameter 1 to be array
 * FIX: possible division by zero
 * FIX: update_term_modified_meta
-* FIX: rewrite rules on deactivate/uninstall
+* FIX: rewrite rules on deactivate/uninstall 
 
 = 5.1.2 =
 * FIX: admin notice dismiss button failing
