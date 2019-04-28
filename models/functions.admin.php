@@ -20,6 +20,17 @@ function xmlsf_plugin_meta_links( $links, $file ) {
   return $links;
 }
 
+function xmlsf_verify_nonce( $context ) {
+
+	if ( isset( $_POST['_xmlsf_'.$context.'_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_'.$context.'_nonce'], XMLSF_BASENAME.'-'.$context ) )
+		return true;
+
+	// Still here? Then add security check failed error message and return false.
+	add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
+
+	return false;
+}
+
 // sanitization
 
 class XMLSF_Admin_Sanitize

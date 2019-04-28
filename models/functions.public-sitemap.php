@@ -1,32 +1,6 @@
 <?php
 
 /**
- * Get index url
- *
- * @param string $sitemap
- * @param string $type
- * @param string $parm
- *
- * @return string
- */
-function xmlsf_get_index_url( $sitemap = 'home', $type = false, $param = false ) {
-
-	if ( xmlsf()->plain_permalinks() ) {
-		$name = '?feed=sitemap-'.$sitemap;
-		$name .= $type ? '-'.$type : '';
-		$name .= $param ? '&m='.$param : '';
-	} else {
-		$name = 'sitemap-'.$sitemap;
-		$name .= $type ? '-'.$type : '';
-		$name .= $param ? '.'.$param : '';
-		$name .= '.xml';
-	}
-
-	return esc_url( trailingslashit( home_url() ) . $name );
-
-}
-
-/**
  * Get root pages data
  * @return array
  */
@@ -66,8 +40,6 @@ function xmlsf_get_root_data() {
 			)
 		);
 	}
-
-	// TODO custom post type root pages here
 
 	return $data;
 
@@ -115,6 +87,27 @@ function xmlsf_get_frontpages() {
 }
 
 /**
+ * Get blog_pages
+ * @return array
+ */
+function xmlsf_get_blogpages() {
+
+	if ( null === xmlsf()->blogpages ) :
+		$blogpages = array();
+		if ( 'page' == get_option('show_on_front') ) {
+			$blogpage = (int) get_option('page_for_posts');
+			if ( !empty($blogpage) ) {
+				$blogpages = array_merge( (array) $blogpage, xmlsf_get_translations($blogpage) );
+			}
+		}
+		xmlsf()->blogpages = $blogpages;
+	endif;
+
+	return xmlsf()->blogpages;
+
+}
+
+/**
  * Get translations
  *
  * @param $post_id
@@ -150,38 +143,6 @@ function xmlsf_get_translations( $post_id ) {
 }
 
 /**
- * Get blog_pages
- * @return array
- */
-function xmlsf_get_blogpages() {
-
-	if ( null === xmlsf()->blogpages ) :
-		$blogpages = array();
-		if ( 'page' == get_option('show_on_front') ) {
-			$blogpage = (int) get_option('page_for_posts');
-			if ( !empty($blogpage) ) {
-				$blogpages = array_merge( (array) $blogpage, xmlsf_get_translations($blogpage) );
-			}
-		}
-		xmlsf()->blogpages = $blogpages;
-	endif;
-
-	return xmlsf()->blogpages;
-
-}
-
-/**
- * Is home?
- *
- * @param $post_id
- *
- * @return bool
- */
-function xmlsf_is_home( $post_id ) {
-	return in_array( $post_id, xmlsf_get_blogpages() ) || in_array( $post_id, xmlsf_get_frontpages() );
-}
-
-/**
  * Post Modified
  *
  * @return string GMT date
@@ -191,7 +152,7 @@ function xmlsf_get_post_modified() {
 	global $post;
 
 	// if blog or home page then simply look for last post date
-	if ( $post->post_type == 'page' && xmlsf_is_home($post->ID) ) {
+	if ( $post->post_type == 'page' && ( in_array( $post->ID, xmlsf_get_blogpages() ) || in_array( $post->ID, xmlsf_get_frontpages() ) ) ) {
 
 		$lastmod = get_lastpostmodified( 'blog' );
 
@@ -205,32 +166,11 @@ function xmlsf_get_post_modified() {
 		};
 
 		// maybe update lastmod to latest comment
-		$options = get_option( 'xmlsf_post_types' );
+		$options = (array) get_option( 'xmlsf_post_types', array() );
 
-		if ( is_array($options) && !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
-
-			/*
-			* Getting ALL meta here because if checking for single key, we cannot
-			* distiguish between empty value or non-exisiting key as both return ''.
-			*/
-			$meta = get_post_meta( $post->ID );
-
-			if ( ! array_key_exists( '_xmlsf_comment_date', $meta ) ) {
-
-				$comments = get_comments( array(
-					'status' => 'approve',
-					'number' => 1,
-					'post_id' => $post->ID,
-				) );
-
-				$lastcomment = isset( $comments[0]->comment_date ) ? $comments[0]->comment_date : '';
-				update_post_meta( $post->ID, '_xmlsf_comment_date', $lastcomment );
-
-			} else {
-
-				$lastcomment = get_post_meta( $post->ID, '_xmlsf_comment_date', true ); // only get one
-
-			}
+		if ( !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
+			// assuming post meta data has been primed here
+			$lastcomment = get_post_meta( $post->ID, '_xmlsf_comment_date', true ); // only get one
 
 			if ( ! empty( $lastcomment ) && strtotime( $lastcomment ) > strtotime( $lastmod ) )
 				$lastmod = $lastcomment;
@@ -250,6 +190,7 @@ function xmlsf_get_post_modified() {
  * @return string
  */
 function xmlsf_get_term_modified( $term ) {
+
 	/*
 	* Getting ALL meta here because if checking for single key, we cannot
 	* distiguish between empty value or non-exisiting key as both return ''.
@@ -263,15 +204,12 @@ function xmlsf_get_term_modified( $term ) {
 			array(
 				'post_type' => 'any',
 				'post_status' => 'publish',
-				'ignore_sticky_posts' => true,
 				'posts_per_page' => 1,
-				'no_found_rows' => true,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 				'update_cache' => false,
 				'lang' => '',
 				'has_password' => false,
-				'suppress_filters' => true,
 				'tax_query' => array(
 					array(
 						'taxonomy' => $term->taxonomy,
@@ -281,11 +219,12 @@ function xmlsf_get_term_modified( $term ) {
 				)
 			)
 		);
+
 		$lastmod = isset($posts[0]->post_date) ? $posts[0]->post_date : '';
 		// get post date here, not modified date because we're only
 		// concerned about new entries on the (first) taxonomy page
 
-		update_term_meta( $term->term_id, 'term_modified', $lastmod );
+		add_term_meta( $term->term_id, 'term_modified', $lastmod );
 
 	} else {
 
@@ -330,14 +269,18 @@ function xmlsf_get_taxonomy_modified( $taxonomy ) {
  */
 function xmlsf_get_post_priority() {
 	// locale LC_NUMERIC should be set to C for these calculations
-	// it is assumed to be done at the request filter
+	// it is assumed to be done once at the request filter
 	//setlocale( LC_NUMERIC, 'C' );
 
 	global $post;
 	$options = get_option( 'xmlsf_post_types' );
 	$priority = isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ? floatval($options[$post->post_type]['priority']) : 0.5;
 
-	if ( $priority_meta = get_post_meta( $post->ID, '_xmlsf_priority', true ) ) {
+	if ( in_array( $post->ID, xmlsf_get_frontpages() ) ) {
+
+		$priority = 1;
+
+	} elseif ( $priority_meta = get_post_meta( $post->ID, '_xmlsf_priority', true ) ) {
 
 		$priority = floatval(str_replace(',','.',$priority_meta));
 
@@ -347,7 +290,7 @@ function xmlsf_get_post_priority() {
 
 		// reduce by age
 		// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
-		if ( !is_sticky($post->ID) && !xmlsf_is_home($post->ID) && xmlsf()->timespan > 0 ) {
+		if ( xmlsf()->timespan > 0 && ! is_sticky( $post->ID ) && ! in_array( $post->ID, xmlsf_get_blogpages() ) ) {
 			$priority -= $priority * ( xmlsf()->lastmodified - $post_modified ) / xmlsf()->timespan;
 		}
 
@@ -406,37 +349,12 @@ function xmlsf_get_term_priority( $term = '' ) {
  * @return array
  */
 function xmlsf_get_post_images( $which ) {
-
 	global $post;
-	$images = array();
 
-	/*
-	* Getting ALL meta here because if checking for single key, we cannot
-	* distiguish between empty value or non-exisiting key as both return ''.
-	*/
-	$meta = get_post_meta( $post->ID );
-
-	if ( ! array_key_exists( '_xmlsf_image_'.$which, $meta ) ) {
-
-		// populate attached images data here
-		$images = (array) xmlsf_images_data( $post, $which );
-
-		// and save it as meta data
-		// note: add_post_meta will clear the meta cache, not update it!
-		foreach ( $images as $data ) {
-			add_post_meta( $post->ID, '_xmlsf_image_'.$which, $data );
-		}
-
-	} else {
-
-		// do this as 'else' otherwise get_post_meta will cause extra db queuries
-		// after add_post_meta has run in the 'if' above (see note)...
-		$images = get_post_meta( $post->ID, '_xmlsf_image_'.$which );
-
-	}
+	// assuming images post meta has been primed here
+	$images = get_post_meta( $post->ID, '_xmlsf_image_'.$which );
 
 	return (array) apply_filters( 'xmlsf_post_images_'.$which, $images );
-
 }
 
 /**
@@ -488,16 +406,19 @@ function xmlsf_sitemap_parse_request( $request ) {
 
 		case 'posttype':
 
-			if ( !isset( $feed[2] ) ) break;
+			if ( ! isset( $feed[2] ) ) break;
 
-			$options = get_option( 'xmlsf_post_types' );
+			// try to raise memory limit, context added for filters
+			wp_raise_memory_limit( 'sitemap-posttype-'.$feed[2] );
+
+			$options = (array) get_option( 'xmlsf_post_types', array() );
 
 			// prepare priority calculation
-			if ( is_array($options) && !empty($options[$feed[2]]['dynamic_priority']) ) {
+			if ( ! empty($options[$feed[2]]['dynamic_priority']) ) {
 				// last posts or page modified date in Unix seconds
-				xmlsf()->lastmodified = mysql2date( 'U', get_lastpostmodified('blog',$feed[2]), false );
+				xmlsf()->lastmodified = mysql2date( 'U', get_lastpostmodified( 'blog', $feed[2]), false );
 				// calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
-				xmlsf()->timespan = xmlsf()->lastmodified - mysql2date( 'U', get_firstpostdate('blog',$feed[2]), false );
+				xmlsf()->timespan = xmlsf()->lastmodified - mysql2date( 'U', get_firstpostdate( 'blog', $feed[2]), false );
 				// total post type comment count
 				xmlsf()->comment_count = wp_count_comments($feed[2])->approved;
 			};
@@ -514,6 +435,9 @@ function xmlsf_sitemap_parse_request( $request ) {
 		case 'taxonomy':
 
 			if ( !isset( $feed[2] ) ) break;
+
+			// try to raise memory limit, context added for filters
+			wp_raise_memory_limit( 'sitemap-taxonomy-'.$feed[2] );
 
 			// WPML compat
 			global $sitepress;
@@ -562,52 +486,6 @@ function xmlsf_cache_get_archives( $query ) {
 	}
 
 	return $arcresults;
-
-}
-
-/**
- * Get archives
- *
- * @param string $post_type
- * @param string $type
- *
- * @return array
- */
-function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
-
-	global $wpdb;
-	$return = array();
-
-	if ( 'monthly' == $type ) :
-
-		$query = "SELECT YEAR(post_date) as `year`, LPAD(MONTH(post_date),2,'0') as `month`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY post_date DESC";
-		$arcresults = xmlsf_cache_get_archives( $query );
-
-		foreach ( (array) $arcresults as $arcresult ) {
-			$return[$arcresult->year.$arcresult->month] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year . $arcresult->month );
-		};
-
-	elseif ( 'yearly' == $type ) :
-
-		$query = "SELECT YEAR(post_date) as `year`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date) ORDER BY post_date DESC";
-		$arcresults = xmlsf_cache_get_archives( $query );
-
-		foreach ( (array) $arcresults as $arcresult ) {
-			$return[$arcresult->year] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year );
-		};
-
-	else :
-
-		$query = "SELECT count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' ORDER BY post_date DESC";
-		$arcresults = xmlsf_cache_get_archives( $query );
-
-		if ( is_object($arcresults[0]) && $arcresults[0]->posts > 0 ) {
-			$return[] = xmlsf_get_index_url( 'posttype', $post_type ); // $sitemap = 'home', $type = false, $param = false
-		};
-
-	endif;
-
-	return $return;
 
 }
 

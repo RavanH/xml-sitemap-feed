@@ -7,9 +7,9 @@
 
 if ( ! defined( 'WPINC' ) ) die;
 
-echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
-<?xml-stylesheet type="text/xsl" href="' . plugins_url('views/styles/sitemap-index.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION . '"?>
-'; ?>
+?>
+<?xml version="1.0" encoding="<?php echo get_bloginfo('charset'); ?>"?>
+<?xml-stylesheet type="text/xsl" href="<?php echo plugins_url('assets/styles/sitemap-index.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION; ?>"?>
 <?php xmlsf_generator(); ?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -21,7 +21,7 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 	</sitemap>
 <?php
 // add rules for public post types
-$post_types = apply_filters( 'xmlsf_post_types', get_option( 'xmlsf_post_types' ) );
+$post_types = apply_filters( 'xmlsf_post_types', (array) get_option( 'xmlsf_post_types', array() ) );
 if ( is_array($post_types) ) :
 	foreach ( $post_types as $post_type => $settings ) {
 		if ( empty($settings['active']) || ! post_type_exists( $post_type ) )

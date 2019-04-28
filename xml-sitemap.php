@@ -82,12 +82,12 @@ define( 'XMLSF_DIR', dirname(__FILE__) );
 
 define( 'XMLSF_BASENAME', plugin_basename(__FILE__) );
 
-require XMLSF_DIR . '/models/global.php';
+require XMLSF_DIR . '/models/functions.php';
 
-require XMLSF_DIR . '/controllers/global.php';
+require XMLSF_DIR . '/controllers/functions.php';
 
 if ( is_admin() ) {
-  require XMLSF_DIR . '/controllers/admin/global.php';
+  require XMLSF_DIR . '/controllers/class.xmlsf-admin.php';
 }
 
 // main plugin init

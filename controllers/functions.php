@@ -9,7 +9,7 @@ function xmlsf_init() {
 	// Upgrade/install, maybe...
 	$db_version = get_option( 'xmlsf_version', 0 );
 	if ( ! version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
-		require XMLSF_DIR . '/controllers/upgrade.php';
+		require_once XMLSF_DIR . '/upgrade.php';
 		new XMLSitemapFeed_Upgrade( $db_version );
 	}
 
@@ -17,7 +17,7 @@ function xmlsf_init() {
 	// include sitemaps if any enabled
 	if ( $sitemaps ) {
 		// main model functions
-		require XMLSF_DIR . '/models/main.php';
+		require XMLSF_DIR . '/models/functions.shared.php';
 
 		// force remove url trailing slash
 		add_filter( 'user_trailingslashit', 'xmlsf_untrailingslash' );
@@ -29,28 +29,29 @@ function xmlsf_init() {
 		add_filter( 'rt_nginx_helper_purge_urls', 'xmlsf_nginx_helper_purge_urls', 10, 2 );
 
 		// main controller functions
-		require XMLSF_DIR . '/controllers/main.php';
+		require XMLSF_DIR . '/controllers/functions.shared.php';
+
+		add_action( 'xmlsf_ping', 'xmlsf_debug_ping', 9, 4 );
 
 		// include and instantiate class
 		xmlsf();
 
 		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-			require XMLSF_DIR . '/models/sitemap-news.php';
+			require XMLSF_DIR . '/models/functions.sitemap-news.php';
 			add_filter( 'xmlsf_news_post_types', 'xmlsf_news_filter_post_types' );
 
-			require XMLSF_DIR . '/controllers/sitemap-news.php';
-			new XMLSF_Sitemap_News_Controller( $sitemaps['sitemap-news'] );
+			require XMLSF_DIR . '/controllers/class.xmlsf-sitemap-news.php';
+			new XMLSF_Sitemap_News( $sitemaps['sitemap-news'] );
 
 			// add feed type, news can now be accessed via /feed/sitemap-news too
 			add_feed( 'sitemap-news', 'xmlsf_news_load_template' );
 		}
 
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
-			require XMLSF_DIR . '/models/sitemap.php';
+			require XMLSF_DIR . '/models/functions.sitemap.php';
 			add_filter( 'xmlsf_post_types', 'xmlsf_filter_post_types' );
 
-			require XMLSF_DIR . '/controllers/sitemap.php';
-			new XMLSF_Sitemap_Controller( $sitemaps['sitemap'] );
+			xmlsf_sitemap( $sitemaps['sitemap'] );
 
 			// add feed type, index can now be accessed via /feed/sitemap too
 			add_feed( 'sitemap', 'xmlsf_load_template_index' );
@@ -100,7 +101,7 @@ function xmlsf_deactivate() {
 	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
 
 	// remove filter and flush rules
-	remove_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 1, 1 );
+	remove_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 99 );
 	// how to unset add_feed() ?
 	flush_rewrite_rules();
 }

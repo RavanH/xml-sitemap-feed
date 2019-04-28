@@ -1,5 +1,5 @@
 <style type="text/css">
-<?php include XMLSF_DIR . '/views/styles/admin.css'; ?>
+<?php include XMLSF_DIR . '/assets/styles/admin.css'; ?>
 </style>
 <div class="wrap">
 
@@ -43,16 +43,18 @@
 		<form action="" method="post">
 			<?php wp_nonce_field( XMLSF_BASENAME.'-help', '_xmlsf_help_nonce' ); ?>
 			<p>
-				<input type="submit" name="xmlsf-check-conflicts" class="button button-small" value="<?php _e( 'Check for conflicts', 'xml-sitemap-feed' ); ?>" />
+				<input type="submit" name="xmlsf-ping-sitemap" class="button button-small" value="<?php _e( 'Ping search engines', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
 				<input type="submit" name="xmlsf-flush-rewrite-rules" class="button button-small" value="<?php _e( 'Flush rewrite rules', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
-				<input type="submit" name="xmlsf-ping-sitemap" class="button button-small" value="<?php _e( 'Ping search engines', 'xml-sitemap-feed' ); ?>" />
+				<input type="submit" name="xmlsf-check-conflicts" class="button button-small" value="<?php _e( 'Check for conflicts', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
-				<input type="submit" name="xmlsf-clear-meta" class="button button-small" value="<?php _e( 'Clear sitemap meta', 'xml-sitemap-feed' ); ?>" />
+				<?php //printf( __('%1$s or %2$s all cached Sitemap metadata.'), '<input type="submit" name="xmlsf-prime-meta" class="button button-small" value="'.__( 'Rebuild', 'xml-sitemap-feed' ).'"/>', '<input type="submit" name="xmlsf-clear-meta" class="button button-small" value="'.__( 'Clear', 'xml-sitemap-feed' ).'"/>'); ?>
+				<input type="submit" name="xmlsf-clear-post-meta" class="button button-small" value="<?php _e( 'Clear post meta caches', 'xml-sitemap-feed' ); ?>" />
+				<input type="submit" name="xmlsf-clear-term-meta" class="button button-small" value="<?php _e( 'Clear term meta cache', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
 				<input type="hidden" name="xmlsf-clear-settings" value="sitemap" />

@@ -4,8 +4,8 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravan
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 4.4
 Requires PHP: 5.4
-Tested up to: 5.1
-Stable tag: 5.1.2
+Tested up to: 5.2
+Stable tag: 5.2
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -42,7 +42,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Custom/static sitemaps can be added to the index.
 * Works out-of-the-box, even on **Multisite** installations.
 * Optionally include Image tags with caption and title for featured images or attached images.
-* Pings Google, Bing & Yahoo on new post publication.
+* Pings Google, Bing & Yahoo on new post publication, once per hour.
 * Options to define which post types and if taxonomies get included in the sitemap
 * Updates Lastmod on post modification or on comments.
 * Set Priority per post type, per taxonomy and per individual post.
@@ -50,9 +50,11 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 
 **Google News Sitemap**
 
-* Optionally include Image tags with caption and title for featured images or attached images.
-* Options to: set a different News Publication Name, include custom post types or limit inclusion to certain post categories.
-* Pings both Google and Bing on new publications.
+* Required news sitemap tags: Publication name, language, title and publication date.
+* Set a News Publication Name or uses site name.
+* Supports custom post types.
+* Limit inclusion to certain post categories.
+* Pings Google on new publications, once per 5 minutes.
 
 = Pro Features =
 
@@ -291,7 +293,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 = 5.2 =
 
-Major query reduction and speed improvements. Some bugfixes.
+Major DB query reduction and speed improvements. Bugfixes.
 
 
 == Changelog ==
@@ -301,8 +303,16 @@ Major query reduction and speed improvements. Some bugfixes.
 * Last comment date meta caching
 * Lastmod and publication dates in local time
 * Removed ignored image tag from news sitemap
+* Max memory limit for post type and taxonomy term sitemaps
+* Prevent CDN file urls
+* Zlib before GZhandler on .gz request
+* FIX: don't ping for excluded posts
+* FIX: traditional and simplified Chinese with WPML
+* FIX: redundant front page url
+* FIX: array_filter() expects parameter 1 to be array
 * FIX: possible division by zero
 * FIX: update_term_modified_meta
+* FIX: rewrite rules on deactivate/uninstall
 
 = 5.1.2 =
 * FIX: admin notice dismiss button failing

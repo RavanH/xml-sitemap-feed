@@ -45,6 +45,7 @@ function xmlsf_sitemap_news_parse_request( $request ) {
 	$post_types = apply_filters( 'xmlsf_news_post_types', $post_types);
 
 	// disable caching
+	$request['cache_results'] = false;
 	if ( ! defined('DONOTCACHEPAGE') ) define('DONOTCACHEPAGE', true);
 	if ( ! defined('DONOTCACHEDB') ) define('DONOTCACHEDB', true);
 
@@ -82,6 +83,7 @@ function xmlsf_sitemap_news_parse_request( $request ) {
  *
  * @return array
  */
+/*
 function xmlsf_news_get_images( $which ) {
 	global $post;
 	$images = array();
@@ -119,6 +121,7 @@ function xmlsf_news_get_images( $which ) {
 
 	return $images;
 }
+*/
 
 /**
  * Get language used in News Sitemap
@@ -133,15 +136,16 @@ function xmlsf_get_language( $post_id ) {
 
 	// WPML compat
 	global $sitepress;
-	// Polylang
-	if ( function_exists('pll_get_post_language') ) {
-		$lang = pll_get_post_language( $post_id, 'slug' );
-		if ( !empty($lang) )
-			$language = xmlsf_parse_language_string( $lang );
-	} elseif ( is_object($sitepress) && method_exists($sitepress, 'get_language_for_element') ) {
+	if ( is_object($sitepress) && method_exists($sitepress, 'get_language_for_element') ) {
 		$post_type = (array) get_query_var( 'post_type', 'post' );
 		$lang = $sitepress->get_language_for_element( $post_id, 'post_'.$post_type[0] );
 		//apply_filters( 'wpml_element_language_code', null, array( 'element_id' => $post_id, 'element_type' => $post_type ) );
+		if ( !empty($lang) )
+			$language = xmlsf_parse_language_string( $lang );
+	}
+	// Polylang
+	elseif ( function_exists('pll_get_post_language') ) {
+		$lang = pll_get_post_language( $post_id, 'slug' );
 		if ( !empty($lang) )
 			$language = xmlsf_parse_language_string( $lang );
 	}
@@ -160,13 +164,12 @@ function xmlsf_parse_language_string( $lang ) {
 	$lang = convert_chars( strtolower( strip_tags( $lang ) ) );
 
 	// no underscores
-	if ( strpos( $lang, '_' ) ) {
-		$expl = explode('_', $lang);
-		$lang = $expl[0];
-	}
+	$lang = str_replace( '_', '-', $lang );
 
 	// no hyphens except...
-	if ( strpos( $lang, '-' ) && !in_array( $lang, array('zh-cn','zh-tw') ) ) {
+	if ( 0 === strpos( $lang, 'zh' ) ) {
+		$lang = strpos( $lang, 'hant' ) || strpos( $lang, 'hk' ) || strpos( $lang, 'tw' ) ? 'zh-tw' : 'zh-cn';
+	} else {
 		// explode on hyphen and use only first part
 		$expl = explode('-', $lang);
 		$lang = $expl[0];

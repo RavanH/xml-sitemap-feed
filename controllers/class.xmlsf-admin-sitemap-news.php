@@ -1,6 +1,6 @@
 <?php
 
-class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
+class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 {
 	/**
    * Holds the values to be used in the fields callbacks
@@ -33,40 +33,35 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 
 	public function tools_actions()
 	{
-		if ( ! isset( $_POST['xmlsf-ping-sitemap-news'] ) )
+		if ( ! isset( $_POST['xmlsf-ping-sitemap-news'] ) || ! xmlsf_verify_nonce('help') )
       return;
 
-		if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+		$sitemaps = get_option( 'xmlsf_sitemaps' );
+		$result = xmlsf_ping( 'google', $sitemaps['sitemap-news'], 5 * MINUTE_IN_SECONDS );
 
-			$sitemaps = get_option( 'xmlsf_sitemaps' );
-			$result = xmlsf_ping( 'google', $sitemaps['sitemap-news'], 5 * MINUTE_IN_SECONDS );
+		switch( $result ) {
+			case 200:
+			$msg = sprintf( /* Translators: Search engine / Service name */ __( 'Pinged %s with success.', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ) );
+			$type = 'updated';
+			break;
 
-			switch( $result ) {
-				case 200:
-				$msg = sprintf( /* Translators: Search engine / Service name */ __( 'Pinged %s with success.', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ) );
-				$type = 'updated';
-				break;
+			case 999:
+			$msg = sprintf( /* Translators: Search engine / Service name, interval number */ __( 'Ping %s skipped: Sitemap already sent within the last %d minutes.', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ), 5 );
+			$type = 'notice-warning';
+			break;
 
-				case 999:
-				$msg = sprintf( /* Translators: Search engine / Service name, interval number */ __( 'Ping %s skipped: Sitemap already sent within the last %d minutes.', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ), 5 );
-				$type = 'notice-warning';
-				break;
+			case '':
+			$msg = sprintf( translate('Oops: %s'), translate('Something went wrong.') );
+			$type = 'error';
+			break;
 
-				case '':
-				$msg = sprintf( translate('Oops: %s'), translate('Something went wrong.') );
-				$type = 'error';
-				break;
-
-				default:
-				$msg = sprintf( /* Translators: Search engine / Service name, response code number */ __( 'Ping %s failed with response code: %d', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ), $result );
-				$type = 'error';
-			}
-
-			add_settings_error( 'ping_sitemap', 'ping_sitemap', $msg, $type );
-
-		} else {
-			add_settings_error( 'ping_sitemap', 'ping_sitemap', translate('Security check failed.') );
+			default:
+			$msg = sprintf( /* Translators: Search engine / Service name, response code number */ __( 'Ping %s failed with response code: %d', 'xml-sitemap-feed' ), __( 'Google News', 'xml-sitemap-feed' ), $result );
+			$type = 'error';
 		}
+
+		add_settings_error( 'ping_sitemap', 'ping_sitemap', $msg, $type );
+
 	}
 
 	/**
@@ -107,17 +102,18 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 	/* When the post is saved, save our meta data */
 	public function save_metadata( $post_id )
 	{
-		if ( !isset($post_id) )
-			$post_id = (int)$_REQUEST['post_ID'];
-
-		if ( !current_user_can( 'edit_post', $post_id ) || !isset($_POST['_xmlsf_news_nonce']) || !wp_verify_nonce($_POST['_xmlsf_news_nonce'], XMLSF_BASENAME) )
-			return;
+		if (
+      // verify nonce
+      ! isset($_POST['_xmlsf_news_nonce']) || ! wp_verify_nonce($_POST['_xmlsf_news_nonce'], XMLSF_BASENAME) ||
+      // user not allowed
+      ! current_user_can( 'edit_post', $post_id )
+    ) return;
 
 		// _xmlsf_news_exclude
 		if ( empty($_POST['xmlsf_news_exclude']) )
-			delete_post_meta($post_id, '_xmlsf_news_exclude');
+			delete_post_meta( $post_id, '_xmlsf_news_exclude' );
 		else
-			update_post_meta($post_id, '_xmlsf_news_exclude', $_POST['xmlsf_news_exclude']);
+			update_post_meta( $post_id, '_xmlsf_news_exclude', '1' );
 	}
 
 	/**
@@ -245,17 +241,6 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin_Controller
 		$screen->add_help_tab( array(
 			'id'      => 'sitemap-news-categories',
 			'title'   => translate('Categories'),
-			'content' => $content
-		) );
-
-		ob_start();
-		include XMLSF_DIR . '/views/admin/help-tab-news-images.php';
-		include XMLSF_DIR . '/views/admin/help-tab-support.php';
-		$content = ob_get_clean();
-
-		$screen->add_help_tab( array(
-			'id'      => 'sitemap-news-images',
-			'title'   => translate('Images'),
 			'content' => $content
 		) );
 

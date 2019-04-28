@@ -11,7 +11,79 @@ function xmlsf_filter_post_types( $post_types ) {
 	// Always exclude attachment and reply post types (bbpress)
 	unset( $post_types['attachment'], $post_types['reply'] );
 
-	return array_filter( $post_types );
+	return array_filter( (array) $post_types );
+}
+
+/**
+ * Get index url
+ *
+ * @param string $sitemap
+ * @param string $type
+ * @param string $parm
+ *
+ * @return string
+ */
+function xmlsf_get_index_url( $sitemap = 'home', $type = false, $param = false ) {
+
+	if ( xmlsf()->plain_permalinks() ) {
+		$name = '?feed=sitemap-'.$sitemap;
+		$name .= $type ? '-'.$type : '';
+		$name .= $param ? '&m='.$param : '';
+	} else {
+		$name = 'sitemap-'.$sitemap;
+		$name .= $type ? '-'.$type : '';
+		$name .= $param ? '.'.$param : '';
+		$name .= '.xml';
+	}
+
+	return esc_url( trailingslashit( home_url() ) . $name );
+
+}
+
+/**
+ * Get archives
+ *
+ * @param string $post_type
+ * @param string $type
+ *
+ * @return array
+ */
+function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
+
+	global $wpdb;
+	$return = array();
+
+	if ( 'monthly' == $type ) :
+
+		$query = "SELECT YEAR(post_date) as `year`, LPAD(MONTH(post_date),2,'0') as `month`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY post_date DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		foreach ( (array) $arcresults as $arcresult ) {
+			$return[$arcresult->year.$arcresult->month] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year . $arcresult->month );
+		};
+
+	elseif ( 'yearly' == $type ) :
+
+		$query = "SELECT YEAR(post_date) as `year`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date) ORDER BY post_date DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		foreach ( (array) $arcresults as $arcresult ) {
+			$return[$arcresult->year] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year );
+		};
+
+	else :
+
+		$query = "SELECT count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' ORDER BY post_date DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		if ( is_object($arcresults[0]) && $arcresults[0]->posts > 0 ) {
+			$return[] = xmlsf_get_index_url( 'posttype', $post_type ); // $sitemap = 'home', $type = false, $param = false
+		};
+
+	endif;
+
+	return $return;
+
 }
 
 /**
@@ -102,7 +174,7 @@ function xmlsf_sanitize_priority( $priority, $min = 0, $max = 1 ) {
  * @param object $post
  * @param string $which
  *
- * @return array|string
+ * @return array
  */
 function xmlsf_images_data( $post, $which ) {
 	$attachments = array();
@@ -130,7 +202,7 @@ function xmlsf_images_data( $post, $which ) {
 
 	}
 
-	if ( empty( $attachments ) ) return '';
+	if ( empty( $attachments ) ) return array();
 
 	// gather all data
 	$images_data = array();
@@ -154,5 +226,30 @@ function xmlsf_images_data( $post, $which ) {
 
 	}
 
-	return ! empty( $images_data ) ? $images_data : '';
+	return $images_data;
+}
+
+/**
+ * Get instantiated sitemap controller class
+ *
+ * @since 5.2
+ * @global XMLSF_Sitemap $xmlsf_sitemap
+ * @return XMLSF_Sitemap object
+ */
+function xmlsf_sitemap( $sitemap = null ) {
+	global $xmlsf_sitemap;
+
+	if ( ! isset( $xmlsf_sitemap ) ) {
+		if ( ! class_exists( 'XMLSF_Sitemap' ) )
+			require XMLSF_DIR . '/controllers/class.xmlsf-sitemap.php';
+
+		if ( empty($sitemap) ) {
+			$sitemaps = get_option( 'xmlsf_sitemaps' );
+			$sitemap = $sitemaps['sitemap'];
+		}
+
+		$xmlsf_sitemap = new XMLSF_Sitemap( $sitemap );
+	}
+
+	return $xmlsf_sitemap;
 }

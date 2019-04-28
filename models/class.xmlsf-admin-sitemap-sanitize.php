@@ -4,6 +4,15 @@ class XMLSF_Admin_Sitemap_Sanitize
 {
 	public static function taxonomies( $new )
 	{
+		$old = (array) get_option( 'xmlsf_taxonomies', array() );
+		if (
+			empty($old) != empty($new) ||
+			( ! empty( array_diff( (array) $old, (array) $new ) ) )
+		) {
+			global $wpdb;
+			$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
+		}
+
 		return $new;
 	}
 
@@ -19,6 +28,15 @@ class XMLSF_Admin_Sitemap_Sanitize
 		$sanitized['term_limit'] = isset($new['term_limit']) ? intval($new['term_limit']) : 5000;
 		if ( $sanitized['term_limit'] < 1 || $sanitized['term_limit'] > 50000 ) $sanitized['term_limit'] = 50000;
 
+		// clear term meta cache if deactivating...
+		if ( empty($sanitized['active']) ) {
+			$old = (array) get_option( 'xmlsf_taxonomy_settings', array() );
+			if ( ! empty($old['active']) ) {
+				global $wpdb;
+				$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
+			}
+		}
+
 		return $sanitized;
 	}
 
@@ -26,9 +44,47 @@ class XMLSF_Admin_Sitemap_Sanitize
 	{
 		$sanitized = is_array($new) ? $new : array();
 
-		foreach ($sanitized as $post_type => $settings) {
+		$old = (array) get_option( 'xmlsf_post_types', array() );
+		$clear_images = false;
+		$clear_comments = false;
+
+		foreach ( $sanitized as $post_type => $settings ) {
 			setlocale( LC_NUMERIC, 'C' );
 			$sanitized[$post_type]['priority'] = isset($settings['priority']) ? xmlsf_sanitize_priority( str_replace( ',', '.', $settings['priority'] ), '0.1', '0.9' ) : '0.5';
+
+			// poll for changes that warrant clearing meta data
+			if ( isset($old[$post_type]) && is_array($old[$post_type]) ) {
+
+				if ( empty($settings['active']) ) {
+					if ( !empty($old[$post_type]['active']) ) {
+						$clear_images = true;
+						$clear_comments = true;
+					}
+				} else {
+					if ( isset($old[$post_type]['tags']) && is_array($old[$post_type]['tags']) && isset($old[$post_type]['tags']['image']) && $old[$post_type]['tags']['image'] != $settings['tags']['image'] ) {
+						$clear_images = true;
+					}
+					if ( ! empty($old[$post_type]['update_lastmod_on_comments']) && empty($settings['update_lastmod_on_comments']) ) {
+						$clear_comments = true;
+					}
+				}
+
+			}
+		}
+
+		global $wpdb;
+
+		// clear images meta caches...
+		if ( $clear_images ) {
+			$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
+			$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
+			update_option( 'xmlsf_images_meta_primed', array() );
+		}
+
+		// clear comments meta caches...
+		if ( $clear_comments ) {
+			$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
+			update_option( 'xmlsf_comments_meta_primed', array() );
 		}
 
 		return $sanitized;

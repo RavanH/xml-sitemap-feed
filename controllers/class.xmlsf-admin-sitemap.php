@@ -1,6 +1,6 @@
 <?php
 
-class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
+class XMLSF_Admin_Sitemap extends XMLSF_Admin
 {
   /**
    * Holds the values to be used in the fields callbacks
@@ -27,45 +27,40 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 
 	public function tools_actions()
 	{
-		if ( ! isset( $_POST['xmlsf-ping-sitemap'] ) )
+		if ( ! isset( $_POST['xmlsf-ping-sitemap'] ) || ! xmlsf_verify_nonce('help') )
       return;
 
-		if ( isset( $_POST['_xmlsf_help_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_help_nonce'], XMLSF_BASENAME.'-help' ) ) {
+		$sitemaps = get_option( 'xmlsf_sitemaps' );
 
-			$sitemaps = get_option( 'xmlsf_sitemaps' );
+		foreach ( array('google','bing') as $se ) {
+			$result = xmlsf_ping( $se, $sitemaps['sitemap'], HOUR_IN_SECONDS );
 
-			foreach ( array('google','bing') as $se ) {
-				$result = xmlsf_ping( $se, $sitemaps['sitemap'], HOUR_IN_SECONDS );
+			$se_name = 'google' == $se ? __('Google','xml-sitemap-feed') : __('Bing & Yahoo','xml-sitemap-feed');
 
-				$se_name = 'google' == $se ? __('Google','xml-sitemap-feed') : __('Bing & Yahoo','xml-sitemap-feed');
+			switch( $result ) {
+				case 200:
+				$msg = sprintf( /* Translators: Search engine / Service name */ __( 'Pinged %s with success.', 'xml-sitemap-feed' ), $se_name );
+				$type = 'updated';
+				break;
 
-				switch( $result ) {
-					case 200:
-					$msg = sprintf( /* Translators: Search engine / Service name */ __( 'Pinged %s with success.', 'xml-sitemap-feed' ), $se_name );
-					$type = 'updated';
-					break;
+				case 999:
+				$msg = sprintf( /* Translators: Search engine / Service name, interval number */ __( 'Ping %s skipped: Sitemap already sent within the last %d minutes.', 'xml-sitemap-feed' ), $se_name, 60 );
+				$type = 'notice-warning';
+				break;
 
-					case 999:
-					$msg = sprintf( /* Translators: Search engine / Service name, interval number */ __( 'Ping %s skipped: Sitemap already sent within the last %d minutes.', 'xml-sitemap-feed' ), $se_name, 60 );
-					$type = 'notice-warning';
-					break;
+				case '':
+				$msg = sprintf( translate('Oops: %s'), translate('Something went wrong.') );
+				$type = 'error';
+				break;
 
-					case '':
-					$msg = sprintf( translate('Oops: %s'), translate('Something went wrong.') );
-					$type = 'error';
-					break;
-
-					default:
-					$msg = sprintf( /* Translators: Search engine / Service name, response code number */ __( 'Ping %s failed with response code: %d', 'xml-sitemap-feed' ), $se_name, $result );
-					$type = 'error';
-				}
-
-				add_settings_error( 'ping_sitemap', 'ping_sitemap', $msg, $type );
+				default:
+				$msg = sprintf( /* Translators: Search engine / Service name, response code number */ __( 'Ping %s failed with response code: %d', 'xml-sitemap-feed' ), $se_name, $result );
+				$type = 'error';
 			}
 
-		} else {
-			add_settings_error( 'ping_sitemap', 'ping_sitemap', translate('Security check failed.') );
+			add_settings_error( 'ping_sitemap', 'ping_sitemap', $msg, $type );
 		}
+
 	}
 
 	/**
@@ -190,17 +185,18 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 	/* When the post is saved, save our meta data */
 	public function save_metadata( $post_id )
 	{
-		if ( !isset($post_id) )
-			$post_id = (int)$_REQUEST['post_ID'];
-
-		if ( !current_user_can( 'edit_post', $post_id ) || !isset($_POST['_xmlsf_nonce']) || !wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME) )
-			return;
+		if (
+      // verify nonce
+      ! isset($_POST['_xmlsf_nonce']) || ! wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME) ||
+      // user not allowed
+      ! current_user_can( 'edit_post', $post_id )
+    ) return;
 
 		// _xmlsf_priority
 		if ( empty($_POST['xmlsf_priority']) )
 			delete_post_meta($post_id, '_xmlsf_priority');
 		else
-			update_post_meta($post_id, '_xmlsf_priority', XMLSF_Admin_Sitemap_Sanitize::priority($_POST['xmlsf_priority']) );
+      update_post_meta($post_id, '_xmlsf_priority', xmlsf_sanitize_priority( $_POST['xmlsf_priority'] ) );
 
 		// _xmlsf_exclude
 		if ( empty($_POST['xmlsf_exclude']) )
@@ -215,8 +211,6 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
   public function public_taxonomies()
 	{
 		if ( !isset( $this->public_taxonomies ) ) {
-			require_once XMLSF_DIR . '/models/public/sitemap.php';
-
 			$this->public_taxonomies = xmlsf_public_taxonomies();
 		}
 
@@ -261,9 +255,9 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 		// taxonomies
 		add_settings_section( 'xml_sitemap_taxonomies_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_taxonomies' );
 		add_settings_field( 'xmlsf_taxonomy_settings', translate('General'), array($this,'taxonomy_settings_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
-		$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
-		if ( !empty( $taxonomy_settings['active'] ) && get_option( 'xmlsf_taxonomies' ) )
-			add_settings_field( 'xmlsf_taxonomies', __('Include taxonomies','xml-sitemap-feed'), array($this,'taxonomies_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
+		//$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
+    if ( apply_filters( 'xmlsf_taxonomies', ! empty( get_option( 'xmlsf_taxonomies' ) ) ) )
+			add_settings_field( 'xmlsf_taxonomies', __('Taxonomies','xml-sitemap-feed'), array($this,'taxonomies_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
 
 		add_settings_section( 'xml_sitemap_advanced_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_advanced' );
 		// custom urls
@@ -369,7 +363,6 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin_Controller
 
 	public function taxonomy_settings_field()
 	{
-		$taxonomies = get_option( 'xmlsf_taxonomies' );
 		$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
 
 		// The actual fields for data entry

@@ -4,7 +4,7 @@
  * Dismissable or interactive admin notices
  */
 
-class XMLSF_Admin_Notices extends XMLSF_Admin_Controller
+class XMLSF_Admin_Notices extends XMLSF_Admin
 {
 	function __construct() {}
 
