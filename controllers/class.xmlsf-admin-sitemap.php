@@ -255,9 +255,9 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		// taxonomies
 		add_settings_section( 'xml_sitemap_taxonomies_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_taxonomies' );
 		add_settings_field( 'xmlsf_taxonomy_settings', translate('General'), array($this,'taxonomy_settings_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
-		$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
-		if ( !empty( $taxonomy_settings['active'] ) && get_option( 'xmlsf_taxonomies' ) )
-			add_settings_field( 'xmlsf_taxonomies', __('Include taxonomies','xml-sitemap-feed'), array($this,'taxonomies_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
+		//$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
+    if ( apply_filters( 'xmlsf_taxonomies', ! empty( get_option( 'xmlsf_taxonomies' ) ) ) )
+			add_settings_field( 'xmlsf_taxonomies', __('Taxonomies','xml-sitemap-feed'), array($this,'taxonomies_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
 
 		add_settings_section( 'xml_sitemap_advanced_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_advanced' );
 		// custom urls
@@ -363,7 +363,6 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 
 	public function taxonomy_settings_field()
 	{
-		$taxonomies = get_option( 'xmlsf_taxonomies' );
 		$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
 
 		// The actual fields for data entry
