@@ -428,6 +428,7 @@ function xmlsf_sitemap_parse_request( $request ) {
 
 			$request['post_type'] = $feed[2];
 			$request['orderby'] = 'modified';
+			$request['order'] = 'DESC';
 			$request['is_date'] = false;
 
 			break;
