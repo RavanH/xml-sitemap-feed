@@ -22,7 +22,7 @@
 			<tr class="high">
 				<th>#</th>
 				<th>XML Sitemap</th>
-				<th>Last Changed</th>
+				<th>Last Modified</th>
 			</tr>
 <xsl:variable name="lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
 <xsl:variable name="upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
