@@ -9,9 +9,10 @@ if ( ! defined( 'WPINC' ) ) die;
 
 $options = get_option('xmlsf_news_tags');
 
-?>
-<?xml version="1.0" encoding="<?php echo get_bloginfo('charset'); ?>"?>
-<?xml-stylesheet type="text/xsl" href="<?php echo plugins_url('assets/styles/sitemap-news.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION; ?>"?>
+// do xml tag via echo or SVN parser is going to freak out
+echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
+<?xml-stylesheet type="text/xsl" href="' . plugins_url('assets/styles/sitemap-news.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION . '"?>
+'; ?>
 <?php xmlsf_generator(); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 	xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">

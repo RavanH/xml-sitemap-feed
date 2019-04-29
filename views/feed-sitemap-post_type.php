@@ -20,9 +20,11 @@ if ( !empty($image) ) {
 	$image_xmlns = '';
 	$image_schema = '';
 }
-?>
-<?xml version="1.0" encoding="<?php echo get_bloginfo('charset'); ?>"?>
-<?xml-stylesheet type="text/xsl" href="<?php echo plugins_url('assets/styles/sitemap.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION; ?>"?>
+
+// do xml tag via echo or SVN parser is going to freak out
+echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
+<?xml-stylesheet type="text/xsl" href="' . plugins_url('assets/styles/sitemap.xsl',XMLSF_BASENAME) . '?ver=' . XMLSF_VERSION . '"?>
+'; ?>
 <?php xmlsf_generator(); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 <?php echo $image_xmlns; ?>
