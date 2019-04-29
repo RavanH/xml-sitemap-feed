@@ -124,7 +124,7 @@ class XMLSF_Admin_Sitemap_Sanitize
 		if ( empty($new) )
 			return '';
 
-		$input = explode( PHP_EOL, sanitize_textarea_field( $new ) );
+		$input = explode( PHP_EOL, strip_tags( $new ) );
 
 		// build sanitized output
 		$sanitized = array();
