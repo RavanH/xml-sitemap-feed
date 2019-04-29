@@ -11,7 +11,7 @@ XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cac
 
 == Description ==
 
-This plugin dynamically creates feeds that comply with the **XML Sitemap** and the **Google News Sitemap** protocol. **Multisite**, **Polylang** and **WPML** compatible and there are no files created. There are options to control which sitemaps are enabled, which Post and Taxonomy types are included, how Priority and Lastmod are calculated, who to ping and a possibility to set additional robots.txt rules from within the WordPress admin.
+This plugin dynamically creates feeds that comply with the **XML Sitemap** and the **Google News Sitemap** protocol. **Multisite**, **Polylang** and **WPML** compatible and there are no files created. There are options to control which sitemaps are enabled, which Post types are included, how Priority and Lastmod are calculated, who to ping and a possibility to set additional robots.txt rules from within the WordPress admin.
 
 The main advantage of this plugin over other XML Sitemap plugins is **simplicity**. No need to change file or folder permissions, move files or spend time tweaking difficult plugin options.
 
@@ -198,7 +198,7 @@ You can also choose to notify major search engines of your new XML sitemap manua
 
 = Can I change the sitemap name/URL? =
 
-No. If you have fancy URL's turned ON in WordPress (Permalinks), the sitemap url that you manually submit to Google (if you are impatient) should be `yourblogurl.tld/sitemap.xml` but if you have the Permalinks' Default option set the feed is only available via `yourblog.url/?feed=sitemap`.
+No. If you have fancy URL's turned ON in WordPress (Permalinks), the sitemap url is `yourblogurl.tld/sitemap.xml` but if you have the Permalink Default option set the feed is only available via `yourblog.url/?feed=sitemap`.
 
 = I see no sitemap.xml file in my site root! =
 
@@ -312,7 +312,7 @@ Major DB query reduction and speed improvements. Bugfixes.
 * FIX: array_filter() expects parameter 1 to be array
 * FIX: possible division by zero
 * FIX: update_term_modified_meta
-* FIX: rewrite rules on deactivate/uninstall 
+* FIX: rewrite rules on deactivate/uninstall
 
 = 5.1.2 =
 * FIX: admin notice dismiss button failing
