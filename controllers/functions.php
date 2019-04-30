@@ -52,10 +52,6 @@ function xmlsf_init() {
 			add_filter( 'xmlsf_post_types', 'xmlsf_filter_post_types' );
 
 			xmlsf_sitemap( $sitemaps['sitemap'] );
-
-			// add feed type, index can now be accessed via /feed/sitemap too
-			add_feed( 'sitemap', 'xmlsf_load_template_index' );
-			//add_filter( 'feed_content_type', 'xmlsf_content_type', 10, 2 );
 		}
 
 		// common sitemap element filters
