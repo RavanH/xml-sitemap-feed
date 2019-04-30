@@ -87,6 +87,33 @@ function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
 }
 
 /**
+ * Get archives from wp_cache
+ *
+ * @param string $post_type
+ * @param string $type
+ *
+ * @return array
+ */
+function xmlsf_cache_get_archives( $query ) {
+
+	global $wpdb;
+
+	$key = md5($query);
+	$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
+
+	if ( !isset( $cache[ $key ] ) ) {
+		$arcresults = $wpdb->get_results($query);
+		$cache[ $key ] = $arcresults;
+		wp_cache_set( 'xmlsf_get_archives', $cache, 'general' );
+	} else {
+		$arcresults = $cache[ $key ];
+	}
+
+	return $arcresults;
+
+}
+
+/**
  * Get taxonomies
  * Returns an array of taxonomy names to be included in the index
  *

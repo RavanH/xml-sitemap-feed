@@ -463,33 +463,6 @@ function xmlsf_sitemap_parse_request( $request ) {
 	return $request;
 }
 
-/**
- * Get archives from wp_cache
- *
- * @param string $post_type
- * @param string $type
- *
- * @return array
- */
-function xmlsf_cache_get_archives( $query ) {
-
-	global $wpdb;
-
-	$key = md5($query);
-	$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
-
-	if ( !isset( $cache[ $key ] ) ) {
-		$arcresults = $wpdb->get_results($query);
-		$cache[ $key ] = $arcresults;
-		wp_cache_set( 'xmlsf_get_archives', $cache, 'general' );
-	} else {
-		$arcresults = $cache[ $key ];
-	}
-
-	return $arcresults;
-
-}
-
 /* -------------------------------------
  *      MISSING WORDPRESS FUNCTIONS
  * ------------------------------------- */
