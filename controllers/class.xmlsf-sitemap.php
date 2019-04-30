@@ -90,7 +90,7 @@ class XMLSF_Sitemap
 			if ( ! empty( $_POST['_xmlsf_exclude'] ) ) return;
 		} else {
 			// fall back on exclude meta data from DB whic may be outdated (see bug)
-			if ( ! empty( get_post_meta( $post->ID, '_xmlsf_exclude' ) ) ) return;
+			if ( get_post_meta( $post->ID, '_xmlsf_exclude' ) ) return;
 		}
 
 		$ping = (array) get_option( 'xmlsf_ping', array() );
