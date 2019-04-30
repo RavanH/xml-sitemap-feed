@@ -50,7 +50,7 @@ if ( have_posts() ) :
 						echo apply_filters( 'the_title_xmlsitemap', get_bloginfo('name') ); ?></news:name>
 				<news:language><?php echo xmlsf_get_language( $post->ID ); ?></news:language>
 			</news:publication>
-			<news:publication_date><?php echo mysql2date( 'c', $post->post_date ); ?></news:publication_date>
+			<news:publication_date><?php echo mysql2date( DATE_W3C, $post->post_date ); ?></news:publication_date>
 			<news:title><?php echo apply_filters( 'the_title_xmlsitemap', get_the_title() ); ?></news:title>
 			<news:keywords><?php echo implode( ', ', apply_filters( 'xmlsf_news_keywords', array() ) ); ?></news:keywords>
 			<news:stock_tickers><?php echo implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ); ?></news:stock_tickers>

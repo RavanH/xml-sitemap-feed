@@ -17,7 +17,7 @@ function xmlsf_get_root_data() {
 				$url = pll_home_url( $language['slug'] );
 				$data[$url] = array(
 					'priority' => '1.0',
-					'lastmod' => mysql2date( 'c', get_lastpostdate('blog') )
+					'lastmod' => mysql2date( DATE_W3C, get_lastpostdate('blog') )
 					// TODO make lastmod date language specific
 				);
 			}
@@ -27,7 +27,7 @@ function xmlsf_get_root_data() {
 			$url = $sitepress->language_url($term);
 			$data[$url] = array(
 				'priority' => '1.0',
-				'lastmod' => mysql2date( 'c', get_lastpostdate('blog') )
+				'lastmod' => mysql2date( DATE_W3C, get_lastpostdate('blog') )
 				// TODO make lastmod date language specific
 			);
 		}
@@ -36,7 +36,7 @@ function xmlsf_get_root_data() {
 		$data = array(
 			trailingslashit( home_url() ) => array(
 				'priority' => '1.0',
-				'lastmod' => mysql2date( 'c', get_lastpostdate('blog') )
+				'lastmod' => mysql2date( DATE_W3C, get_lastpostdate('blog') )
 			)
 		);
 	}
@@ -178,7 +178,7 @@ function xmlsf_get_post_modified() {
 
 	}
 
-	return ! empty( $lastmod ) ? mysql2date( 'c', $lastmod ) : false;
+	return ! empty( $lastmod ) ? mysql2date( DATE_W3C, $lastmod ) : false;
 
 }
 
@@ -232,7 +232,7 @@ function xmlsf_get_term_modified( $term ) {
 
 	}
 
-	return ! empty( $lastmod ) ? mysql2date( 'c', $lastmod ) : false;
+	return ! empty( $lastmod ) ? mysql2date( DATE_W3C, $lastmod ) : false;
 
 }
 
@@ -258,7 +258,7 @@ function xmlsf_get_taxonomy_modified( $taxonomy ) {
 	$lastmodified = array_filter( $lastmodified );
 	$lastmod = end( $lastmodified );
 
-	return mysql2date( 'c', $lastmod );
+	return mysql2date( DATE_W3C, $lastmod );
 
 }
 

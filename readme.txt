@@ -291,14 +291,15 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.2.1 =
+= 5.2.2 =
 
 Bugfix release.
 
 
 == Changelog ==
 
-= 5.2.1 =
+= 5.2.2 =
+* FIX invalid date format on some PHP versions
 * FIX Can't use function return value in write context
 * FIX non-cyrillic URLs stripped from External Web Pages field
 * FIX Call to undefined function xmlsf_cache_get_archives()
