@@ -64,11 +64,9 @@ class XMLSF_Sitemap_News
 
 		$news_tags = (array) get_option('xmlsf_news_tags');
 
-		error_log('6');
 		// is this an active post type?
 		if ( empty( $news_tags['post_type'] ) || ! in_array( $post->post_type, (array) $news_tags['post_type'] ) ) return;
 
-		error_log('7');
 		// are categories limited and is not in correct category?
 		if ( ! empty( $news_tags['categories'] ) ) {
 			$cats = wp_get_post_categories( $post->ID, array( 'fields' => 'ids' ) );
