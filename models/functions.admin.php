@@ -79,7 +79,7 @@ class XMLSF_Admin_Sanitize
 		  $new = array_filter($new);
 		  $new = reset($new);
 		}
-		$input = $new ? explode( PHP_EOL, sanitize_textarea_field( $new ) ) : array();
+		$input = $new ? explode( PHP_EOL, strip_tags( $new ) ) : array();
 
 		// build sanitized output
 		$sanitized = array();
@@ -122,6 +122,6 @@ class XMLSF_Admin_Sanitize
 		if ( empty($old) && !empty($new) )
 			set_transient('xmlsf_check_static_files','');
 
-		return sanitize_textarea_field( $new );
+		return strip_tags( $new );
 	}
 }
