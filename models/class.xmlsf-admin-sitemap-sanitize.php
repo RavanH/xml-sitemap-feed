@@ -4,11 +4,10 @@ class XMLSF_Admin_Sitemap_Sanitize
 {
 	public static function taxonomies( $new )
 	{
-		$old = (array) get_option( 'xmlsf_taxonomies', array() );
-		if (
-			empty($old) != empty($new) ||
-			( ! empty( array_diff( (array) $old, (array) $new ) ) )
-		) {
+		$old = get_option( 'xmlsf_taxonomies' );
+		if ( empty( $old ) ) $old = array();
+		$diff = array_diff( (array) $old, (array) $new );
+		if ( ! empty( $diff ) ) {
 			global $wpdb;
 			$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
 		}

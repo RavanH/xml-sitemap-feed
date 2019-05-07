@@ -70,7 +70,8 @@ class XMLSF_Sitemap_News
 		// are categories limited and is not in correct category?
 		if ( ! empty( $news_tags['categories'] ) ) {
 			$cats = wp_get_post_categories( $post->ID, array( 'fields' => 'ids' ) );
-			if ( empty( array_intersect( (array) $cats, (array) $news_tags['categories'] ) ) ) return;
+			$intersect = array_intersect( (array) $cats, (array) $news_tags['categories'] );
+			if ( empty( $intersect ) ) return;
 		}
 
 		// PING
