@@ -298,6 +298,9 @@ Bugfix release.
 
 == Changelog ==
 
+= 5.2.3 =
+* FIX Cannot use return value in write context
+
 = 5.2.2 =
 * FIX invalid date format on some PHP versions
 * FIX Can't use function return value in write context
