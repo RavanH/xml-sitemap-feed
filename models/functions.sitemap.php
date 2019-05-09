@@ -55,7 +55,7 @@ function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
 
 	if ( 'monthly' == $type ) :
 
-		$query = "SELECT YEAR(post_date) as `year`, LPAD(MONTH(post_date),2,'0') as `month`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY post_date DESC";
+		$query = "SELECT YEAR(post_date) as `year`, LPAD(MONTH(post_date),2,'0') as `month`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date), LPAD(MONTH(post_date),2,'0') ORDER BY `year` DESC, `month` DESC";
 		$arcresults = xmlsf_cache_get_archives( $query );
 
 		foreach ( (array) $arcresults as $arcresult ) {
@@ -64,7 +64,7 @@ function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
 
 	elseif ( 'yearly' == $type ) :
 
-		$query = "SELECT YEAR(post_date) as `year`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date) ORDER BY post_date DESC";
+		$query = "SELECT YEAR(post_date) as `year`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date) ORDER BY `year` DESC";
 		$arcresults = xmlsf_cache_get_archives( $query );
 
 		foreach ( (array) $arcresults as $arcresult ) {
