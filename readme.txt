@@ -300,6 +300,7 @@ Bugfix release.
 
 = 5.2.3 =
 * FIX Cannot use return value in write context
+* FIX issue #30 for sql_mode=ONLY_FULL_GROUP_BY, thanks @silvios
 
 = 5.2.2 =
 * FIX invalid date format on some PHP versions
