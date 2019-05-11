@@ -85,7 +85,7 @@ class XMLSF_Sitemap
 		if ( ! array_key_exists( $post->post_type, (array) $this->post_types ) ) return;
 
 		// we're saving from post edit screen (f.e. 'inline-save' would be from quick edit)
-		if ( ! empty( $_POST ) && 'editpost' == $_POST['action'] ) {
+		if ( ! empty( $_POST ) && ! empty( $_POST['action'] ) && 'editpost' == $_POST['action'] ) {
 			// bail out when exclude field is checked
 			if ( ! empty( $_POST['_xmlsf_exclude'] ) ) return;
 		} else {
