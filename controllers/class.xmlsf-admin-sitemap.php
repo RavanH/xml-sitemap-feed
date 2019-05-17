@@ -159,6 +159,13 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		$priority = get_post_meta( $post->ID, '_xmlsf_priority', true );
 		$disabled = false;
 
+    // priority value precheck to prevent "invalid form control not focusable" when meta box is hidden
+    if ( !empty($priority) && is_numeric($priority) ) {
+      $priority = xmlsf_sanitize_priority( $priority );
+    } else {
+      $priority = '';
+    }
+
 		// disable options and (visibly) set excluded to true for private posts
 		if ( 'private' == $post->post_status ) {
 			$disabled = true;
@@ -193,7 +200,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
     ) return;
 
 		// _xmlsf_priority
-		if ( empty($_POST['xmlsf_priority']) )
+		if ( empty($_POST['xmlsf_priority']) || ! is_numeric($_POST['xmlsf_priority']) )
 			delete_post_meta($post_id, '_xmlsf_priority');
 		else
       update_post_meta($post_id, '_xmlsf_priority', xmlsf_sanitize_priority( $_POST['xmlsf_priority'] ) );

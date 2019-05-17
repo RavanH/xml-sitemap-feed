@@ -54,7 +54,7 @@ class XMLSF_Sitemap_News
 		if ( ! in_array( 'google', (array) get_option( 'xmlsf_ping' ) ) ) return;
 
 		// we're saving from post edit screen
-		if ( ! empty( $_POST ) && 'editpost' == $_POST['action'] ) {
+		if ( ! empty( $_POST ) && ! empty( $_POST['action'] ) && 'editpost' == $_POST['action'] ) {
 			// bail out when exclude field is checked
 			if ( ! empty( $_POST['_xmlsf_news_exclude'] ) ) return;
 		} else {
