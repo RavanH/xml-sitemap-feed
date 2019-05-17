@@ -291,7 +291,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.2.2 =
+= 5.2.3 =
 
 Bugfix release.
 
