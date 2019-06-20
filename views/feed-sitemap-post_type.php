@@ -32,10 +32,6 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
 		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd<?php echo $image_schema; ?>">
 <?php
-
-// set empty sitemap flag
-$have_posts = false;
-
 // loop away!
 if ( have_posts() ) :
 	while ( have_posts() ) :
