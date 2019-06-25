@@ -25,7 +25,7 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 $post_types = apply_filters( 'xmlsf_post_types', (array) get_option( 'xmlsf_post_types', array() ) );
 if ( is_array($post_types) ) :
 	foreach ( $post_types as $post_type => $settings ) {
-		if ( empty($settings['active']) || ! post_type_exists( $post_type ) )
+		if ( ! post_type_exists( $post_type ) )
 			continue;
 
 		$archive = isset($settings['archive']) ? $settings['archive'] : '';
