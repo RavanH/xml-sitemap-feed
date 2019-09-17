@@ -40,4 +40,14 @@ class XMLSF_Admin_Notices extends XMLSF_Admin
 	{
 		include XMLSF_DIR . '/views/admin/notice-seopress-sitemap.php';
 	}
+
+	public static function notice_rankmath_date_redirect()
+	{
+		include XMLSF_DIR . '/views/admin/notice-rankmath-date-redirect.php';
+	}
+
+	public static function notice_rankmath_sitemap()
+	{
+		include XMLSF_DIR . '/views/admin/notice-rankmath-sitemap.php';
+	}
 }

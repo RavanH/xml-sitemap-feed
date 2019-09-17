@@ -68,8 +68,10 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	 */
 	public function check_plugin_conflicts()
 	{
+    if ( wp_doing_ajax() || ! current_user_can( 'manage_options' ) ) return;
+
 		// TODO:
-		// W3TC static files 404 exclusion rules ? Said to be fixed in W3TC next veresion...
+		// W3TC static files 404 exclusion rules ? Said to be fixed in W3TC next version...
 		// Google (XML) Sitemaps Generator Plugin for WordPress and Google News sitemap incompatibility
 
 		// WP SEO conflict notices
@@ -123,6 +125,33 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 				}
 			}
 		}
+
+    // Rank Math conflict notices
+		if ( is_plugin_active('seo-by-rank-math/rank-math.php') ) {
+
+			// check date archive redirection
+			if ( !in_array( 'rankmath_date_redirect', parent::$dismissed ) ) {
+				$rankmath_titles = get_option( 'rank-math-options-titles' );
+				if ( ! empty( $rankmath_titles['disable_date_archives'] ) && $rankmath_titles['disable_date_archives'] == 'on' ) {
+					// check if Split by option is set anywhere
+					foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
+						if ( !empty( $settings['active'] ) && !empty( $settings['archive'] ) ) {
+							add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_rankmath_date_redirect' ) );
+							break;
+						}
+					}
+				}
+			}
+
+			// check rank math sitemap option
+			if ( !in_array( 'rankmath_sitemap', parent::$dismissed ) ) {
+				$rankmath_modules = (array) get_option( 'rank_math_modules' );
+				if ( in_array( 'sitemap', $rankmath_modules ) ) {
+					add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_rankmath_sitemap' ) );
+				}
+			}
+		}
+
 	}
 
 	/**
