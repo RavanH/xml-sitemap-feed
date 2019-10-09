@@ -60,9 +60,16 @@ define( 'XMLSF_VERSION', '5.2.4' );
  *	ACTIONS
  *	xmlsf_ping                 -> Fires hen a search engine has been pinged. Carries four arguments:
  *								                search engine (google|bing), sitemap name, full ping url, ping repsonse code.
+ *	xmlsf_tags_after           -> Fired inside the XML Sitemap loop at the end of the tags, 
+ *	                              just before each closing </url> is generated. Can be used to
+ *	                              echo custom tags or trigger another action in the background.
+ *	xmlsf_url_after            -> Fired inside the XML Sitemap loop after each url node.
+ *	                              Can be used to append alternative url or trigger another action in the background.
  *	xmlsf_news_tags_after      -> Fired inside the Google News Sitemap loop at the end of the news
  *	                              tags, just before each closing </news:news> is generated. Can be used to
  *	                              echo custom tags or trigger another action in the background.
+ *	xmlsf_news_url_after       -> Fired inside the Google News Sitemap loop after each news url node.
+ *	                              Can be used to append alternative url or trigger another action in the background.
  *	xmlsf_news_settings_before -> Fired before the Google News Sitemap settings form
  *	xmlsf_news_settings_after  -> Fired after the Google News Sitemap settings form
  *

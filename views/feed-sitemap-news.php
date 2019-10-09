@@ -58,6 +58,7 @@ if ( have_posts() ) :
 		</news:news>
 	</url>
 <?php
+			do_action( 'xmlsf_news_url_after' );
     endwhile;
 endif;
 

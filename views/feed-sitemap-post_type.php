@@ -76,9 +76,12 @@ if ( have_posts() ) :
 <?php
 			}
 		endif;
+
+		do_action( 'xmlsf_tags_after' );
 ?>
  	</url>
 <?php
+		do_action( 'xmlsf_url_after' );
   endwhile;
 endif;
 
