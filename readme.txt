@@ -5,7 +5,7 @@ Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Googl
 Requires at least: 4.4
 Requires PHP: 5.4
 Tested up to: 5.3
-Stable tag: 5.2.5
+Stable tag: 5.2.6
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -291,15 +291,16 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.2.4 =
+= 5.2.6 =
 
-Bugfixes + Rank Math compatibility warnings.
+New action hooks, taxonomy selection bugfix and relative path stylesheets.
 
 
 == Changelog ==
 
-= 5.2.5 =
+= 5.2.6 =
 * NEW: xmlsf_tags_after, xmlsf_url_after and xmlsf_news_url_after action hooks
+* Make stylesheet paths relative to prevent exclusion when using Polylang with language domains
 * FIX: Taxonomy selection not available to new installs
 
 = 5.2.4 =
