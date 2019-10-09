@@ -3,7 +3,7 @@
 Plugin Name: XML Sitemap & Google News
 Plugin URI: http://status301.net/wordpress-plugins/xml-sitemap-feed/
 Description: Feed the  hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
-Version: 5.2.4
+Version: 5.2.5
 Text Domain: xml-sitemap-feed
 Requires at least: 4.6
 Requires PHP: 5.4
@@ -11,7 +11,7 @@ Author: RavanH
 Author URI: http://status301.net/
 */
 
-define( 'XMLSF_VERSION', '5.2.4' );
+define( 'XMLSF_VERSION', '5.2.5' );
 
 /*  Copyright 2019 RavanH
     http://status301.net/
@@ -60,7 +60,7 @@ define( 'XMLSF_VERSION', '5.2.4' );
  *	ACTIONS
  *	xmlsf_ping                 -> Fires hen a search engine has been pinged. Carries four arguments:
  *								                search engine (google|bing), sitemap name, full ping url, ping repsonse code.
- *	xmlsf_tags_after           -> Fired inside the XML Sitemap loop at the end of the tags, 
+ *	xmlsf_tags_after           -> Fired inside the XML Sitemap loop at the end of the tags,
  *	                              just before each closing </url> is generated. Can be used to
  *	                              echo custom tags or trigger another action in the background.
  *	xmlsf_url_after            -> Fired inside the XML Sitemap loop after each url node.
