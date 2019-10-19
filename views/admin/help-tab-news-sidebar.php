@@ -21,6 +21,9 @@
 		<a href="https://support.google.com/news/publisher-center/answer/70871" target="_blank"><?php _e( /* https://support.google.com/news/publisher-center/answer/70871 */ 'Incorrect article date', 'xml-sitemap-feed' ); ?></a>
 	</li>
 	<li>
-		<a href="https://groups.google.com/a/googleproductforums.com/forum/#!categories/news/google-news-publishers" target="_blank"><?php _e( /* https://groups.google.com/a/googleproductforums.com/forum/#!categories/news/google-news-publishers */ 'Publisher Help Forum', 'xml-sitemap-feed' ); ?></a>
+		<a href="https://support.google.com/googlenews/" target="_blank"><?php _e( /* https://support.google.com/googlenews/ */ 'Google News Help Center', 'xml-sitemap-feed' ); ?></a>
+	</li>
+	<li>
+		<a href="https://support.google.com/googlenews/community" target="_blank"><?php _e( /* https://support.google.com/googlenews/community */ 'Publisher Help Forum', 'xml-sitemap-feed' ); ?></a>
 	</li>
 </ul>
