@@ -9,12 +9,6 @@
 		<a href="https://support.google.com/news/publisher/answer/40787" target="_blank"><?php _e( /* https://support.google.com/news/publisher/answer/40787 */ 'Getting into Google News', 'xml-sitemap-feed' ); ?></a>
 	</li>
 	<li>
-		<a href="https://partnerdash.google.com/partnerdash/d/news#p:id=pfehome"><?php _e( /* https://partnerdash.google.com/partnerdash/d/news#p:id=pfehome */ 'Google News Publisher Center', 'xml-sitemap-feed' ); ?></a>
-	</li>
-	<li>
-		<a href="https://www.xml-sitemaps.com/validate-xml-sitemap.html" target="_blank"><?php _e( /* https://www.xml-sitemaps.com/validate-xml-sitemap.html */ 'Validate an XML Sitemap', 'xml-sitemap-feed' ); ?></a>
-	</li>
-	<li>
 		<a href="https://support.google.com/news/publisher-center/answer/6075793" target="_blank"><?php _e( /* https://support.google.com/news/publisher-center/answer/6075793 */ 'News sitemap errors', 'xml-sitemap-feed' ); ?></a>
 	</li>
 	<li>

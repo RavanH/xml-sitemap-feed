@@ -3,9 +3,6 @@
 </p>
 <ul>
 	<li>
-		<a href="https://www.xml-sitemaps.com/validate-xml-sitemap.html" target="_blank"><?php _e( /* https://www.xml-sitemaps.com/validate-xml-sitemap.html */ 'Validate an XML Sitemap', 'xml-sitemap-feed' ); ?></a>
-	</li>
-	<li>
 		<a href="https://support.google.com/webmasters/answer/156184" target="_blank"><?php _e( /* https://support.google.com/webmasters/answer/156184 */ 'Learn more about sitemaps on Google Search Console Help', 'xml-sitemap-feed' ); ?></a>
 	</li>
 	<li>
