@@ -6,6 +6,9 @@
 		<a href="https://support.google.com/news/publisher-center/answer/74288" target="_blank"><?php _e( /* https://support.google.com/news/publisher-center/answer/74288 */ 'Create a Google News sitemap', 'xml-sitemap-feed' ); ?></a>
 	</li>-->
 	<li>
+		<a href="https://search.google.com/search-console" target="_blank"><?php _e( /*  */ 'Google Search Console', 'xml-sitemap-feed' ); ?></a>
+	</li>
+	<li>
 		<a href="https://support.google.com/news/publisher/answer/40787" target="_blank"><?php _e( /* https://support.google.com/news/publisher/answer/40787 */ 'Getting into Google News', 'xml-sitemap-feed' ); ?></a>
 	</li>
 	<li>

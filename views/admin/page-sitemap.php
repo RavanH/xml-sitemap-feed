@@ -62,6 +62,8 @@
 			</p>
 		</form>
 
+		<?php include XMLSF_DIR . '/views/admin/sidebar-links.php'; ?>
+
 		<?php include XMLSF_DIR . '/views/admin/sidebar-help.php'; ?>
 
 		<?php include XMLSF_DIR . '/views/admin/help-tab-sidebar.php'; ?>

@@ -14,8 +14,7 @@
 <body>
 	<h1>XML Sitemap Feed - Index</h1>
 	<div id="header">
-		<p>This is the XML Sitemap Index to aid search engines like <a href="https://www.google.com">Google</a>, <a href="https://www.bing.com/">Bing</a>, <a href="https://www.yahoo.com">Yahoo!</a> and <a href="https://www.ask.com">Ask</a> indexing your site better.
-		If you have a <a href="https://www.google.com/webmasters/tools/">Google Webmaster Tools</a> and/or <a href="https://www.bing.com/toolbox/webmaster">Bing Webmaster Tools</a> account, please submit <strong><em>this index file</em></strong> as your sitemap. Read more about XML sitemaps on <a href="https://www.sitemaps.org/">Sitemaps.org</a>.</p>
+		<p>This is the XML Sitemap Index to aid search engines like <a href="https://www.google.com">Google</a>, <a href="https://www.bing.com/">Bing</a>, <a href="https://www.yahoo.com">Yahoo!</a> and <a href="https://www.ask.com">Ask</a> indexing your site better. Read more about XML sitemaps on <a href="https://www.sitemaps.org/">Sitemaps.org</a></p>
 	</div>
 	<div id="content">
 		<table cellpadding="5">

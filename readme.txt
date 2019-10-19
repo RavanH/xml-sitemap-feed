@@ -300,7 +300,7 @@ New action hooks, taxonomy selection bugfix and relative path stylesheets.
 
 = 5.2.6 =
 * NEW: xmlsf_tags_after, xmlsf_url_after and xmlsf_news_url_after action hooks
-* Make stylesheet paths relative to prevent exclusion when using Polylang with language domains
+* Make stylesheet paths relative to prevent exclusion when using different language domains
 * FIX: Taxonomy selection not available to new installs
 
 = 5.2.4 =
