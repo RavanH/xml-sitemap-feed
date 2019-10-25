@@ -298,6 +298,9 @@ New action hooks, taxonomy selection bugfix and relative path stylesheets.
 
 == Changelog ==
 
+= 5.2.7 =
+* NEW: Ad Inserter compatibility check
+
 = 5.2.6 =
 * NEW: xmlsf_tags_after, xmlsf_url_after and xmlsf_news_url_after action hooks
 * Make stylesheet paths relative to prevent exclusion when using different language domains
