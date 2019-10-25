@@ -55,7 +55,7 @@ class XMLSF_Admin
 		// ACTIONS & CHECKS
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
 		add_action( 'admin_init', array( $this, 'static_files' ) );
-		add_action( 'admin_init', array( $this, 'check_theme_conflicts' ) );
+		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
 	}
 
 	/**
@@ -303,11 +303,25 @@ class XMLSF_Admin
 	 * Check for conflicting themes and their settings
 	 */
 
-	public function check_theme_conflicts()
+	public function check_conflicts()
 	{
 		// Catch Box Pro feed redirect
-		if ( !in_array( 'catchbox_feed_redirect', self::$dismissed ) && function_exists( 'catchbox_is_feed_url_present' ) && catchbox_is_feed_url_present(null) ) {
+		if ( /*!in_array( 'catchbox_feed_redirect', self::$dismissed ) &&*/ function_exists( 'catchbox_is_feed_url_present' ) && catchbox_is_feed_url_present(null) ) {
 			add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_catchbox_feed_redirect' ) );
+		}
+
+		// Ad Inserter XML setting incompatibility warning
+    if ( /*!in_array( 'ad_inserter_feed', parent::$dismissed ) &&*/ is_plugin_active('ad-inserter/ad-inserter.php') ) {
+      $adsettings = get_option( 'ad_inserter' );
+			if ( is_array($adsettings) && !empty($adsettings) ) {
+        foreach ( $adsettings as $ad => $settings ) {
+					// check rss feed setting
+          if ( !empty( $settings['code'] ) && empty( $settings['disable_insertion'] ) && !empty( $settings['enable_feed'] ) ) {
+            add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_ad_inserter_feed' ) );
+            break;
+          }
+        }
+			}
 		}
 	}
 
