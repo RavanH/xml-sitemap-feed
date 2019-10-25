@@ -19,7 +19,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
   {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
-		add_action( 'admin_init', array( $this, 'check_plugin_conflicts' ), 11 );
+		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_metadata' ) );
@@ -66,7 +66,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	/**
 	 * Check for conflicting plugins and their settings
 	 */
-	public function check_plugin_conflicts()
+	public function check_conflicts()
 	{
     if ( wp_doing_ajax() || ! current_user_can( 'manage_options' ) ) return;
 
@@ -77,7 +77,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		// WP SEO conflict notices
 		if ( is_plugin_active('wordpress-seo/wp-seo.php') ) {
 			// check date archive redirection
-			if ( !in_array( 'wpseo_date_redirect', parent::$dismissed ) ) {
+			//if ( !in_array( 'wpseo_date_redirect', parent::$dismissed ) ) {
 				$wpseo_titles = get_option( 'wpseo_titles' );
 				if ( !empty( $wpseo_titles['disable-date'] ) ) {
 					// check if Split by option is set anywhere
@@ -88,7 +88,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 						}
 					}
 				}
-			}
+			//}
 
 			// check wpseo sitemap option
 			if ( !in_array( 'wpseo_sitemap', parent::$dismissed ) ) {
@@ -104,7 +104,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 
 			// check date archive redirection
 			$seopress_toggle = get_option( 'seopress_toggle' );
-			if ( !in_array( 'seopress_date_redirect', parent::$dismissed ) ) {
+			//if ( !in_array( 'seopress_date_redirect', parent::$dismissed ) ) {
 				$seopress_titles = get_option( 'seopress_titles_option_name' );
 				if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) ) {
 					// check if Split by option is set anywhere
@@ -115,7 +115,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 						}
 					}
 				}
-			}
+			//}
 
 			// check seopress sitemap option
 			if ( !in_array( 'seopress_sitemap', parent::$dismissed ) ) {
@@ -130,7 +130,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		if ( is_plugin_active('seo-by-rank-math/rank-math.php') ) {
 
 			// check date archive redirection
-			if ( !in_array( 'rankmath_date_redirect', parent::$dismissed ) ) {
+			//if ( !in_array( 'rankmath_date_redirect', parent::$dismissed ) ) {
 				$rankmath_titles = get_option( 'rank-math-options-titles' );
 				if ( ! empty( $rankmath_titles['disable_date_archives'] ) && $rankmath_titles['disable_date_archives'] == 'on' ) {
 					// check if Split by option is set anywhere
@@ -141,7 +141,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 						}
 					}
 				}
-			}
+			//}
 
 			// check rank math sitemap option
 			if ( !in_array( 'rankmath_sitemap', parent::$dismissed ) ) {

@@ -1,4 +1,4 @@
-<div class="notice notice-error fade is-dismissible">
+<div class="notice notice-warning fade is-dismissible">
 	<p>
     <strong><?php _e('XML Sitemap & Google News','xml-sitemap-feed'); ?></strong>
   </p>

@@ -1,13 +1,13 @@
 <div class="notice notice-warning fade is-dismissible">
 	<p>
-        <strong><?php _e('XML Sitemap & Google News','xml-sitemap-feed'); ?></strong>
-    </p>
-    <p>
-        <?php printf( /* translators: %1$s number of files, %2$s is Reading Settings URL */ _n(
-            'The following static file has been found. Either delete it or disable the conflicting <a href="%2$s">sitemap</a>.',
-            'The following %1$s static files have been found. Either delete them or disable the conflicting <a href="%2$s">sitemaps</a>.',
-            $number,'xml-sitemap-feed'), number_format_i18n($number), admin_url('options-reading.php') . '#xmlsf_sitemaps' ); ?>
-    </p>
+    <strong><?php _e('XML Sitemap & Google News','xml-sitemap-feed'); ?></strong>
+  </p>
+  <p>
+    <?php printf( /* translators: %1$s number of files, %2$s is Reading Settings URL */ _n(
+        'The following static file has been found. Either delete it or disable the conflicting <a href="%2$s">sitemap</a>.',
+        'The following %1$s static files have been found. Either delete them or disable the conflicting <a href="%2$s">sitemaps</a>.',
+        $number,'xml-sitemap-feed'), number_format_i18n($number), admin_url('options-reading.php') . '#xmlsf_sitemaps' ); ?>
+  </p>
 	<form action="" method="post">
 		<?php wp_nonce_field( XMLSF_BASENAME.'-notice', '_xmlsf_notice_nonce' ); ?>
 		<ul>
@@ -22,6 +22,6 @@
 			&nbsp;
 			<input type="hidden" name="xmlsf-dismiss" value="static_files" />
 			<input type="submit" class="button button-small" name="xmlsf-dismiss-submit" value="<?php echo translate('Dismiss'); ?>" />
-	    </p>
+	  </p>
 	</form>
 </div>

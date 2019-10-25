@@ -16,6 +16,11 @@ class XMLSF_Admin_Notices extends XMLSF_Admin
 		include XMLSF_DIR . '/views/admin/notice-static-files.php';
 	}
 
+	public static function notice_ad_inserter_feed()
+	{
+		include XMLSF_DIR . '/views/admin/notice-ad-insterter-feed.php';
+	}
+
 	public static function notice_catchbox_feed_redirect()
 	{
 		include XMLSF_DIR . '/views/admin/notice-catchbox-feed-redirect.php';

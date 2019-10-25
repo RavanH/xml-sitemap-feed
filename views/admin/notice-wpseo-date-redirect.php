@@ -1,7 +1,4 @@
 <div class="notice notice-error fade is-dismissible">
-	<p>
-    <strong><?php _e('XML Sitemap & Google News','xml-sitemap-feed'); ?></strong>
-  </p>
   <p>
 		<?php printf( /* translators: conflicting plugin name */
 			__( 'A setting in the %s plugin causes all date based sitemaps to redirect to the main page.', 'xml-sitemap-feed'),
@@ -16,11 +13,4 @@
 			'<a href="' . admin_url('options-general.php') . '?page=xmlsf">' . __('Included post types','xml-sitemap-feed') . '</a>'
 		); ?>
   </p>
-	<form action="" method="post">
-		<?php wp_nonce_field( XMLSF_BASENAME.'-notice', '_xmlsf_notice_nonce' ); ?>
-		<p>
-			<input type="hidden" name="xmlsf-dismiss" value="wpseo_date_redirect" />
-			<input type="submit" class="button button-small" name="xmlsf-dismiss-submit" value="<?php echo translate('Dismiss'); ?>" />
-		</p>
-	</form>
 </div>
