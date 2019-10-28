@@ -13,7 +13,7 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 '; ?>
 <?php xmlsf_generator(); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-	<?php do_action('xmlsf_urlset_custom'); ?>
+<?php do_action('xmlsf_urlset_custom'); ?>
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
 		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
