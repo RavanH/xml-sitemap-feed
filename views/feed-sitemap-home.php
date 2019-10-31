@@ -27,6 +27,7 @@ foreach ( xmlsf_get_root_data() as $url => $data ) {
 <?php do_action( 'xmlsf_tags_after', 'home' ); ?>
 	</url>
 <?php
+	do_action( 'xmlsf_url_after', 'home' );
 }
 ?>
 </urlset>

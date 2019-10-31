@@ -33,6 +33,7 @@ if ( is_array($urls) ) :
 <?php do_action( 'xmlsf_tags_after', 'custom' ); ?>
  	</url>
 <?php
+		do_action( 'xmlsf_url_after', 'custom' );
 	};
 
 endif;

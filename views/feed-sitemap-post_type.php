@@ -82,7 +82,7 @@ if ( have_posts() ) :
 ?>
  	</url>
 <?php
-		do_action( 'xmlsf_url_after' );
+		do_action( 'xmlsf_url_after', 'post_type' );
   endwhile;
 endif;
 

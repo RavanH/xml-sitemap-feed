@@ -33,7 +33,8 @@ if ( is_array($terms) ) :
 ?>
 	</url>
 <?php
-    endforeach;
+  do_action( 'xmlsf_url_after', 'taxonomy' );
+	endforeach;
 endif;
 
 ?></urlset>

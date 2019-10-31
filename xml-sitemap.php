@@ -67,8 +67,9 @@ define( 'XMLSF_VERSION', '5.2.6' );
  *	                              closing </url> is generated. Can be used to echo custom tags or trigger another
  *	                              action in the background. Passes parameter home|post_type|taxonomy|custom
  *                                to allow identification of the current sitemap.
- *	xmlsf_url_after            -> Fired inside the XML Sitemap loop after each url node.
- *	                              Can be used to append alternative url or trigger another action in the background.
+ *	xmlsf_url_after            -> Fired inside the XML Sitemap loop after each url node. Can be used to append
+ *	                              alternative url or trigger another action in the background. Passes parameter
+ *                                home|post_type|taxonomy|custom to allow identification of the current sitemap.
  *	xmlsf_news_urlset          -> Fired inside the Google News Sitemap urlset tag. Can be used to
  *	                              echo additional XML namespaces.
  *	xmlsf_news_tags_after      -> Fired inside the Google News Sitemap loop at the end of the news
