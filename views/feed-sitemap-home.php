@@ -24,6 +24,7 @@ foreach ( xmlsf_get_root_data() as $url => $data ) {
 		<loc><?php echo esc_url( $url ); ?></loc>
 		<priority><?php echo $data['priority']; ?></priority>
 		<lastmod><?php echo $data['lastmod']; ?></lastmod>
+<?php do_action( 'xmlsf_tags_after', 'home' ); ?>
 	</url>
 <?php
 }

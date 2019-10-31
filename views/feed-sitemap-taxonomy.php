@@ -28,7 +28,9 @@ if ( is_array($terms) ) :
 	 	<priority><?php echo xmlsf_get_term_priority( $term ); ?></priority>
 <?php if ( $lastmod = xmlsf_get_term_modified( $term ) ) { ?>
 		<lastmod><?php echo $lastmod; ?></lastmod>
-<?php } ?>
+<?php }
+ 		do_action( 'xmlsf_tags_after', 'taxonomy' );
+?>
 	</url>
 <?php
     endforeach;

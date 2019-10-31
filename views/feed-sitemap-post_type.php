@@ -78,7 +78,7 @@ if ( have_posts() ) :
 			}
 		endif;
 
-		do_action( 'xmlsf_tags_after' );
+		do_action( 'xmlsf_tags_after', 'post_type' );
 ?>
  	</url>
 <?php

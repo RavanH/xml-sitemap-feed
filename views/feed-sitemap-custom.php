@@ -30,6 +30,7 @@ if ( is_array($urls) ) :
 	<url>
 		<loc><?php echo esc_url( $url[0] ); ?></loc>
 		<priority><?php echo ( isset($url[1]) && is_numeric($url[1]) ) ? $url[1] : '0.5'; ?></priority>
+<?php do_action( 'xmlsf_tags_after', 'custom' ); ?>
  	</url>
 <?php
 	};
