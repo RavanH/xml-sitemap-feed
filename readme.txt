@@ -58,7 +58,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 
 = Pro Features =
 
-**[Google News Advanced](https://premium.status301.net/downloads/google-news-advanced/)**
+**[Google News Advanced](https://premium.status301.com/downloads/google-news-advanced/)**
 
 * Multiple post types - Include more than one post type in the same News Sitemap.
 * Keywords - Add the keywords tag to your News Sitemap. Keywords can be created from Tags, Categories or a dedicated Keywords taxonomy.

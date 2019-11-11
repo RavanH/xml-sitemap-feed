@@ -9,7 +9,7 @@
 <?php endforeach; if ( $do_warning || 'radio' == $type ) : ?>
 	<p class="description">
 		<?php if ( $do_warning ) _e( 'Custom post types that do not use the post category taxonomy, cannot be included as long as any category is selected below.', 'xml-sitemap-feed' ); ?>
-    <?php if ('radio' == $type) printf( /* Translators: Advanced plugin name */ __('Including multiple post types in the same News Sitemap is provided by the %s module.','xml-sitemap-feed'),'<a href="https://premium.status301.net/downloads/google-news-advanced/" target="_blank">'.__('Google News Advanced','xml-sitemap-feed').'</a>'); ?>
+    <?php if ('radio' == $type) printf( /* Translators: Advanced plugin name */ __('Including multiple post types in the same News Sitemap is provided by the %s module.','xml-sitemap-feed'),'<a href="https://premium.status301.com/downloads/google-news-advanced/" target="_blank">'.__('Google News Advanced','xml-sitemap-feed').'</a>'); ?>
 	</p>
 <?php endif; ?>
 </fieldset>
