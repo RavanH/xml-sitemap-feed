@@ -291,7 +291,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.2.6 =
+= 5.2.7 =
 
 New action hooks, taxonomy selection bugfix and relative path stylesheets.
 
@@ -301,6 +301,7 @@ New action hooks, taxonomy selection bugfix and relative path stylesheets.
 = 5.2.7 =
 * NEW: Ad Inserter compatibility check
 * NEW: xmlsf_urlset and xmlsf_news_urlset action hooks, thanks to Stanislav Khromov (@khromov)
+* Exclude hierarchical post types from news sitemap
 
 = 5.2.6 =
 * NEW: xmlsf_tags_after, xmlsf_url_after and xmlsf_news_url_after action hooks
