@@ -295,7 +295,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 	public function post_type_field()
 	{
 		global $wp_taxonomies;
-		$post_types = apply_filters( 'xmlsf_news_post_types', get_post_types( array( 'public' => true ) /*,'objects'*/) );
+		$post_types = apply_filters( 'xmlsf_news_post_types', get_post_types( array( 'public' => true, 'hierarchical' => false ) /*,'objects'*/) );
 
 		if ( is_array($post_types) && !empty($post_types) ) :
 
