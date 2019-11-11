@@ -164,14 +164,17 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
       // ADVANCED SECTION
   		add_settings_section( 'news_sitemap_advanced_section', /* '<a name="xmlnf"></a>'.__('Google News Sitemap','xml-sitemap-feed') */ '', '', 'xmlsf_news_advanced' );
 
+      // Hierarchical post types
+  		add_settings_field( 'xmlsf_news_hierarchical', __( 'Hierarchical post types', 'xml-sitemap-feed' ), array( $this,'hierarchical_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
+
   		// Keywords
-  		add_settings_field( 'xmlsf_news_keywords', __('Keywords', 'xml-sitemap-feed' ), array( $this,'keywords_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
+  		add_settings_field( 'xmlsf_news_keywords', __( 'Keywords', 'xml-sitemap-feed' ), array( $this,'keywords_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
 
   		// Stock tickers
-  		add_settings_field( 'xmlsf_news_stock_tickers', __('Stock tickers', 'xml-sitemap-feed' ), array( $this,'stock_tickers_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
+  		add_settings_field( 'xmlsf_news_stock_tickers', __( 'Stock tickers', 'xml-sitemap-feed' ), array( $this,'stock_tickers_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
 
   		// Ping log
-  		add_settings_field( 'xmlsf_news_ping_log', __('Ping log', 'xml-sitemap-feed' ), array( $this,'ping_log_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
+  		add_settings_field( 'xmlsf_news_ping_log', __( 'Ping log', 'xml-sitemap-feed' ), array( $this,'ping_log_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
     } else {
   		// GENERAL SECTION
   		add_settings_section( 'news_sitemap_general_section', /* '<a name="xmlnf"></a>'.__('Google News Sitemap','xml-sitemap-feed') */ '', '', 'xmlsf_news_general' );
@@ -331,6 +334,12 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
   {
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-news-keywords.php';
+	}
+
+  public function hierarchical_field()
+  {
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/field-news-hierarchical.php';
 	}
 
 	public function stock_tickers_field()
