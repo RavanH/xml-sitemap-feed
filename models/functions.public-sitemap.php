@@ -383,7 +383,7 @@ function xmlsf_set_terms_args( $args ) {
 	$args['orderby'] = 'count';
 	$args['pad_counts'] = true;
 	$args['lang'] = '';
-	$args['hierachical'] = 0;
+	$args['hierarchical'] = 0;
 	$args['suppress_filter'] = true;
 
 	return $args;
