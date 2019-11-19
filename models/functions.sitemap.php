@@ -180,7 +180,7 @@ function xmlsf_public_taxonomies() {
  * @param float $max
  * @return float
  */
-function xmlsf_sanitize_priority( $priority, $min = 0, $max = 1 ) {
+function xmlsf_sanitize_priority( $priority, $min = .1, $max = 1 ) {
 
 	$priority = (float) $priority;
 	$min = (float) $min;

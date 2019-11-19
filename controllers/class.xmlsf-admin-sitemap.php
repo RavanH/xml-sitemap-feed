@@ -188,12 +188,8 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		$priority = get_post_meta( $post->ID, '_xmlsf_priority', true );
 		$disabled = false;
 
-    // priority value precheck to prevent "invalid form control not focusable" when meta box is hidden
-    if ( !empty($priority) && is_numeric($priority) ) {
-      $priority = xmlsf_sanitize_priority( $priority );
-    } else {
-      $priority = '';
-    }
+    // value prechecks to prevent "invalid form control not focusable" when meta box is hidden
+    $priority = is_numeric($priority) ? xmlsf_sanitize_priority( $priority ): '';
 
 		// disable options and (visibly) set excluded to true for private posts
 		if ( 'private' == $post->post_status ) {

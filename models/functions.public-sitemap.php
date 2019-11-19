@@ -304,7 +304,7 @@ function xmlsf_get_post_priority() {
 	$priority = apply_filters( 'xmlsf_post_priority', $priority, $post->ID );
 
 	// a final check for limits and round it
-	return xmlsf_sanitize_priority( $priority, 0.1, 1 );
+	return xmlsf_sanitize_priority( $priority );
 
 }
 
@@ -337,7 +337,7 @@ function xmlsf_get_term_priority( $term = '' ) {
 	$priority = apply_filters( 'xmlsf_term_priority', $priority, $term->slug );
 
 	// a final check for limits and round it
-	return xmlsf_sanitize_priority( $priority, 0.1, 1 );
+	return xmlsf_sanitize_priority( $priority );
 
 }
 
