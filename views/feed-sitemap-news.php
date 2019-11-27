@@ -44,15 +44,15 @@ if ( have_posts() ) :
 			<news:publication>
 				<news:name><?php
 					if( !empty($options['name']) )
-						echo apply_filters( 'the_title_xmlsitemap', $options['name'] );
+						echo apply_filters( 'xmlsf_news_publication_name', $options['name'] );
 					elseif(defined('XMLSF_GOOGLE_NEWS_NAME'))
-						echo apply_filters( 'the_title_xmlsitemap', XMLSF_GOOGLE_NEWS_NAME );
+						echo apply_filters( 'xmlsf_news_publication_name', XMLSF_GOOGLE_NEWS_NAME );
 					else
-						echo apply_filters( 'the_title_xmlsitemap', get_bloginfo('name') ); ?></news:name>
+						echo apply_filters( 'xmlsf_news_publication_name', get_bloginfo('name') ); ?></news:name>
 				<news:language><?php echo xmlsf_get_language( $post->ID ); ?></news:language>
 			</news:publication>
 			<news:publication_date><?php echo mysql2date( DATE_W3C, $post->post_date ); ?></news:publication_date>
-			<news:title><?php echo apply_filters( 'the_title_xmlsitemap', get_the_title() ); ?></news:title>
+			<news:title><?php echo apply_filters( 'xmlsf_news_title', get_the_title() ); ?></news:title>
 			<news:keywords><?php echo implode( ', ', apply_filters( 'xmlsf_news_keywords', array() ) ); ?></news:keywords>
 			<news:stock_tickers><?php echo implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ); ?></news:stock_tickers>
 <?php do_action( 'xmlsf_news_tags_after' ); ?>
