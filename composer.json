@@ -1,0 +1,12 @@
+{
+  "name": "ravanh/xml-sitemap-feed",
+  "description": "XML and Google News Sitemaps for WordPress to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "version": "5.2.8",
+  "authors": [
+    {
+      "name": "Rolf Allard van Hagen"
+    }
+  ]
+}
