@@ -55,9 +55,10 @@ if ( have_posts() ) :
 			<news:title><?php echo apply_filters( 'xmlsf_news_title', get_the_title() ); ?></news:title>
 			<news:keywords><?php echo implode( ', ', apply_filters( 'xmlsf_news_keywords', array() ) ); ?></news:keywords>
 			<news:stock_tickers><?php echo implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ); ?></news:stock_tickers>
-<?php do_action( 'xmlsf_news_tags_after' ); ?>
+<?php do_action( 'xmlsf_news_tags_before' ); ?>
 		</news:news>
-	</url>
+    <?php do_action( 'xmlsf_news_tags_after' ); ?>
+  </url>
 <?php
 			do_action( 'xmlsf_news_url_after' );
     endwhile;
