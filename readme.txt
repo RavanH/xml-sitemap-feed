@@ -291,12 +291,15 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.2.7 =
+= 5.2.8 =
 
-New action hooks, Ad Inserter compatibility check.
 
 
 == Changelog ==
+
+= 5.2.8 =
+* Revisit fix: invalid form control not focusable when meta box is hidden
+* Revisit fix: force Status 200 response
 
 = 5.2.7 =
 * NEW: Ad Inserter compatibility check
