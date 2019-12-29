@@ -24,7 +24,7 @@ $have_posts = false;
 
 // loop away!
 if ( have_posts() ) :
-    while ( have_posts() ) :
+  while ( have_posts() ) :
 		the_post();
 
 		// check if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
@@ -59,8 +59,8 @@ if ( have_posts() ) :
 		</news:news>
 	</url>
 <?php
-			do_action( 'xmlsf_news_url_after' );
-    endwhile;
+		do_action( 'xmlsf_news_url_after' );
+  endwhile;
 endif;
 
 if ( !$have_posts ) :
