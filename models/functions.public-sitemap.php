@@ -420,7 +420,9 @@ function xmlsf_sitemap_parse_request( $request ) {
 				// calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
 				xmlsf()->timespan = xmlsf()->lastmodified - mysql2date( 'U', get_firstpostdate( 'blog', $feed[2]), false );
 				// total post type comment count
-				xmlsf()->comment_count = wp_count_comments($feed[2])->approved;
+				xmlsf()->comment_count = wp_count_comments()->approved;
+				// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
+				// TODO cache this more pertinently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/
 			};
 
 			// setup filter
