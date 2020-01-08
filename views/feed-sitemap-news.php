@@ -18,14 +18,14 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 <?php do_action('xmlsf_urlset', 'news'); ?>
 	xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
 <?php
-
-// set empty news sitemap flag
-$have_posts = false;
-
+global $wp_query, $post;
 // loop away!
 if ( have_posts() ) :
   while ( have_posts() ) :
-		the_post();
+		$wp_query->in_the_loop = true;
+		// don't do the_post() here to avoid expensive setup_postdata(), just do:
+		$wp_query->in_the_loop = true;
+		$post = $wp_query->next_post();
 
 		// check if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
 		// or if post meta says "exclude me please"
@@ -36,7 +36,7 @@ if ( have_posts() ) :
 			 ) || !xmlsf_is_allowed_domain( get_permalink() ) )
 			continue;
 
-		$have_posts = true;
+		$did_posts = true;
 		?>
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
@@ -63,7 +63,7 @@ if ( have_posts() ) :
   endwhile;
 endif;
 
-if ( !$have_posts ) :
+if ( empty( $did_posts ) ) :
 	// No posts done? Then do at least the homepage to prevent error message in GWT.
 	?>
 	<url>

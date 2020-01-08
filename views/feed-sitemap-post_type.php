@@ -33,10 +33,13 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
 		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd<?php echo $image_schema; ?>">
 <?php
+global $wp_query, $post;
 // loop away!
 if ( have_posts() ) :
 	while ( have_posts() ) :
-		the_post();
+		// don't do the_post() here to avoid expensive setup_postdata(), just do:
+		$wp_query->in_the_loop = true;
+		$post = $wp_query->next_post();
 
 		// check if page is in the exclusion list (like front page or post meta)
 		// or if we are dealing with an external URL :: Thanks to Francois Deschenes :)
@@ -45,8 +48,8 @@ if ( have_posts() ) :
 			|| !xmlsf_is_allowed_domain( get_permalink() )
 		) continue;
 
-	$did_posts = true;
-	?>
+		$did_posts = true;
+		?>
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
 		<priority><?php echo xmlsf_get_post_priority(); ?></priority>
