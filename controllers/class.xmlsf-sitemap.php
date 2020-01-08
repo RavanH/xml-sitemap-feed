@@ -43,25 +43,6 @@ class XMLSF_Sitemap
 		// PINGING
 		add_action( 'transition_post_status', array($this,'do_pings'), 10, 3 );
 
-		// FEED TEMPLATES
-		add_action( 'do_feed_sitemap', 'xmlsf_load_template_index', 10, 1 );
-		add_action( 'do_feed_sitemap_index', 'xmlsf_load_template_index', 10, 1 );
-		add_action( 'do_feed_sitemap-home', 'xmlsf_load_template_home', 10, 1 );
-		add_action( 'do_feed_sitemap-custom', 'xmlsf_load_template_custom', 10, 1 );
-
-		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
-
-		if ( is_array($this->post_types) ) {
-			foreach ( $this->post_types as $post_type => $settings ) {
-				if ( !empty($settings['active']) )
-					// FEED TEMPLATES
-					add_action( 'do_feed_sitemap-posttype-'.$post_type, 'xmlsf_load_template', 10, 1 );
-				}
-		}
-
-		foreach ( xmlsf_get_taxonomies() as $name ) {
-			add_action( 'do_feed_sitemap-taxonomy-'.$name, 'xmlsf_load_template_taxonomy', 10, 1 );
-		}
 	}
 
 	/**

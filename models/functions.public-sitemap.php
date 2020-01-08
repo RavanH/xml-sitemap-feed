@@ -400,13 +400,22 @@ function xmlsf_sitemap_parse_request( $request ) {
 
 	$feed = explode( '-' ,$request['feed'], 3 );
 
-	if ( !isset( $feed[1] ) ) return $request;
+	if ( !isset( $feed[1] ) ) {
+		// prepare index templates
+		add_action( 'do_feed_sitemap', 'xmlsf_load_template_index', 10, 1 );
+		add_action( 'do_feed_sitemap_index', 'xmlsf_load_template_index', 10, 1 );
+
+		return $request;
+	}
 
 	switch( $feed[1] ) {
 
 		case 'posttype':
 
 			if ( ! isset( $feed[2] ) ) break;
+
+			// prepare template
+			add_action( 'do_feed_sitemap-posttype-'.$feed[2], 'xmlsf_load_template', 10, 1 );
 
 			// try to raise memory limit, context added for filters
 			wp_raise_memory_limit( 'sitemap-posttype-'.$feed[2] );
@@ -439,6 +448,9 @@ function xmlsf_sitemap_parse_request( $request ) {
 
 			if ( !isset( $feed[2] ) ) break;
 
+			// prepare template
+			add_action( 'do_feed_sitemap-taxonomy-'.$feed[2], 'xmlsf_load_template_taxonomy', 10, 1 );
+
 			// try to raise memory limit, context added for filters
 			wp_raise_memory_limit( 'sitemap-taxonomy-'.$feed[2] );
 
@@ -459,7 +471,9 @@ function xmlsf_sitemap_parse_request( $request ) {
 			break;
 
 		default:
-		// do nothing
+			// prepare other templates
+			add_action( 'do_feed_sitemap-home', 'xmlsf_load_template_home', 10, 1 );
+			add_action( 'do_feed_sitemap-custom', 'xmlsf_load_template_custom', 10, 1 );
 	}
 
 	return $request;
