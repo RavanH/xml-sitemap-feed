@@ -207,12 +207,16 @@ class XMLSF_Sitemap
 			|| empty( $this->post_types[$post_type]['update_lastmod_on_comments'] ) // comments date irrelevant
 		) return;
 
+		$tz = date_default_timezone_get();
+  	date_default_timezone_set('UTC');
+		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date_gmt', date('Y-m-d H:i:s') );
+		date_default_timezone_set($tz);
+
 		// update comment meta data
-		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date_gmt', $comment->comment_date_gtm );
 	}
 
 	/**
-	 * Update post comment meta, hooked to transition comment status
+	 * Update post comment meta, hooked to comment post
 	 *
 	 * @since 5.2
 	 *
@@ -351,7 +355,7 @@ class XMLSF_Sitemap
 			'post_id' => $post->ID,
 		) );
 
-		if ( isset( $comments[0]->comment_date ) )
+		if ( isset( $comments[0]->comment_date_gmt ) )
 			update_post_meta( $post->ID, '_xmlsf_comment_date_gmt', $comments[0]->comment_date_gmt );
 	}
 
