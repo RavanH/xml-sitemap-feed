@@ -82,7 +82,7 @@ class XMLSF_Admin_Sitemap_Sanitize
 
 		// clear comments meta caches...
 		if ( $clear_comments ) {
-			$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
+			$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date_gmt' ) );
 			update_option( 'xmlsf_comments_meta_primed', array() );
 		}
 

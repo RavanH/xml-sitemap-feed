@@ -177,6 +177,12 @@ class XMLSitemapFeed_Upgrade {
 			$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified_gmt' ) );
 		}
 
+		if ( version_compare( '5.3', $db_version, '>' ) ) {
+			// clear comments meta
+			$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
+			update_option( 'xmlsf_comments_meta_primed', array() );
+		}
+
 		if ( defined('WP_DEBUG') && WP_DEBUG ) {
 			error_log('XML Sitemap Feeds upgraded from '.$db_version.' to '.XMLSF_VERSION);
 		}

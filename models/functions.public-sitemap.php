@@ -170,7 +170,7 @@ function xmlsf_get_post_modified() {
 
 		if ( !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
 			// assuming post meta data has been primed here
-			$lastcomment = get_post_meta( $post->ID, '_xmlsf_comment_date', true ); // only get one
+			$lastcomment = get_post_meta( $post->ID, '_xmlsf_comment_date_gmt', true ); // only get one
 
 			if ( ! empty( $lastcomment ) && strtotime( $lastcomment ) > strtotime( $lastmod ) )
 				$lastmod = $lastcomment;
@@ -220,7 +220,7 @@ function xmlsf_get_term_modified( $term ) {
 			)
 		);
 
-		$lastmod = isset($posts[0]->post_date_gmt) ? $posts[0]->post_date_gmt : '';
+		$lastmod = isset($posts[0]->post_date) ? $posts[0]->post_date : '';
 		// get post date here, not modified date because we're only
 		// concerned about new entries on the (first) taxonomy page
 
@@ -232,7 +232,7 @@ function xmlsf_get_term_modified( $term ) {
 
 	}
 
-	return ! empty( $lastmod ) ? get_date_from_gmt( $lastmod, DATE_W3C ) : false;
+	return ! empty( $lastmod ) ? mysql2date( DATE_W3C, $lastmod, false ) : false;
 
 }
 

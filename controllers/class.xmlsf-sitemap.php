@@ -27,6 +27,8 @@ class XMLSF_Sitemap
 	{
 		$this->sitemap = $sitemap;
 
+		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
+
 		// Cache clearance
 		add_action( 'clean_post_cache', array($this,'clean_post_cache'), 99, 2 );
 
@@ -206,7 +208,7 @@ class XMLSF_Sitemap
 		) return;
 
 		// update comment meta data
-		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date', $comment->comment_date_gtm );
+		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date_gmt', $comment->comment_date_gtm );
 	}
 
 	/**
@@ -231,7 +233,7 @@ class XMLSF_Sitemap
 		) return;
 
 		// update comment meta data
-		update_post_meta( $commentdata['comment_post_ID'], '_xmlsf_comment_date', $commentdata['comment_date_gmt'] );
+		update_post_meta( $commentdata['comment_post_ID'], '_xmlsf_comment_date_gmt', $commentdata['comment_date_gmt'] );
 	}
 
 	/**
@@ -350,7 +352,7 @@ class XMLSF_Sitemap
 		) );
 
 		if ( isset( $comments[0]->comment_date ) )
-			update_post_meta( $post->ID, '_xmlsf_comment_date', $comments[0]->comment_date_gmt );
+			update_post_meta( $post->ID, '_xmlsf_comment_date_gmt', $comments[0]->comment_date_gmt );
 	}
 
 }
