@@ -17,7 +17,7 @@ function xmlsf_get_root_data() {
 				$url = pll_home_url( $language['slug'] );
 				$data[$url] = array(
 					'priority' => '1.0',
-					'lastmod' => mysql2date( DATE_W3C, get_lastpostdate('blog') )
+					'lastmod' => get_date_from_gmt( get_lastpostdate('GMT'), DATE_W3C )
 					// TODO make lastmod date language specific
 				);
 			}
@@ -27,7 +27,7 @@ function xmlsf_get_root_data() {
 			$url = $sitepress->language_url($term);
 			$data[$url] = array(
 				'priority' => '1.0',
-				'lastmod' => mysql2date( DATE_W3C, get_lastpostdate('blog') )
+				'lastmod' => get_date_from_gmt( get_lastpostdate('GMT'), DATE_W3C )
 				// TODO make lastmod date language specific
 			);
 		}
@@ -36,7 +36,7 @@ function xmlsf_get_root_data() {
 		$data = array(
 			trailingslashit( home_url() ) => array(
 				'priority' => '1.0',
-				'lastmod' => mysql2date( DATE_W3C, get_lastpostdate('blog') )
+				'lastmod' => get_date_from_gmt( get_lastpostdate('GMT'), DATE_W3C )
 			)
 		);
 	}
@@ -154,15 +154,15 @@ function xmlsf_get_post_modified() {
 	// if blog or home page then simply look for last post date
 	if ( $post->post_type == 'page' && ( in_array( $post->ID, xmlsf_get_blogpages() ) || in_array( $post->ID, xmlsf_get_frontpages() ) ) ) {
 
-		$lastmod = get_lastpostmodified( 'blog' );
+		$lastmod = get_lastpostdate( 'GMT' );
 
 	} else {
 
-		$lastmod = $post->post_modified;
+		$lastmod = $post->post_modified_gmt;
 
 		// make sure lastmod is not older than publication date (happens on scheduled posts)
-		if ( isset( $post->post_date ) && strtotime( $post->post_date ) > strtotime( $lastmod ) ) {
-			$lastmod = $post->post_date;
+		if ( isset( $post->post_date_gmt ) && strtotime( $post->post_date_gmt ) > strtotime( $lastmod ) ) {
+			$lastmod = $post->post_date_gmt;
 		};
 
 		// maybe update lastmod to latest comment
@@ -178,7 +178,7 @@ function xmlsf_get_post_modified() {
 
 	}
 
-	return ! empty( $lastmod ) ? mysql2date( DATE_W3C, $lastmod ) : false;
+	return ! empty( $lastmod ) ? get_date_from_gmt( $lastmod, DATE_W3C ) : false;
 
 }
 
@@ -220,7 +220,7 @@ function xmlsf_get_term_modified( $term ) {
 			)
 		);
 
-		$lastmod = isset($posts[0]->post_date) ? $posts[0]->post_date : '';
+		$lastmod = isset($posts[0]->post_date_gmt) ? $posts[0]->post_date_gmt : '';
 		// get post date here, not modified date because we're only
 		// concerned about new entries on the (first) taxonomy page
 
@@ -232,7 +232,7 @@ function xmlsf_get_term_modified( $term ) {
 
 	}
 
-	return ! empty( $lastmod ) ? mysql2date( DATE_W3C, $lastmod ) : false;
+	return ! empty( $lastmod ) ? get_date_from_gmt( $lastmod, DATE_W3C ) : false;
 
 }
 
@@ -249,7 +249,7 @@ function xmlsf_get_taxonomy_modified( $taxonomy ) {
 
 	$lastmodified = array();
 	foreach ( (array)$obj->object_type as $object_type ) {
-		$lastmodified[] = get_lastpostdate( 'blog', $object_type );
+		$lastmodified[] = get_lastpostdate( 'GMT', $object_type );
 		// get last post date here, not modified date because we're only
 		// concerned about new entries on the (first) taxonomy page
 	}
@@ -258,7 +258,7 @@ function xmlsf_get_taxonomy_modified( $taxonomy ) {
 	$lastmodified = array_filter( $lastmodified );
 	$lastmod = end( $lastmodified );
 
-	return mysql2date( DATE_W3C, $lastmod );
+	return get_date_from_gmt( $lastmod, DATE_W3C );
 
 }
 
@@ -286,7 +286,7 @@ function xmlsf_get_post_priority() {
 
 	} elseif ( !empty($options[$post->post_type]['dynamic_priority']) ) {
 
-		$post_modified = mysql2date('U',$post->post_modified, false);
+		$post_modified = mysql2date('U',$post->post_modified);
 
 		// reduce by age
 		// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
@@ -358,15 +358,6 @@ function xmlsf_get_post_images( $which ) {
 }
 
 /**
- * Filter limits
- * override default feed limit
- * @return string
- */
-function xmlsf_filter_limits( $limit ) {
-	return 'LIMIT 0, 50000';
-}
-
-/**
  * Terms arguments filter
  * Does not check if we are really in a sitemap feed.
  *
@@ -376,9 +367,11 @@ function xmlsf_filter_limits( $limit ) {
  */
 function xmlsf_set_terms_args( $args ) {
 	// https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
+
 	$options = get_option('xmlsf_taxonomy_settings');
 	$args['number'] = isset($options['term_limit']) ? intval($options['term_limit']) : 5000;
 	if ( $args['number'] < 1 || $args['number'] > 50000 ) $args['number'] = 50000;
+
 	$args['order'] = 'DESC';
 	$args['orderby'] = 'count';
 	$args['pad_counts'] = true;
@@ -425,22 +418,34 @@ function xmlsf_sitemap_parse_request( $request ) {
 			// prepare priority calculation
 			if ( ! empty($options[$feed[2]]['dynamic_priority']) ) {
 				// last posts or page modified date in Unix seconds
-				xmlsf()->lastmodified = mysql2date( 'U', get_lastpostmodified( 'blog', $feed[2]), false );
+				xmlsf()->lastmodified = get_date_from_gmt( get_lastpostmodified( 'GMT', $feed[2]), 'U' );
 				// calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
-				xmlsf()->timespan = xmlsf()->lastmodified - mysql2date( 'U', get_firstpostdate( 'blog', $feed[2]), false );
+				xmlsf()->timespan = xmlsf()->lastmodified - get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2]), 'U' );
 				// total post type comment count
 				xmlsf()->comment_count = wp_count_comments()->approved;
 				// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
 				// TODO cache this more pertinently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/
 			};
 
-			// setup filter
-			add_filter( 'post_limits', 'xmlsf_filter_limits' );
+			// setup filters
+			add_filter( 'post_limits', function() { return 'LIMIT 0, 50000'; } );
+			add_filter( 'split_the_query', '__return_false' );
 
+			// modify request
 			$request['post_type'] = $feed[2];
 			$request['orderby'] = 'modified';
 			$request['order'] = 'DESC';
 			$request['is_date'] = false;
+
+			// prevent term cache update query unless needed for permalinks
+			if ( strpos( get_option( 'permalink_structure' ), '%category%' ) === false )
+				$request['update_post_term_cache'] = false;
+
+			// make sure to update meta cache for:
+			// 1. excluded posts
+			// 2. image data (if activated)
+			// 3. lasmod on comments (if activated)
+			$request['update_post_meta_cache'] = true;
 
 			break;
 
@@ -463,10 +468,13 @@ function xmlsf_sitemap_parse_request( $request ) {
 				$sitepress->switch_lang('all');
 			}
 
-			add_filter( 'get_terms_args', 'xmlsf_set_terms_args' );
-
 			// pass on taxonomy name via request
 			$request['taxonomy'] = $feed[2];
+
+			// setup filters
+			add_filter( 'get_terms_args', 'xmlsf_set_terms_args' );
+			//add_filter( 'split_the_query', '__return_false' );
+			add_filter( 'posts_request', '__return_false' ); // disable main feed query
 
 			break;
 

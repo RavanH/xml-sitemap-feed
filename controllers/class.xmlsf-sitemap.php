@@ -93,7 +93,7 @@ class XMLSF_Sitemap
 		wp_cache_delete( 'xmlsf_get_archives', 'general' );
 
 		// TODO get year / month here to delete specific keys too !!!!
-		$m = mysql2date( 'Ym', $post->post_date, false );
+		$m = get_date_from_gmt( $post->post_date_gmt, 'Ym' );
 		$y = substr( $m, 0, 4 );
 
 		// clear possible last post modified cache keys
@@ -206,7 +206,7 @@ class XMLSF_Sitemap
 		) return;
 
 		// update comment meta data
-		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date', $comment->comment_date );
+		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date', $comment->comment_date_gtm );
 	}
 
 	/**
@@ -231,7 +231,7 @@ class XMLSF_Sitemap
 		) return;
 
 		// update comment meta data
-		update_post_meta( $commentdata['comment_post_ID'], '_xmlsf_comment_date', $commentdata['comment_date'] );
+		update_post_meta( $commentdata['comment_post_ID'], '_xmlsf_comment_date', $commentdata['comment_date_gmt'] );
 	}
 
 	/**
@@ -350,7 +350,7 @@ class XMLSF_Sitemap
 		) );
 
 		if ( isset( $comments[0]->comment_date ) )
-			update_post_meta( $post->ID, '_xmlsf_comment_date', $comments[0]->comment_date );
+			update_post_meta( $post->ID, '_xmlsf_comment_date', $comments[0]->comment_date_gmt );
 	}
 
 }
