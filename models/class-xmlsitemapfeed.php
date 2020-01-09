@@ -121,7 +121,7 @@ class XMLSitemapFeed {
 	 * Constructor
 	 * @return void
 	 */
-	 function __construct() {}
+	function __construct() {}
 
 	/**
 	 * Default options

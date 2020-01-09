@@ -18,7 +18,7 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
 		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 <?php
-$terms = get_terms( get_query_var('taxonomy') );
+$terms = get_terms( array('taxonomy'=>get_query_var('taxonomy')) );
 
 if ( is_array($terms) ) :
     foreach ( $terms as $term ) :
