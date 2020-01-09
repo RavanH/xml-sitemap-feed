@@ -398,6 +398,9 @@ function xmlsf_sitemap_parse_request( $request ) {
 		add_action( 'do_feed_sitemap', 'xmlsf_load_template_index', 10, 1 );
 		add_action( 'do_feed_sitemap_index', 'xmlsf_load_template_index', 10, 1 );
 
+		// disable default feed query
+		add_filter( 'posts_request', '__return_false' );
+
 		return $request;
 	}
 
@@ -471,10 +474,11 @@ function xmlsf_sitemap_parse_request( $request ) {
 			// pass on taxonomy name via request
 			$request['taxonomy'] = $feed[2];
 
-			// setup filters
+			// set terms args
 			add_filter( 'get_terms_args', 'xmlsf_set_terms_args' );
-			//add_filter( 'split_the_query', '__return_false' );
-			add_filter( 'posts_request', '__return_false' ); // disable main feed query
+
+			// disable default feed query
+			add_filter( 'posts_request', '__return_false' );
 
 			break;
 
@@ -482,6 +486,9 @@ function xmlsf_sitemap_parse_request( $request ) {
 			// prepare other templates
 			add_action( 'do_feed_sitemap-home', 'xmlsf_load_template_home', 10, 1 );
 			add_action( 'do_feed_sitemap-custom', 'xmlsf_load_template_custom', 10, 1 );
+
+			// disable default feed query
+			add_filter( 'posts_request', '__return_false' );
 	}
 
 	return $request;
