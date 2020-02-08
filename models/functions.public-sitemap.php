@@ -420,14 +420,18 @@ function xmlsf_sitemap_parse_request( $request ) {
 
 			// prepare priority calculation
 			if ( ! empty($options[$feed[2]]['dynamic_priority']) ) {
-				// last posts or page modified date in Unix seconds
-				xmlsf()->lastmodified = get_date_from_gmt( get_lastpostmodified( 'GMT', $feed[2]), 'U' );
+
+				// last of this post type modified date in Unix seconds
+				xmlsf()->lastmodified = get_date_from_gmt( get_lastpostmodified( 'GMT', $feed[2] ), 'U' );
+
 				// calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
 				xmlsf()->timespan = xmlsf()->lastmodified - get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2]), 'U' );
+
 				// total post type comment count
 				xmlsf()->comment_count = wp_count_comments()->approved;
+
 				// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
-				// TODO cache this more pertinently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/
+				// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/
 			};
 
 			// setup filters
