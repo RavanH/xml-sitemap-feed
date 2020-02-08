@@ -14,9 +14,9 @@ class XMLSF_Sitemap
 
 	/**
 	 * Post types included in sitemap index
-	 * @var array
+	 * @var array|null
 	 */
-	private $post_types = array();
+	private $post_types;
 
 	/**
 	 * CONSTRUCTOR
@@ -26,8 +26,6 @@ class XMLSF_Sitemap
 	function __construct( $sitemap )
 	{
 		$this->sitemap = $sitemap;
-
-		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
 
 		// Cache clearance
 		add_action( 'clean_post_cache', array($this,'clean_post_cache'), 99, 2 );
@@ -48,6 +46,19 @@ class XMLSF_Sitemap
 	}
 
 	/**
+	 * Get the post types
+	 *
+	 * @return array $post_types
+	 */
+	public function post_types()
+	{
+		if ( null === $this->post_types ) {
+			$this->post_types = get_option( 'xmlsf_post_types', array() );
+		}
+		return (array) $this->post_types;
+	}
+
+	/**
 	 * Do pings, hooked to transition post status
 	 *
 	 * @param $new_status
@@ -65,7 +76,7 @@ class XMLSF_Sitemap
 		//if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) return;
 
 		// bail out when inactive post type
-		if ( ! array_key_exists( $post->post_type, (array) $this->post_types ) ) return;
+		if ( ! array_key_exists( $post->post_type, $this->post_types() ) ) return;
 
 		// we're saving from post edit screen (f.e. 'inline-save' would be from quick edit)
 		if ( ! empty( $_POST ) && ! empty( $_POST['action'] ) && 'editpost' == $_POST['action'] ) {
@@ -123,12 +134,14 @@ class XMLSF_Sitemap
 	 */
 	public function update_term_modified_meta( $new_status, $old_status, $post )
 	{
+		$post_types = $this->post_types();
+
 		// bail when...
 		if (
 			// no status transition or not moving in or out of 'publish' status
 			$old_status == $new_status || ( 'publish' != $new_status && 'publish' != $old_status ) ||
 			// inactive post type
-			! array_key_exists($post->post_type, $this->post_types) || empty( $this->post_types[$post->post_type]['active'] )
+			! array_key_exists($post->post_type, $post_types) || empty( $post_types[$post->post_type]['active'] )
 		) return;
 
 		$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
