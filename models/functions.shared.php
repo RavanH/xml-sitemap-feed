@@ -13,6 +13,8 @@ function xmlsf_filter_request( $request ) {
 	if ( xmlsf()->request_filtered ) return $request;
 
 	if ( isset($request['feed']) && strpos($request['feed'],'sitemap') === 0 ) :
+		// prevent public errors breaking xml
+		@ini_set( 'display_errors', 0 );
 
 		// make sure we have the proper locale setting for calculations
 		setlocale( LC_NUMERIC, 'C' );
