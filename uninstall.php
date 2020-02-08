@@ -69,6 +69,7 @@ class XMLSitemapFeed_Uninstall {
     // remove transients
     delete_transient( 'xmlsf_flush_rewrite_rules' );
   	delete_transient( 'xmlsf_check_static_files' );
+    delete_transient( 'xmlsf_prefetch_post_meta_failed' );
 
 		// remove plugin settings
 		delete_option('xmlsf_version');

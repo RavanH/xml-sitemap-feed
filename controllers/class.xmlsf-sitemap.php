@@ -253,7 +253,7 @@ class XMLSF_Sitemap
 		$post_type = $wp_query->get( 'post_type' );
 
 		if ( empty($post_type) || ! is_string($post_type) ) {
-			set_transient( 'xmlsf_prefetch_post_meta', 'Unexpected post type in WP_Query: '.print_r($post_type, true) );
+			set_transient( 'xmlsf_prefetch_post_meta_failed', 'Unexpected post type in WP_Query: '.print_r($post_type, true) );
 		};
 
 		// bail if post type not set
