@@ -6,10 +6,14 @@
  */
 function xmlsf_wpml_language_switcher() {
 	global $sitepress, $post;
-	if ( isset( $sitepress ) ) {
-		$post_language = apply_filters( 'wpml_post_language_details', NULL, $post->ID );
-		$sitepress->switch_lang( $post_language['language_code'] );
-	}
+
+	$language = apply_filters( 'wpml_element_language_code', NULL, array( 'element_id' => $post->ID, 'element_type' => $post->post_type ) );
+	$sitepress->switch_lang( $language );
+}
+global $sitepress;
+if ( is_object( $sitepress ) ) {
+	add_action( 'xmlsf_url', 'xmlsf_wpml_language_switcher' );
+	add_action( 'xmlsf_news_url', 'xmlsf_wpml_language_switcher' );
 }
 
 /**

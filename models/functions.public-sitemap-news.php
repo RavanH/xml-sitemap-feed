@@ -13,24 +13,6 @@ function xmlsf_news_filter_where( $where = '' ) {
 }
 
 /**
- * Filter news limits
- * override default feed limit for GN
- * @return string
- */
-function xmlsf_news_filter_limits( $limits ) {
-	return 'LIMIT 0, 1000';
-}
-
-/**
- * Filter no news limits
- * in case there is no news, just take the latest post
- * @return string
- */
-function xmlsf_news_filter_no_news_limits( $limits ) {
-	return 'LIMIT 0, 1';
-}
-
-/**
  * Filter request
  *
  * @param $request
@@ -38,6 +20,12 @@ function xmlsf_news_filter_no_news_limits( $limits ) {
  * @return mixed
  */
 function xmlsf_sitemap_news_parse_request( $request ) {
+
+	// FILTER HOOK FOR PLUGIN COMPATIBILITIES
+	$request = apply_filters( 'xmlsf_news_request', $request );
+	// Developers: add your actions that should run when a news sitemap request is found with
+	// add_filter( 'xmlsf_news_request', 'your_filter_function' );
+	// Filters hooked here already:
 
 	// prepare for news and return modified request
 	$options = get_option( 'xmlsf_news_tags' );
@@ -59,10 +47,10 @@ function xmlsf_sitemap_news_parse_request( $request ) {
 	}
 
 	if ( $live ) {
-		add_filter( 'post_limits', 'xmlsf_news_filter_limits' );
+		add_filter( 'post_limits', function() { return 'LIMIT 0, 1000';	} );
 		add_filter( 'posts_where', 'xmlsf_news_filter_where', 10, 1 );
 	} else {
-		add_filter( 'post_limits', 'xmlsf_news_filter_no_news_limits' );
+		add_filter( 'post_limits', function() { return 'LIMIT 0, 1'; } );
 	}
 
 	// post type
@@ -124,34 +112,42 @@ function xmlsf_news_get_images( $which ) {
 */
 
 /**
- * Get language used in News Sitemap
+ * Post language filter for Polylang
  *
+ * @param $language
  * @param $post_id
  *
  * @return string
  */
-function xmlsf_get_language( $post_id ) {
+function xmlsf_polylang_post_language_filter( $language, $post_id ) {
 
-	$language = xmlsf()->blog_language();
-
-	// WPML compat
-	global $sitepress;
-	if ( is_object($sitepress) && method_exists($sitepress, 'get_language_for_element') ) {
-		$post_type = (array) get_query_var( 'post_type', 'post' );
-		$lang = $sitepress->get_language_for_element( $post_id, 'post_'.$post_type[0] );
-		//apply_filters( 'wpml_element_language_code', null, array( 'element_id' => $post_id, 'element_type' => $post_type ) );
-		if ( !empty($lang) )
-			$language = xmlsf_parse_language_string( $lang );
-	}
-	// Polylang
-	elseif ( function_exists('pll_get_post_language') ) {
-		$lang = pll_get_post_language( $post_id, 'slug' );
-		if ( !empty($lang) )
-			$language = xmlsf_parse_language_string( $lang );
+	if ( function_exists('pll_get_post_language') ) {
+		$language = pll_get_post_language( $post_id, 'slug' );
 	}
 
-	return apply_filters( 'xmlsf_post_language', $language, $post_id );
+	return $language;
 }
+add_filter( 'xmlsf_news_language', 'xmlsf_polylang_post_language_filter', 10, 2 );
+
+/**
+ * Post language filter for WPML
+ *
+ * @param $language
+ * @param $post_id
+ * @param $post_type
+ *
+ * @return string
+ */
+function xmlsf_wpml_post_language_filter( $language, $post_id, $post_type = 'post' ) {
+
+ 	global $sitepress;
+
+	if ( $sitepress )
+		$language = apply_filters( 'wpml_element_language_code', $language, array( 'element_id' => $post_id, 'element_type' => $post_type ) );
+
+	return $language;
+}
+add_filter( 'xmlsf_news_language', 'xmlsf_wpml_post_language_filter', 10, 3 );
 
 /**
  * Parse language string
@@ -161,6 +157,7 @@ function xmlsf_get_language( $post_id ) {
  * @return string
  */
 function xmlsf_parse_language_string( $lang ) {
+
 	$lang = convert_chars( strtolower( strip_tags( $lang ) ) );
 
 	// no underscores
@@ -177,3 +174,4 @@ function xmlsf_parse_language_string( $lang ) {
 
 	return !empty($lang) ? $lang : 'en';
 }
+add_filter( 'xmlsf_news_language', 'xmlsf_parse_language_string', 99 );

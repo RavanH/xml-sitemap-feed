@@ -11,10 +11,10 @@ function xmlsf_get_root_data() {
 
 	// Polylang and WPML compat
 	if ( function_exists('pll_the_languages') && function_exists('pll_home_url') ) {
-		$languages = pll_the_languages( array( 'raw' => 1 ) );
+		$languages = pll_languages_list();
 		if ( is_array($languages) ) {
 			foreach ( $languages as $language ) {
-				$url = pll_home_url( $language['slug'] );
+				$url = pll_home_url( $language );
 				$data[$url] = array(
 					'priority' => '1.0',
 					'lastmod' => get_date_from_gmt( get_lastpostdate('GMT'), DATE_W3C )
@@ -41,7 +41,7 @@ function xmlsf_get_root_data() {
 		);
 	}
 
-	return $data;
+	return apply_filters( 'xmlsf_root_data', $data );
 
 }
 
@@ -391,9 +391,15 @@ function xmlsf_set_terms_args( $args ) {
  */
 function xmlsf_sitemap_parse_request( $request ) {
 
+	// FILTER HOOK FOR PLUGIN COMPATIBILITIES
+	$request = apply_filters( 'xmlsf_request', $request );
+	// Developers: add your actions that should run when a sitemap request is found like
+	// add_filter( 'xmlsf_request', 'your_filter_function' );
+	// Filters hooked here already:
+
 	$feed = explode( '-' ,$request['feed'], 3 );
 
-	if ( !isset( $feed[1] ) ) {
+	if ( ! isset( $feed[1] ) ) {
 		// prepare index templates
 		add_action( 'do_feed_sitemap', 'xmlsf_load_template_index', 10, 1 );
 		add_action( 'do_feed_sitemap_index', 'xmlsf_load_template_index', 10, 1 );
@@ -465,15 +471,6 @@ function xmlsf_sitemap_parse_request( $request ) {
 
 			// try to raise memory limit, context added for filters
 			wp_raise_memory_limit( 'sitemap-taxonomy-'.$feed[2] );
-
-			// WPML compat
-			global $sitepress;
-			if ( is_object($sitepress) ) {
-				remove_filter( 'get_terms_args', array($sitepress,'get_terms_args_filter') );
-				remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
-				remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
-				$sitepress->switch_lang('all');
-			}
 
 			// pass on taxonomy name via request
 			$request['taxonomy'] = $feed[2];
@@ -570,11 +567,11 @@ if( !function_exists('_get_post_time') ) {
 	$order = ( $which == 'last' ) ? 'DESC' : 'ASC';
 
 	/* CODE SUGGESTION BY Frédéric Demarle
-   * to make this language aware:
-  "SELECT post_{$field}_gmt FROM $wpdb->posts" . PLL()->model->post->join_clause()
-  ."WHERE post_status = 'publish' AND post_type IN ({$post_types})" . PLL()->model->post->where_clause( $lang )
-  . ORDER BY post_{$field}_gmt DESC LIMIT 1
-  */
+	* to make this language aware:
+	"SELECT post_{$field}_gmt FROM $wpdb->posts" . PLL()->model->post->join_clause()
+	."WHERE post_status = 'publish' AND post_type IN ({$post_types})" . PLL()->model->post->where_clause( $lang )
+	. ORDER BY post_{$field}_gmt DESC LIMIT 1
+	*/
 	switch ( $timezone ) {
 		case 'gmt':
 			$date = $wpdb->get_var("SELECT post_{$field}_gmt FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
@@ -589,12 +586,12 @@ if( !function_exists('_get_post_time') ) {
 	}
 
 	if ( $date ) {
-        wp_cache_set( $key, $date, 'timeinfo' );
+		wp_cache_set( $key, $date, 'timeinfo' );
 
-        return $date;
-    }
+		return $date;
+	}
 
-    return false;
+	return false;
 
  }
 }

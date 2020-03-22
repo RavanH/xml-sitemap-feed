@@ -21,46 +21,48 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 global $wp_query, $post;
 // loop away!
 if ( have_posts() ) :
-  while ( have_posts() ) :
-		$wp_query->in_the_loop = true;
-		// don't do the_post() here to avoid expensive setup_postdata(), just do:
-		$wp_query->in_the_loop = true;
+	$wp_query->in_the_loop = true;
+	while ( have_posts() ) :
+		//the_post(); // disabled to avoid expensive but useless setup_postdata(), just do:
+		// TODO : maybe make our own setup_postdata version?
 		$post = $wp_query->next_post();
 
 		// check if we are not dealing with an external URL :: Thanks to Francois Deschenes :)
 		// or if post meta says "exclude me please"
 		if ( apply_filters(
-			 	'xmlsf_news_excluded',
-			 	get_post_meta( $post->ID, '_xmlsf_news_exclude', true ),
-			 	$post->ID
-			 ) || !xmlsf_is_allowed_domain( get_permalink() ) )
-			continue;
+				'xmlsf_news_excluded',
+				get_post_meta( $post->ID, '_xmlsf_news_exclude', true ),
+				$post->ID
+			) || !xmlsf_is_allowed_domain( get_permalink() )
+		) continue;
 
 		$did_posts = true;
-		?>
+
+		do_action( 'xmlsf_news_url' ); ?>
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
 		<news:news>
 			<news:publication>
 				<news:name><?php
 					if( !empty($options['name']) )
-						echo apply_filters( 'the_title_xmlsitemap', $options['name'] );
+						echo apply_filters( 'xmlsf_news_publication_name', $options['name'] );
 					elseif(defined('XMLSF_GOOGLE_NEWS_NAME'))
-						echo apply_filters( 'the_title_xmlsitemap', XMLSF_GOOGLE_NEWS_NAME );
+						echo apply_filters( 'xmlsf_news_publication_name', XMLSF_GOOGLE_NEWS_NAME );
 					else
-						echo apply_filters( 'the_title_xmlsitemap', get_bloginfo('name') ); ?></news:name>
-				<news:language><?php echo xmlsf_get_language( $post->ID ); ?></news:language>
+						echo apply_filters( 'xmlsf_news_publication_name', get_bloginfo('name') ); ?></news:name>
+				<news:language><?php echo apply_filters( 'xmlsf_news_language', xmlsf()->blog_language(), $post->ID, $post->post_type ); ?></news:language>
 			</news:publication>
 			<news:publication_date><?php echo get_date_from_gmt( $post->post_date_gmt, DATE_W3C ); ?></news:publication_date>
-			<news:title><?php echo apply_filters( 'the_title_xmlsitemap', get_the_title() ); ?></news:title>
+			<news:title><?php echo apply_filters( 'xmlsf_news_title', get_the_title() ); ?></news:title>
 			<news:keywords><?php echo implode( ', ', apply_filters( 'xmlsf_news_keywords', array() ) ); ?></news:keywords>
 			<news:stock_tickers><?php echo implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ); ?></news:stock_tickers>
-<?php do_action( 'xmlsf_news_tags_after' ); ?>
+<?php do_action( 'xmlsf_news_tags_inner' ); ?>
 		</news:news>
+<?php do_action( 'xmlsf_news_tags_after' ); ?>
 	</url>
-<?php
-		do_action( 'xmlsf_news_url_after' );
-  endwhile;
+<?php do_action( 'xmlsf_news_url_after' );
+	endwhile;
+	$wp_query->in_the_loop = false;
 endif;
 
 if ( empty( $did_posts ) ) :

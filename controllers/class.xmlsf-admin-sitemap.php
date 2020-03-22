@@ -2,21 +2,21 @@
 
 class XMLSF_Admin_Sitemap extends XMLSF_Admin
 {
-  /**
-   * Holds the values to be used in the fields callbacks
-   */
-  private $screen_id;
+	/**
+	* Holds the values to be used in the fields callbacks
+	*/
+	private $screen_id;
 
 	/**
-   * Holds the public taxonomies array
-   */
-  private $public_taxonomies;
+	* Holds the public taxonomies array
+	*/
+	private $public_taxonomies;
 
-  /**
-   * Start up
-   */
-  public function __construct()
-  {
+	/**
+	* Start up
+	*/
+	public function __construct()
+	{
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
 		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
@@ -28,7 +28,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	public function tools_actions()
 	{
 		if ( ! isset( $_POST['xmlsf-ping-sitemap'] ) || ! xmlsf_verify_nonce('help') )
-      return;
+	  return;
 
 		$sitemaps = get_option( 'xmlsf_sitemaps' );
 
@@ -68,7 +68,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	 */
 	public function check_conflicts()
 	{
-    if ( wp_doing_ajax() || ! current_user_can( 'manage_options' ) ) return;
+	if ( wp_doing_ajax() || ! current_user_can( 'manage_options' ) ) return;
 
 		// TODO:
 		// W3TC static files 404 exclusion rules ? Said to be fixed in W3TC next version...
@@ -126,7 +126,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 			}
 		}
 
-    // Rank Math conflict notices
+		// Rank Math conflict notices
 		if ( is_plugin_active('seo-by-rank-math/rank-math.php') ) {
 
 			// check date archive redirection
@@ -188,8 +188,8 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		$priority = get_post_meta( $post->ID, '_xmlsf_priority', true );
 		$disabled = false;
 
-    // value prechecks to prevent "invalid form control not focusable" when meta box is hidden
-    $priority = is_numeric($priority) ? xmlsf_sanitize_priority( $priority ): '';
+	// value prechecks to prevent "invalid form control not focusable" when meta box is hidden
+	$priority = is_numeric($priority) ? xmlsf_sanitize_priority( $priority ): '';
 
 		// disable options and (visibly) set excluded to true for private posts
 		if ( 'private' == $post->post_status ) {
@@ -218,17 +218,17 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	public function save_metadata( $post_id )
 	{
 		if (
-      // verify nonce
-      ! isset($_POST['_xmlsf_nonce']) || ! wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME) ||
-      // user not allowed
-      ! current_user_can( 'edit_post', $post_id )
-    ) return;
+	  // verify nonce
+	  ! isset($_POST['_xmlsf_nonce']) || ! wp_verify_nonce($_POST['_xmlsf_nonce'], XMLSF_BASENAME) ||
+	  // user not allowed
+	  ! current_user_can( 'edit_post', $post_id )
+	) return;
 
 		// _xmlsf_priority
 		if ( empty($_POST['xmlsf_priority']) || ! is_numeric($_POST['xmlsf_priority']) )
 			delete_post_meta($post_id, '_xmlsf_priority');
 		else
-      update_post_meta($post_id, '_xmlsf_priority', xmlsf_sanitize_priority( $_POST['xmlsf_priority'] ) );
+	  update_post_meta($post_id, '_xmlsf_priority', xmlsf_sanitize_priority( $_POST['xmlsf_priority'] ) );
 
 		// _xmlsf_exclude
 		if ( empty($_POST['xmlsf_exclude']) )
@@ -238,9 +238,9 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	}
 
 	/**
-   * Gets public taxonomies
-   */
-  public function public_taxonomies()
+	* Gets public taxonomies
+	*/
+	public function public_taxonomies()
 	{
 		if ( !isset( $this->public_taxonomies ) ) {
 			$this->public_taxonomies = xmlsf_public_taxonomies();
@@ -250,25 +250,25 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	}
 
 	/**
-   * Add options page
-   */
-  public function add_settings_page()
+	* Add options page
+	*/
+	public function add_settings_page()
 	{
-    // This page will be under "Settings"
-    $this->screen_id = add_options_page(
-      __('XML Sitemap','xml-sitemap-feed'),
-      __('XML Sitemap','xml-sitemap-feed'),
-      'manage_options',
-      'xmlsf',
-      array( $this, 'settings_page' )
-    );
-  }
+	// This page will be under "Settings"
+	$this->screen_id = add_options_page(
+	  __('XML Sitemap','xml-sitemap-feed'),
+	  __('XML Sitemap','xml-sitemap-feed'),
+	  'manage_options',
+	  'xmlsf',
+	  array( $this, 'settings_page' )
+	);
+	}
 
-  /**
-   * Options page callback
-   */
-  public function settings_page()
-  {
+	/**
+	* Options page callback
+	*/
+	public function settings_page()
+	{
 		// SECTIONS & SETTINGS
 		// post_types
 		add_settings_section( 'xml_sitemap_post_types_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_post_types' );
@@ -287,7 +287,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		// taxonomies
 		add_settings_section( 'xml_sitemap_taxonomies_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_taxonomies' );
 		add_settings_field( 'xmlsf_taxonomy_settings', translate('General'), array($this,'taxonomy_settings_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
-    add_settings_field( 'xmlsf_taxonomies', __('Taxonomies','xml-sitemap-feed'), array($this,'taxonomies_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
+		add_settings_field( 'xmlsf_taxonomies', __('Taxonomies','xml-sitemap-feed'), array($this,'taxonomies_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
 
 		add_settings_section( 'xml_sitemap_advanced_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_advanced' );
 		// custom urls
@@ -297,17 +297,26 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 
 		$active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'post_types';
 
+		do_action( 'xmlsf_add_settings', $active_tab );
+
+		// prepare sitemap link url
 		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
-		$url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() || empty($sitemaps['sitemap']) ? '?feed=sitemap' : $sitemaps['sitemap'] );
+
+		$sitemap = xmlsf()->plain_permalinks() || empty( $sitemaps['sitemap-news'] ) ? '?feed=sitemap' : $sitemaps['sitemap'];
+
+		// remove WPML home url filter
+		global $wpml_url_filters;
+		if ( is_object($wpml_url_filters) )
+			remove_filter( 'home_url', array( $wpml_url_filters, 'home_url_filter' ), - 10 );
 
 		include XMLSF_DIR . '/views/admin/page-sitemap.php';
-  }
+	}
 
-  /**
-   * Register and add settings
-   */
-  public function register_settings()
-  {
+	/**
+	* Register and add settings
+	*/
+	public function register_settings()
+	{
 		// Help tab
 		add_action( 'load-'.$this->screen_id, array($this,'help_tab') );
 
@@ -320,7 +329,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		register_setting( 'xmlsf_advanced', 'xmlsf_urls', array('XMLSF_Admin_Sitemap_Sanitize','custom_urls_settings') );
 		// custom sitemaps
 		register_setting( 'xmlsf_advanced', 'xmlsf_custom_sitemaps', array('XMLSF_Admin_Sitemap_Sanitize','custom_sitemaps_settings') );
-  }
+	}
 
 	/**
 	* XML SITEMAP SECTION
@@ -336,7 +345,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
-			'id'      => 'sitemap-settings',
+			'id'	  => 'sitemap-settings',
 			'title'   => __( 'XML Sitemap', 'xml-sitemap-feed' ),
 			'content' => $content
 		) );
@@ -346,7 +355,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
-			'id'      => 'sitemap-settings-post-types',
+			'id'	  => 'sitemap-settings-post-types',
 			'title'   => __( 'Post types', 'xml-sitemap-feed' ),
 			'content' => $content
 		) );
@@ -356,7 +365,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
-			'id'      => 'sitemap-settings-taxonomies',
+			'id'	  => 'sitemap-settings-taxonomies',
 			'title'   => __( 'Taxonomies', 'xml-sitemap-feed' ),
 			'content' => $content,
 		) );
@@ -366,7 +375,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
-			'id'      => 'sitemap-settings-advanced',
+			'id'	  => 'sitemap-settings-advanced',
 			'title'   => translate( 'Advanced' ),
 			'content' => $content
 		) );
@@ -417,7 +426,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	}
 
 	public function urls_settings_field()
-  {
+	{
 		$urls = get_option( 'xmlsf_urls' );
 		$lines = array();
 

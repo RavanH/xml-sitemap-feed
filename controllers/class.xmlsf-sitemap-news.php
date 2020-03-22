@@ -27,7 +27,7 @@ class XMLSF_Sitemap_News
 		$this->sitemap = $sitemap;
 
 		// PINGING
-		add_action( 'transition_post_status', array( $this, 'do_ping' ), 10, 3 );
+		add_action( 'transition_post_status', array( $this, 'do_ping' ), 999, 3 );
 
 		// FEED TEMPLATES
 		add_action( 'do_feed_sitemap-news', 'xmlsf_news_load_template', 10, 1 );
@@ -45,11 +45,6 @@ class XMLSF_Sitemap_News
 		// bail out when already published or not publishing
 		if ( $old_status == 'publish' || $new_status != 'publish' ) return;
 
-		// bail out when REST API call without new post data, see Gutenberg issue https://github.com/WordPress/gutenberg/issues/15094
-		// NO ! Don't bail out now because there will be no other chance as long as bug is not fixed...
-		// ... we'll have to make do without $_POST data so potentially incorrect get_post_meta() information.
-		//if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) return;
-
 		// bail out when Google ping not checked
 		if ( ! in_array( 'google', (array) get_option( 'xmlsf_ping' ) ) ) return;
 
@@ -58,7 +53,7 @@ class XMLSF_Sitemap_News
 			// bail out when exclude field is checked
 			if ( ! empty( $_POST['_xmlsf_news_exclude'] ) ) return;
 		} else {
-			// fall back on exclude meta data from DB whic may be outdated (see bug)
+			// fall back on exclude meta data from DB which may be outdated (see bug)
 			if ( get_post_meta( $post->ID, '_xmlsf_news_exclude' ) ) return;
 		}
 

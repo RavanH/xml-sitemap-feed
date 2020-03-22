@@ -409,5 +409,3 @@ class XMLSF_Admin
 	}
 
 }
-
-new XMLSF_Admin();

@@ -49,6 +49,8 @@ if ( have_posts() ) :
 		) continue;
 
 		$did_posts = true;
+
+		do_action( 'xmlsf_url', 'post_type' );
 		?>
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
@@ -59,34 +61,24 @@ if ( have_posts() ) :
 <?php
 		if ( !empty($image) ) :
 			foreach ( get_post_meta( $post->ID, '_xmlsf_image_'.$image ) as $img_data ) {
+
 				if ( empty($img_data['loc']) )
-					continue;
-	?>
+					continue; ?>
 		<image:image>
 			<image:loc><?php echo utf8_uri_encode( $img_data['loc'] ); ?></image:loc>
-<?php
-			if ( !empty($img_data['title']) ) {
-		?>
+<?php			if ( !empty($img_data['title']) ) { ?>
 			<image:title><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $img_data['title']); ?>]]></image:title>
-<?php
-			}
-			if ( !empty($img_data['caption']) ) {
-		?>
+<?php			}; if ( !empty($img_data['caption']) ) { ?>
 			<image:caption><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $img_data['caption']); ?>]]></image:caption>
-<?php
-			}
-		?>
+<?php			}
+				do_action( 'xmlsf_image_tags_inner', 'post_type' ); ?>
 		</image:image>
-<?php
-			}
+<?php		}
 		endif;
-
-		do_action( 'xmlsf_tags_after', 'post_type' );
-?>
+		do_action( 'xmlsf_tags_after', 'post_type' ); ?>
  	</url>
-<?php
-		do_action( 'xmlsf_url_after', 'post_type' );
-  endwhile;
+<?php	do_action( 'xmlsf_url_after', 'post_type' );
+	endwhile;
 endif;
 
 if ( empty( $did_posts ) ) :

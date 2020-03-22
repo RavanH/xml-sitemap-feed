@@ -19,11 +19,11 @@ function xmlsf_filter_request( $request ) {
 		// make sure we have the proper locale setting for calculations
 		setlocale( LC_NUMERIC, 'C' );
 
-		// include shared functions
-		require_once XMLSF_DIR . '/models/functions.public-shared.php';
-
 		// set the sitemap conditional flag
 		xmlsf()->is_sitemap = true;
+
+		// include shared functions
+		require_once XMLSF_DIR . '/models/functions.public-shared.php';
 
 		// REPSONSE HEADERS filtering
 		add_filter( 'wp_headers', 'xmlsf_headers' );
@@ -37,30 +37,22 @@ function xmlsf_filter_request( $request ) {
 		$request['post_status'] = 'publish';
 		$request['no_found_rows'] = true; // found rows calc is slow and only needed for pagination
 
-		// PLUGIN COMPATIBILITIES
-		// Polylang
-		$request['lang'] = '';
-		// WPML compat
-		global $wpml_query_filter;
-		if ( is_object($wpml_query_filter) ) {
-			remove_filter( 'posts_join', array( $wpml_query_filter, 'posts_join_filter' ) );
-			remove_filter( 'posts_where', array( $wpml_query_filter, 'posts_where_filter' ) );
-			add_action( 'the_post', 'xmlsf_wpml_language_switcher' );
-		}
-		// bbPress
-		remove_filter( 'bbp_request', 'bbp_request_feed_trap' );
-
+		// COMPRESSION
 		// check for gz request
 		if ( substr($request['feed'], -3) == '.gz' ) {
+			// pop that .gz
 			$request['feed'] = substr($request['feed'], 0, -3);
+			// verify/apply compression settings
 			xmlsf_output_compression();
 		}
 
+		// FURTHER REQUEST PARSING
 		if ( strpos($request['feed'],'sitemap-news') === 0 ) {
 			// set the news sitemap conditional flag
 			xmlsf()->is_news = true;
 
 			require_once XMLSF_DIR . '/models/functions.public-sitemap-news.php';
+
 			$request = xmlsf_sitemap_news_parse_request( $request );
 		} else {
 			require_once XMLSF_DIR . '/models/functions.public-sitemap.php';

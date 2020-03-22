@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravan
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 4.4
 Requires PHP: 5.4
-Tested up to: 5.3
+Tested up to: 5.4
 Stable tag: 5.2.7
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
@@ -291,15 +291,27 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.2.8 =
+= 5.3 =
 
 
 
 == Changelog ==
 
-= 5.2.8 =
-* Revisit fix: invalid form control not focusable when meta box is hidden
-* Revisit fix: force Status 200 response
+= 5.3 =
+TODO prime meta caches button
+TODO mention Pro News Feed
+TODO verify/update help links
+* NEW: request filters `xmlsf_request` and `xmlsf_news_request`
+* NEW: nexs template filters `xmlsf_news_publication_name` and `xmlsf_news_title`
+* NEW: sitemap template action hook `xmlsf_url`
+* NEW: sitemap template action hooks `xmlsf_news_url` and `xmlsf_news_tags_inner`
+* Moved news template action hook `xmlsf_news_tags_after` to after closing </news:news> tag
+* Less DB queries, smaller memory footprint
+* Better debug info with SAVEQUERIES
+* FIX: invalid form control not focusable when meta box is hidden
+* FIX: force Status 200 response
+* FIX: priority calculation last modified for post type
+* FIX: news sitemap redirection with Polylang
 
 = 5.2.7 =
 * NEW: Ad Inserter compatibility check

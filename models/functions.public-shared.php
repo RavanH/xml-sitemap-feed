@@ -68,3 +68,72 @@ function xmlsf_is_allowed_domain( $url ) {
 
 	return apply_filters( 'xmlsf_allowed_domain', $return, $url );
 }
+
+
+/**
+ * Polylang compatibility hooked into xml request filter
+ *
+ * @param array $request
+ *
+ * @return array
+ */
+function xmlsf_polylang_request( $request ) {
+
+	if ( function_exists('pll_languages_list') ) {
+		$request['lang'] = 'all'; // | 'all' | implode( ',', pll_languages_list() );
+		// prevent language redirections
+		add_filter( 'pll_check_canonical_url', '__return_false' );
+	}
+
+	return $request;
+}
+add_filter( 'xmlsf_request', 'xmlsf_polylang_request' );
+add_filter( 'xmlsf_news_request', 'xmlsf_polylang_request' );
+
+/**
+ * WPML compatibility hooked into xml request filter
+ *
+ * @param array $request
+ *
+ * @return array
+ */
+function xmlsf_wpml_request( $request ) {
+	global $sitepress, $wpml_query_filter;
+
+	if ( is_object($sitepress) ) {
+		// remove filters for tax queries
+		remove_filter( 'get_terms_args', array($sitepress,'get_terms_args_filter') );
+		remove_filter( 'get_term', array($sitepress,'get_term_adjust_id'), 1 );
+		remove_filter( 'terms_clauses', array($sitepress,'terms_clauses') );
+		// set language to all
+		$sitepress->switch_lang('all');
+	}
+
+	if ( $wpml_query_filter ) {
+		// remove query filters
+		remove_filter( 'posts_join', array( $wpml_query_filter, 'posts_join_filter' ), 10, 2 );
+		remove_filter( 'posts_where', array( $wpml_query_filter, 'posts_where_filter' ), 10, 2 );
+	}
+
+	$request['lang'] = ''; // strip off potential lang url parameter
+
+	return $request;
+}
+add_filter( 'xmlsf_request', 'xmlsf_wpml_request' );
+add_filter( 'xmlsf_news_request', 'xmlsf_wpml_request' );
+
+/**
+ * BBPress compatibility hooked into xml request filter
+ *
+ * @param array $request
+ *
+ * @return array
+ */
+function xmlsf_bbpress_request( $request ) {
+
+	remove_filter( 'bbp_request', 'bbp_request_feed_trap' );
+
+	return $request;
+}
+add_filter( 'xmlsf_request', 'xmlsf_bbpress_request' );
+add_filter( 'xmlsf_news_request', 'xmlsf_bbpress_request' );

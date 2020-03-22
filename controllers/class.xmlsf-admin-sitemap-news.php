@@ -3,15 +3,15 @@
 class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 {
 	/**
-   * Holds the values to be used in the fields callbacks
-   */
-  private $options;
+	* Holds the values to be used in the fields callbacks
+	*/
+	private $options;
 
-  /**
-   * Start up
-   */
-  public function __construct()
-  {
+	/**
+	* Start up
+	*/
+	public function __construct()
+	{
 		// META
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_metadata' ) );
@@ -25,7 +25,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 
 		// TOOLS ACTIONS
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
-  }
+	}
 
 	/**
 	* TOOLS ACTIONS
@@ -34,7 +34,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 	public function tools_actions()
 	{
 		if ( ! isset( $_POST['xmlsf-ping-sitemap-news'] ) || ! xmlsf_verify_nonce('help') )
-      return;
+		return;
 
 		$sitemaps = get_option( 'xmlsf_sitemaps' );
 		$result = xmlsf_ping( 'google', $sitemaps['sitemap-news'], 5 * MINUTE_IN_SECONDS );
@@ -103,11 +103,11 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 	public function save_metadata( $post_id )
 	{
 		if (
-      // verify nonce
-      ! isset($_POST['_xmlsf_news_nonce']) || ! wp_verify_nonce($_POST['_xmlsf_news_nonce'], XMLSF_BASENAME) ||
-      // user not allowed
-      ! current_user_can( 'edit_post', $post_id )
-    ) return;
+			// verify nonce
+			! isset($_POST['_xmlsf_news_nonce']) || ! wp_verify_nonce($_POST['_xmlsf_news_nonce'], XMLSF_BASENAME) ||
+			// user not allowed
+			! current_user_can( 'edit_post', $post_id )
+		) return;
 
 		// _xmlsf_news_exclude
 		if ( empty($_POST['xmlsf_news_exclude']) )
@@ -121,91 +121,98 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 	*/
 
 	/**
-   * Add options page
-   */
-  public function add_settings_page()
+	* Add options page
+	*/
+	public function add_settings_page()
 	{
-    // This page will be under "Settings"
-    $screen_id = add_options_page(
-  	__('Google News Sitemap','xml-sitemap-feed'),
-          __('Google News','xml-sitemap-feed'),
-          'manage_options',
-          'xmlsf_news',
-          array( $this, 'settings_page' )
-    );
+		// This page will be under "Settings"
+		$screen_id = add_options_page(
+			__('Google News Sitemap','xml-sitemap-feed'),
+			__('Google News','xml-sitemap-feed'),
+			'manage_options',
+			'xmlsf_news',
+			array( $this, 'settings_page' )
+		);
 
-  	// Help tab
-  	add_action( 'load-'.$screen_id, array( $this, 'help_tab' ) );
-  }
+		// Help tab
+		add_action( 'load-'.$screen_id, array( $this, 'help_tab' ) );
+	}
 
-  /**
-   * Options page callback
-   */
-  public function settings_page()
-  {
-    $this->options = (array) get_option( 'xmlsf_news_tags', array() );
-
-		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
-		$url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() || empty($sitemaps['sitemap-news']) ? '?feed=sitemap-news' : $sitemaps['sitemap-news'] );
+	/**
+	* Options page callback
+	*/
+	public function settings_page()
+	{
+		$this->options = (array) get_option( 'xmlsf_news_tags', array() );
 
 		$active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'general';
 
-    do_action( 'xmlsf_news_add_settings', $active_tab );
+		do_action( 'xmlsf_news_add_settings', $active_tab );
+
+		// prepare sitemap link url
+		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
+
+		$sitemap = xmlsf()->plain_permalinks() || empty($sitemaps['sitemap-news']) ? '?feed=sitemap-news' : $sitemaps['sitemap-news'];
+
+		// remove WPML home url filter
+		global $wpml_url_filters;
+		if ( is_object($wpml_url_filters) )
+			remove_filter( 'home_url', array( $wpml_url_filters, 'home_url_filter' ), - 10 );
 
 		include XMLSF_DIR . '/views/admin/page-sitemap-news.php';
 	}
 
-  /**
-   * Add advanced settings
-   */
-  public function add_settings( $active_tab = '' )
+	/**
+	* Add advanced settings
+	*/
+	public function add_settings( $active_tab = '' )
 	{
-    if ( 'advanced' == $active_tab ) {
-      // ADVANCED SECTION
-  		add_settings_section( 'news_sitemap_advanced_section', /* '<a name="xmlnf"></a>'.__('Google News Sitemap','xml-sitemap-feed') */ '', '', 'xmlsf_news_advanced' );
+		if ( 'advanced' == $active_tab ) {
+			// ADVANCED SECTION
+			add_settings_section( 'news_sitemap_advanced_section', /* '<a name="xmlnf"></a>'.__('Google News Sitemap','xml-sitemap-feed') */ '', '', 'xmlsf_news_advanced' );
 
-      // Hierarchical post types
-  		add_settings_field( 'xmlsf_news_hierarchical', __( 'Hierarchical post types', 'xml-sitemap-feed' ), array( $this,'hierarchical_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
+			// Hierarchical post types
+			add_settings_field( 'xmlsf_news_hierarchical', __( 'Hierarchical post types', 'xml-sitemap-feed' ), array( $this,'hierarchical_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
 
-  		// Keywords
-  		add_settings_field( 'xmlsf_news_keywords', __( 'Keywords', 'xml-sitemap-feed' ), array( $this,'keywords_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
+			// Keywords
+			add_settings_field( 'xmlsf_news_keywords', __( 'Keywords', 'xml-sitemap-feed' ), array( $this,'keywords_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
 
-  		// Stock tickers
-  		add_settings_field( 'xmlsf_news_stock_tickers', __( 'Stock tickers', 'xml-sitemap-feed' ), array( $this,'stock_tickers_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
+			// Stock tickers
+			add_settings_field( 'xmlsf_news_stock_tickers', __( 'Stock tickers', 'xml-sitemap-feed' ), array( $this,'stock_tickers_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
 
-  		// Ping log
-  		add_settings_field( 'xmlsf_news_ping_log', __( 'Ping log', 'xml-sitemap-feed' ), array( $this,'ping_log_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
-    } else {
-  		// GENERAL SECTION
-  		add_settings_section( 'news_sitemap_general_section', /* '<a name="xmlnf"></a>'.__('Google News Sitemap','xml-sitemap-feed') */ '', '', 'xmlsf_news_general' );
+			// Ping log
+			add_settings_field( 'xmlsf_news_ping_log', __( 'Ping log', 'xml-sitemap-feed' ), array( $this,'ping_log_field' ), 'xmlsf_news_advanced', 'news_sitemap_advanced_section' );
+		} else {
+			// GENERAL SECTION
+			add_settings_section( 'news_sitemap_general_section', /* '<a name="xmlnf"></a>'.__('Google News Sitemap','xml-sitemap-feed') */ '', '', 'xmlsf_news_general' );
 
-  		// SETTINGS
-  		add_settings_field( 'xmlsf_news_name', '<label for="xmlsf_news_name">'.__('Publication name','xml-sitemap-feed').'</label>', array($this,'name_field'), 'xmlsf_news_general', 'news_sitemap_general_section' );
-  		add_settings_field( 'xmlsf_news_post_type', __('Post type','xml-sitemap-feed'), array($this,'post_type_field'), 'xmlsf_news_general', 'news_sitemap_general_section' );
+			// SETTINGS
+			add_settings_field( 'xmlsf_news_name', '<label for="xmlsf_news_name">'.__('Publication name','xml-sitemap-feed').'</label>', array($this,'name_field'), 'xmlsf_news_general', 'news_sitemap_general_section' );
+			add_settings_field( 'xmlsf_news_post_type', __('Post type','xml-sitemap-feed'), array($this,'post_type_field'), 'xmlsf_news_general', 'news_sitemap_general_section' );
 
-  		global $wp_taxonomies;
-  		$news_post_type = isset( $this->options['post_type'] ) && !empty( $this->options['post_type'] ) ? (array) $this->options['post_type'] : array('post');
-  		$post_types = ( isset( $wp_taxonomies['category'] ) ) ? $wp_taxonomies['category']->object_type : array();
+			global $wp_taxonomies;
+			$news_post_type = isset( $this->options['post_type'] ) && !empty( $this->options['post_type'] ) ? (array) $this->options['post_type'] : array('post');
+			$post_types = ( isset( $wp_taxonomies['category'] ) ) ? $wp_taxonomies['category']->object_type : array();
 
-  		foreach ( $news_post_type as $post_type ) {
-  			if ( in_array( $post_type, $post_types ) ) {
-  				add_settings_field( 'xmlsf_news_categories', translate('Categories'), array($this,'categories_field'), 'xmlsf_news_general', 'news_sitemap_general_section' );
-  				break;
-  			}
-  		}
+			foreach ( $news_post_type as $post_type ) {
+				if ( in_array( $post_type, $post_types ) ) {
+					add_settings_field( 'xmlsf_news_categories', translate('Categories'), array($this,'categories_field'), 'xmlsf_news_general', 'news_sitemap_general_section' );
+					break;
+				}
+			}
 
-  		// Source labels - deprecated
-  		add_settings_field( 'xmlsf_news_labels', __('Source labels', 'xml-sitemap-feed' ), array($this,'labels_field'), 'xmlsf_news_general', 'news_sitemap_general_section' );
-    }
+			// Source labels - deprecated
+			add_settings_field( 'xmlsf_news_labels', __('Source labels', 'xml-sitemap-feed' ), array($this,'labels_field'), 'xmlsf_news_general', 'news_sitemap_general_section' );
+		}
 	}
 
 	/**
-	 * Register settings
-	 */
+	* Register settings
+	*/
 	public function register_settings()
-  {
+	{
 		register_setting( 'xmlsf_news_general', 'xmlsf_news_tags', array('XMLSF_Admin_Sitemap_News_Sanitize','news_tags_settings') );
-  }
+	}
 
 	/**
 	* GOOGLE NEWS SITEMAP SECTION
@@ -220,7 +227,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
-			'id'      => 'sitemap-news-settings',
+			'id'	  => 'sitemap-news-settings',
 			'title'   => __( 'Google News Sitemap', 'xml-sitemap-feed' ),
 			'content' => $content
 		) );
@@ -231,7 +238,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
-			'id'      => 'sitemap-news-name',
+			'id'	  => 'sitemap-news-name',
 			'title'   => __( 'Publication name', 'xml-sitemap-feed' ),
 			'content' => $content
 		) );
@@ -242,7 +249,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
-			'id'      => 'sitemap-news-categories',
+			'id'	  => 'sitemap-news-categories',
 			'title'   => translate('Categories'),
 			'content' => $content
 		) );
@@ -253,7 +260,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
-			'id'      => 'sitemap-news-keywords',
+			'id'	  => 'sitemap-news-keywords',
 			'title'   => __( 'Keywords', 'xml-sitemap-feed' ),
 			'content' => $content
 		) );
@@ -264,7 +271,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
-			'id'      => 'sitemap-news-stocktickers',
+			'id'	  => 'sitemap-news-stocktickers',
 			'title'   => __( 'Stock tickers', 'xml-sitemap-feed' ),
 			'content' => $content
 		) );
@@ -275,7 +282,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		$content = ob_get_clean();
 
 		$screen->add_help_tab( array(
-			'id'      => 'sitemap-news-labels',
+			'id'	  => 'sitemap-news-labels',
 			'title'   => __( 'Source labels', 'xml-sitemap-feed' ),
 			'content' => $content
 		) );
@@ -310,8 +317,8 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 
 			$do_warning = !empty( $this->options['categories'] ) && count($post_types) > 1 ? true : false;
 
-			// The actual fields for data entry
-			include XMLSF_DIR . '/views/admin/field-news-post-type.php';
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/field-news-post-type.php';
 
 		else :
 
@@ -320,9 +327,31 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		endif;
 	}
 
+	public function terms_checklist_language_filter( $args )
+	{
+		if ( function_exists('pll_languages_list') ) {
+			$args['lang'] = implode( ',', pll_languages_list() );
+		} else {
+			$args['lang'] = '';
+		}
+
+		return $args;
+	}
+
 	public function categories_field()
 	{
 		$selected_categories = isset( $this->options['categories'] ) && is_array( $this->options['categories'] ) ? $this->options['categories'] : array();
+
+		if ( function_exists('pll_languages_list') ) {
+			add_filter( 'get_terms_args', function( $args ){ $args['lang'] = implode( ',', pll_languages_list() ); return $args; }/*array( $this, 'terms_checklist_language_filter' )*/ );
+		}
+
+		global $sitepress;
+		if ( $sitepress ) {
+			remove_filter( 'get_terms_args', array( $sitepress, 'get_terms_args_filter' ) );
+			remove_filter( 'get_term', array( $sitepress, 'get_term_adjust_id' ), 1 );
+			remove_filter( 'terms_clauses', array( $sitepress, 'terms_clauses' ) );
+		}
 
 		$cat_list = str_replace('name="post_category[]"','name="'.'xmlsf_news_tags[categories][]"', wp_terms_checklist( null, array( 'taxonomy' => 'category', 'selected_cats' => $selected_categories, 'echo' => false ) ) );
 
@@ -331,31 +360,31 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 	}
 
 	public function keywords_field()
-  {
+	{
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-news-keywords.php';
 	}
 
-  public function hierarchical_field()
-  {
+	public function hierarchical_field()
+	{
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-news-hierarchical.php';
 	}
 
 	public function stock_tickers_field()
-  {
+	{
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-news-stocktickers.php';
 	}
 
 	public function ping_log_field()
-  {
+	{
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-news-ping-log.php';
 	}
 
 	public function labels_field()
-  {
+	{
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-news-labels.php';
 	}
