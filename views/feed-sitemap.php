@@ -17,11 +17,12 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
 		http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
 	<sitemap>
-		<loc><?php echo xmlsf_get_index_url( 'home' ); ?></loc>
+		<loc><?php echo xmlsf_get_index_url(); ?></loc>
 		<lastmod><?php echo get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ); ?></lastmod>
 	</sitemap>
 <?php
-// add rules for public post types
+
+// public post types
 $post_types = apply_filters( 'xmlsf_post_types', (array) get_option( 'xmlsf_post_types', array() ) );
 if ( is_array($post_types) ) :
 	foreach ( $post_types as $post_type => $settings ) {
@@ -45,7 +46,7 @@ if ( is_array($post_types) ) :
 	}
 endif;
 
-// add rules for public taxonomies
+// public taxonomies
 foreach ( xmlsf_get_taxonomies() as $taxonomy ) : ?>
 	<sitemap>
 		<loc><?php echo xmlsf_get_index_url( 'taxonomy', $taxonomy ); ?></loc>

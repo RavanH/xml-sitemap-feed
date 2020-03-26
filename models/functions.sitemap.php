@@ -25,7 +25,7 @@ function xmlsf_filter_post_types( $post_types ) {
  *
  * @return string
  */
-function xmlsf_get_index_url( $sitemap = 'home', $type = false, $m = false, $w = false, $gz = false ) {
+function xmlsf_get_index_url( $sitemap = 'root', $type = false, $m = false, $w = false, $gz = false ) {
 
 	if ( xmlsf()->plain_permalinks() ) {
 		$name = '?feed=sitemap-'.$sitemap;
