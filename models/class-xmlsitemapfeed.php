@@ -19,6 +19,21 @@ class XMLSitemapFeed {
 	);
 
 	/**
+	 * Rewrite rules
+	 * @var array
+	 */
+	public $rewrite_rules = array(
+		'sitemap.xml' => array(
+			'regex' => 'sitemap(?:_index)?(-[a-z0-9\-_]+)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml(\.gz)?$',
+			'query' => 'index.php?feed=sitemap$matches[1]$matches[4]&m=$matches[2]&w=$matches[3]'
+		),
+		'sitemap-news.xml' => array(
+			'regex' => 'sitemap-news\.xml(\.gz)?$',
+			'query' => 'index.php?feed=sitemap-news$matches[1]'
+		)
+	);
+
+	/**
 	 * Front pages
 	 *
 	 * @var null/array $frontpages
@@ -187,6 +202,17 @@ class XMLSitemapFeed {
 		}
 
 		return apply_filters( 'xmlsf_defaults', $return, $key );
+	}
+
+	/**
+	 * Get rewrite rules set
+	 *
+	 * @param string $sitemap
+	 * @return array|false
+	 */
+	public function rewrite_ruleset( $sitemap = 'sitemap' )
+	{
+		return ( isset($this->rewrite_rules[$sitemap]) ) ? $this->rewrite_rules[$sitemap] : false;
 	}
 
 	/**

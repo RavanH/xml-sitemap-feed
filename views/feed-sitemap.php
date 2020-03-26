@@ -17,8 +17,8 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
 		http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
 	<sitemap>
-		<loc><?php echo xmlsf_get_index_url('home'); ?></loc>
-		<lastmod><?php echo get_date_from_gmt( get_lastpostdate('GMT'), DATE_W3C ); ?></lastmod>
+		<loc><?php echo xmlsf_get_index_url( 'home' ); ?></loc>
+		<lastmod><?php echo get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ); ?></lastmod>
 	</sitemap>
 <?php
 // add rules for public post types
@@ -28,13 +28,17 @@ if ( is_array($post_types) ) :
 		if ( empty($settings['active']) || ! post_type_exists( $post_type ) )
 			continue;
 
-		$archive = isset($settings['archive']) ? $settings['archive'] : '';
+		$archive = isset( $settings['archive'] ) ? $settings['archive'] : '';
 
-		foreach ( xmlsf_get_archives($post_type,$archive) as $m => $url ) {
+		foreach ( xmlsf_get_archives( $post_type, $archive ) as $mw => $url ) {
+			// test for weekly archives
+			$mw = explode('.',$mw);
+			$m = $mw[0];
+			$w = isset( $mw[1] ) ? $mw[1] : '';
 ?>
 	<sitemap>
 		<loc><?php echo $url; ?></loc>
-		<lastmod><?php echo get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $m ), DATE_W3C ); ?></lastmod>
+		<lastmod><?php echo get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $m, $w ), DATE_W3C ); ?></lastmod>
 	</sitemap>
 <?php
 		}
@@ -44,7 +48,7 @@ endif;
 // add rules for public taxonomies
 foreach ( xmlsf_get_taxonomies() as $taxonomy ) : ?>
 	<sitemap>
-		<loc><?php echo xmlsf_get_index_url('taxonomy',$taxonomy); ?></loc>
+		<loc><?php echo xmlsf_get_index_url( 'taxonomy', $taxonomy ); ?></loc>
 <?php if ( $lastmod = xmlsf_get_taxonomy_modified( $taxonomy ) ) { ?>
 		<lastmod><?php echo $lastmod; ?></lastmod>
 <?php } ?>
@@ -53,22 +57,22 @@ foreach ( xmlsf_get_taxonomies() as $taxonomy ) : ?>
 endforeach;
 
 // custom URLs sitemap
-if ( apply_filters( 'xmlsf_custom_urls', get_option('xmlsf_urls') ) ) :
+if ( apply_filters( 'xmlsf_custom_urls', get_option( 'xmlsf_urls' ) ) ) :
 ?>
 	<sitemap>
-		<loc><?php echo xmlsf_get_index_url('custom'); ?></loc>
+		<loc><?php echo xmlsf_get_index_url( 'custom' ); ?></loc>
 	</sitemap>
 <?php
 endif;
 
 // custom sitemaps
-$custom_sitemaps = apply_filters( 'xmlsf_custom_sitemaps', get_option('xmlsf_custom_sitemaps', array()) );
-if ( is_array($custom_sitemaps) ) :
+$custom_sitemaps = apply_filters( 'xmlsf_custom_sitemaps', get_option( 'xmlsf_custom_sitemaps', array() ) );
+if ( is_array( $custom_sitemaps ) ) :
 	foreach ( $custom_sitemaps as $url ) {
-		if (empty($url)) continue;
+		if ( empty( $url ) ) continue;
 ?>
 	<sitemap>
-		<loc><?php echo esc_url($url); ?></loc>
+		<loc><?php echo esc_url( $url ); ?></loc>
 	</sitemap>
 <?php
 	}

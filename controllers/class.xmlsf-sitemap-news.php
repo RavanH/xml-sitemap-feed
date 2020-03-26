@@ -24,7 +24,11 @@ class XMLSF_Sitemap_News
 
 	function __construct( $sitemap )
 	{
-		$this->sitemap = $sitemap;
+		if ( $sitemap ) $this->sitemap = $sitemap;
+
+		// add sitemap rewrite rule
+		if ( $ruleset = xmlsf()->rewrite_ruleset( $this->sitemap ) )
+			add_rewrite_rule( $ruleset['regex'], $ruleset['query'], 'top' );
 
 		// PINGING
 		add_action( 'transition_post_status', array( $this, 'do_ping' ), 999, 3 );

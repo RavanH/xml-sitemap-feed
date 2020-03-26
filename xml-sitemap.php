@@ -170,23 +170,23 @@ function xmlsf_init() {
 	xmlsf();
 
 	if ( ! empty( $sitemaps['sitemap'] ) ) {
-		// add sitemap rewrite rule
-		add_rewrite_rule('sitemap(?:_index)?(\-[a-z0-9\-_]+)?(\.[0-9]+)?\.xml(\.gz)?$', 'index.php?feed=sitemap$matches[1]$matches[3]&m=$matches[2]', 'top');
+		//add_rewrite_rule('sitemap(?:_index)?(\-[a-z0-9\-_]+)?(\.\d{4,6})?(\.\d{1,2})?\.xml(\.gz)?$', 'index.php?feed=sitemap$matches[1]$matches[4]&m=$matches[2]&w=$matches[3]', 'top');
 
 		require XMLSF_DIR . '/models/functions.sitemap.php';
 		add_filter( 'xmlsf_post_types', 'xmlsf_filter_post_types' );
 
-		// common sitemap element filters
+		// sitemap title element filters
 		add_filter( 'the_title_xmlsitemap', 'strip_tags' );
 		add_filter( 'the_title_xmlsitemap', 'ent2ncr', 8 );
 		add_filter( 'the_title_xmlsitemap', 'esc_html' );
 
-		xmlsf_sitemap( $sitemaps['sitemap'] );
+		global $xmlsf_sitemap;
+		require XMLSF_DIR . '/controllers/class.xmlsf-sitemap.php';
+		$xmlsf_sitemap = new XMLSF_Sitemap( $sitemaps['sitemap'] );
 	}
 
 	if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-		// add news specific rewrite rule
-		add_rewrite_rule('sitemap-news\.xml(\.gz)?$', 'index.php?feed=sitemap-news$matches[1]', 'top');
+		//add_rewrite_rule('sitemap-news\.xml(\.gz)?$', 'index.php?feed=sitemap-news$matches[1]', 'top');
 
 		require XMLSF_DIR . '/models/functions.sitemap-news.php';
 		add_filter( 'xmlsf_news_post_types', 'xmlsf_news_filter_post_types' );
@@ -235,9 +235,13 @@ function xmlsf_deactivate() {
 	// terms meta
 	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
 
-	// remove filter and flush rules
-	remove_filter( 'rewrite_rules_array', 'xmlsf_rewrite_rules', 99 );
-	// how to unset add_feed() ?
+	// remove rules and flush rules
+	global $wp_rewrite;
+	$sitemaps = get_option( 'xmlsf_sitemaps' );
+	foreach ( $sitemaps as $sitemap => $name ) {
+		$ruleset = xmlsf()->rewrite_ruleset( $name );
+		unset( $wp_rewrite->extra_rules_top[$ruleset['regex']] );
+	}
 	flush_rewrite_rules();
 }
 

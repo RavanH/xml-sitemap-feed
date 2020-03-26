@@ -19,21 +19,27 @@ function xmlsf_filter_post_types( $post_types ) {
  *
  * @param string $sitemap
  * @param string $type
- * @param string $parm
+ * @param string $m
+ * @param string $w
+ * @param string $gz
  *
  * @return string
  */
-function xmlsf_get_index_url( $sitemap = 'home', $type = false, $param = false ) {
+function xmlsf_get_index_url( $sitemap = 'home', $type = false, $m = false, $w = false, $gz = false ) {
 
 	if ( xmlsf()->plain_permalinks() ) {
 		$name = '?feed=sitemap-'.$sitemap;
+		$name .= $gz ? '.gz' : '';
 		$name .= $type ? '-'.$type : '';
-		$name .= $param ? '&m='.$param : '';
+		$name .= $m ? '&m='.$m : '';
+		$name .= $w ? '&w='.$w : '';
 	} else {
 		$name = 'sitemap-'.$sitemap;
 		$name .= $type ? '-'.$type : '';
-		$name .= $param ? '.'.$param : '';
+		$name .= $m ? '.'.$m : '';
+		$name .= $w ? '.'.$w : '';
 		$name .= '.xml';
+		$name .= $gz ? '.gz' : '';
 	}
 
 	return esc_url( trailingslashit( home_url() ) . $name );
@@ -53,9 +59,19 @@ function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
 	global $wpdb;
 	$return = array();
 
-	if ( 'monthly' == $type ) :
+	if ( 'weekly' == $type ) :
 
-		$query = "SELECT YEAR(post_date) as `year`, LPAD(MONTH(post_date),2,'0') as `month`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date), LPAD(MONTH(post_date),2,'0') ORDER BY `year` DESC, `month` DESC";
+		$week       = _wp_mysql_week( '`post_date`' );
+		$query      = "SELECT DISTINCT LPAD($week,2,'0') AS `week`, YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD($week,2,'0') ORDER BY `year` DESC, `week` DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		foreach ( (array) $arcresults as $arcresult ) {
+			$return[$arcresult->year . '.' . $arcresult->week] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year, $arcresult->week );
+		};
+
+	elseif ( 'monthly' == $type ) :
+
+		$query = "SELECT YEAR(`post_date`) AS `year`, LPAD(MONTH(`post_date`),2,'0') AS `month`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD(MONTH(`post_date`),2,'0') ORDER BY `year` DESC, `month` DESC";
 		$arcresults = xmlsf_cache_get_archives( $query );
 
 		foreach ( (array) $arcresults as $arcresult ) {
@@ -64,7 +80,7 @@ function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
 
 	elseif ( 'yearly' == $type ) :
 
-		$query = "SELECT YEAR(post_date) as `year`, count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' GROUP BY YEAR(post_date) ORDER BY `year` DESC";
+		$query      = "SELECT YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`) ORDER BY `year` DESC";
 		$arcresults = xmlsf_cache_get_archives( $query );
 
 		foreach ( (array) $arcresults as $arcresult ) {
@@ -73,7 +89,7 @@ function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
 
 	else :
 
-		$query = "SELECT count(ID) as posts FROM {$wpdb->posts} WHERE post_type = '{$post_type}' AND post_status = 'publish' ORDER BY post_date DESC";
+		$query      = "SELECT COUNT(ID) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' ORDER BY `post_date` DESC";
 		$arcresults = xmlsf_cache_get_archives( $query );
 
 		if ( is_object($arcresults[0]) && $arcresults[0]->posts > 0 ) {
@@ -254,29 +270,4 @@ function xmlsf_images_data( $post, $which ) {
 	}
 
 	return $images_data;
-}
-
-/**
- * Get instantiated sitemap controller class
- *
- * @since 5.2
- * @global XMLSF_Sitemap $xmlsf_sitemap
- * @return XMLSF_Sitemap object
- */
-function xmlsf_sitemap( $sitemap = null ) {
-	global $xmlsf_sitemap;
-
-	if ( ! isset( $xmlsf_sitemap ) ) {
-		if ( ! class_exists( 'XMLSF_Sitemap' ) )
-			require XMLSF_DIR . '/controllers/class.xmlsf-sitemap.php';
-
-		if ( empty($sitemap) ) {
-			$sitemaps = get_option( 'xmlsf_sitemaps' );
-			$sitemap = $sitemaps['sitemap'];
-		}
-
-		$xmlsf_sitemap = new XMLSF_Sitemap( $sitemap );
-	}
-
-	return $xmlsf_sitemap;
 }

@@ -448,7 +448,6 @@ function xmlsf_sitemap_parse_request( $request ) {
 			$request['post_type'] = $feed[2];
 			$request['orderby'] = 'modified';
 			$request['order'] = 'DESC';
-			$request['is_date'] = false;
 
 			// prevent term cache update query unless needed for permalinks
 			if ( strpos( get_option( 'permalink_structure' ), '%category%' ) === false )
@@ -483,6 +482,18 @@ function xmlsf_sitemap_parse_request( $request ) {
 
 			break;
 
+		case 'authors':
+
+			// prepare template
+			add_action( 'do_feed_sitemap-authors', 'xmlsf_load_template_authors', 10, 1 );
+
+			// disable default feed query
+			add_filter( 'posts_request', '__return_false' );
+
+			// modify query ?
+
+			break;
+
 		default:
 			// prepare other templates
 			add_action( 'do_feed_sitemap-home', 'xmlsf_load_template_home', 10, 1 );
@@ -508,10 +519,12 @@ function xmlsf_sitemap_parse_request( $request ) {
  * @param string $post_type Post type to check. Defaults to 'any'.
  * @param string $which Which to check. Can be 'first' or 'last'. Defaults to 'last'.
  * @param string $m year, month or day period. Can be empty or integer.
+ * @param string $w week. Can be empty or integer.
+ *
  * @return string The date.
  */
 if( !function_exists('_get_post_time') ) {
- function _get_post_time( $timezone, $field, $post_type = 'any', $which = 'last', $m = '' ) {
+ function _get_post_time( $timezone, $field, $post_type = 'any', $which = 'last', $m = '', $w = '' ) {
 
 	global $wpdb;
 
@@ -523,7 +536,14 @@ if( !function_exists('_get_post_time') ) {
 
 	$m = preg_replace('|[^0-9]|', '', $m);
 
-	$key = "{$which}post{$field}{$m}:$timezone";
+	if ( ! empty( $w ) ) {
+		// when a week number is set make sure 'm' is year only
+		$m = substr( $m, 0, 4 );
+		// and append 'w' to the cache key
+		$key = "{$which}post{$field}{$m}.{$w}:$timezone";
+	} else {
+		$key = "{$which}post{$field}{$m}.{$w}:$timezone";
+	}
 
 	if ( 'any' !== $post_type ) {
 		$key .= ':' . sanitize_key( $post_type );
@@ -563,6 +583,10 @@ if( !function_exists('_get_post_time') ) {
 			}
 		}
 	}
+	if ( !empty($w) ) {
+		$week     = _wp_mysql_week( 'post_date' );
+		$where .= " AND $week=$w";
+	}
 
 	$order = ( $which == 'last' ) ? 'DESC' : 'ASC';
 
@@ -575,10 +599,12 @@ if( !function_exists('_get_post_time') ) {
 	switch ( $timezone ) {
 		case 'gmt':
 			$date = $wpdb->get_var("SELECT post_{$field}_gmt FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
-				break;
+			break;
+
 		case 'blog':
 			$date = $wpdb->get_var("SELECT post_{$field} FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
 			break;
+
 		case 'server':
 			$add_seconds_server = date('Z');
 			$date = $wpdb->get_var("SELECT DATE_ADD(post_{$field}_gmt, INTERVAL '$add_seconds_server' SECOND) FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
@@ -627,12 +653,16 @@ if( !function_exists('get_firstpostdate') ) {
  *
  * @uses apply_filters() Calls 'get_lastmodified' filter
  * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
+ * @param string $post_type The post type to get the last modified date for.
+ * @param string $m The period to check in. Defaults to any, can be YYYY, YYYYMM or YYYYMMDD
+ * @param string $w The week to check in. Defaults to any, can be one or two digit week number. Must be used with $m in YYYY format.
+ *
  * @return string The date of the oldest modified post.
  */
 if( !function_exists('get_lastmodified') ) {
- function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '' ) {
+ function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '', $w = '' ) {
 
-	return apply_filters( 'get_lastmodified', _get_post_time( $timezone, 'modified', $post_type, 'last', $m ), $timezone );
+	return apply_filters( 'get_lastmodified', _get_post_time( $timezone, 'modified', $post_type, 'last', $m, $w ), $timezone );
 
  }
 }

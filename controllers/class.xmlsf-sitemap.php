@@ -25,9 +25,13 @@ class XMLSF_Sitemap
 
 	function __construct( $sitemap )
 	{
-		$this->sitemap = $sitemap;
+		if ( $sitemap ) $this->sitemap = $sitemap;
 
 		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
+
+		// add sitemap rewrite rule
+		if ( $rules = xmlsf()->rewrite_ruleset( $this->sitemap ) )
+			add_rewrite_rule( $rules['regex'], $rules['query'], 'top' );
 
 		// Cache clearance
 		add_action( 'clean_post_cache', array($this,'clean_post_cache'), 99, 2 );
