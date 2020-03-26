@@ -23,6 +23,9 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_metadata' ) );
+
+		// placeholders for advanced options
+		add_action( 'xmlsf_posttype_archive_field_options', array( $this, 'advanced_archive_field_options' ) );
 	}
 
 	public function tools_actions()
@@ -228,7 +231,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		if ( empty($_POST['xmlsf_priority']) || ! is_numeric($_POST['xmlsf_priority']) )
 			delete_post_meta($post_id, '_xmlsf_priority');
 		else
-	  update_post_meta($post_id, '_xmlsf_priority', xmlsf_sanitize_priority( $_POST['xmlsf_priority'] ) );
+			update_post_meta($post_id, '_xmlsf_priority', xmlsf_sanitize_priority( $_POST['xmlsf_priority'] ) );
 
 		// _xmlsf_exclude
 		if ( empty($_POST['xmlsf_exclude']) )
@@ -254,14 +257,14 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	*/
 	public function add_settings_page()
 	{
-	// This page will be under "Settings"
-	$this->screen_id = add_options_page(
-	  __('XML Sitemap','xml-sitemap-feed'),
-	  __('XML Sitemap','xml-sitemap-feed'),
-	  'manage_options',
-	  'xmlsf',
-	  array( $this, 'settings_page' )
-	);
+		// This page will be under "Settings"
+		$this->screen_id = add_options_page(
+		  __('XML Sitemap','xml-sitemap-feed'),
+		  __('XML Sitemap','xml-sitemap-feed'),
+		  'manage_options',
+		  'xmlsf',
+		  array( $this, 'settings_page' )
+		);
 	}
 
 	/**
@@ -441,6 +444,14 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		include XMLSF_DIR . '/views/admin/field-sitemap-urls.php';
 	}
 
+	public function advanced_archive_field_options()
+	{
+		?>
+		<option value=""<?php echo disabled( true ); ?>>
+			<?php echo __('Week','xml-sitemap-feed'); ?>
+		</option>
+		<?php
+	}
 }
 
 new XMLSF_Admin_Sitemap();
