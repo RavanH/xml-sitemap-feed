@@ -32,9 +32,6 @@ class XMLSF_Sitemap_News
 
 		// PINGING
 		add_action( 'transition_post_status', array( $this, 'do_ping' ), 999, 3 );
-
-		// FEED TEMPLATES
-		add_action( 'do_feed_sitemap-news', 'xmlsf_news_load_template', 10, 1 );
 	}
 
 	/**
@@ -77,11 +74,4 @@ class XMLSF_Sitemap_News
 		xmlsf_ping( 'google', $this->sitemap, 5 * MINUTE_IN_SECONDS );
 	}
 
-}
-
-/**
- * set up the news sitemap template
- */
-function xmlsf_news_load_template() {
-	load_template( XMLSF_DIR . '/views/feed-sitemap-news.php' );
 }

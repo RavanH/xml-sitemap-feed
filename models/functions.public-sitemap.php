@@ -383,27 +383,31 @@ function xmlsf_set_terms_args( $args ) {
 }
 
 /**
- * Filter request
+ * Filter request for sitemaps
  *
- * @param $request
+ * @param array $request
+ * @param array $feed
  *
- * @return mixed
+ * @return array $request filtered
  */
-function xmlsf_sitemap_parse_request( $request ) {
+function xmlsf_sitemap_filter_request( $request ) {
 
-	// FILTER HOOK FOR PLUGIN COMPATIBILITIES
+	/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
 	$request = apply_filters( 'xmlsf_request', $request );
-	// Developers: add your actions that should run when a sitemap request is found like
-	// add_filter( 'xmlsf_request', 'your_filter_function' );
-	// Filters hooked here already:
+	/**
+	 * Developers: add your actions that should run when a sitemap request is with:
+	 *
+	 * add_filter( 'xmlsf_request', 'your_filter_function' );
+	 *
+	 * Filters hooked here already:
+	 * xmlsf_polylang_request - Polylang compatibility
+	 * xmlsf_wpml_request - WPML compatibility
+	 * xmlsf_bbpress_request - bbPress compatibility
+	 */
 
-	$feed = explode( '-' ,$request['feed'], 3 );
+	$feed = explode( '-' , $request['feed'], 3 );
 
 	if ( ! isset( $feed[1] ) ) {
-		// prepare index templates
-		add_action( 'do_feed_sitemap', 'xmlsf_load_template_index', 10, 1 );
-		add_action( 'do_feed_sitemap_index', 'xmlsf_load_template_index', 10, 1 );
-
 		// disable default feed query
 		add_filter( 'posts_request', '__return_false' );
 
@@ -415,9 +419,6 @@ function xmlsf_sitemap_parse_request( $request ) {
 		case 'posttype':
 
 			if ( ! isset( $feed[2] ) ) break;
-
-			// prepare template
-			add_action( 'do_feed_sitemap-posttype-'.$feed[2], 'xmlsf_load_template', 10, 1 );
 
 			// try to raise memory limit, context added for filters
 			wp_raise_memory_limit( 'sitemap-posttype-'.$feed[2] );
@@ -465,9 +466,6 @@ function xmlsf_sitemap_parse_request( $request ) {
 
 			if ( !isset( $feed[2] ) ) break;
 
-			// prepare template
-			add_action( 'do_feed_sitemap-taxonomy-'.$feed[2], 'xmlsf_load_template_taxonomy', 10, 1 );
-
 			// try to raise memory limit, context added for filters
 			wp_raise_memory_limit( 'sitemap-taxonomy-'.$feed[2] );
 
@@ -482,25 +480,6 @@ function xmlsf_sitemap_parse_request( $request ) {
 
 			break;
 
-		case 'authors':
-
-			// prepare template
-			add_action( 'do_feed_sitemap-authors', 'xmlsf_load_template_authors', 10, 1 );
-
-			// disable default feed query
-			add_filter( 'posts_request', '__return_false' );
-
-			// modify query ?
-
-			break;
-
-		default:
-			// prepare other templates
-			add_action( 'do_feed_sitemap-home', 'xmlsf_load_template_home', 10, 1 );
-			add_action( 'do_feed_sitemap-custom', 'xmlsf_load_template_custom', 10, 1 );
-
-			// disable default feed query
-			add_filter( 'posts_request', '__return_false' );
 	}
 
 	return $request;

@@ -1,5 +1,5 @@
 <style type="text/css">
-<?php include XMLSF_DIR . '/assets/styles/admin.css'; ?>
+<?php include XMLSF_DIR . '/assets/admin.css'; ?>
 </style>
 <div class="wrap">
 

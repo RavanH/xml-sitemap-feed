@@ -17,6 +17,44 @@ if ( is_object( $sitepress ) ) {
 }
 
 /**
+ * XML Stylesheet
+ */
+function xmlsf_xml_stylesheet( $sitemap = false ) {
+
+	/**
+	 * GET STYLESHEET URL
+	 *
+	 * DEVELOPERS: a custom stylesheet file in the active (parent or child) theme /assets subdirectory, will be used when found there
+	 *
+	 * Must start with 'sitemap', optionally folowed by another designator, serperated by a hyphen.
+	 * It should always end with the xsl extension.
+	 *
+	 * Examples:
+	 * assets/sitemap.xsl
+	 * assets/sitemap-home.xsl
+	 * assets/sitemap-posttype.xsl
+	 * assets/sitemap-taxonomy.xsl
+	 * assets/sitemap-authors.xsl
+	 * assets/sitemap-custom.xsl
+	 * assets/sitemap-news.xsl
+	 * assets/sitemap-[custom_sitemap_name].xsl
+	**/
+
+	$file = $sitemap ? 'assets/sitemap-'.$sitemap.'.xsl' : 'assets/sitemap.xsl';
+
+	// find theme stylesheet file
+	if ( file_exists( get_stylesheet_directory() . '/' . $file ) ) {
+		$url = get_stylesheet_directory_uri() . '/' . $file;
+	} elseif ( file_exists( get_template_directory() . '/' . $file ) ) {
+		$url = get_template_directory_uri() . '/' . $file;
+	} else {
+		$url = plugins_url( $file, XMLSF_BASENAME );
+	}
+
+	echo '<?xml-stylesheet type="text/xsl" href="' . wp_make_link_relative( $url ) . '?ver=' . XMLSF_VERSION . '"?>';
+}
+
+/**
  * Generator info
  */
 function xmlsf_generator() {
@@ -89,4 +127,61 @@ function xmlsf_debug_ping( $se, $sitemap, $ping_url, $response_code ) {
 			error_log( 'Pinged '. $ping_url .' with response code: ' . $response_code );
 		}
 	}
+}
+
+/**
+ * Load feed template
+ *
+ * First checks for a child/parent theme template file, then falls back to plugin template
+ *
+ * @since 5.3
+ *
+ * @param bool $is_comment_feed unused
+ * @param string $feed feed type
+ */
+function xmlsf_load_template( $is_comment_feed, $feed ) {
+
+	/**
+	 * GET TEMPLATE FILE
+	 *
+	 * DEVELOPERS: a custom template file in the active (parent or child) theme directory will be used when found there
+	 *
+	 * Must start with 'sitemap', optionally folowed by other designators, serperated by hyphens.
+	 * It should always end with the php extension.
+	 *
+	 * Examples:
+	 * sitemap.php
+	 * sitemap-home.php
+	 * sitemap-posttype.php
+	 * * sitemap-posttype-post.php
+	 * * sitemap-posttype-page.php
+	 * * sitemap-posttype-[custom_post_type].php
+	 * sitemap-taxonomy.php
+	 * * sitemap-taxonomy-category.php
+	 * * sitemap-taxonomy-post_tag.php
+	 * * sitemap-taxonomy-[custom_taxonomy].php
+	 * sitemap-authors.php
+	 * sitemap-custom.php
+	 * sitemap-news.php
+	 * sitemap-[custom_sitemap_name].php
+	**/
+
+	$parts = explode( '-' , $feed, 3 );
+
+	// possible theme template file names
+	$templates = array();
+	if ( ! empty( $parts[1] ) ) {
+		if ( ! empty( $parts[2] ) ) {
+			$templates[] = "{$parts[0]}-{$parts[1]}-{$parts[2]}.php";
+		}
+		$templates[] = "{$parts[0]}-{$parts[1]}.php";
+	} else {
+		$templates[] = "{$parts[0]}.php";
+	}
+
+	// find theme template file and load that
+	locate_template( $templates, true );
+
+	// still here, then fall back on plugin template file
+	load_template( XMLSF_DIR . '/views/feed-' . implode( '-', array_slice( $parts, 0, 2 ) ) . '.php' );
 }

@@ -8,9 +8,8 @@
 if ( ! defined( 'WPINC' ) ) die;
 
 // do xml tag via echo or SVN parser is going to freak out
-echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
-<?xml-stylesheet type="text/xsl" href="' . wp_make_link_relative( plugins_url('assets/styles/sitemap-index.xsl',XMLSF_BASENAME) ) . '?ver=' . XMLSF_VERSION . '"?>
-'; ?>
+echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>'; ?>
+<?php xmlsf_xml_stylesheet(); ?>
 <?php xmlsf_generator(); ?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
