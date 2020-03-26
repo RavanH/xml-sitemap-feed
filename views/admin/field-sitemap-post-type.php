@@ -6,7 +6,7 @@
 	<p>
 		<label>
 			<input type="checkbox" name="xmlsf_post_types[<?php echo $obj->name; ?>][active]" id="xmlsf_post_types_<?php echo $obj->name; ?>" value="1"<?php checked( !empty($options[$obj->name]["active"]), true); ?> />
-			<?php printf( /* translators: Post type name and post count */ __('Include %s', 'xml-sitemap-feed'), $obj->label ); ?> (<?php echo $count->publish; ?>)
+			<?php printf( /* translators: Post type name and post count */ __( 'Include %s', 'xml-sitemap-feed' ), $obj->label ); ?> (<?php echo $count->publish; ?>)
 		</label>
 	</p>
 
@@ -15,23 +15,23 @@
 	$archive = isset($options[$obj->name]['archive']) ? $options[$obj->name]['archive'] : 'yearly';
 	?>
 	<p>
-		<label><?php _e('Split by','xml-sitemap-feed'); ?>
+		<label><?php _e( 'Split by', 'xml-sitemap-feed' ); ?>
 			<select name="xmlsf_post_types[<?php echo $obj->name; ?>][archive]" id="xmlsf_post_types_'<?php echo $obj->name; ?>_archive">
 				<option value="">
 					<?php echo translate('None'); ?>
 				</option>
-				<option value="yearly"<?php echo selected( $archive == 'yearly', true, false); ?>>
-					<?php echo __('Year','xml-sitemap-feed'); ?>
+				<option value="yearly"<?php echo selected( $archive == 'yearly', true, false ); ?>>
+					<?php echo __( 'Year', 'xml-sitemap-feed' ); ?>
 				</option>
-				<option value="monthly"<?php echo selected( $archive == 'monthly', true, false); ?>>
-					<?php echo __('Month','xml-sitemap-feed'); ?>
+				<option value="monthly"<?php echo selected( $archive == 'monthly', true, false ); ?>>
+					<?php echo __( 'Month', 'xml-sitemap-feed' ); ?>
 				</option>
-				<option value="weekly"<?php echo selected( $archive == 'weekly', true, false); ?>>
-					<?php echo __('Week','xml-sitemap-feed'); ?>
-				</option>
-
+				<?php do_action( 'xmlsf_posttype_archive_field_options', $obj, $archive ); ?>
 			</select>
 		</label>
+		<span class="description"><?php echo apply_filters(
+			'xmlsf_posttype_archive_field_description',
+			sprintf( /* Translators: XML Sitemap Advanced */ __( 'More options available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">'.__('XML Sitemap Advanced','xml-sitemap-feed').'</a>' ) ); ?></span>
 	</p>
 	<?php
 	}

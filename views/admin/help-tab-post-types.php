@@ -6,7 +6,10 @@
 <p>
 	<strong><?php _e( 'Split by', 'xml-sitemap-feed' ); ?></strong>
 	<br />
-	<?php _e( 'Choose Split by Month or Week if you experience errors or slow sitemaps.', 'xml-sitemap-feed' ); ?>
+	<?php _e( 'Choose Split by Month if you experience errors or slow sitemaps.', 'xml-sitemap-feed' ); ?> 
+	<?php echo apply_filters(
+		'xmlsf_posttype_archive_field_description',
+		sprintf( /* Translators: XML Sitemap Advanced */ __( 'More options available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">'.__('XML Sitemap Advanced','xml-sitemap-feed').'</a>' ) ); ?>
 </p>
 <p>
 	<strong><?php _e( 'Priority', 'xml-sitemap-feed' ); ?></strong>
