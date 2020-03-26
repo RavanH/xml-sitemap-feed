@@ -1,7 +1,7 @@
 <h3><span class="dashicons dashicons-admin-links"></span> <?php echo translate('Links'); ?></h3>
 <ul>
 	<li>
-		<a href="https://partnerdash.google.com/partnerdash/d/news#p:id=pfehome" target="_blank"><?php _e( /* https://partnerdash.google.com/partnerdash/d/news#p:id=pfehome */ 'Google News Publisher Center', 'xml-sitemap-feed' ); ?></a>
+		<a href="https://publishercenter.google.com/publications" target="_blank"><?php _e( /* https://publishercenter.google.com/publications */ 'Google News Publisher Center', 'xml-sitemap-feed' ); ?></a>
 	</li>
 	<li>
 		<a href="https://search.google.com/search-console" target="_blank"><?php _e( /*  */ 'Google Search Console', 'xml-sitemap-feed' ); ?></a>
