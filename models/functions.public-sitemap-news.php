@@ -13,19 +13,26 @@ function xmlsf_news_filter_where( $where = '' ) {
 }
 
 /**
- * Filter request
+ * Filter request for news sitemap
  *
  * @param $request
  *
  * @return mixed
  */
-function xmlsf_sitemap_news_parse_request( $request ) {
+function xmlsf_sitemap_news_filter_request( $request ) {
 
-	// FILTER HOOK FOR PLUGIN COMPATIBILITIES
+	/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
 	$request = apply_filters( 'xmlsf_news_request', $request );
-	// Developers: add your actions that should run when a news sitemap request is found with
-	// add_filter( 'xmlsf_news_request', 'your_filter_function' );
-	// Filters hooked here already:
+	/**
+	 * Developers: add your actions that should run when a news sitemap request is found with:
+	 *
+	 * add_filter( 'xmlsf_news_request', 'your_filter_function' );
+	 *
+	 * Filters hooked here already:
+	 * xmlsf_polylang_request - Polylang compatibility
+	 * xmlsf_wpml_request - WPML compatibility
+	 * xmlsf_bbpress_request - bbPress compatibility
+	 */
 
 	// prepare for news and return modified request
 	$options = get_option( 'xmlsf_news_tags' );
@@ -39,7 +46,7 @@ function xmlsf_sitemap_news_parse_request( $request ) {
 
 	// set up query filters
 	$live = false;
-	foreach ($post_types as $post_type) {
+	foreach ( $post_types as $post_type ) {
 		if ( strtotime( get_lastpostdate( 'gmt', $post_type ) ) > strtotime( gmdate( 'Y-m-d H:i:s', strtotime('-48 hours') ) ) ) {
 			$live = true;
 			break;

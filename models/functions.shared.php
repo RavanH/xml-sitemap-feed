@@ -3,65 +3,79 @@
 /**
  * Filter request
  *
- * @param $request
+ * @param array $request
  *
- * @return mixed
+ * @return array $request filtered
  */
 function xmlsf_filter_request( $request ) {
 
-	// short-circuit if request has already been filtered
-	if ( xmlsf()->request_filtered ) return $request;
+	// short-circuit if request is not a feed or it does not start with 'sitemap'
+	if ( empty( $request['feed'] ) || strpos( $request['feed'], 'sitemap' ) !== 0 ) {
+		return $request;
+	}
 
-	if ( isset($request['feed']) && strpos($request['feed'],'sitemap') === 0 ) :
-		// prevent public errors breaking xml
-		@ini_set( 'display_errors', 0 );
+	/** IT'S A SITEMAP */
 
-		// make sure we have the proper locale setting for calculations
-		setlocale( LC_NUMERIC, 'C' );
+	// set the sitemap conditional flag
+	xmlsf()->is_sitemap = true;
 
-		// set the sitemap conditional flag
-		xmlsf()->is_sitemap = true;
+	// include shared public functions
+	require_once XMLSF_DIR . '/models/functions.public-shared.php';
 
-		// include shared functions
-		require_once XMLSF_DIR . '/models/functions.public-shared.php';
+	/** COMPRESSION */
 
-		// REPSONSE HEADERS filtering
-		add_filter( 'wp_headers', 'xmlsf_headers' );
+	// check for gz request
+	if ( substr($request['feed'], -3) == '.gz' ) {
+		// pop that .gz
+		$request['feed'] = substr($request['feed'], 0, -3);
+		// verify/apply compression settings
+		xmlsf_output_compression();
+	}
 
-		// Remove filters to prevent stuff like cdn urls for xml stylesheet and images
-		remove_all_filters( 'plugins_url' );
-		remove_all_filters( 'wp_get_attachment_url' );
-		remove_all_filters( 'image_downsize' );
+	/** PREPARE TO LOAD TEMPLATE */
 
-		// modify request parameters
-		$request['post_status'] = 'publish';
-		$request['no_found_rows'] = true; // found rows calc is slow and only needed for pagination
+	add_action (
+		'do_feed_' . $request['feed'],
+		'xmlsf_load_template',
+		10,
+		2
+	);
 
-		// COMPRESSION
-		// check for gz request
-		if ( substr($request['feed'], -3) == '.gz' ) {
-			// pop that .gz
-			$request['feed'] = substr($request['feed'], 0, -3);
-			// verify/apply compression settings
-			xmlsf_output_compression();
-		}
+	/** MODIFY REQUEST PARAMETERS */
 
-		// FURTHER REQUEST PARSING
-		if ( strpos($request['feed'],'sitemap-news') === 0 ) {
-			// set the news sitemap conditional flag
-			xmlsf()->is_news = true;
+	$request['post_status'] = 'publish';
+	$request['no_found_rows'] = true; // found rows calc is slow and only needed for pagination
 
-			require_once XMLSF_DIR . '/models/functions.public-sitemap-news.php';
+	// SPECIFIC REQUEST FILTERING AND PREPEARTIONS
+	if ( strpos( $request['feed'], 'news' ) === 8 ) {
+		// set the news sitemap conditional flag
+		xmlsf()->is_news = true;
+		// include public news functions
+		require_once XMLSF_DIR . '/models/functions.public-sitemap-news.php';
+		// filter news request
+		$request = xmlsf_sitemap_news_filter_request( $request );
+	} else {
+		// include public sitemap functions
+		require_once XMLSF_DIR . '/models/functions.public-sitemap.php';
+		// filter sitemap request
+		$request = xmlsf_sitemap_filter_request( $request );
+	}
 
-			$request = xmlsf_sitemap_news_parse_request( $request );
-		} else {
-			require_once XMLSF_DIR . '/models/functions.public-sitemap.php';
-			$request = xmlsf_sitemap_parse_request( $request );
-		}
+	/** GENERAL MISC. PREPARATIONS */
 
-	endif;
+	// prevent public errors breaking xml
+	@ini_set( 'display_errors', 0 );
 
-	xmlsf()->request_filtered = true;
+	// make sure we have the proper locale setting for calculations
+	setlocale( LC_NUMERIC, 'C' );
+
+	// REPSONSE HEADERS filtering
+	add_filter( 'wp_headers', 'xmlsf_headers' );
+
+	// Remove filters to prevent stuff like cdn urls for xml stylesheet and images
+	remove_all_filters( 'plugins_url' );
+	remove_all_filters( 'wp_get_attachment_url' );
+	remove_all_filters( 'image_downsize' );
 
 	return $request;
 }
@@ -82,9 +96,11 @@ function xmlsf_untrailingslash( $request ) {
  * Ping
  *
  * @since 5.1
+ *
  * @param $se google|bing
  * @param $sitemap sitemap
  * @param $interval seconds
+ *
  * @return string ping response|999 (skipped)
  */
 function xmlsf_ping( $se, $sitemap, $interval ) {
@@ -147,7 +163,7 @@ function xmlsf_nginx_helper_purge_urls( $urls = array(), $redis = false ) {
 			if ( is_array($post_types) ) {
 				foreach ( $post_types as $post_type => $settings ) {
 					$archive = !empty($settings['archive']) ? $settings['archive'] : '';
-					foreach ( xmlsf_get_archives($post_type,$archive) as $url ) {
+					foreach ( xmlsf_get_archives( $post_type, $archive ) as $url ) {
 						$urls[] = parse_url( $url, PHP_URL_PATH);
 					}
 				}
@@ -157,7 +173,7 @@ function xmlsf_nginx_helper_purge_urls( $urls = array(), $redis = false ) {
 			$taxonomies = get_option('xmlsf_taxonomies');
 			if ( is_array($taxonomies) ) {
 				foreach ( $taxonomies as $taxonomy ) {
-					$urls[] = parse_url( xmlsf_get_index_url('taxonomy',$taxonomy), PHP_URL_PATH);
+					$urls[] = parse_url( xmlsf_get_index_url( 'taxonomy', $taxonomy ), PHP_URL_PATH );
 				}
 			}
 		}
