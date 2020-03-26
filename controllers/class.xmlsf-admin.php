@@ -24,9 +24,14 @@ class XMLSF_Admin
 	public static $dismissed = array();
 
 	/**
+	 * Minimal compatible pro version
+	 * @var float
+	 */
+	public static $compat_pro_min = '1.2';
+
+	/**
 	 * CONSTRUCTOR
 	 */
-
 	function __construct()
 	{
 		require XMLSF_DIR . '/models/functions.admin.php';
@@ -96,7 +101,9 @@ class XMLSF_Admin
 		}
 	}
 
-	/* SITEMAPS */
+	/**
+	 * SITEMAPS
+	 */
 
 	public function xml_sitemaps_help()
 	{
@@ -168,7 +175,9 @@ class XMLSF_Admin
 		include XMLSF_DIR . '/views/admin/field-sitemap-domains.php';
 	}
 
-	/* ROBOTS */
+	/**
+	 * ROBOTS
+	 */
 
 	public function robots_settings_field()
 	{
@@ -176,7 +185,9 @@ class XMLSF_Admin
 		include XMLSF_DIR . '/views/admin/field-robots.php';
 	}
 
-	/* PING SETTINGS */
+	/**
+	 * PING SETTINGS
+	 */
 
 	public function ping_settings_help()
 	{
@@ -224,7 +235,6 @@ class XMLSF_Admin
 	/**
 	 * Delete static sitemap files
 	 */
-
 	public function delete_static_files()
 	{
 		if ( empty($_POST['xmlsf-delete']) ) {
@@ -305,22 +315,35 @@ class XMLSF_Admin
 
 	public function check_conflicts()
 	{
+		// Google News Advanced incompatibility notice
+		if ( is_plugin_active('xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php') ) {
+			// check version
+			if ( !in_array( 'xmlsf_advanced_news', self::$dismissed ) ) {
+				if (
+					! defined( 'XMLSF_NEWS_ADV_VERSION' ) ||
+					version_compare( XMLSF_NEWS_ADV_VERSION, self::$compat_pro_min, '<' )
+				) {
+					add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_xmlsf_advanced_news' ) );
+				}
+			}
+		}
+
 		// Catch Box Pro feed redirect
 		if ( /*!in_array( 'catchbox_feed_redirect', self::$dismissed ) &&*/ function_exists( 'catchbox_is_feed_url_present' ) && catchbox_is_feed_url_present(null) ) {
 			add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_catchbox_feed_redirect' ) );
 		}
 
 		// Ad Inserter XML setting incompatibility warning
-    if ( /*!in_array( 'ad_inserter_feed', parent::$dismissed ) &&*/ is_plugin_active('ad-inserter/ad-inserter.php') ) {
-      $adsettings = get_option( 'ad_inserter' );
+		if ( /*!in_array( 'ad_inserter_feed', parent::$dismissed ) &&*/ is_plugin_active('ad-inserter/ad-inserter.php') ) {
+			$adsettings = get_option( 'ad_inserter' );
 			if ( is_array($adsettings) && !empty($adsettings) ) {
-        foreach ( $adsettings as $ad => $settings ) {
+				foreach ( $adsettings as $ad => $settings ) {
 					// check rss feed setting
-          if ( !empty( $settings['code'] ) && empty( $settings['disable_insertion'] ) && !empty( $settings['enable_feed'] ) ) {
-            add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_ad_inserter_feed' ) );
-            break;
-          }
-        }
+					if ( !empty( $settings['code'] ) && empty( $settings['disable_insertion'] ) && !empty( $settings['enable_feed'] ) ) {
+						add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_ad_inserter_feed' ) );
+						break;
+					}
+				}
 			}
 		}
 	}
