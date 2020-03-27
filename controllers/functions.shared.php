@@ -31,7 +31,7 @@ function xmlsf_xml_stylesheet( $sitemap = false ) {
 	 *
 	 * Examples:
 	 * assets/sitemap.xsl
-	 * assets/sitemap-home.xsl
+	 * assets/sitemap-root.xsl
 	 * assets/sitemap-posttype.xsl
 	 * assets/sitemap-taxonomy.xsl
 	 * assets/sitemap-authors.xsl
@@ -51,7 +51,7 @@ function xmlsf_xml_stylesheet( $sitemap = false ) {
 		$url = plugins_url( $file, XMLSF_BASENAME );
 	}
 
-	echo '<?xml-stylesheet type="text/xsl" href="' . wp_make_link_relative( $url ) . '?ver=' . XMLSF_VERSION . '"?>';
+	echo '<?xml-stylesheet type="text/xsl" href="' . wp_make_link_relative( $url ) . '?ver=' . XMLSF_VERSION . '"?>' . PHP_EOL;
 }
 
 /**
