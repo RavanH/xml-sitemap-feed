@@ -1,12 +1,14 @@
 <p>
-	<strong><?php _e( 'Include post types in the sitemap index. ', 'xml-sitemap-feed' ); ?></strong>
+	<strong><?php _e( 'Include...', 'xml-sitemap-feed' ); ?></strong>
 	<br />
-	<?php _e( 'Activate the option Include... for any post type you wish to create a sitemap for. If you have more post types than the standard Posts and Pages, make sure they are public by following links in the sitemap in an anonymous browser window or after logging out. When you end up on a 404 Not Found page, then come back here and deactivate the post type in question.', 'xml-sitemap-feed' ); ?>
+	<?php _e( 'Activate these to include a post type sitemap in the sitemap index.', 'xml-sitemap-feed' ); ?>
+	<?php _e( 'Make sure that post types are public by following links in the sitemap in an anonymous browser window or after logging out.', 'xml-sitemap-feed' ); ?>
+	<?php _e( 'Some post types or posts may be carrying noindex headers. Make sure to NOT include those post types or posts.', 'xml-sitemap-feed' ); ?>
 </p>
 <p>
 	<strong><?php _e( 'Split by', 'xml-sitemap-feed' ); ?></strong>
 	<br />
-	<?php _e( 'Choose Split by Month if you experience errors or slow sitemaps.', 'xml-sitemap-feed' ); ?> 
+	<?php _e( 'Choose Split by Month if you experience errors or slow sitemaps.', 'xml-sitemap-feed' ); ?>
 	<?php echo apply_filters(
 		'xmlsf_posttype_archive_field_description',
 		sprintf( /* Translators: XML Sitemap Advanced */ __( 'More options available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">'.__('XML Sitemap Advanced','xml-sitemap-feed').'</a>' ) ); ?>

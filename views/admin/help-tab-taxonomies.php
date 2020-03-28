@@ -1,4 +1,14 @@
 <p>
+	<strong><?php _e( 'Include taxonomies', 'xml-sitemap-feed' ); ?></strong>
+	<br />
+	<?php _e( 'Activate this to include a taxonomy terms sitemap in the sitemap index.', 'xml-sitemap-feed' ); ?>
+</p>
+<p>
+	<strong><?php _e( 'Priority', 'xml-sitemap-feed' ); ?></strong>
+	<br />
+	<?php echo __( 'Priority can be used to signal the importance of taxonomy term archives relative to other content like posts, pages or author archives.', 'xml-sitemap-feed' ); ?>
+</p>
+<p>
 	<strong><?php _e( 'Automatic Priority calculation.', 'xml-sitemap-feed' ); ?></strong>
 	<br />
 	<?php echo __('Adjusts the Priority of each taxonomy term based on the relative number of attributed posts.','xml-sitemap-feed'); ?>
