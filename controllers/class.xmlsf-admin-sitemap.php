@@ -272,8 +272,11 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	*/
 	public function settings_page()
 	{
-		// SECTIONS & SETTINGS
-		// post_types
+		/**
+		 * SECTIONS & SETTINGS
+		 */
+
+		/** POST TYPES */
 		add_settings_section( 'xml_sitemap_post_types_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_post_types' );
 		$post_types = apply_filters( 'xmlsf_post_types', get_post_types( array( 'public' => true ) /*,'objects'*/) );
 
@@ -287,11 +290,16 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 			}
 		endif;
 
-		// taxonomies
+		/** TAXONOMIES */
 		add_settings_section( 'xml_sitemap_taxonomies_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_taxonomies' );
 		add_settings_field( 'xmlsf_taxonomy_settings', translate('General'), array($this,'taxonomy_settings_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
 		add_settings_field( 'xmlsf_taxonomies', __('Taxonomies','xml-sitemap-feed'), array($this,'taxonomies_field'), 'xmlsf_taxonomies', 'xml_sitemap_taxonomies_section' );
 
+		/** AUTHORS */
+		add_settings_section( 'xml_sitemap_authors_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_authors' );
+		add_settings_field( 'xmlsf_author_settings', translate('General'), array($this,'author_settings_field'), 'xmlsf_authors', 'xml_sitemap_authors_section' );
+
+		/** ADVANCED */
 		add_settings_section( 'xml_sitemap_advanced_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_advanced' );
 		// custom urls
 		add_settings_field( 'xmlsf_urls', __('External web pages','xml-sitemap-feed'), array($this,'urls_settings_field'), 'xmlsf_advanced', 'xml_sitemap_advanced_section' );
@@ -305,7 +313,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		// prepare sitemap link url
 		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
-		$sitemap = xmlsf()->plain_permalinks() || empty( $sitemaps['sitemap-news'] ) ? '?feed=sitemap' : $sitemaps['sitemap'];
+		$sitemap = xmlsf()->plain_permalinks() ? '?feed=sitemap' : $sitemaps['sitemap'];
 
 		// remove WPML home url filter
 		global $wpml_url_filters;
@@ -328,6 +336,8 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		// taxonomies
 		register_setting( 'xmlsf_taxonomies', 'xmlsf_taxonomy_settings', array('XMLSF_Admin_Sitemap_Sanitize','taxonomy_settings') );
 		register_setting( 'xmlsf_taxonomies', 'xmlsf_taxonomies', array('XMLSF_Admin_Sitemap_Sanitize','taxonomies') );
+		// authors
+		register_setting( 'xmlsf_authors', 'xmlsf_author_settings', array('XMLSF_Admin_Sitemap_Sanitize','author_settings') );
 		// custom urls
 		register_setting( 'xmlsf_advanced', 'xmlsf_urls', array('XMLSF_Admin_Sitemap_Sanitize','custom_urls_settings') );
 		// custom sitemaps
@@ -370,6 +380,16 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		$screen->add_help_tab( array(
 			'id'	  => 'sitemap-settings-taxonomies',
 			'title'   => __( 'Taxonomies', 'xml-sitemap-feed' ),
+			'content' => $content,
+		) );
+
+		ob_start();
+		include XMLSF_DIR . '/views/admin/help-tab-authors.php';
+		$content = ob_get_clean();
+
+		$screen->add_help_tab( array(
+			'id'	  => 'sitemap-settings-authors',
+			'title'   => __( 'Authors', 'xml-sitemap-feed' ),
 			'content' => $content,
 		) );
 
@@ -417,6 +437,19 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-sitemap-taxonomies.php';
+	}
+
+	public function author_settings_field()
+	{
+		$author_settings = get_option( 'xmlsf_author_settings' );
+
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/field-sitemap-author-settings.php';
+	}
+
+	public function authors_field()
+	{
+		include XMLSF_DIR . '/views/admin/field-sitemap-authors.php';
 	}
 
 	public function custom_sitemaps_settings_field()

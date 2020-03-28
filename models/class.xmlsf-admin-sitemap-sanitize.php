@@ -39,6 +39,30 @@ class XMLSF_Admin_Sitemap_Sanitize
 		return $sanitized;
 	}
 
+	public static function author_settings( $new )
+	{
+		setlocale( LC_NUMERIC, 'C' );
+
+		$sanitized = array();
+
+		$sanitized['active'] = !empty($new['active']) ? '1' : '';
+		$sanitized['priority'] = isset($new['priority']) ? xmlsf_sanitize_priority( str_replace( ',', '.', $new['priority'] ), .1, .9 ) : '0.3';
+		$sanitized['dynamic_priority'] = !empty($new['dynamic_priority']) ? '1' : '';
+		$sanitized['term_limit'] = isset($new['term_limit']) ? intval($new['term_limit']) : 5000;
+		if ( $sanitized['term_limit'] < 1 || $sanitized['term_limit'] > 50000 ) $sanitized['term_limit'] = 50000;
+
+		// clear user meta cache if deactivating...
+/*		if ( empty($sanitized['active']) ) {
+			$old = (array) get_option( 'xmlsf_taxonomy_settings', array() );
+			if ( ! empty($old['active']) ) {
+				global $wpdb;
+				$wpdb->delete( $wpdb->prefix.'usermeta', array( 'meta_key' => 'last_published_date_gmt' ) );
+			}
+		}
+*/
+		return $sanitized;
+	}
+
 	public static function post_types_settings( $new = array() )
 	{
 		$sanitized = is_array($new) ? $new : array();

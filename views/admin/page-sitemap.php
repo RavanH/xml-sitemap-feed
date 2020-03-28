@@ -11,9 +11,11 @@
 	</p>
 
 	<nav class="nav-tab-wrapper">
-		<a href="?page=xmlsf&tab=post_types" class="nav-tab <?php echo $active_tab == 'post_types' ? 'nav-tab-active' : ''; ?>"><?php _e('Post types','xml-sitemap-feed'); ?></a>
-		<a href="?page=xmlsf&tab=taxonomies" class="nav-tab <?php echo $active_tab == 'taxonomies' ? 'nav-tab-active' : ''; ?>"><?php _e('Taxonomies','xml-sitemap-feed'); ?></a>
-		<a href="?page=xmlsf&tab=advanced" class="nav-tab <?php echo $active_tab == 'advanced' ? 'nav-tab-active' : ''; ?>"><?php echo translate('Advanced'); ?></a>
+		<a class="nav-tab<?php echo $active_tab == 'post_types' ? ' nav-tab-active' : '" href="?page=xmlsf&tab=post_types'; ?>"><?php _e('Post types','xml-sitemap-feed'); ?></a>
+		<a class="nav-tab<?php echo $active_tab == 'taxonomies' ? ' nav-tab-active' : '" href="?page=xmlsf&tab=taxonomies'; ?>"><?php _e('Taxonomies','xml-sitemap-feed'); ?></a>
+		<a class="nav-tab<?php echo $active_tab == 'authors' ? ' nav-tab-active' : '" href="?page=xmlsf&tab=authors'; ?>"><?php _e('Authors','xml-sitemap-feed'); ?></a>
+		<a class="nav-tab<?php echo $active_tab == 'advanced' ? ' nav-tab-active' : '" href="?page=xmlsf&tab=advanced'; ?>"><?php echo translate('Advanced'); ?></a>
+		<?php do_action( 'xmlsf_sitemap_nav_tabs', $active_tab ); ?>
 	</nav>
 
 	<div class="main">

@@ -31,13 +31,13 @@ class XMLSitemapFeed_Upgrade {
 	 *
 	 * @since 5.1
 	 */
-	function install()
+	private function install()
 	{
 		$defaults = xmlsf()->defaults();
 
 		foreach ( $defaults as $option => $default ) {
 			delete_option( 'xmlsf_'.$option );
-			if ( in_array( $option, array('ping','robots') ) )
+			if ( in_array( $option, array( 'ping', 'robots' ) ) )
 				add_option( 'xmlsf_'.$option, $default, null, false );
 			else
 				add_option( 'xmlsf_'.$option, $default );
@@ -54,7 +54,7 @@ class XMLSitemapFeed_Upgrade {
 	 *
 	 * @since 5.1
 	 */
-	function upgrade( $db_version )
+	private function upgrade( $db_version )
 	{
 		global $wpdb;
 
@@ -152,20 +152,6 @@ class XMLSitemapFeed_Upgrade {
 			add_option( 'xmlsf_robots', $robots, null, false );
 		}
 
-		if ( version_compare( '5.0.2', $db_version, '>' ) ) {
-			$defaults = xmlsf()->defaults();
-
-			foreach ( $defaults as $option => $default ) {
-				if ( get_option( 'xmlsf_'.$option ) ) continue;
-				if ( in_array( $option, array('ping','robots') ) )
-					add_option( 'xmlsf_'.$option, $default, null, false );
-				else
-					add_option( 'xmlsf_'.$option, $default );
-			}
-
-			delete_option( 'xmlsf_version' );
-		}
-
 		if ( version_compare( '5.1', $db_version, '>' ) ) {
 			delete_transient('xmlsf_ping_google_sitemap_news');
 			delete_transient('xmlsf_ping_google_sitemap');
@@ -183,9 +169,23 @@ class XMLSitemapFeed_Upgrade {
 			update_option( 'xmlsf_comments_meta_primed', array() );
 		}
 
+		$this->update_from_defaults();
+
 		if ( defined('WP_DEBUG') && WP_DEBUG ) {
 			error_log('XML Sitemap Feeds upgraded from '.$db_version.' to '.XMLSF_VERSION);
 		}
+	}
+
+	private function update_from_defaults() {
+
+		foreach ( xmlsf()->defaults() as $option => $default ) {
+			if ( get_option( 'xmlsf_'.$option ) ) continue;
+			if ( in_array( $option, array('ping','robots') ) )
+				add_option( 'xmlsf_'.$option, $default, null, false );
+			else
+				add_option( 'xmlsf_'.$option, $default );
+		}
+
 	}
 
 }

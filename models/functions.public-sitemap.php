@@ -46,6 +46,70 @@ function xmlsf_get_root_data() {
 }
 
 /**
+ * Author data
+ *
+ * @return array
+ */
+function xmlsf_get_author_data() {
+
+	$author_settings = get_option( 'xmlsf_author_settings' );
+
+	$args = (array) apply_filters(
+		'xmlsf_get_author_args',
+		array(
+			'orderby'             => 'post_count',
+			'order'               => 'DESC',
+			'number'              => ! empty( $author_settings['term_limit'] ) && is_numeric( $author_settings['term_limit'] ) ? $author_settings['term_limit'] : '1000',
+			'fields'              => array( 'ID' ), // must be an array
+			'has_published_posts' => true, // means all post types
+			'who'                 => 'authors'
+		)
+	);
+	// make sure 'fields' is an array and includes 'ID'
+	$args['fields'] = array_merge( (array) $args['fields'], array( 'ID' ) );
+
+	$users = get_users( $args );
+
+	$priority = ! empty( $author_settings['priority'] ) ? $author_settings['priority'] : '';
+
+	$post_type = ( empty( $args['has_published_posts'] ) || true === $args['has_published_posts'] ) ? 'any' : $args['has_published_posts'];
+
+	$data = array();
+	foreach ( $users as $user ) {
+		$url = get_author_posts_url( $user->ID );
+
+		// allow filtering of users
+		if ( apply_filters( 'xmlsf_skip_user', false, $user ) ) continue;
+
+		// last publication date
+		$posts = get_posts(
+			array(
+				'author' => $user->ID,
+				'post_type' => $post_type,
+				'post_status' => 'publish',
+				'posts_per_page' => 1,
+				'order' => 'DESC',
+				'orderby ' => 'post_date',
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'update_cache' => false,
+				'lang' => '', // TODO make multilanguage compatible
+			)
+		);
+
+		$lastmod = '';
+		if ( $posts ) {
+			$lastmod = get_the_date( DATE_W3C, $posts[0] );
+		}
+
+		$data[$url] = array( 'priority' => $priority, 'lastmod' => $lastmod );
+	}
+
+	return apply_filters( 'xmlsf_author_data', $data );
+
+}
+
+/**
  * Do tags
  *
  * @param string $type
@@ -407,6 +471,8 @@ function xmlsf_sitemap_filter_request( $request ) {
 
 	$feed = explode( '-' , $request['feed'], 3 );
 
+	add_filter( 'split_the_query', '__return_false' );
+
 	if ( ! isset( $feed[1] ) ) {
 		// disable default feed query
 		add_filter( 'posts_request', '__return_false' );
@@ -443,7 +509,6 @@ function xmlsf_sitemap_filter_request( $request ) {
 
 			// setup filters
 			add_filter( 'post_limits', function() { return 'LIMIT 0, 50000'; } );
-			add_filter( 'split_the_query', '__return_false' );
 
 			// modify request
 			$request['post_type'] = $feed[2];
@@ -479,6 +544,10 @@ function xmlsf_sitemap_filter_request( $request ) {
 			add_filter( 'posts_request', '__return_false' );
 
 			break;
+
+		default:
+
+			add_filter( 'posts_request', '__return_false' );
 
 	}
 
