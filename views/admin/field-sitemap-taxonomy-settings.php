@@ -1,4 +1,4 @@
-<fieldset id="xmlsf_taxonomies">
+<fieldset id="xmlsf_taxonomy_settings">
   <legend class="screen-reader-text">
     <?php echo translate( 'General' ); ?>
   </legend>
