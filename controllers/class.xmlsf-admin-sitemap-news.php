@@ -152,7 +152,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		// prepare sitemap link url
 		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
-		$sitemap = xmlsf()->plain_permalinks() || empty($sitemaps['sitemap-news']) ? '?feed=sitemap-news' : $sitemaps['sitemap-news'];
+		$sitemap = xmlsf()->plain_permalinks() ? '?feed=sitemap-news' : $sitemaps['sitemap-news'];
 
 		// remove WPML home url filter
 		global $wpml_url_filters;

@@ -24,13 +24,12 @@ $urls = apply_filters( 'xmlsf_custom_urls', get_option('xmlsf_urls') );
 if ( is_array($urls) ) :
 	// and loop away!
 	foreach ( $urls as $url ) {
-		if (empty($url[0]))
-			continue;
+		if (empty($url[0])) continue;
 	?>
 	<url>
 		<loc><?php echo esc_url( $url[0] ); ?></loc>
 		<priority><?php echo ( isset($url[1]) && is_numeric($url[1]) ) ? $url[1] : '0.5'; ?></priority>
-<?php do_action( 'xmlsf_tags_after', 'custom' ); ?>
+<?php 	do_action( 'xmlsf_tags_after', 'custom' ); ?>
  	</url>
 <?php
 		do_action( 'xmlsf_url_after', 'custom' );
