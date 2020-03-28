@@ -9,11 +9,13 @@
  * @return array
  */
 function xmlsf_headers( $headers ) {
-	// force status 200 for all cases
+	// force status 200
 	$headers['Status'] = '200';
 	// set noindex
 	$headers['X-Robots-Tag'] = 'noindex, follow';
+	// force content type
 	$headers['Content-Type'] = 'text/xml; charset=' . get_bloginfo('charset');
+
 	return $headers;
 }
 

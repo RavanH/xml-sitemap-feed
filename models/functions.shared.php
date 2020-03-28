@@ -19,6 +19,9 @@ function xmlsf_filter_request( $request ) {
 	// set the sitemap conditional flag
 	xmlsf()->is_sitemap = true;
 
+	// save a few db queries
+	add_filter( 'split_the_query', '__return_false' );
+
 	// include shared public functions
 	require_once XMLSF_DIR . '/models/functions.public-shared.php';
 

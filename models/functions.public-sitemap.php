@@ -1,6 +1,21 @@
 <?php
 
 /**
+ * Response headers filter
+ * Does not check if we are really in a sitemap feed.
+ *
+ * @param $headers
+ *
+ * @return array
+ */
+function xmlsf_sitemap_headers( $headers ) {
+	// don't allow caching
+	$headers['Cache-Control'] = 'public, nocache';
+
+	return $headers;
+}
+
+/**
  * Get root pages data
  * @return array
  */
@@ -456,6 +471,9 @@ function xmlsf_set_terms_args( $args ) {
  */
 function xmlsf_sitemap_filter_request( $request ) {
 
+	// REPSONSE HEADERS filtering
+	add_filter( 'wp_headers', 'xmlsf_sitemap_headers' );
+
 	/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
 	$request = apply_filters( 'xmlsf_request', $request );
 	/**
@@ -470,8 +488,6 @@ function xmlsf_sitemap_filter_request( $request ) {
 	 */
 
 	$feed = explode( '-' , $request['feed'], 3 );
-
-	add_filter( 'split_the_query', '__return_false' );
 
 	if ( ! isset( $feed[1] ) ) {
 		// disable default feed query
