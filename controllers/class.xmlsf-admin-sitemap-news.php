@@ -24,17 +24,17 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		add_action( 'xmlsf_news_add_settings', array( $this, 'add_settings' ) );
 
 		// TOOLS ACTIONS
-		add_action( 'admin_init', array( $this, 'tools_actions' ) );
+		add_action( 'admin_init', array( $this, 'ping_sitemap' ) );
 	}
 
 	/**
 	* TOOLS ACTIONS
 	*/
 
-	public function tools_actions()
+	public function ping_sitemap()
 	{
 		if ( ! isset( $_POST['xmlsf-ping-sitemap-news'] ) || ! xmlsf_verify_nonce('help') )
-		return;
+			return;
 
 		$sitemaps = get_option( 'xmlsf_sitemaps' );
 		$result = xmlsf_ping( 'google', $sitemaps['sitemap-news'], 5 * MINUTE_IN_SECONDS );

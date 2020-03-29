@@ -8,10 +8,12 @@
  * @return array
  */
 function xmlsf_filter_post_types( $post_types ) {
-	// Always exclude attachment and reply post types (bbpress)
-	unset( $post_types['attachment'], $post_types['reply'] );
+	$post_types = (array) $post_types;
 
-	return array_filter( (array) $post_types );
+	// Always exclude attachment and reply post types (bbpress)
+	unset( /*$post_types['attachment'],*/ $post_types['reply'] );
+
+	return array_filter( $post_types );
 }
 
 /**

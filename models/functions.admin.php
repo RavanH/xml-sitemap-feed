@@ -9,15 +9,15 @@ function xmlsf_add_action_link( $links ) {
 }
 
 function xmlsf_plugin_meta_links( $links, $file ) {
-  $support_link = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/">' . __('Support','xml-sitemap-feed') . '</a>';
-  $rate_link = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/?filter=5#new-post">' . __('Rate ★★★★★','xml-sitemap-feed') . '</a>';
+	$support_link = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/">' . __('Support','xml-sitemap-feed') . '</a>';
+	$rate_link = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/?filter=5#new-post">' . __('Rate ★★★★★','xml-sitemap-feed') . '</a>';
 
-  if ( $file == XMLSF_BASENAME ) {
-    $links[] = $support_link;
-    $links[] = $rate_link;
-  }
+	if ( $file == XMLSF_BASENAME ) {
+		$links[] = $support_link;
+		$links[] = $rate_link;
+	}
 
-  return $links;
+	return $links;
 }
 
 function xmlsf_verify_nonce( $context ) {
@@ -26,7 +26,7 @@ function xmlsf_verify_nonce( $context ) {
 		return true;
 
 	// Still here? Then add security check failed error message and return false.
-	add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') );
+add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') /* . ' Context: '. $context */ );
 
 	return false;
 }
@@ -38,7 +38,7 @@ class XMLSF_Admin_Sanitize
 
 	public static function sitemaps_settings( $new )
 	{
-		if  ( '1' !== get_option('blog_public') ) {
+		if ( '1' !== get_option('blog_public') ) {
 			return '';
 		}
 
@@ -76,8 +76,8 @@ class XMLSF_Admin_Sanitize
 
 		// clean up input
 		if(is_array($new)) {
-		  $new = array_filter($new);
-		  $new = reset($new);
+			$new = array_filter($new);
+			$new = reset($new);
 		}
 		$input = $new ? explode( PHP_EOL, strip_tags( $new ) ) : array();
 
@@ -115,8 +115,8 @@ class XMLSF_Admin_Sanitize
 
 		// clean up input
 		if ( is_array( $new ) ) {
-		  $new = array_filter( $new );
-		  $new = reset( $new );
+			$new = array_filter( $new );
+			$new = reset( $new );
 		}
 
 		if ( empty($old) && !empty($new) )
