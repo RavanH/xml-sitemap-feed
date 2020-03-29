@@ -18,7 +18,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	public function __construct()
 	{
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
-		add_action( 'admin_init', array( $this, 'tools_actions' ) );
+		add_action( 'admin_init', array( $this, 'ping_sitemap' ) );
 		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
@@ -28,10 +28,13 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		add_action( 'xmlsf_posttype_archive_field_options', array( $this, 'advanced_archive_field_options' ) );
 	}
 
-	public function tools_actions()
+	/**
+	 * Ping sitemaps
+	 */
+	public function ping_sitemap()
 	{
 		if ( ! isset( $_POST['xmlsf-ping-sitemap'] ) || ! xmlsf_verify_nonce('help') )
-	  return;
+			return;
 
 		$sitemaps = get_option( 'xmlsf_sitemaps' );
 
@@ -74,30 +77,33 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	if ( wp_doing_ajax() || ! current_user_can( 'manage_options' ) ) return;
 
 		// TODO:
-		// W3TC static files 404 exclusion rules ? Said to be fixed in W3TC next version...
-		// Google (XML) Sitemaps Generator Plugin for WordPress and Google News sitemap incompatibility
+		// Google (XML) Sitemaps Generator Plugin for WordPress and Google News Sitemap incompatibility
 
 		// WP SEO conflict notices
 		if ( is_plugin_active('wordpress-seo/wp-seo.php') ) {
 			// check date archive redirection
-			//if ( !in_array( 'wpseo_date_redirect', parent::$dismissed ) ) {
-				$wpseo_titles = get_option( 'wpseo_titles' );
-				if ( !empty( $wpseo_titles['disable-date'] ) ) {
-					// check if Split by option is set anywhere
-					foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
-						if ( !empty( $settings['active'] ) && !empty( $settings['archive'] ) ) {
-							add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_wpseo_date_redirect' ) );
-							break;
-						}
+			$wpseo_titles = get_option( 'wpseo_titles' );
+			if ( !empty( $wpseo_titles['disable-date'] ) ) {
+				// check if Split by option is set anywhere
+				foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
+					if ( !empty( $settings['active'] ) && !empty( $settings['archive'] ) ) {
+						add_action(
+							'admin_notices',
+							function() { include XMLSF_DIR . '/views/admin/notice-wpseo-date-redirect.php'; }
+						);
+						break;
 					}
 				}
-			//}
+			}
 
 			// check wpseo sitemap option
 			if ( !in_array( 'wpseo_sitemap', parent::$dismissed ) ) {
 				$wpseo = get_option( 'wpseo' );
 				if ( !empty( $wpseo['enable_xml_sitemap'] ) ) {
-					add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_wpseo_sitemap' ) );
+					add_action(
+						'admin_notices',
+						function() { include XMLSF_DIR . '/views/admin/notice-wpseo-sitemap.php'; }
+					);
 				}
 			}
 		}
@@ -107,24 +113,30 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 
 			// check date archive redirection
 			$seopress_toggle = get_option( 'seopress_toggle' );
-			//if ( !in_array( 'seopress_date_redirect', parent::$dismissed ) ) {
-				$seopress_titles = get_option( 'seopress_titles_option_name' );
-				if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) ) {
-					// check if Split by option is set anywhere
-					foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
-						if ( !empty( $settings['active'] ) && !empty( $settings['archive'] ) ) {
-							add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_seopress_date_redirect' ) );
-							break;
-						}
+
+			$seopress_titles = get_option( 'seopress_titles_option_name' );
+			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) ) {
+				// check if Split by option is set anywhere
+				foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
+					if ( !empty( $settings['active'] ) && !empty( $settings['archive'] ) ) {
+						add_action(
+							'admin_notices',
+							function() { include XMLSF_DIR . '/views/admin/notice-seopress-date-redirect.php'; }
+						);
+						break;
 					}
 				}
-			//}
+			}
+
 
 			// check seopress sitemap option
 			if ( !in_array( 'seopress_sitemap', parent::$dismissed ) ) {
 				$seopress_xml_sitemap = get_option( 'seopress_xml_sitemap_option_name' );
 				if ( ! empty( $seopress_toggle['toggle-xml-sitemap'] ) && !empty( $seopress_xml_sitemap['seopress_xml_sitemap_general_enable'] ) ) {
-					add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_seopress_sitemap' ) );
+					add_action(
+						'admin_notices',
+						function() { include XMLSF_DIR . '/views/admin/notice-seopress-sitemap.php'; }
+					);
 				}
 			}
 		}
@@ -133,28 +145,46 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		if ( is_plugin_active('seo-by-rank-math/rank-math.php') ) {
 
 			// check date archive redirection
-			//if ( !in_array( 'rankmath_date_redirect', parent::$dismissed ) ) {
-				$rankmath_titles = get_option( 'rank-math-options-titles' );
-				if ( ! empty( $rankmath_titles['disable_date_archives'] ) && $rankmath_titles['disable_date_archives'] == 'on' ) {
-					// check if Split by option is set anywhere
-					foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
-						if ( !empty( $settings['active'] ) && !empty( $settings['archive'] ) ) {
-							add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_rankmath_date_redirect' ) );
-							break;
-						}
+			$rankmath_titles = get_option( 'rank-math-options-titles' );
+			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && $rankmath_titles['disable_date_archives'] == 'on' ) {
+				// check if Split by option is set anywhere
+				foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
+					if ( !empty( $settings['active'] ) && !empty( $settings['archive'] ) ) {
+						add_action(
+							'admin_notices',
+							function() { include XMLSF_DIR . '/views/admin/notice-rankmath-date-redirect.php'; }
+						);
+						break;
 					}
 				}
-			//}
+			}
 
 			// check rank math sitemap option
 			if ( !in_array( 'rankmath_sitemap', parent::$dismissed ) ) {
 				$rankmath_modules = (array) get_option( 'rank_math_modules' );
 				if ( in_array( 'sitemap', $rankmath_modules ) ) {
-					add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_rankmath_sitemap' ) );
+					add_action(
+						'admin_notices',
+						function() { include XMLSF_DIR . '/views/admin/notice-rankmath-sitemap.php'; }
+					);
 				}
 			}
 		}
 
+		// All in One SEO Pack conflict notices
+		if ( is_plugin_active('all-in-ine-seo-pack/all_in_one_seo_pack.php') ) {
+
+			// check aioseop sitemap option
+			if ( !in_array( 'rankmath_sitemap', parent::$dismissed ) ) {
+				$rankmath_modules = (array) get_option( 'rank_math_modules' );
+				if ( in_array( 'sitemap', $rankmath_modules ) ) {
+					add_action(
+						'admin_notices',
+						function() { include XMLSF_DIR . '/views/admin/notice-rankmath-sitemap.php'; }
+					);
+				}
+			}
+		}
 	}
 
 	/**
