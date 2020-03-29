@@ -35,7 +35,6 @@ class XMLSF_Admin
 	function __construct()
 	{
 		require XMLSF_DIR . '/models/functions.admin.php';
-		require XMLSF_DIR . '/controllers/class.xmlsf-admin-notices.php';
 
 		$this->sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
@@ -53,11 +52,12 @@ class XMLSF_Admin
 		add_filter( 'plugin_action_links_' . XMLSF_BASENAME, 'xmlsf_add_action_link' );
 		add_filter( 'plugin_row_meta', 'xmlsf_plugin_meta_links', 10, 2);
 
-		add_action( 'admin_init', array( $this, 'notices_actions' ) );
-		add_action( 'admin_init', array( $this, 'transients_actions' ) );
+		// REGISTER SETTINGS
 		add_action( 'admin_init', array( $this, 'register_settings' ), 0 );
 
 		// ACTIONS & CHECKS
+		add_action( 'admin_init', array( $this, 'notices_actions' ) );
+		add_action( 'admin_init', array( $this, 'transients_actions' ) );
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
 		add_action( 'admin_init', array( $this, 'static_files' ) );
 		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
@@ -244,7 +244,10 @@ class XMLSF_Admin
 
 		$allowed_files = array('sitemap.xml','sitemap-news.xml','robots.txt');
 
-		$this->static_files();
+		if ( null === self::$static_files ) {
+			self::$static_files = get_transient( 'xmlsf_static_files' );
+			delete_transient( 'xmlsf_static_files' );
+		}
 
 		foreach ( $_POST['xmlsf-delete'] as $name ) {
 			if ( !in_array($name,$allowed_files) ) {
@@ -280,7 +283,10 @@ class XMLSF_Admin
 			self::$static_files = get_transient( 'xmlsf_static_files' );
 
 		if ( !empty(self::$static_files) && !in_array( 'static_files', self::$dismissed ) ) {
-			add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_static_files' ) );
+			add_action(
+				'admin_notices',
+				function() { include XMLSF_DIR . '/views/admin/notice-static-files.php'; }
+			);
 		}
 	}
 
@@ -323,14 +329,20 @@ class XMLSF_Admin
 					! defined( 'XMLSF_NEWS_ADV_VERSION' ) ||
 					version_compare( XMLSF_NEWS_ADV_VERSION, self::$compat_pro_min, '<' )
 				) {
-					add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_xmlsf_advanced_news' ) );
+					add_action(
+						'admin_notices',
+						function() { include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced-news.php'; }
+					);
 				}
 			}
 		}
 
 		// Catch Box Pro feed redirect
 		if ( /*!in_array( 'catchbox_feed_redirect', self::$dismissed ) &&*/ function_exists( 'catchbox_is_feed_url_present' ) && catchbox_is_feed_url_present(null) ) {
-			add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_catchbox_feed_redirect' ) );
+			add_action(
+				'admin_notices',
+				function() { include XMLSF_DIR . '/views/admin/notice-catchbox-feed-redirect.php'; }
+			);
 		}
 
 		// Ad Inserter XML setting incompatibility warning
@@ -340,7 +352,10 @@ class XMLSF_Admin
 				foreach ( $adsettings as $ad => $settings ) {
 					// check rss feed setting
 					if ( !empty( $settings['code'] ) && empty( $settings['disable_insertion'] ) && !empty( $settings['enable_feed'] ) ) {
-						add_action( 'admin_notices', array( 'XMLSF_Admin_Notices', 'notice_ad_inserter_feed' ) );
+						add_action(
+							'admin_notices',
+							function() { include XMLSF_DIR . '/views/admin/notice-ad-insterter-feed.php'; }
+						);
 						break;
 					}
 				}
@@ -353,12 +368,6 @@ class XMLSF_Admin
 		if ( isset( $_POST['xmlsf-clear-settings-submit'] ) && isset( $_POST['xmlsf-clear-settings'] ) ) {
 			if ( xmlsf_verify_nonce('help') ) {
 				$this->clear_settings( $_POST['xmlsf-clear-settings'] );
-			}
-		}
-
-		if ( isset( $_POST['xmlsf-delete-submit'] ) ) {
-			if ( xmlsf_verify_nonce('help') ) {
-				$this->delete_static_files();
 			}
 		}
 
@@ -413,6 +422,12 @@ class XMLSF_Admin
 	public function notices_actions()
 	{
 		self::$dismissed = (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
+
+		if ( isset( $_POST['xmlsf-delete-submit'] ) ) {
+			if ( xmlsf_verify_nonce('notice') ) {
+				$this->delete_static_files();
+			}
+		}
 
 		if ( isset( $_POST['xmlsf-dismiss-submit'] ) && isset( $_POST['xmlsf-dismiss'] ) ) {
 			if ( xmlsf_verify_nonce('notice') ) {
