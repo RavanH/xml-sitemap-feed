@@ -181,7 +181,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 			add_settings_field(
 				'xmlsf_news_hierarchical',
 				__( 'Hierarchical post types', 'xml-sitemap-feed' ),
-				array( $this, 'hierarchical_field' ),
+				function() { include XMLSF_DIR . '/views/admin/field-news-hierarchical.php'; },
 				'xmlsf_news_advanced',
 				'news_sitemap_advanced_section'
 			);
@@ -190,7 +190,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 			add_settings_field(
 				'xmlsf_news_keywords',
 				__( 'Keywords', 'xml-sitemap-feed' ),
-				array( $this, 'keywords_field' ),
+				function() { include XMLSF_DIR . '/views/admin/field-news-keywords.php'; },
 				'xmlsf_news_advanced',
 				'news_sitemap_advanced_section'
 			);
@@ -199,7 +199,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 			add_settings_field(
 				'xmlsf_news_stock_tickers',
 				__( 'Stock tickers', 'xml-sitemap-feed' ),
-				array( $this, 'stock_tickers_field' ),
+				function() { include XMLSF_DIR . '/views/admin/field-news-stocktickers.php'; },
 				'xmlsf_news_advanced',
 				'news_sitemap_advanced_section'
 			);
@@ -208,7 +208,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 			add_settings_field(
 				'xmlsf_news_ping_log',
 				__( 'Ping log', 'xml-sitemap-feed' ),
-				array( $this, 'ping_log_field' ),
+				function() { include XMLSF_DIR . '/views/admin/field-news-ping-log.php'; },
 				'xmlsf_news_advanced',
 				'news_sitemap_advanced_section'
 			);
@@ -250,7 +250,13 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 			}
 
 			// Source labels - deprecated
-			add_settings_field( 'xmlsf_news_labels', __('Source labels', 'xml-sitemap-feed' ), array($this,'labels_field'), 'xmlsf_news_general', 'news_sitemap_general_section' );
+			add_settings_field(
+				'xmlsf_news_labels',
+				__('Source labels', 'xml-sitemap-feed' ),
+				function() { include XMLSF_DIR . '/views/admin/field-news-labels.php'; },
+				'xmlsf_news_general',
+				'news_sitemap_general_section'
+			);
 		}
 	}
 
@@ -409,36 +415,6 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-news-categories.php';
-	}
-
-	public function keywords_field()
-	{
-		// The actual fields for data entry
-		include XMLSF_DIR . '/views/admin/field-news-keywords.php';
-	}
-
-	public function hierarchical_field()
-	{
-		// The actual fields for data entry
-		include XMLSF_DIR . '/views/admin/field-news-hierarchical.php';
-	}
-
-	public function stock_tickers_field()
-	{
-		// The actual fields for data entry
-		include XMLSF_DIR . '/views/admin/field-news-stocktickers.php';
-	}
-
-	public function ping_log_field()
-	{
-		// The actual fields for data entry
-		include XMLSF_DIR . '/views/admin/field-news-ping-log.php';
-	}
-
-	public function labels_field()
-	{
-		// The actual fields for data entry
-		include XMLSF_DIR . '/views/admin/field-news-labels.php';
 	}
 
 }
