@@ -172,15 +172,16 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		}
 
 		// All in One SEO Pack conflict notices
-		if ( is_plugin_active('all-in-ine-seo-pack/all_in_one_seo_pack.php') ) {
+	if ( is_plugin_active('all-in-one-seo-pack/all_in_one_seo_pack.php') ) {
+			// check aioseop sitemap module
+			if ( !in_array( 'aioseop_sitemap', parent::$dismissed ) ) {
+				$aioseop_options = (array) get_option( 'aioseop_options' );
 
-			// check aioseop sitemap option
-			if ( !in_array( 'rankmath_sitemap', parent::$dismissed ) ) {
-				$rankmath_modules = (array) get_option( 'rank_math_modules' );
-				if ( in_array( 'sitemap', $rankmath_modules ) ) {
+				if ( isset( $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) && "on" === $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) {
+					// sitemap module on
 					add_action(
 						'admin_notices',
-						function() { include XMLSF_DIR . '/views/admin/notice-rankmath-sitemap.php'; }
+						function() { include XMLSF_DIR . '/views/admin/notice-aioseop-sitemap.php'; }
 					);
 				}
 			}
