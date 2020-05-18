@@ -3,15 +3,15 @@
 Plugin Name: XML Sitemap & Google News
 Plugin URI: http://status301.net/wordpress-plugins/xml-sitemap-feed/
 Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
-Version: 5.3.0-alpha-11
+Version: 5.3.0-alpha-14
 Text Domain: xml-sitemap-feed
 Requires at least: 4.6
-Requires PHP: 5.4
+Requires PHP: 5.6
 Author: RavanH
 Author URI: http://status301.net/
 */
 
-define( 'XMLSF_VERSION', '5.3.0-alpha-11' );
+define( 'XMLSF_VERSION', '5.3.0-alpha-14' );
 
 /*  Copyright 2020 RavanH
     http://status301.net/
@@ -32,6 +32,7 @@ define( 'XMLSF_VERSION', '5.3.0-alpha-11' );
  * --------------------
  *
  *	FILTERS
+ *
  *	xmlsf_defaults             -> Filters the default array values for different option groups.
  *	xmlsf_request              -> Filters request when an xml sitemap request is found,
  *	                              can be used for plugin compatibility.
@@ -39,6 +40,7 @@ define( 'XMLSF_VERSION', '5.3.0-alpha-11' );
  *	                              can be used for plugin compatibility.
  *	xmlsf_allowed_domain       -> Filters the response when checking the url against allowed domains.
  *	                              Passes variable $url; must return true or false.
+ *	xmlsf_index_url_args       -> Filters the index url arguments array
  *	xmlsf_excluded             -> Filters the response when checking the post for exclusion flags in
  *	                              XML Sitemap context. Passes the post exclusion flag and $post_id; must return true or false.
  *	xmlsf_news_excluded        -> Filters the response when checking the post for exclusion flags in
@@ -64,6 +66,7 @@ define( 'XMLSF_VERSION', '5.3.0-alpha-11' );
  *	xmlsf_news_post_types      -> Filters the post types array for the Google News sitemap settings page.
  *
  *	ACTIONS
+ *
  *	xmlsf_ping                 -> Fires when a search engine has been pinged. Carries four arguments:
  *	                              search engine (google|bing), sitemap name, full ping url, ping repsonse code.
  *	xmlsf_urlset               -> Fired inside each sitemap's urlset tag. Can be used to
@@ -166,7 +169,7 @@ function xmlsf_init() {
 
 	add_action( 'xmlsf_ping', 'xmlsf_debug_ping', 9, 4 );
 
-	// include and instantiate class
+	// include and instantiate main class
 	xmlsf();
 
 	if ( ! empty( $sitemaps['sitemap'] ) ) {
@@ -253,6 +256,7 @@ function xmlsf_deactivate() {
  * Get instantiated sitemap class
  *
  * @since 5.0
+ *
  * @global XMLSitemapFeed $xmlsf
  * @return XMLSitemapFeed object
  */
@@ -334,3 +338,30 @@ function is_news() {
 	}
 	return $xmlsf->is_news;
 }
+
+// TODO start with namespacing and autoload
+// http://justintadlock.com/archives/2018/12/14/php-namespaces-for-wordpress-developers
+/*
+spl_autoload_register( function( $class ) {
+
+	$namespace = 'Justin\\';
+	$path      = 'src';
+
+	// Bail if the class is not in our namespace.
+	if ( 0 !== strpos( $class, $namespace ) ) {
+		return;
+	}
+
+	// Remove the namespace.
+	$class = str_replace( $namespace, '', $class );
+
+	// Build the filename.
+	$file = realpath( __DIR__ . "/{$path}" );
+	$file = $file . DIRECTORY_SEPARATOR . str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
+
+	// If the file exists for the class name, load it.
+	if ( file_exists( $file ) ) {
+		include( $file );
+	}
+} );
+*/

@@ -303,19 +303,22 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 == Changelog ==
 
 = 5.3 =
-TODO verify date archive redirect Yoast Pro?
 TODO custom post type root pages
 TODO prime meta caches button
 TODO Google News Feed tab
+TODO allow attachment pages?
 * NEW: Author sitemap
 * NEW: allow custom theme templates and stylesheets
 * NEW: request filters `xmlsf_request` and `xmlsf_news_request`
 * NEW: news template filters `xmlsf_news_publication_name` and `xmlsf_news_title`
 * NEW: sitemap template action hook `xmlsf_url`
 * NEW: sitemap template action hooks `xmlsf_news_url` and `xmlsf_news_tags_inner`
+* NEW: `xmlsf_index_url_args` filter
+* NEW: All in One SEO Pack incompatibility message and instructions
 * Moved news template action hook `xmlsf_news_tags_after` to after closing </news:news> tag
 * Less DB queries, smaller memory footprint
 * Better debug info with SAVEQUERIES
+* FIX: conflicting static file deletion
 * FIX: invalid form control not focusable when meta box is hidden
 * FIX: force Status 200 response
 * FIX: priority calculation last modified for post type
