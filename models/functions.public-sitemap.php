@@ -16,6 +16,92 @@ function xmlsf_sitemap_headers( $headers ) {
 }
 
 /**
+ * Get post archives data
+ *
+ * @param string $post_type
+ * @param string $archive_type
+ *
+ * @return array
+ */
+function xmlsf_get_index_archive_data( $post_type = 'post', $archive_type = '' ) {
+
+	global $wpdb;
+
+	if ( 'weekly' == $archive_type ) :
+
+		$week       = _wp_mysql_week( '`post_date`' );
+		$query      = "SELECT DISTINCT LPAD($week,2,'0') AS `week`, YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD($week,2,'0') ORDER BY `year` DESC, `week` DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		foreach ( (array) $arcresults as $arcresult ) {
+			$url = xmlsf_get_index_url( 'posttype', array( 'type' => $post_type, 'm' => $arcresult->year, 'w' => $arcresult->week ) );
+			$return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year, $arcresult->week ), DATE_W3C );
+		};
+
+	elseif ( 'monthly' == $archive_type ) :
+
+		$query = "SELECT YEAR(`post_date`) AS `year`, LPAD(MONTH(`post_date`),2,'0') AS `month`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD(MONTH(`post_date`),2,'0') ORDER BY `year` DESC, `month` DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		foreach ( (array) $arcresults as $arcresult ) {
+			$url = xmlsf_get_index_url( 'posttype', array( 'type' => $post_type, 'm' => $arcresult->year . $arcresult->month ) );
+			$return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year . $arcresult->month ), DATE_W3C );
+		};
+
+	elseif ( 'yearly' == $archive_type ) :
+
+		$query      = "SELECT YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`) ORDER BY `year` DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		foreach ( (array) $arcresults as $arcresult ) {
+			$url = xmlsf_get_index_url( 'posttype', array( 'type' => $post_type, 'm' => $arcresult->year ) );
+			$return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year ), DATE_W3C );
+		};
+
+	else :
+
+		$query      = "SELECT COUNT(ID) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' ORDER BY `post_date` DESC";
+		$arcresults = xmlsf_cache_get_archives( $query );
+
+		if ( is_object($arcresults[0]) && $arcresults[0]->posts > 0 ) {
+			 $url = xmlsf_get_index_url( 'posttype', array( 'type' => $post_type ) );
+			 $return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type ), DATE_W3C );
+		};
+
+	endif;
+
+	return $return;
+
+}
+
+/**
+ * Get archives from wp_cache
+ *
+ * @param string $query
+ *
+ * @return array
+ */
+function xmlsf_cache_get_archives( $query ) {
+
+	global $wpdb;
+
+	$key = md5( $query );
+	$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
+
+	// is this query not in cache?
+	if ( ! isset( $cache[ $key ] ) ) {
+		// then query DB
+		$cache[ $key ] = $wpdb->get_results( $query );
+		// and write it to the cache
+		wp_cache_set( 'xmlsf_get_archives', $cache, 'general' );
+	}
+
+	// return the cached query
+	return $cache[ $key ];
+
+}
+
+/**
  * Get root pages data
  * @return array
  */
@@ -142,6 +228,18 @@ function xmlsf_do_tags( $type = 'post' ) {
 		!empty($post_types[$type]['tags'])
 	) ? (array) $post_types[$type]['tags'] : array();
 
+}
+
+/**
+ * Do authors
+ *
+ * @return bool
+ */
+function xmlsf_do_authors() {
+
+	$settings = get_option( 'xmlsf_author_settings', xmlsf()->defaults('author_settings') );
+
+	return is_array( $settings ) && ! empty( $settings['active'] );
 }
 
 /**
@@ -587,7 +685,7 @@ function xmlsf_sitemap_filter_request( $request ) {
  *
  * @return string The date.
  */
-if( !function_exists('_get_post_time') ) {
+if ( ! function_exists( '_get_post_time' ) ) {
  function _get_post_time( $timezone, $field, $post_type = 'any', $which = 'last', $m = '', $w = '' ) {
 
 	global $wpdb;
@@ -699,8 +797,8 @@ if( !function_exists('_get_post_time') ) {
  * @param string $post_type Post type to check.
  * @return string The date of the last post.
  */
-if( !function_exists('get_firstpostdate') ) {
- function get_firstpostdate($timezone = 'server', $post_type = 'any') {
+if ( ! function_exists( 'get_firstpostdate' ) ) {
+ function get_firstpostdate( $timezone = 'server', $post_type = 'any' ) {
 
 	return apply_filters( 'get_firstpostdate', _get_post_time( $timezone, 'date', $post_type, 'first' ), $timezone );
 
@@ -723,7 +821,7 @@ if( !function_exists('get_firstpostdate') ) {
  *
  * @return string The date of the oldest modified post.
  */
-if( !function_exists('get_lastmodified') ) {
+if ( ! function_exists( 'get_lastmodified' ) ) {
  function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '', $w = '' ) {
 
 	return apply_filters( 'get_lastmodified', _get_post_time( $timezone, 'modified', $post_type, 'last', $m, $w ), $timezone );

@@ -11,7 +11,7 @@ function xmlsf_filter_post_types( $post_types ) {
 	$post_types = (array) $post_types;
 
 	// Always exclude attachment and reply post types (bbpress)
-	unset( /*$post_types['attachment'],*/ $post_types['reply'] );
+	unset( $post_types['attachment'], $post_types['reply'] );
 
 	return array_filter( $post_types );
 }
@@ -20,14 +20,19 @@ function xmlsf_filter_post_types( $post_types ) {
  * Get index url
  *
  * @param string $sitemap
- * @param string $type
- * @param string $m
- * @param string $w
- * @param string $gz
+ * @param array $args arguments:
+ *                    $type - post_type or taxonomy, default false
+ *                    $m    - YYYY, YYYYMM, YYYYMMDD
+ *                    $w    - week of the year ($m must be YYYY format)
+ *                    $gz   - bool for GZ extension (triggers compression verification)
  *
  * @return string
  */
-function xmlsf_get_index_url( $sitemap = 'root', $type = false, $m = false, $w = false, $gz = false ) {
+function xmlsf_get_index_url( $sitemap = 'root', $args = array() ) {
+
+	// get our arguments
+	$args = apply_filters( 'xmlsf_index_url_args', wp_parse_args( $args, array( 'type' => false, 'm' => false, 'w' => false, 'gz' => false) ) );
+	extract( $args );
 
 	if ( xmlsf()->plain_permalinks() ) {
 		$name = '?feed=sitemap-'.$sitemap;
@@ -49,89 +54,6 @@ function xmlsf_get_index_url( $sitemap = 'root', $type = false, $m = false, $w =
 }
 
 /**
- * Get archives
- *
- * @param string $post_type
- * @param string $type
- *
- * @return array
- */
-function xmlsf_get_archives( $post_type = 'post', $type = '' ) {
-
-	global $wpdb;
-	$return = array();
-
-	if ( 'weekly' == $type ) :
-
-		$week       = _wp_mysql_week( '`post_date`' );
-		$query      = "SELECT DISTINCT LPAD($week,2,'0') AS `week`, YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD($week,2,'0') ORDER BY `year` DESC, `week` DESC";
-		$arcresults = xmlsf_cache_get_archives( $query );
-
-		foreach ( (array) $arcresults as $arcresult ) {
-			$return[$arcresult->year . '.' . $arcresult->week] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year, $arcresult->week );
-		};
-
-	elseif ( 'monthly' == $type ) :
-
-		$query = "SELECT YEAR(`post_date`) AS `year`, LPAD(MONTH(`post_date`),2,'0') AS `month`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD(MONTH(`post_date`),2,'0') ORDER BY `year` DESC, `month` DESC";
-		$arcresults = xmlsf_cache_get_archives( $query );
-
-		foreach ( (array) $arcresults as $arcresult ) {
-			$return[$arcresult->year.$arcresult->month] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year . $arcresult->month );
-		};
-
-	elseif ( 'yearly' == $type ) :
-
-		$query      = "SELECT YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`) ORDER BY `year` DESC";
-		$arcresults = xmlsf_cache_get_archives( $query );
-
-		foreach ( (array) $arcresults as $arcresult ) {
-			$return[$arcresult->year] = xmlsf_get_index_url( 'posttype', $post_type, $arcresult->year );
-		};
-
-	else :
-
-		$query      = "SELECT COUNT(ID) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' ORDER BY `post_date` DESC";
-		$arcresults = xmlsf_cache_get_archives( $query );
-
-		if ( is_object($arcresults[0]) && $arcresults[0]->posts > 0 ) {
-			$return[] = xmlsf_get_index_url( 'posttype', $post_type ); // $sitemap = 'home', $type = false, $param = false
-		};
-
-	endif;
-
-	return $return;
-
-}
-
-/**
- * Get archives from wp_cache
- *
- * @param string $post_type
- * @param string $type
- *
- * @return array
- */
-function xmlsf_cache_get_archives( $query ) {
-
-	global $wpdb;
-
-	$key = md5($query);
-	$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
-
-	if ( !isset( $cache[ $key ] ) ) {
-		$arcresults = $wpdb->get_results($query);
-		$cache[ $key ] = $arcresults;
-		wp_cache_set( 'xmlsf_get_archives', $cache, 'general' );
-	} else {
-		$arcresults = $cache[ $key ];
-	}
-
-	return $arcresults;
-
-}
-
-/**
  * Get taxonomies
  * Returns an array of taxonomy names to be included in the index
  *
@@ -140,10 +62,15 @@ function xmlsf_cache_get_archives( $query ) {
  * @return array
  */
 function xmlsf_get_taxonomies() {
+
 	$taxonomy_settings = get_option('xmlsf_taxonomy_settings');
+
 	$tax_array = array();
+
 	if ( !empty( $taxonomy_settings['active'] ) ) {
+
 		$taxonomies = get_option('xmlsf_taxonomies');
+
 		if ( is_array($taxonomies) ) {
 			foreach ( $taxonomies as $taxonomy ) {
 				$count = wp_count_terms( $taxonomy, array('hide_empty'=>true) );
@@ -155,8 +82,11 @@ function xmlsf_get_taxonomies() {
 				if ( 0 < wp_count_terms( $name, array('hide_empty'=>true) ) )
 					$tax_array[] = $name;
 		}
+
 	}
+
 	return $tax_array;
+
 }
 
 /**
@@ -177,8 +107,10 @@ function xmlsf_public_taxonomies() {
 
 		// check each tax public flag and term count and append name to array
 		foreach ( get_object_taxonomies( $post_type, 'objects' ) as $taxonomy ) {
+
 			if ( !empty( $taxonomy->public ) && !in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) )
 				$tax_array[$taxonomy->name] = $taxonomy->label;
+
 		}
 
 	}

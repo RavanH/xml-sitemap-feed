@@ -22,23 +22,19 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>'; ?>
 <?php
 
 // public post types
-$post_types = apply_filters( 'xmlsf_post_types', (array) get_option( 'xmlsf_post_types', array() ) );
-if ( is_array($post_types) ) :
+$post_types = (array) apply_filters( 'xmlsf_post_types', get_option( 'xmlsf_post_types', array() ) );
+if ( ! empty( $post_types ) ) :
 	foreach ( $post_types as $post_type => $settings ) {
-		if ( empty($settings['active']) || ! post_type_exists( $post_type ) )
+		if ( empty( $settings['active'] ) || ! post_type_exists( $post_type ) )
 			continue;
 
 		$archive = isset( $settings['archive'] ) ? $settings['archive'] : '';
 
-		foreach ( xmlsf_get_archives( $post_type, $archive ) as $mw => $url ) {
-			// test for weekly archives
-			$mw = explode('.',$mw);
-			$m = $mw[0];
-			$w = isset( $mw[1] ) ? $mw[1] : '';
+		foreach ( xmlsf_get_index_archive_data( $post_type, $archive ) as $url => $lastmod ) {
 ?>
 	<sitemap>
 		<loc><?php echo $url; ?></loc>
-		<lastmod><?php echo get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $m, $w ), DATE_W3C ); ?></lastmod>
+		<lastmod><?php echo $lastmod; ?></lastmod>
 	</sitemap>
 <?php
 		}
@@ -48,13 +44,22 @@ endif;
 // public taxonomies
 foreach ( xmlsf_get_taxonomies() as $taxonomy ) : ?>
 	<sitemap>
-		<loc><?php echo xmlsf_get_index_url( 'taxonomy', $taxonomy ); ?></loc>
+		<loc><?php echo xmlsf_get_index_url( 'taxonomy', array( 'type' => $taxonomy ) ); ?></loc>
 <?php if ( $lastmod = xmlsf_get_taxonomy_modified( $taxonomy ) ) { ?>
 		<lastmod><?php echo $lastmod; ?></lastmod>
 <?php } ?>
 	</sitemap>
 <?php
 endforeach;
+
+// authors
+if ( xmlsf_do_authors() ) : ?>
+	<sitemap>
+		<loc><?php echo xmlsf_get_index_url( 'author' ); ?></loc>
+		<lastmod><?php echo get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ); ?></lastmod>
+	</sitemap>
+<?php
+endif;
 
 // custom URLs sitemap
 if ( apply_filters( 'xmlsf_custom_urls', get_option( 'xmlsf_urls' ) ) ) :
