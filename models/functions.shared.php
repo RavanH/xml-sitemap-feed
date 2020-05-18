@@ -9,6 +9,9 @@
  */
 function xmlsf_filter_request( $request ) {
 
+	global $xmlsf;
+	$xmlsf->request_filtered = true;
+
 	// short-circuit if request is not a feed or it does not start with 'sitemap'
 	if ( empty( $request['feed'] ) || strpos( $request['feed'], 'sitemap' ) !== 0 ) {
 		return $request;
@@ -158,7 +161,8 @@ function xmlsf_nginx_helper_purge_urls( $urls = array(), $redis = false ) {
 
 		if ( !empty( $sitemaps['sitemap'] ) ) {
 			$urls[] = '/sitemap.xml';
-			$urls[] = '/sitemap-home.xml';
+			$urls[] = '/sitemap-root.xml';
+			$urls[] = '/sitemap-author.xml';
 			$urls[] = '/sitemap-custom.xml';
 
 			// add public post types sitemaps
@@ -176,7 +180,7 @@ function xmlsf_nginx_helper_purge_urls( $urls = array(), $redis = false ) {
 			$taxonomies = get_option('xmlsf_taxonomies');
 			if ( is_array($taxonomies) ) {
 				foreach ( $taxonomies as $taxonomy ) {
-					$urls[] = parse_url( xmlsf_get_index_url( 'taxonomy', $taxonomy ), PHP_URL_PATH );
+					$urls[] = parse_url( xmlsf_get_index_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
 				}
 			}
 		}

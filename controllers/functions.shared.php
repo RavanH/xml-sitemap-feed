@@ -151,7 +151,7 @@ function xmlsf_load_template( $is_comment_feed, $feed ) {
 	 *
 	 * Examples:
 	 * sitemap.php
-	 * sitemap-home.php
+	 * sitemap-root.php
 	 * sitemap-posttype.php
 	 * * sitemap-posttype-post.php
 	 * * sitemap-posttype-page.php
