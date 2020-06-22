@@ -315,6 +315,7 @@ TODO allow attachment pages?
 * NEW: sitemap template action hooks `xmlsf_news_url` and `xmlsf_news_tags_inner`
 * NEW: `xmlsf_index_url_args` filter
 * NEW: All in One SEO Pack incompatibility message and instructions
+* NEW: The SEO Framework incompatibility message and instructions
 * Moved news template action hook `xmlsf_news_tags_after` to after closing </news:news> tag
 * Less DB queries, smaller memory footprint
 * Better debug info with SAVEQUERIES

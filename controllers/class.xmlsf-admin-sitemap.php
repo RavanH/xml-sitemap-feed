@@ -172,7 +172,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		}
 
 		// All in One SEO Pack conflict notices
-	if ( is_plugin_active('all-in-one-seo-pack/all_in_one_seo_pack.php') ) {
+		if ( is_plugin_active('all-in-one-seo-pack/all_in_one_seo_pack.php') ) {
 			// check aioseop sitemap module
 			if ( !in_array( 'aioseop_sitemap', parent::$dismissed ) ) {
 				$aioseop_options = (array) get_option( 'aioseop_options' );
@@ -186,6 +186,25 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 				}
 			}
 		}
+
+		// SEO Framework conflict notices
+		//autodescription-site-settings[sitemaps_output]
+		//
+		if ( is_plugin_active('autodescription/autodescription.php') ) {
+			// check sfw sitemap module
+			if ( !in_array( 'seoframework_sitemap', parent::$dismissed ) ) {
+				$sfw_options = (array) get_option( 'autodescription-site-settings' );
+
+				if ( ! empty( $sfw_options['sitemaps_output'] ) ) {
+					// sitemap module on
+					add_action(
+						'admin_notices',
+						function() { include XMLSF_DIR . '/views/admin/notice-seoframework-sitemap.php'; }
+					);
+				}
+			}
+		}
+
 	}
 
 	/**
