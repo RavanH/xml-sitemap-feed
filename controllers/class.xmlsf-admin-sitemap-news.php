@@ -363,6 +363,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 	public function post_type_field()
 	{
 		global $wp_taxonomies;
+
 		$post_types = apply_filters( 'xmlsf_news_post_types', get_post_types( array( 'public' => true, 'hierarchical' => false ) /*,'objects'*/) );
 
 		if ( is_array($post_types) && !empty($post_types) ) :
@@ -375,8 +376,8 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 
 			$do_warning = !empty( $this->options['categories'] ) && count($post_types) > 1 ? true : false;
 
-		// The actual fields for data entry
-		include XMLSF_DIR . '/views/admin/field-news-post-type.php';
+			// The actual fields for data entry
+			include XMLSF_DIR . '/views/admin/field-news-post-type.php';
 
 		else :
 
