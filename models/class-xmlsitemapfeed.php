@@ -24,7 +24,7 @@ class XMLSitemapFeed {
 	 */
 	public $rewrite_rules = array(
 		'sitemap.xml' => array(
-			'regex' => 'sitemap(?:_index)?(-[a-z0-9\-_]+)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml(\.gz)?$',
+			'regex' => 'sitemap(-[a-z0-9\-_]+)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml(\.gz)?$',
 			'query' => 'index.php?feed=sitemap$matches[1]$matches[4]&m=$matches[2]&w=$matches[3]'
 		),
 		'sitemap-news.xml' => array(
