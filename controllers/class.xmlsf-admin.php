@@ -406,11 +406,11 @@ class XMLSF_Admin
 				// remove metadata
 				global $wpdb;
 				// images meta
-		  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
-		  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
+				$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
+				$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
 				update_option( 'xmlsf_images_meta_primed', array() );
 				// comments meta
-		    $wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date_gmt' ) );
+				$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date_gmt' ) );
 				update_option( 'xmlsf_comments_meta_primed', array() );
 
 				add_settings_error( 'clear_meta_notice', 'clear_meta_notice', __('Sitemap post meta caches have been cleared.','xml-sitemap-feed'), 'updated' );
