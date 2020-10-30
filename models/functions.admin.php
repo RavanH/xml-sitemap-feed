@@ -26,7 +26,7 @@ function xmlsf_verify_nonce( $context ) {
 		return true;
 
 	// Still here? Then add security check failed error message and return false.
-add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') /* . ' Context: '. $context */ );
+	add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') /* . ' Context: '. $context */ );
 
 	return false;
 }
