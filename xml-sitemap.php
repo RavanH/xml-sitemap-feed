@@ -12,22 +12,23 @@ Author URI: http://status301.net/
 */
 
 define( 'XMLSF_VERSION', '5.3.0-alpha-14' );
+/**
+ * Copyright 2020 RavanH
+ * http://status301.net/
+ * mailto: ravanhagen@gmail.com
 
-/*  Copyright 2020 RavanH
-    http://status301.net/
-    mailto: ravanhagen@gmail.com
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License version 3 as
-    published by the Free Software Foundation.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-*/
-
-/* --------------------
+/**
+ * --------------------
  *  AVAILABLE HOOKS
  * --------------------
  *
@@ -77,7 +78,7 @@ define( 'XMLSF_VERSION', '5.3.0-alpha-14' );
  *	                              to allow identification of the current sitemap.
  *	xmlsf_image_tags_inner     -> Fired inside the XML Sitemap loop just before each closing </image:image> is generated. Can be used to
  *	                              echo custom <image:image> tags or trigger another action in the background.
-*	xmlsf_tags_after           -> Fired inside the XML Sitemap loop at the end of the tags, just before each
+ *	xmlsf_tags_after           -> Fired inside the XML Sitemap loop at the end of the tags, just before each
  *	                              closing </url> is generated. Can be used to echo custom tags or trigger another
  *	                              action in the background. Passes parameter home|post_type|taxonomy|custom
  *	                              to allow identification of the current sitemap.
@@ -124,12 +125,12 @@ register_deactivation_hook( __FILE__, 'xmlsf_deactivate' );
  *     CONTROLLERS
  ***********************/
 
- /**
-  * Plugin initialization
-  *
-  * @since 1.0
-  * @return void
-  */
+/**
+ * Plugin initialization
+ *
+ * @since 1.0
+ * @return void
+ */
 function xmlsf_init() {
 
 	// add robots.txt filter
