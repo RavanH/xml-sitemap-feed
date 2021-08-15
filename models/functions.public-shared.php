@@ -14,7 +14,7 @@ function xmlsf_headers( $headers ) {
 	// set noindex
 	$headers['X-Robots-Tag'] = 'noindex, follow';
 	// force content type
-	$headers['Content-Type'] = 'text/xml; charset=' . get_bloginfo('charset');
+	$headers['Content-Type'] = 'application/xml; charset=' . get_bloginfo('charset');
 
 	return $headers;
 }

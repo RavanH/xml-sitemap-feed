@@ -1,20 +1,20 @@
 <?php
 /*
 Plugin Name: XML Sitemap & Google News
-Plugin URI: http://status301.net/wordpress-plugins/xml-sitemap-feed/
+Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
 Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
-Version: 5.3.0-alpha-15
+Version: 5.3.0-alpha-16
 Text Domain: xml-sitemap-feed
 Requires at least: 4.6
 Requires PHP: 5.6
 Author: RavanH
-Author URI: http://status301.net/
+Author URI: https://status301.net/
 */
 
-define( 'XMLSF_VERSION', '5.3.0-alpha-14' );
+define( 'XMLSF_VERSION', '5.3.0-alpha-16' );
 /**
- * Copyright 2020 RavanH
- * http://status301.net/
+ * Copyright 2021 RavanH
+ * https://status301.net/
  * mailto: ravanhagen@gmail.com
 
  * This program is free software; you can redistribute it and/or modify
@@ -115,7 +115,7 @@ define( 'XMLSF_DIR', dirname(__FILE__) );
 define( 'XMLSF_BASENAME', plugin_basename(__FILE__) );
 
 // main plugin init
-add_action( 'init', 'xmlsf_init' );
+add_action( 'init', 'xmlsf_init', 9 );
 
 register_activation_hook( __FILE__, 'xmlsf_activate' );
 
@@ -187,6 +187,9 @@ function xmlsf_init() {
 		global $xmlsf_sitemap;
 		require XMLSF_DIR . '/controllers/class.xmlsf-sitemap.php';
 		$xmlsf_sitemap = new XMLSF_Sitemap( $sitemaps['sitemap'] );
+
+		// replace core sitemap
+		remove_action( 'init', 'wp_sitemaps_get_server' );
 	}
 
 	if ( ! empty( $sitemaps['sitemap-news'] ) ) {

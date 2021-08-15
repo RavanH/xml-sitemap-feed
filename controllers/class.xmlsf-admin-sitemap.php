@@ -351,6 +351,8 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 
 		/** ADVANCED */
 		add_settings_section( 'xml_sitemap_advanced_section', /*'<a name="xmlsf"></a>'.__('XML Sitemap','xml-sitemap-feed')*/ '', '', 'xmlsf_advanced' );
+		// custom name
+		add_settings_field( 'xmlsf_sitemap_name', '<label for="xmlsf_sitemap_name">' . __('XML Sitemap URL','xml-sitemap-feed') . '</label>', array($this,'xmlsf_sitemap_name_field'), 'xmlsf_advanced', 'xml_sitemap_advanced_section' );
 		// custom urls
 		add_settings_field( 'xmlsf_urls', __('External web pages','xml-sitemap-feed'), array($this,'urls_settings_field'), 'xmlsf_advanced', 'xml_sitemap_advanced_section' );
 		// custom sitemaps
@@ -500,6 +502,18 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	public function authors_field()
 	{
 		include XMLSF_DIR . '/views/admin/field-sitemap-authors.php';
+	}
+
+	// Advanced tab fields
+	public function xmlsf_sitemap_name_field()
+	{
+		$sitemaps = (array) get_option( 'xmlsf_sitemaps' );
+		$default = apply_filters( 'xmlsf_sitemap_filename', 'sitemap.xml' );
+
+		$name = !empty( $sitemaps['sitemap'] ) && $sitemaps['sitemap'] != $default ? $sitemaps['sitemap'] : '';
+
+		// The actual fields for data entry
+		include XMLSF_DIR . '/views/admin/field-sitemap-name.php';
 	}
 
 	public function custom_sitemaps_settings_field()

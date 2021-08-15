@@ -30,25 +30,41 @@ class XMLSF_Sitemap
 		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
 
 		// add sitemap rewrite rule
-		if ( $rules = xmlsf()->rewrite_ruleset( $this->sitemap ) )
-			add_rewrite_rule( $rules['regex'], $rules['query'], 'top' );
+		if ( $ruleset = xmlsf()->rewrite_ruleset( $this->sitemap ) ) {
+			add_rewrite_rule( $ruleset['regex'], $ruleset['query'], 'top' );
+		}
+
+		// redirect wp-sitemap requests
+		add_action( 'template_redirect', array( $this, 'redirect'),	0 );
 
 		// Cache clearance
-		add_action( 'clean_post_cache', array($this,'clean_post_cache'), 99, 2 );
+		add_action( 'clean_post_cache', array( $this, 'clean_post_cache'), 99, 2 );
 
 		// Update term meta lastmod date
-		add_action( 'transition_post_status', array($this,'update_term_modified_meta'), 10, 3 );
+		add_action( 'transition_post_status', array( $this, 'update_term_modified_meta' ), 10, 3 );
 
 		// Update images post meta
-		add_action( 'transition_post_status', array($this,'update_post_images_meta'), 10, 3 );
+		add_action( 'transition_post_status', array( $this, 'update_post_images_meta' ), 10, 3 );
 
 		// Update last comment date post meta
-		add_action( 'transition_comment_status', array($this,'update_post_comment_meta'), 10, 3 );
-		add_action( 'comment_post', array($this,'update_post_comment_meta_cp'), 10, 3 ); // when comment is not held for moderation
+		add_action( 'transition_comment_status', array( $this, 'update_post_comment_meta' ), 10, 3 );
+		add_action( 'comment_post', array( $this, 'update_post_comment_meta_cp' ), 10, 3 ); // when comment is not held for moderation
 
 		// PINGING
-		add_action( 'transition_post_status', array($this,'do_pings'), 10, 3 );
+		add_action( 'transition_post_status', array( $this, 'do_pings' ), 10, 3 );
 
+	}
+
+	/**
+	 * Do WP core sitemap index redirect
+	 *
+	 * @uses wp_redirect()
+	 */
+	public function redirect() { 
+		if ( ! empty( $_SERVER['REQUEST_URI'] ) && substr( $_SERVER['REQUEST_URI'], 0, 15) === '/wp-sitemap.xml' ) { 
+			wp_redirect( home_url( $this->sitemap ), 301, 'XML Sitemap & Google News for WordPress' ); 
+			exit(); 
+		} 
 	}
 
 	/**
@@ -212,7 +228,7 @@ class XMLSF_Sitemap
 		) return;
 
 		$tz = date_default_timezone_get();
-  	date_default_timezone_set('UTC');
+  		date_default_timezone_set('UTC');
 		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date_gmt', date('Y-m-d H:i:s') );
 		date_default_timezone_set($tz);
 
