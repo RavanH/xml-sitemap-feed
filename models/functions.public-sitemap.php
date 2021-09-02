@@ -10,7 +10,7 @@
  */
 function xmlsf_sitemap_headers( $headers ) {
 	// don't allow caching
-	$headers['Cache-Control'] = 'public, nocache';
+	$headers['Cache-Control'] = 'nocache';
 
 	return $headers;
 }
