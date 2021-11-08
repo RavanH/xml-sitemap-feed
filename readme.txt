@@ -5,7 +5,7 @@ Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Googl
 Requires at least: 4.4
 Requires PHP: 5.4
 Tested up to: 5.9
-Stable tag: 5.2.7
+Stable tag: 5.3
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -23,7 +23,7 @@ An XML Sitemap Index becomes instantly available on **yourblog.url/sitemap.xml**
 
 Please read the FAQ's for info on how to get your articles listed on Google News.
 
-**Compatible with caching plugins** like WP Super Cache, W3 Total Cache and Quick Cache that cache feeds, allowing a faster serving to the impatient (when hungry) spider.
+**Compatible with caching solutions** like CloudFlare, WP Super Cache, W3 Total Cache and Quick Cache that cache feeds, allowing a faster serving to the impatient (when hungry) spider.
 
 **NOTES:**
 
@@ -40,7 +40,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 
 **XML Sitemap**
 
-* Sitemap Index includes posts, pages and authors by default.
+* Sitemap Index includes **posts**, **pages** and **authors** by default.
 * Optionally include sitemaps for custom post types, categories and tags.
 * Sitemap with custom URLs optional.
 * Custom/static sitemaps can be added to the index.
@@ -298,15 +298,11 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 = 5.3 =
 
-
+Author sitemap, custom theme template, speed improvements and bugfixes.
 
 == Changelog ==
 
 = 5.3 =
-TODO custom post type root pages
-TODO prime meta caches button
-TODO Google News Feed tab
-TODO allow attachment pages?
 * NEW: Author sitemap
 * NEW: allow custom theme templates and stylesheets
 * NEW: request filters `xmlsf_request` and `xmlsf_news_request`
@@ -325,6 +321,7 @@ TODO allow attachment pages?
 * FIX: force Status 200 response
 * FIX: priority calculation last modified for post type
 * FIX: news sitemap redirection with Polylang
+* FIX: Cache-Control header no-cache
 
 = 5.2.7 =
 * NEW: Ad Inserter compatibility check
