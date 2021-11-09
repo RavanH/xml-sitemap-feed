@@ -302,6 +302,11 @@ Author sitemap, custom theme template, speed improvements and bugfixes.
 
 == Changelog ==
 
+= 5.3.1 =
+* FIX: Restore wp-sitemap.xml rewrite rules after deactivation
+* FIX: Call to undefined function xmlsf_get_archives()
+* Use nocache_headers()
+
 = 5.3 =
 * NEW: Author sitemap
 * NEW: allow custom theme templates and stylesheets

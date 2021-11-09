@@ -132,7 +132,7 @@ function xmlsf_debug_ping( $se, $sitemap, $ping_url, $response_code ) {
 /**
  * Load feed template
  *
- * First checks for a child/parent theme template file, then falls back to plugin template
+ * Hooked into do_feed_{sitemap...}. First checks for a child/parent theme template file, then falls back to plugin template
  *
  * @since 5.3
  *

@@ -170,7 +170,7 @@ function xmlsf_nginx_helper_purge_urls( $urls = array(), $redis = false ) {
 			if ( is_array($post_types) ) {
 				foreach ( $post_types as $post_type => $settings ) {
 					$archive = !empty($settings['archive']) ? $settings['archive'] : '';
-					foreach ( xmlsf_get_archives( $post_type, $archive ) as $url ) {
+					foreach ( xmlsf_get_index_archive_data( $post_type, $archive ) as $url ) {
 						$urls[] = parse_url( $url, PHP_URL_PATH);
 					}
 				}
