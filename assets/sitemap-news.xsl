@@ -1,5 +1,4 @@
 <xsl:stylesheet version="1.1"
-	xmlns:html="http://www.w3.org/TR/REC-html40"
 	xmlns:sitemap="http://www.sitemaps.org/schemas/sitemap/0.9"
 	xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
