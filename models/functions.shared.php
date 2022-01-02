@@ -113,7 +113,7 @@ function xmlsf_ping( $se, $sitemap, $interval ) {
 	if ( 'google' == $se ) {
 		$url = 'https://www.google.com/ping';
 	} elseif ( 'bing' == $se ) {
-		$url = 'https://www.bing.com/ping';
+		$url = 'https://www.bing.com/webmaster/ping.aspx';
 	} else {
 		return '';
 	}
