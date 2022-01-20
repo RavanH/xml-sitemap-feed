@@ -65,6 +65,8 @@ function xmlsf_get_index_archive_data( $post_type = 'post', $archive_type = '' )
 
 	global $wpdb;
 
+	$return = array();
+
 	if ( 'weekly' == $archive_type ) :
 
 		$week       = _wp_mysql_week( '`post_date`' );
