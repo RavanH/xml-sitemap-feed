@@ -52,7 +52,7 @@ function xmlsf_filter_request( $request ) {
 	$request['post_status'] = 'publish';
 	$request['no_found_rows'] = true; // found rows calc is slow and only needed for pagination
 
-	// SPECIFIC REQUEST FILTERING AND PREPEARTIONS
+	// SPECIFIC REQUEST FILTERING AND PREPARATIONS
 	if ( strpos( $request['feed'], 'news' ) === 8 ) {
 		// set the news sitemap conditional flag
 		xmlsf()->is_news = true;
