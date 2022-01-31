@@ -117,7 +117,9 @@ function xmlsf_ping( $se, $sitemap, $interval ) {
 	} else {
 		return '';
 	}
-	$url = add_query_arg( 'sitemap', urlencode( trailingslashit( get_bloginfo( 'url' ) ) . $sitemap ), $url );
+	$response = '';
+	$site = get_bloginfo( 'url' ); // 'https://exists.not/' for debugging
+	$url = add_query_arg( 'sitemap', urlencode( trailingslashit( $site ) . $sitemap ), $url );
 
 	// check if we did not ping already within the interval
 	if ( false === get_transient( 'xmlsf_ping_'.$se.'_'.$sitemap ) ) {
@@ -132,7 +134,7 @@ function xmlsf_ping( $se, $sitemap, $interval ) {
 		$code = 999;
 	}
 
-	do_action( 'xmlsf_ping', $se, $sitemap, $url, $code );
+	do_action( 'xmlsf_ping', $se, $sitemap, $url, $code, $response );
 
 	return $code;
 }

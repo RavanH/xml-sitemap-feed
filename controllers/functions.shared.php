@@ -119,12 +119,16 @@ function xmlsf_output_compression() {
 /**
  * Error messages for ping
  */
-function xmlsf_debug_ping( $se, $sitemap, $ping_url, $response_code ) {
+function xmlsf_debug_ping( $se, $sitemap, $ping_url, $response_code, $response = '' ) {
 	if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
 		if ( $response_code == 999 ) {
 			error_log( 'Ping '. $se .' skipped.' );
 		} else {
 			error_log( 'Pinged '. $ping_url .' with response code: ' . $response_code );
+		}
+
+		if ( ! empty( $response ) ) {
+			error_log( 'Response: ' . print_r( $response, true ) );
 		}
 	}
 }
