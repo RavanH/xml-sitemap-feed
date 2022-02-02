@@ -19,6 +19,9 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 <?php
 foreach ( xmlsf_get_author_data() as $url => $data ) {
+	// check if we are dealing with an external URL :: Thanks to Francois Deschenes :)
+	if ( ! xmlsf_is_allowed_domain( $url ) ) continue;
+
 ?>
 	<url>
 		<loc><?php echo esc_url( $url ); ?></loc>

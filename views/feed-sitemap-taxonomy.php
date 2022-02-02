@@ -22,9 +22,12 @@ $terms = get_terms( array('taxonomy'=>get_query_var('taxonomy')) );
 
 if ( is_array($terms) ) :
     foreach ( $terms as $term ) :
-	?>
+		$url = get_term_link( $term );
+		// Check if we are dealing with an external URL. This can happen with multi-language plugins where each language has its own domain.
+		if ( ! xmlsf_is_allowed_domain( $url ) ) continue;
+		?>
 	<url>
-		<loc><?php echo get_term_link( $term ); ?></loc>
+		<loc><?php echo $url; ?></loc>
 	 	<priority><?php echo xmlsf_get_term_priority( $term ); ?></priority>
 <?php if ( $lastmod = xmlsf_get_term_modified( $term ) ) { ?>
 		<lastmod><?php echo $lastmod; ?></lastmod>
@@ -33,7 +36,7 @@ if ( is_array($terms) ) :
 ?>
 	</url>
 <?php
-  do_action( 'xmlsf_url_after', 'taxonomy' );
+		do_action( 'xmlsf_url_after', 'taxonomy' );
 	endforeach;
 endif;
 

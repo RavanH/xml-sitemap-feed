@@ -200,7 +200,8 @@ class XMLSitemapFeed {
 
 	/**
 	 * Get domain
-	 * @return string
+	 * 
+	 * @return array
 	 */
 	public function get_allowed_domains()
 	{
