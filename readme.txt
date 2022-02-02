@@ -302,6 +302,10 @@ Fix Bing ping 410 error response and help links.
 
 == Changelog ==
 
+= 5.3.4 =
+* FIX: "Failed opening required" when no template
+* Filter domains in taxonomy and author sitemaps
+
 = 5.3.3 =
 * FIX: Undefined variable + Invalid argument supplied for foreach(), thanks @yankyaw09
 
@@ -426,7 +430,7 @@ Fix Bing ping 410 error response and help links.
 * Taxonomy term sitemaps speed improvement: get lastmod date from database
 * Exclude Woocommerce product_shipping_class taxonomy
 * PHP 7.2+ compat: create_function deprecated
-* No more domain filtering for custom URLs and sitemaps
+* No more domain filtering for custom URLs and external sitemaps
 * FIX Gutenberg editor GN genre taxonomy not showing
 * FIX Plain and /index.php/ permalink structure
 * FIX Clear all options on uninstall
