@@ -8,7 +8,7 @@
 	</label>
 
 	<?php if ( isset($this->sitemaps['sitemap']) ) {
-		$sitemap_url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap' : $this->sitemaps['sitemap'] );
+		$sitemap_url = xmlsf_sitemap_url();
 	?>
 	<span class="description">
 		&nbsp;&ndash;&nbsp;
@@ -25,7 +25,7 @@
 	</label>
 
 	<?php if (isset($this->sitemaps['sitemap-news'])) {
-		$news_url = trailingslashit(get_bloginfo('url')) . ( xmlsf()->plain_permalinks() ? '?feed=sitemap-news' : $this->sitemaps['sitemap-news'] );
+		$news_url = trailingslashit(get_bloginfo('url')) . ( $wp_rewrite->using_permalinks() ? $this->sitemaps['sitemap-news'] : '?feed=sitemap-news' );
 	?>
 	<span class="description">
 		&nbsp;&ndash;&nbsp;

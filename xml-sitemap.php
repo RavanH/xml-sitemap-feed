@@ -3,7 +3,7 @@
 Plugin Name: XML Sitemap & Google News
 Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
 Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
-Version: 5.3.4-beta-2
+Version: 5.4-beta-2
 Text Domain: xml-sitemap-feed
 Requires at least: 4.6
 Requires PHP: 5.6
@@ -71,6 +71,7 @@ define( 'XMLSF_VERSION', '5.3.3' );
  *
  * xmlsf_ping                  -> Fires when a search engine has been pinged. Carries four arguments:
  *                                search engine (google|bing), sitemap name, full ping url, ping repsonse code.
+ * xmlsf_generator             -> Fired before each sitemap's urlset tag.
  * xmlsf_urlset                -> Fired inside each sitemap's urlset tag. Can be used to
  *                                echo additional XML namespaces. Passes parameter home|post_type|taxonomy|custom
  *                                to allow identification of the current sitemap.
@@ -122,10 +123,6 @@ register_activation_hook( __FILE__, 'xmlsf_activate' );
 
 register_deactivation_hook( __FILE__, 'xmlsf_deactivate' );
 
-/***********************
- *     CONTROLLERS
- ***********************/
-
 /**
  * Plugin initialization
  *
@@ -134,8 +131,8 @@ register_deactivation_hook( __FILE__, 'xmlsf_deactivate' );
  */
 function xmlsf_init() {
 
-	// add robots.txt filter
-	add_filter( 'robots_txt', 'xmlsf_robots_txt', 9 );
+	// Add robots.txt filter.
+	add_filter( 'robots_txt', 'xmlsf_robots_txt', 0 );
 
 	// Upgrade/install, maybe...
 	$db_version = get_option( 'xmlsf_version', 0 );
@@ -145,69 +142,86 @@ function xmlsf_init() {
 	}
 
 	if ( is_admin() ) {
-		require XMLSF_DIR . '/controllers/class.xmlsf-admin.php';
+		require XMLSF_DIR . '/inc/class.xmlsf-admin.php';
 		new XMLSF_Admin();
 	}
 
 	$sitemaps = get_option( 'xmlsf_sitemaps' );
 
-	// return if nothing enabled
-	if ( empty( $sitemaps ) ) return;
+	// If nothing enabled, just disable core sitemap and bail.
+	if ( empty( $sitemaps ) ) {
+		add_filter( 'wp_sitemaps_enabled', '__return_false' );
+		return;
+	}
 
-	// main model functions
-	require XMLSF_DIR . '/models/functions.shared.php';
+	// main functions
+	require XMLSF_DIR . '/inc/functions.php';
 
 	// force remove url trailing slash
 	add_filter( 'user_trailingslashit', 'xmlsf_untrailingslash' );
 
-	// MAIN REQUEST filter
-	add_filter( 'request', 'xmlsf_filter_request', 0 );
-
-	// NGINX HELPER PURGE URLS
-	add_filter( 'rt_nginx_helper_purge_urls', 'xmlsf_nginx_helper_purge_urls', 10, 2 );
-
-	// main controller functions
-	require XMLSF_DIR . '/controllers/functions.shared.php';
-
 	add_action( 'xmlsf_ping', 'xmlsf_debug_ping', 9, 5 );
+
+	// post types filter
+	add_filter( 'xmlsf_post_types', 'xmlsf_filter_post_types' );
 
 	// include and instantiate main class
 	xmlsf();
 
 	if ( ! empty( $sitemaps['sitemap'] ) ) {
-		//add_rewrite_rule('sitemap(?:_index)?(\-[a-z0-9\-_]+)?(\.\d{4,6})?(\.\d{1,2})?\.xml(\.gz)?$', 'index.php?feed=sitemap$matches[1]$matches[4]&m=$matches[2]&w=$matches[3]', 'top');
-
-		require XMLSF_DIR . '/models/functions.sitemap.php';
-		add_filter( 'xmlsf_post_types', 'xmlsf_filter_post_types' );
-
-		// sitemap title element filters
-		add_filter( 'the_title_xmlsitemap', 'strip_tags' );
-		add_filter( 'the_title_xmlsitemap', 'ent2ncr', 8 );
-		add_filter( 'the_title_xmlsitemap', 'esc_html' );
-
 		global $xmlsf_sitemap;
-		require XMLSF_DIR . '/controllers/class.xmlsf-sitemap.php';
-		$xmlsf_sitemap = new XMLSF_Sitemap( $sitemaps['sitemap'] );
 
-		// replace core sitemap
-		remove_action( 'init', 'wp_sitemaps_get_server' );
+		require XMLSF_DIR . '/inc/class.xmlsf-sitemap.php';
+		require XMLSF_DIR . '/inc/functions.sitemap.php';
+
+		// Ping actions.
+		add_action( 'xmlsf_ping_google', 'xmlsf_ping', 10, 3 );
+		add_action( 'xmlsf_ping_bing', 'xmlsf_ping', 10, 3 );
+
+		if ( get_option( 'xmlsf_core_sitemap' ) ) {
+			require XMLSF_DIR . '/inc/class.xmlsf-sitemap-core.php';
+			$xmlsf_sitemap = new XMLSF_Sitemap_Core( 'wp-sitemap.xml' );
+		} else {
+			// Remove core sitemap.
+			remove_action( 'init', 'wp_sitemaps_get_server' );
+
+			// Sitemap title element filters.
+			if ( function_exists('esc_xml') ) {
+				// since WP 5.5
+				add_filter( 'the_title_xmlsitemap', 'esc_xml' );
+			} else {
+				add_filter( 'the_title_xmlsitemap', 'strip_tags' );
+				add_filter( 'the_title_xmlsitemap', 'ent2ncr', 8 );
+				add_filter( 'the_title_xmlsitemap', 'esc_html' );
+			}
+
+			require XMLSF_DIR . '/inc/class.xmlsf-sitemap-plugin.php';
+			$xmlsf_sitemap = new XMLSF_Sitemap_Plugin( $sitemaps['sitemap'] );
+		}
+	} else {
+		// Disable core sitemap.
+		add_filter( 'wp_sitemaps_enabled', '__return_false' );
 	}
 
 	if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-		//add_rewrite_rule('sitemap-news\.xml(\.gz)?$', 'index.php?feed=sitemap-news$matches[1]', 'top');
-
-		require XMLSF_DIR . '/models/functions.sitemap-news.php';
-		add_filter( 'xmlsf_news_post_types', 'xmlsf_news_filter_post_types' );
+		// Ping action.
+		add_action( 'xmlsf_news_pings', 'xmlsf_ping', 10, 3 );
 
 		// common sitemap element filters
-		add_filter( 'xmlsf_news_publication_name', 'strip_tags' );
-		add_filter( 'xmlsf_news_publication_name', 'ent2ncr', 8 );
-		add_filter( 'xmlsf_news_publication_name', 'esc_html' );
-		add_filter( 'xmlsf_news_title', 'strip_tags' );
-		add_filter( 'xmlsf_news_title', 'ent2ncr', 8 );
-		add_filter( 'xmlsf_news_title', 'esc_html' );
+		if ( function_exists('esc_xml') ) {
+			// since WP 5.5
+			add_filter( 'xmlsf_news_publication_name', 'esc_xml' );
+			add_filter( 'xmlsf_news_title', 'esc_xml' );
+		} else {
+			add_filter( 'xmlsf_news_publication_name', 'strip_tags' );
+			add_filter( 'xmlsf_news_publication_name', 'ent2ncr', 8 );
+			add_filter( 'xmlsf_news_publication_name', 'esc_html' );
+			add_filter( 'xmlsf_news_title', 'strip_tags' );
+			add_filter( 'xmlsf_news_title', 'ent2ncr', 8 );
+			add_filter( 'xmlsf_news_title', 'esc_html' );
+		}
 
-		require XMLSF_DIR . '/controllers/class.xmlsf-sitemap-news.php';
+		require XMLSF_DIR . '/inc/class.xmlsf-sitemap-news.php';
 		new XMLSF_Sitemap_News( $sitemaps['sitemap-news'] );
 	}
 
@@ -245,12 +259,8 @@ function xmlsf_deactivate() {
 
 	// remove rules so they can be REGENERATED on the next page load (without this plugin active)
 	delete_option( 'rewrite_rules' );
-	
-}
 
-/*****************
- *     MODELS
- *****************/
+}
 
 /**
  * Get instantiated sitemap class
@@ -265,7 +275,7 @@ function xmlsf() {
 
 	if ( ! isset( $xmlsf ) ) {
 		if ( ! class_exists( 'XMLSitemapFeed' ) )
-			require XMLSF_DIR . '/models/class-xmlsitemapfeed.php';
+			require XMLSF_DIR . '/inc/class.xmlsitemapfeed.php';
 
 		$xmlsf = new XMLSitemapFeed();
 	}
@@ -280,63 +290,62 @@ function xmlsf() {
  * @return string
  */
 function xmlsf_robots_txt( $output ) {
-	$url = trailingslashit( get_bloginfo('url') );
 
+	// CUSTOM ROBOTS
+	$robots_custom = get_option('xmlsf_robots');
+	$output .= $robots_custom ? $robots_custom . PHP_EOL : '';
+
+	// SITEMAPS
 	$sitemaps = get_option( 'xmlsf_sitemaps' );
+	$output .= PHP_EOL . '# XML Sitemap & Google News version ' . XMLSF_VERSION . ' - https://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
+	if ( '1' != get_option('blog_public') ) {
+		$output .= '# XML Sitemaps are disabled because of this site\'s privacy settings.' . PHP_EOL;
+	} elseif( ! is_array($sitemaps) || empty( $sitemaps ) ) {
+		$output .= '# No XML Sitemaps are enabled on this site.' . PHP_EOL;
+	} else {
+		$output .= ! empty( $sitemaps['sitemap'] ) && ! get_option( 'xmlsf_core_sitemap' ) ? 'Sitemap: ' . xmlsf_sitemap_url() . PHP_EOL : PHP_EOL;
+		$output .= ! empty( $sitemaps['sitemap-news'] ) ? 'Sitemap: ' . xmlsf_sitemap_url( 'news' ) . PHP_EOL : '';
+	}
 
-	// PRE
-	$pre = '# XML Sitemap & Google News version ' . XMLSF_VERSION . ' - https://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
-	if ( '1' != get_option('blog_public') )
-		$pre .= '# XML Sitemaps are disabled because of this site\'s privacy settings.' . PHP_EOL;
-	elseif( !is_array($sitemaps) || empty( $sitemaps ) )
-		$pre .= '# No XML Sitemaps are enabled on this site.' . PHP_EOL;
-	else
-		foreach ( $sitemaps as $pretty )
-			$pre .= 'Sitemap: ' . $url . $pretty . PHP_EOL;
-	$pre .= PHP_EOL;
-
-	// DEFAULT
-	if ( substr($output, -1) !== PHP_EOL ) $output .= PHP_EOL;
-
-	// POST
-	$post = get_option('xmlsf_robots');
-	if ( $post !== '' ) $post .= PHP_EOL;
-
-	return $pre . $output . $post;
+	return $output;
 }
 
-/* --------------------------------
- *     CONDITIONAL FUNCTIONS
- * -------------------------------- */
+/* ---------------------------
+ *     CONDITIONAL TAGS
+ * --------------------------- */
 
-/**
- * Is the query for a sitemap?
- *
- * @since 4.8
- * @return bool
- */
-function is_sitemap() {
-	global $xmlsf;
-	if ( ! is_object( $xmlsf ) || $xmlsf->request_filtered === false ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
-		return false;
+if ( ! function_exists( 'is_sitemap' ) ) {
+	/**
+	 * Is the query for a sitemap?
+	 *
+	 * @since 4.8
+	 * @return bool
+	 */
+	function is_sitemap() {
+		global $xmlsf;
+		if ( ! is_object( $xmlsf ) || $xmlsf->request_filtered === false ) {
+			_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
+			return false;
+		}
+		return $xmlsf->is_sitemap;
 	}
-	return $xmlsf->is_sitemap;
 }
 
-/**
- * Is the query for a news sitemap?
- *
- * @since 4.8
- * @return bool
- */
-function is_news() {
-	global $xmlsf;
-	if ( ! is_object( $xmlsf ) || $xmlsf->request_filtered === false ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
-		return false;
+if ( ! function_exists( 'is_news' ) ) {
+	/**
+	 * Is the query for a news sitemap?
+	 *
+	 * @since 4.8
+	 * @return bool
+	 */
+	function is_news() {
+		global $xmlsf;
+		if ( ! is_object( $xmlsf ) || $xmlsf->request_filtered === false ) {
+			_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
+			return false;
+		}
+		return $xmlsf->is_news;
 	}
-	return $xmlsf->is_news;
 }
 
 // TODO start with namespacing and autoload

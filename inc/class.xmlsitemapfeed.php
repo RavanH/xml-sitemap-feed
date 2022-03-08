@@ -64,13 +64,6 @@ class XMLSitemapFeed {
 	private $scheme;
 
 	/**
-	 * Are we using plain permalinks
-	 *
-	 * @var bool $plain_permalinks
-	 */
-	private $plain_permalinks = null;
-
-	/**
 	 * Excluded taxonomies
 	 *
 	 * post format taxonomy is disabled
@@ -84,7 +77,7 @@ class XMLSitemapFeed {
 	/**
 	 * Maximum number of posts in any taxonomy term
 	 *
-	 * @var null/int $taxonomy_termmaxposts
+	 * @var null|int $taxonomy_termmaxposts
 	 */
 	public $taxonomy_termmaxposts = null;
 
@@ -143,6 +136,7 @@ class XMLSitemapFeed {
 
 			$this->defaults = array(
 				'sitemaps' => $sitemaps,
+				'core_sitemap' => class_exists( 'SimpleXMLElement' ) ? '1' : '',
 				'post_types' => array(
 					'post' => array(
 						'active' => '1',
@@ -164,18 +158,21 @@ class XMLSitemapFeed {
 						)
 					)
 				),
+				'post_type_settings' => array(
+					'limit' => '2000'
+				),
 				'taxonomies' => '',
 				'taxonomy_settings' => array(
 					'active' => '',
 					'priority' => '0.3',
 					'dynamic_priority' => '',
-					'term_limit' => '3000'
+					'limit' => '2000'
 				),
 				'authors' => '',
 				'author_settings' => array(
 					'active' => '1',
 					'priority' => '0.3',
-					'term_limit' => '1000'
+					'limit' => '2000'
 				),
 				'ping' => array(
 					'google',
@@ -219,21 +216,6 @@ class XMLSitemapFeed {
 		}
 
 		return $this->domains;
-	}
-
-	/**
-	 * Whether or not to use plain permalinks
-	 * Used for sitemap index and admin page
-	 *
-	 * @return bool
-	 */
-	public function plain_permalinks()
-	{
-		if ( null === $this->plain_permalinks ) {
-			$permalink_structure = get_option('permalink_structure');
-			$this->plain_permalinks = ('' == $permalink_structure || 0 === strpos($permalink_structure,'/index.php') ) ? true : false;
-		}
-		return $this->plain_permalinks;
 	}
 
 	/**

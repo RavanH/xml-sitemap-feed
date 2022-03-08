@@ -305,6 +305,7 @@ Fix Bing ping 410 error response and help links.
 = 5.3.4 =
 * FIX: "Failed opening required" when no template
 * Filter domains in taxonomy and author sitemaps
+* NEW: xmlsf_generator action hook
 
 = 5.3.3 =
 * FIX: Undefined variable + Invalid argument supplied for foreach(), thanks @yankyaw09

@@ -26,7 +26,7 @@ if ( !empty($image) ) {
 echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 '; ?>
 <?php xmlsf_xml_stylesheet( 'posttype' ); ?>
-<?php xmlsf_generator(); ?>
+<?php do_action( 'xmlsf_generator' ); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 <?php do_action('xmlsf_urlset', 'post_type'); ?>
 <?php echo $image_xmlns; ?>
@@ -55,8 +55,8 @@ if ( have_posts() ) :
 		?>
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
-		<priority><?php echo xmlsf_get_post_priority(); ?></priority>
-<?php if ( $lastmod = xmlsf_get_post_modified() ) { ?>
+		<priority><?php echo xmlsf_get_post_priority( $post ); ?></priority>
+<?php if ( $lastmod = xmlsf_get_post_modified( $post ) ) { ?>
 		<lastmod><?php echo $lastmod; ?></lastmod>
 <?php } ?>
 <?php

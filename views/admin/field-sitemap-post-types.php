@@ -11,7 +11,7 @@
 	</p>
 
 	<?php
-	if ( empty($obj->hierarchical) ) {
+	if ( empty($obj->hierarchical) && ! get_option( 'xmlsf_core_sitemap' ) ) {
 	$archive = isset($options[$obj->name]['archive']) ? $options[$obj->name]['archive'] : 'yearly';
 	?>
 	<p>
@@ -49,22 +49,25 @@
 
 	<p>
 		<label>
-			<input type="checkbox" name="xmlsf_post_types[<?php echo $obj->name; ?>][dynamic_priority]" value="1"<?php echo checked( !empty($options[$obj->name]['dynamic_priority']), true, false); ?> />
+			<input type="checkbox" name="xmlsf_post_types[<?php echo $obj->name; ?>][dynamic_priority]" id="xmlsf_post_types_<?php echo $obj->name; ?>_dynamic_priority" value="1"<?php echo checked( !empty($options[$obj->name]['dynamic_priority']), true, false); ?> />
 			<?php echo __('Automatic Priority calculation.','xml-sitemap-feed'); ?>
 		</label>
 	</p>
 
 	<p>
 		<label>
-			<input type="checkbox" name="xmlsf_post_types[<?php echo $obj->name; ?>][update_lastmod_on_comments]" value="1"<?php echo checked( !empty($options[$obj->name]["update_lastmod_on_comments"]), true, false); ?> />
+			<input type="checkbox" name="xmlsf_post_types[<?php echo $obj->name; ?>][update_lastmod_on_comments]" id="xmlsf_post_types_<?php echo $obj->name; ?>_update_lastmod_on_comments" value="1"<?php echo checked( !empty($options[$obj->name]["update_lastmod_on_comments"]), true, false); ?> />
 			<?php echo __('Update the Last Changed date on each new comment.','xml-sitemap-feed'); ?>
 		</label>
 	</p>
 
+	<?php
+	if ( ! get_option( 'xmlsf_core_sitemap' ) ) {
+	?>
 	<p>
 		<label>
 			<?php echo __('Add image tags for','xml-sitemap-feed'); ?>
-			<select name="xmlsf_post_types[<?php echo $obj->name; ?>][tags][image]">
+			<select name="xmlsf_post_types[<?php echo $obj->name; ?>][tags][image]" id="xmlsf_post_types_<?php echo $obj->name; ?>_tags_image">
 				<option value="">
 					<?php echo translate('None'); ?>
 				</option>
@@ -77,5 +80,7 @@
 			</select>
 		</label>
 	</p>
-
+	<?php
+	}
+	?>
 </fieldset>

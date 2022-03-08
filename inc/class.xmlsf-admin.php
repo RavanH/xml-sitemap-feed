@@ -34,18 +34,19 @@ class XMLSF_Admin
 	 */
 	function __construct()
 	{
-		require XMLSF_DIR . '/models/functions.admin.php';
+		require XMLSF_DIR . '/inc/functions.admin.php';
+		require XMLSF_DIR . '/inc/class.xmlsf-admin-sanitize.php';
 
 		$this->sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
 		if ( isset($this->sitemaps['sitemap']) ) {
-			require XMLSF_DIR . '/models/class.xmlsf-admin-sitemap-sanitize.php';
-			require XMLSF_DIR . '/controllers/class.xmlsf-admin-sitemap.php';
+			require XMLSF_DIR . '/inc/class.xmlsf-admin-sitemap-sanitize.php';
+			require XMLSF_DIR . '/inc/class.xmlsf-admin-sitemap.php';
 		}
 
 		if ( isset($this->sitemaps['sitemap-news']) ) {
-			require XMLSF_DIR . '/models/class.xmlsf-admin-sitemap-news-sanitize.php';
-			require XMLSF_DIR . '/controllers/class.xmlsf-admin-sitemap-news.php';
+			require XMLSF_DIR . '/inc/class.xmlsf-admin-sitemap-news-sanitize.php';
+			require XMLSF_DIR . '/inc/class.xmlsf-admin-sitemap-news.php';
 		}
 
 		// ACTION LINK
@@ -73,31 +74,74 @@ class XMLSF_Admin
 
 	public function register_settings()
 	{
-		// sitemaps
-		register_setting( 'reading', 'xmlsf_sitemaps', array('XMLSF_Admin_Sanitize','sitemaps_settings') );
-		add_settings_field( 'xmlsf_sitemaps', __('Enable XML sitemaps','xml-sitemap-feed'), array($this,'sitemaps_settings_field'), 'reading' );
+		global $wp_rewrite;
 
-		// custom domains, only when any sitemap is active
+		// Sitemaps.
+		register_setting( 
+			'reading', 
+			'xmlsf_sitemaps', 
+			array( 'XMLSF_Admin_Sanitize', 'sitemaps_settings' ) 
+		);
+		add_settings_field( 
+			'xmlsf_sitemaps', 
+			__( 'Enable XML sitemaps', 'xml-sitemap-feed' ), 
+			array( $this, 'sitemaps_settings_field' ), 
+			'reading' 
+		);
+
+		// Custom domains, only when any sitemap is active.
 		if ( isset($this->sitemaps['sitemap']) || isset($this->sitemaps['sitemap-news']) ) {
-			register_setting( 'reading', 'xmlsf_domains', array('XMLSF_Admin_Sanitize','domains_settings') );
-			add_settings_field( 'xmlsf_domains', __('Allowed domains','xml-sitemap-feed'), array($this,'domains_settings_field'), 'reading' );
+			register_setting( 
+				'reading', 
+				'xmlsf_domains', 
+				array( 'XMLSF_Admin_Sanitize', 'domains_settings' ) 
+			);
+			add_settings_field( 
+				'xmlsf_domains', 
+				__( 'Allowed domains', 'xml-sitemap-feed' ), 
+				array( $this, 'domains_settings_field' ), 
+				'reading' 
+			);
 		}
 
-		// help tab
-		add_action( 'load-options-reading.php', array($this,'xml_sitemaps_help') );
+		// Help tab.
+		add_action( 
+			'load-options-reading.php', 
+			array( $this, 'xml_sitemaps_help' ) 
+		);
 
-		// robots rules, only when permalinks are set
+		// Robots rules, only when permalinks are set.
 		$rules = get_option( 'rewrite_rules' );
-		if( ! xmlsf()->plain_permalinks() && isset( $rules['robots\.txt$'] ) ) {
-			register_setting( 'reading', 'xmlsf_robots', array('XMLSF_Admin_Sanitize','robots_settings') );
-			add_settings_field( 'xmlsf_robots', __('Additional robots.txt rules','xml-sitemap-feed'), array($this,'robots_settings_field'), 'reading' );
+		if( $wp_rewrite->using_permalinks() && isset( $rules['robots\.txt$'] ) ) {
+			register_setting( 
+				'reading', 
+				'xmlsf_robots', 
+				array( 'XMLSF_Admin_Sanitize', 'robots_settings' ) 
+			);
+			add_settings_field( 
+				'xmlsf_robots', 
+				__( 'Additional robots.txt rules', 'xml-sitemap-feed' ), 
+				array( $this, 'robots_settings_field' ), 
+				'reading' 
+			);
 		}
 
-		// ping, only when any sitemap is active
+		// Ping, only when any sitemap is active.
 		if ( isset($this->sitemaps['sitemap']) || isset($this->sitemaps['sitemap-news']) ) {
-			register_setting( 'writing', 'xmlsf_ping', array('XMLSF_Admin_Sanitize','ping_settings') );
-			add_settings_field( 'xmlsf_ping', __('Ping Services','xml-sitemap-feed'), array($this,'ping_settings_field'), 'writing' );
-			add_action( 'load-options-writing.php', array($this,'ping_settings_help') );
+			register_setting( 
+				'writing', 
+				'xmlsf_ping', 
+				array( 'XMLSF_Admin_Sanitize', 'ping_settings' ) 
+			);
+			add_settings_field( 
+				'xmlsf_ping', 
+				__( 'Ping Services', 'xml-sitemap-feed' ),
+				array( $this, 'ping_settings_field' ), 'writing' 
+			);
+			add_action( 
+				'load-options-writing.php', 
+				array( $this, 'ping_settings_help' ) 
+			);
 		}
 	}
 
@@ -112,36 +156,42 @@ class XMLSF_Admin
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();
 
-		get_current_screen()->add_help_tab( array(
-			'id'      => 'sitemap-settings',
-			'title'   => __( 'Enable XML sitemaps', 'xml-sitemap-feed' ),
-			'content' => $content,
-			'priority' => 11
-		) );
+		get_current_screen()->add_help_tab( 
+			array(
+				'id'      => 'sitemap-settings',
+				'title'   => __( 'Enable XML sitemaps', 'xml-sitemap-feed' ),
+				'content' => $content,
+				'priority' => 11
+			) 
+		);
 
 		ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-allowed-domains.php';
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();
 
-		get_current_screen()->add_help_tab( array(
-			'id'      => 'allowed-domains',
-			'title'   =>__( 'Allowed domains', 'xml-sitemap-feed' ),
-			'content' => $content,
-			'priority' => 11
-		) );
+		get_current_screen()->add_help_tab( 
+			array(
+				'id'      => 'allowed-domains',
+				'title'   =>__( 'Allowed domains', 'xml-sitemap-feed' ),
+				'content' => $content,
+				'priority' => 11
+			) 
+		);
 
 		ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-robots.php';
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();
 
-		get_current_screen()->add_help_tab( array(
-			'id'      => 'robots',
-			'title'   => __( 'Additional robots.txt rules', 'xml-sitemap-feed' ),
-			'content' => $content,
-			'priority' => 11
-		) );
+		get_current_screen()->add_help_tab(
+			array(
+				'id'      => 'robots',
+				'title'   => __( 'Additional robots.txt rules', 'xml-sitemap-feed' ),
+				'content' => $content,
+				'priority' => 11
+			) 
+		);
 	}
 
 	/**
@@ -150,6 +200,8 @@ class XMLSF_Admin
 
 	public function sitemaps_settings_field()
 	{
+		global $wp_rewrite;
+
 		if ( 1 == get_option('blog_public') ) :
 
 			// The actual fields for data entry
@@ -157,7 +209,7 @@ class XMLSF_Admin
 
 		else :
 
-			_e( 'XML Sitemaps are not available because of your site&#8217;s visibility settings (above).', 'xml-sitemap-feed' );
+			_e( 'XML Sitemaps are not available because of your site&#8217;s visibility settings (above).', 'xml-sitemap-feed' );
 
 		endif;
 	}
@@ -196,12 +248,14 @@ class XMLSF_Admin
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();
 
-		get_current_screen()->add_help_tab( array(
-			'id'      => 'ping-services',
-			'title'   => __( 'Ping Services', 'xml-sitemap-feed' ),
-			'content' => $content,
-			'priority' => 11
-		) );
+		get_current_screen()->add_help_tab( 
+			array(
+				'id'      => 'ping-services',
+				'title'   => __( 'Ping Services', 'xml-sitemap-feed' ),
+				'content' => $content,
+				'priority' => 11
+			)
+		);
 	}
 
 	public function ping_settings_field()
@@ -217,9 +271,9 @@ class XMLSF_Admin
 	 */
 	public function clear_settings( $sitemap = '' )
 	{
-		$defaults = 'sitemap-news' == $sitemap ? array(
-			'news_tags' => xmlsf()->default_news_tags
-		) : xmlsf()->defaults();
+		$defaults = 'sitemap-news' == $sitemap ? 
+			array( 'news_tags' => xmlsf()->default_news_tags ) : 
+			xmlsf()->defaults();
 
 		unset( $defaults['sitemaps'] );
 
@@ -229,7 +283,12 @@ class XMLSF_Admin
 
 		delete_transient( 'xmlsf_static_files' );
 
-		add_settings_error( 'notice_clear_settings', 'notice_clear_settings', __('Settings reset to the plugin defaults.','xml-sitemap-feed'), 'updated' );
+		add_settings_error( 
+			'notice_clear_settings', 
+			'notice_clear_settings', 
+			__( 'Settings reset to the plugin defaults.', 'xml-sitemap-feed' ), 
+			'updated' 
+		);
 	}
 
 	/**
@@ -237,12 +296,22 @@ class XMLSF_Admin
 	 */
 	public function delete_static_files()
 	{
-		if ( empty($_POST['xmlsf-delete']) ) {
-			add_settings_error( 'static_files', 'none_selected', __('No files selected for deletion!','xml-sitemap-feed'), 'notice-warning' );
+		if ( empty( $_POST['xmlsf-delete'] ) ) {
+			add_settings_error( 
+				'static_files', 
+				'none_selected', 
+				__( 'No files selected for deletion!', 'xml-sitemap-feed' ), 
+				'notice-warning' 
+			);
 			return;
 		}
 
-		$allowed_files = array('sitemap.xml','sitemap-news.xml','robots.txt');
+		$allowed_files = array(
+			'wp-sitemap.xml',
+			'sitemap.xml',
+			'sitemap-news.xml',
+			'robots.txt'
+		);
 
 		if ( null === self::$static_files ) {
 			self::$static_files = get_transient( 'xmlsf_static_files' );
@@ -250,21 +319,44 @@ class XMLSF_Admin
 		}
 
 		foreach ( $_POST['xmlsf-delete'] as $name ) {
-			if ( !in_array($name,$allowed_files) ) {
-				unset(self::$static_files[$name]);
-				add_settings_error( 'static_files', 'file_not_allowed', sprintf( /* Translators: static file name */ __('File %s not in the list of allowed files!','xml-sitemap-feed'), '<em>' . $name . '</em>' ) );
+			if ( ! in_array( $name,$allowed_files ) ) {
+				unset( self::$static_files[$name] );
+				add_settings_error( 
+					'static_files', 
+					'file_not_allowed', 
+					sprintf( 
+						/* Translators: static file name */ __( 'File %s not in the list of allowed files!', 'xml-sitemap-feed' ), 
+						'<em>' . $name . '</em>' 
+					) 
+				);
 				continue;
 			}
-			if ( !isset(self::$static_files[$name]) ) {
+			if ( ! isset( self::$static_files[$name] ) ) {
 				// do nothing and be quiet about it...
 				continue;
 			}
-			if ( unlink(self::$static_files[$name]) ) {
-				unset(self::$static_files[$name]);
-				add_settings_error( 'static_files', 'file_deleted_'.$name, sprintf( /* Translators: static file name */ __('Static file %s succesfully deleted.','xml-sitemap-feed'), '<em>' . $name . '</em>' ), 'updated' );
+			if ( unlink( self::$static_files[$name] ) ) {
+				unset( self::$static_files[$name] );
+				add_settings_error( 
+					'static_files', 
+					'file_deleted_'.$name, 
+					sprintf( 
+						/* Translators: static file name */ __( 'Static file %s succesfully deleted.', 'xml-sitemap-feed' ), 
+						'<em>' . $name . '</em>' 
+					), 
+					'updated' 
+				);
 			} else {
-				add_settings_error( 'static_files', 'file_failed_'.$name,
-					sprintf( /* Translators: static file name */ __('Static file %s deletion failed.','xml-sitemap-feed'), '<em>' . $name . '</em>' ) . ' ' . sprintf( /* Translators: static file full path and name */ __('This is probably due to insufficient rights. Please try to remove %s manually via FTP or your hosting provider control panel.','xml-sitemap-feed'), self::$static_files[$name] )
+				add_settings_error( 
+					'static_files', 
+					'file_failed_'.$name,
+					sprintf( 
+						/* Translators: static file name */ __( 'Static file %s deletion failed.', 'xml-sitemap-feed'), 
+						'<em>' . $name . '</em>' 
+					) . ' ' . sprintf( 
+						/* Translators: static file full path and name */ __( 'This is probably due to insufficient rights. Please try to remove %s manually via FTP or your hosting provider control panel.', 'xml-sitemap-feed' ), 
+						self::$static_files[$name] 
+					)
 				);
 			}
 		}
@@ -297,9 +389,18 @@ class XMLSF_Admin
 	{
 		$home_path = trailingslashit( get_home_path() );
 		self::$static_files = array();
+
+		// Add activated sitemaps.
 		$check_for = $this->sitemaps;
+
+		// Add robots.txt
 		if ( get_option('xmlsf_robots') ) {
 			$check_for['robots'] = 'robots.txt';
+		}
+
+		// When core sitemap server is used.
+		if ( get_option('xmlsf_core_sitemap') && ! empty( $check_for['sitemap'] ) ) {
+			$check_for['sitemap'] = 'wp-sitemap.xml';
 		}
 
 		foreach ( $check_for as $name => $pretty ) {
@@ -373,47 +474,79 @@ class XMLSF_Admin
 
 		if ( isset( $_POST['xmlsf-check-conflicts'] ) ) {
 			if ( xmlsf_verify_nonce('help') ) {
-				// reset ignored warnings
+				// Reset ignored warnings.
 				delete_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
 				self::$dismissed = array();
 
 				$this->check_static_files();
-				if ( empty( self::$static_files ) )
-					add_settings_error( 'static_files_notice', 'static_files', __('No conflicting static files found.','xml-sitemap-feed'), 'notice-info');
+				if ( empty( self::$static_files ) ) {
+					add_settings_error( 
+						'static_files_notice', 
+						'static_files', 
+						__( 'No conflicting static files found.', 'xml-sitemap-feed' ), 
+						'notice-info'
+					);
+				}
 			}
 		}
 
 		if ( isset( $_POST['xmlsf-flush-rewrite-rules'] ) ) {
 			if ( xmlsf_verify_nonce('help') ) {
-				// flush rewrite rules
+				// Flush rewrite rules.
 				flush_rewrite_rules();
-				add_settings_error( 'flush_admin_notice', 'flush_admin_notice', __('WordPress rewrite rules have been flushed.','xml-sitemap-feed'), 'updated' );
+				add_settings_error( 
+					'flush_admin_notice', 
+					'flush_admin_notice', 
+					__( 'WordPress rewrite rules have been flushed.', 'xml-sitemap-feed' ), 
+					'updated' 
+				);
 			}
 		}
 
 		if ( isset( $_POST['xmlsf-clear-term-meta'] ) ) {
 			if ( xmlsf_verify_nonce('help') ) {
-				// remove metadata
+				// Remove terms metadata.
 				global $wpdb;
-		  	// terms meta
-		  	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
-				add_settings_error( 'clear_meta_notice', 'clear_meta_notice', __('Sitemap term meta cache has been cleared.','xml-sitemap-feed'), 'updated' );
+				$wpdb->delete( 
+					$wpdb->prefix.'termmeta', 
+					array( 'meta_key' => 'term_modified' ) 
+				);
+				add_settings_error( 
+					'clear_meta_notice', 
+					'clear_meta_notice', 
+					__( 'Sitemap term meta cache has been cleared.', 'xml-sitemap-feed' ), 
+					'updated' 
+				);
 			}
 		}
 
 		if ( isset( $_POST['xmlsf-clear-post-meta'] ) ) {
 			if ( xmlsf_verify_nonce('help') ) {
-				// remove metadata
+				// Remove metadata.
 				global $wpdb;
-				// images meta
-				$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
-				$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
+				// Images meta.
+				$wpdb->delete( 
+					$wpdb->prefix.'postmeta', 
+					array( 'meta_key' => '_xmlsf_image_attached' ) 
+				);
+				$wpdb->delete( 
+					$wpdb->prefix.'postmeta', 
+					array( 'meta_key' => '_xmlsf_image_featured' ) 
+				);
 				update_option( 'xmlsf_images_meta_primed', array() );
-				// comments meta
-				$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date_gmt' ) );
+				// Comments meta.
+				$wpdb->delete( 
+					$wpdb->prefix.'postmeta', 
+					array( 'meta_key' => '_xmlsf_comment_date_gmt' ) 
+				);
 				update_option( 'xmlsf_comments_meta_primed', array() );
 
-				add_settings_error( 'clear_meta_notice', 'clear_meta_notice', __('Sitemap post meta caches have been cleared.','xml-sitemap-feed'), 'updated' );
+				add_settings_error( 
+					'clear_meta_notice', 
+					'clear_meta_notice', 
+					__( 'Sitemap post meta caches have been cleared.', 'xml-sitemap-feed' ), 
+					'updated' 
+				);
 			}
 		}
 
@@ -431,7 +564,12 @@ class XMLSF_Admin
 
 		if ( isset( $_POST['xmlsf-dismiss-submit'] ) && isset( $_POST['xmlsf-dismiss'] ) ) {
 			if ( xmlsf_verify_nonce('notice') ) {
-				add_user_meta( get_current_user_id(), 'xmlsf_dismissed', $_POST['xmlsf-dismiss'], false );
+				add_user_meta( 
+					get_current_user_id(), 
+					'xmlsf_dismissed', 
+					$_POST['xmlsf-dismiss'], 
+					false 
+				);
 				self::$dismissed[] = $_POST['xmlsf-dismiss'];
 			}
 		}
@@ -439,11 +577,11 @@ class XMLSF_Admin
 
 	public function transients_actions()
 	{
-		// CATCH TRANSIENT for flushing rewrite rules after the sitemaps setting has changed
-		delete_transient('xmlsf_flush_rewrite_rules') && flush_rewrite_rules();
+		// CATCH TRANSIENT for flushing rewrite rules after the sitemaps setting has changed.
+		delete_transient( 'xmlsf_flush_rewrite_rules' ) && flush_rewrite_rules();
 
-		// CATCH TRANSIENT for static file check
-		delete_transient('xmlsf_check_static_files') && $this->check_static_files();
+		// CATCH TRANSIENT for static file check.
+		delete_transient( 'xmlsf_check_static_files' ) && $this->check_static_files();
 	}
 
 }

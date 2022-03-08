@@ -2,6 +2,20 @@
 
 class XMLSF_Admin_Sitemap_Sanitize
 {
+	public static function core_sitemap( $new )
+	{
+		$old = get_option( 'xmlsf_core_sitemap' );
+		$new = absint( $new );
+
+		if ( $old !== $new ) {
+			// when sitemap server has been changed, set transients
+			set_transient( 'xmlsf_flush_rewrite_rules', '' );
+			set_transient( 'xmlsf_check_static_files', '' );
+		}
+
+		return $new;
+	}
+
 	public static function taxonomies( $new )
 	{
 		$old = get_option( 'xmlsf_taxonomies' );
@@ -18,14 +32,13 @@ class XMLSF_Admin_Sitemap_Sanitize
 	public static function taxonomy_settings( $new )
 	{
 		setlocale( LC_NUMERIC, 'C' );
-
 		$sanitized = array();
 
 		$sanitized['active'] = !empty($new['active']) ? '1' : '';
-		$sanitized['priority'] = isset($new['priority']) ? xmlsf_sanitize_priority( str_replace( ',', '.', $new['priority'] ), .1, .9 ) : '0.3';
+		$sanitized['priority'] = is_numeric($new['priority']) ? xmlsf_sanitize_priority( str_replace( ',', '.', $new['priority'] ), .1, .9 ) : '0.3';
 		$sanitized['dynamic_priority'] = !empty($new['dynamic_priority']) ? '1' : '';
-		$sanitized['term_limit'] = isset($new['term_limit']) ? intval($new['term_limit']) : 5000;
-		if ( $sanitized['term_limit'] < 1 || $sanitized['term_limit'] > 50000 ) $sanitized['term_limit'] = 50000;
+		$sanitized['limit'] = is_numeric($new['limit']) ? intval($new['limit']) : 2000;
+		if ( $sanitized['limit'] < 1 || $sanitized['limit'] > 50000 ) $sanitized['limit'] = 50000;
 
 		// clear term meta cache if deactivating...
 		if ( empty($sanitized['active']) ) {
@@ -42,14 +55,13 @@ class XMLSF_Admin_Sitemap_Sanitize
 	public static function author_settings( $new )
 	{
 		setlocale( LC_NUMERIC, 'C' );
-
 		$sanitized = array();
 
 		$sanitized['active'] = !empty($new['active']) ? '1' : '';
-		$sanitized['priority'] = isset($new['priority']) ? xmlsf_sanitize_priority( str_replace( ',', '.', $new['priority'] ), .1, .9 ) : '0.3';
+		$sanitized['priority'] = is_numeric($new['priority']) ? xmlsf_sanitize_priority( str_replace( ',', '.', $new['priority'] ), .1, .9 ) : '0.3';
 		$sanitized['dynamic_priority'] = !empty($new['dynamic_priority']) ? '1' : '';
-		$sanitized['term_limit'] = isset($new['term_limit']) ? intval($new['term_limit']) : 5000;
-		if ( $sanitized['term_limit'] < 1 || $sanitized['term_limit'] > 50000 ) $sanitized['term_limit'] = 50000;
+		$sanitized['limit'] = is_numeric($new['limit']) ? intval($new['limit']) : 2000;
+		if ( $sanitized['limit'] < 1 || $sanitized['limit'] > 50000 ) $sanitized['limit'] = 50000;
 
 		// clear user meta cache if deactivating...
 /*		if ( empty($sanitized['active']) ) {
@@ -63,8 +75,20 @@ class XMLSF_Admin_Sitemap_Sanitize
 		return $sanitized;
 	}
 
-	public static function post_types_settings( $new = array() )
+	public static function post_type_settings( $new = array() )
 	{
+		setlocale( LC_NUMERIC, 'C' );
+		$sanitized = array();
+
+		$sanitized['limit'] = is_numeric( $new['limit'] ) ? intval($new['limit']) : 2000;
+		if ( $sanitized['limit'] < 1 || $sanitized['limit'] > 50000 ) $sanitized['limit'] = 50000;
+
+		return $sanitized;
+	}
+
+	public static function post_types( $new = array() )
+	{
+		setlocale( LC_NUMERIC, 'C' );
 		$sanitized = is_array($new) ? $new : array();
 
 		$old = (array) get_option( 'xmlsf_post_types', array() );
@@ -72,8 +96,7 @@ class XMLSF_Admin_Sitemap_Sanitize
 		$clear_comments = false;
 
 		foreach ( $sanitized as $post_type => $settings ) {
-			setlocale( LC_NUMERIC, 'C' );
-			$sanitized[$post_type]['priority'] = isset($settings['priority']) ? xmlsf_sanitize_priority( str_replace( ',', '.', $settings['priority'] ), .1, .9 ) : '0.5';
+			$sanitized[$post_type]['priority'] = is_numeric($settings['priority']) ? xmlsf_sanitize_priority( str_replace( ',', '.', $settings['priority'] ), .1, .9 ) : '0.5';
 
 			// poll for changes that warrant clearing meta data
 			if ( isset($old[$post_type]) && is_array($old[$post_type]) ) {
@@ -138,6 +161,8 @@ class XMLSF_Admin_Sitemap_Sanitize
 
 	public static function custom_urls_settings( $new )
 	{
+		setlocale( LC_NUMERIC, 'C' );
+
 		// clean up input
 		if ( is_array( $new ) ) {
 			$new = array_filter($new);
@@ -160,7 +185,6 @@ class XMLSF_Admin_Sitemap_Sanitize
 			$url = filter_var( esc_url( trim( $arr[0] ) ), FILTER_VALIDATE_URL );
 
 			if ( !empty( $url ) ) {
-				setlocale( LC_NUMERIC, 'C' );
 				$priority = isset( $arr[1] ) ? xmlsf_sanitize_priority( str_replace( ',', '.', $arr[1] ) ) : '0.5';
 				$sanitized[] = array( $url, $priority );
 			}

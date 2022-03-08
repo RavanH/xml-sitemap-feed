@@ -10,13 +10,13 @@ if ( ! defined( 'WPINC' ) ) die;
 // do xml tag via echo or SVN parser is going to freak out
 echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>'; ?>
 <?php xmlsf_xml_stylesheet(); ?>
-<?php xmlsf_generator(); ?>
+<?php do_action( 'xmlsf_generator' ); ?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
 		http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
 	<sitemap>
-		<loc><?php echo xmlsf_get_index_url(); ?></loc>
+		<loc><?php echo xmlsf_sitemap_url( 'root' ); ?></loc>
 		<lastmod><?php echo get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ); ?></lastmod>
 	</sitemap>
 <?php
@@ -30,7 +30,9 @@ if ( ! empty( $post_types ) ) :
 
 		$archive = isset( $settings['archive'] ) ? $settings['archive'] : '';
 
-		foreach ( xmlsf_get_index_archive_data( $post_type, $archive ) as $url => $lastmod ) {
+		$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
+
+		foreach ( $archive_data as $url => $lastmod ) {
 ?>
 	<sitemap>
 		<loc><?php echo $url; ?></loc>
@@ -44,7 +46,7 @@ endif;
 // public taxonomies
 foreach ( xmlsf_get_taxonomies() as $taxonomy ) : ?>
 	<sitemap>
-		<loc><?php echo xmlsf_get_index_url( 'taxonomy', array( 'type' => $taxonomy ) ); ?></loc>
+		<loc><?php echo xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ); ?></loc>
 <?php if ( $lastmod = xmlsf_get_taxonomy_modified( $taxonomy ) ) { ?>
 		<lastmod><?php echo $lastmod; ?></lastmod>
 <?php } ?>
@@ -55,7 +57,7 @@ endforeach;
 // authors
 if ( xmlsf_do_authors() ) : ?>
 	<sitemap>
-		<loc><?php echo xmlsf_get_index_url( 'author' ); ?></loc>
+		<loc><?php echo xmlsf_sitemap_url( 'author' ); ?></loc>
 		<lastmod><?php echo get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ); ?></lastmod>
 	</sitemap>
 <?php
@@ -65,7 +67,7 @@ endif;
 if ( apply_filters( 'xmlsf_custom_urls', get_option( 'xmlsf_urls' ) ) ) :
 ?>
 	<sitemap>
-		<loc><?php echo xmlsf_get_index_url( 'custom' ); ?></loc>
+		<loc><?php echo xmlsf_sitemap_url( 'custom' ); ?></loc>
 	</sitemap>
 <?php
 endif;

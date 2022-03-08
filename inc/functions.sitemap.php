@@ -1,146 +1,6 @@
 <?php
 
 /**
- * Filter sitemap post types
- *
- * @since 5.0
- * @param $post_types array
- * @return array
- */
-function xmlsf_filter_post_types( $post_types ) {
-	$post_types = (array) $post_types;
-
-	// Always exclude attachment and reply post types (bbpress)
-	unset( $post_types['attachment'], $post_types['reply'] );
-
-	return array_filter( $post_types );
-}
-
-/**
- * Get index url
- *
- * @param string $sitemap
- * @param array $args arguments:
- *                    $type - post_type or taxonomy, default false
- *                    $m    - YYYY, YYYYMM, YYYYMMDD
- *                    $w    - week of the year ($m must be YYYY format)
- *                    $gz   - bool for GZ extension (triggers compression verification)
- *
- * @return string
- */
-function xmlsf_get_index_url( $sitemap = 'root', $args = array() ) {
-
-	// get our arguments
-	$args = apply_filters( 'xmlsf_index_url_args', wp_parse_args( $args, array( 'type' => false, 'm' => false, 'w' => false, 'gz' => false) ) );
-	extract( $args );
-
-	if ( xmlsf()->plain_permalinks() ) {
-		$name = '?feed=sitemap-'.$sitemap;
-		$name .= $gz ? '.gz' : '';
-		$name .= $type ? '-'.$type : '';
-		$name .= $m ? '&m='.$m : '';
-		$name .= $w ? '&w='.$w : '';
-	} else {
-		$name = 'sitemap-'.$sitemap;
-		$name .= $type ? '-'.$type : '';
-		$name .= $m ? '.'.$m : '';
-		$name .= $w ? '.'.$w : '';
-		$name .= '.xml';
-		$name .= $gz ? '.gz' : '';
-	}
-
-	return esc_url( trailingslashit( home_url() ) . $name );
-
-}
-
-/**
- * Get post archives data
- *
- * @param string $post_type
- * @param string $archive_type
- *
- * @return array
- */
-function xmlsf_get_index_archive_data( $post_type = 'post', $archive_type = '' ) {
-
-	global $wpdb;
-
-	$return = array();
-
-	if ( 'weekly' == $archive_type ) :
-
-		$week       = _wp_mysql_week( '`post_date`' );
-		$query      = "SELECT DISTINCT LPAD($week,2,'0') AS `week`, YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD($week,2,'0') ORDER BY `year` DESC, `week` DESC";
-		$arcresults = xmlsf_cache_get_archives( $query );
-
-		foreach ( (array) $arcresults as $arcresult ) {
-			$url = xmlsf_get_index_url( 'posttype', array( 'type' => $post_type, 'm' => $arcresult->year, 'w' => $arcresult->week ) );
-			$return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year, $arcresult->week ), DATE_W3C );
-		};
-
-	elseif ( 'monthly' == $archive_type ) :
-
-		$query = "SELECT YEAR(`post_date`) AS `year`, LPAD(MONTH(`post_date`),2,'0') AS `month`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD(MONTH(`post_date`),2,'0') ORDER BY `year` DESC, `month` DESC";
-		$arcresults = xmlsf_cache_get_archives( $query );
-
-		foreach ( (array) $arcresults as $arcresult ) {
-			$url = xmlsf_get_index_url( 'posttype', array( 'type' => $post_type, 'm' => $arcresult->year . $arcresult->month ) );
-			$return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year . $arcresult->month ), DATE_W3C );
-		};
-
-	elseif ( 'yearly' == $archive_type ) :
-
-		$query      = "SELECT YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`) ORDER BY `year` DESC";
-		$arcresults = xmlsf_cache_get_archives( $query );
-
-		foreach ( (array) $arcresults as $arcresult ) {
-			$url = xmlsf_get_index_url( 'posttype', array( 'type' => $post_type, 'm' => $arcresult->year ) );
-			$return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year ), DATE_W3C );
-		};
-
-	else :
-
-		$query      = "SELECT COUNT(ID) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' ORDER BY `post_date` DESC";
-		$arcresults = xmlsf_cache_get_archives( $query );
-
-		if ( is_object($arcresults[0]) && $arcresults[0]->posts > 0 ) {
-			 $url = xmlsf_get_index_url( 'posttype', array( 'type' => $post_type ) );
-			 $return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type ), DATE_W3C );
-		};
-
-	endif;
-
-	return $return;
-
-}
-
-/**
- * Get archives from wp_cache
- *
- * @param string $query
- *
- * @return array
- */
-function xmlsf_cache_get_archives( $query ) {
-
-	global $wpdb;
-
-	$key = md5($query);
-	$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
-
-	if ( !isset( $cache[ $key ] ) ) {
-		$arcresults = $wpdb->get_results($query);
-		$cache[ $key ] = $arcresults;
-		wp_cache_set( 'xmlsf_get_archives', $cache, 'general' );
-	} else {
-		$arcresults = $cache[ $key ];
-	}
-
-	return $arcresults;
-
-}
-
-/**
  * Get taxonomies
  * Returns an array of taxonomy names to be included in the index
  *
@@ -174,62 +34,6 @@ function xmlsf_get_taxonomies() {
 
 	return $tax_array;
 
-}
-
-/**
- * Get all public (and not empty) taxonomies
- * Returns an array associated taxonomy object names and labels.
- *
- * @since 5.0
- * @param void
- * @return array
- */
-function xmlsf_public_taxonomies() {
-
-	$tax_array = array();
-
-	foreach ( (array) get_option( 'xmlsf_post_types' ) as $post_type => $settings ) {
-
-		if ( empty($settings['active']) ) continue;
-
-		// check each tax public flag and term count and append name to array
-		foreach ( get_object_taxonomies( $post_type, 'objects' ) as $taxonomy ) {
-
-			if ( !empty( $taxonomy->public ) && !in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) )
-				$tax_array[$taxonomy->name] = $taxonomy->label;
-
-		}
-
-	}
-
-	return $tax_array;
-}
-
-/**
- * Santize priority value
- * Expects proper locale setting for calculations: setlocale( LC_NUMERIC, 'C' );
- *
- * Returns a float within the set limits.
- *
- * @since 5.2
- * @param float $priority
- * @param float $min
- * @param float $max
- * @return float
- */
-function xmlsf_sanitize_priority( $priority, $min = .1, $max = 1 ) {
-
-	$priority = (float) $priority;
-	$min = (float) $min;
-	$max = (float) $max;
-
-	if ( $priority <= $min ) {
-		return number_format( $min, 1 );
-	} elseif ( $priority >= $max ) {
-		return number_format( $max, 1 );
-	} else {
-		return number_format( $priority, 1 );
-	}
 }
 
 /**
@@ -291,6 +95,78 @@ function xmlsf_images_data( $post, $which ) {
 	}
 
 	return $images_data;
+}
+
+/**
+ * Get all public (and not empty) taxonomies
+ * Returns an array associated taxonomy object names and labels.
+ *
+ * @since 5.0
+ * @param void
+ * @return array
+ */
+function xmlsf_public_taxonomies() {
+
+	$tax_array = array();
+
+	foreach ( (array) get_option( 'xmlsf_post_types' ) as $post_type => $settings ) {
+
+		if ( empty($settings['active']) ) continue;
+
+		// check each tax public flag and term count and append name to array
+		foreach ( get_object_taxonomies( $post_type, 'objects' ) as $taxonomy ) {
+
+			if ( !empty( $taxonomy->public ) && !in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) )
+				$tax_array[$taxonomy->name] = $taxonomy->label;
+
+		}
+
+	}
+
+	return $tax_array;
+}
+
+/**
+ * Santize priority value
+ * Expects proper locale setting for calculations: setlocale( LC_NUMERIC, 'C' );
+ *
+ * Returns a float within the set limits.
+ *
+ * @since 5.2
+ * @param float $priority
+ * @param float $min
+ * @param float $max
+ * @return float
+ */
+function xmlsf_sanitize_priority( $priority, $min = .1, $max = 1 ) {
+
+	setlocale( LC_NUMERIC, 'C' );
+
+	$priority = (float) $priority;
+	$min = (float) $min;
+	$max = (float) $max;
+
+	if ( $priority <= $min ) {
+		return number_format( $min, 1 );
+	} elseif ( $priority >= $max ) {
+		return number_format( $max, 1 );
+	} else {
+		return number_format( $priority, 1 );
+	}
+}
+
+/**
+ * Get active sitemap post types
+ *
+ * @since 5.4
+ * @return array
+ */
+function xmlsf_active_post_types() {
+	$settings = (array) apply_filters( 'xmlsf_post_types', get_option( 'xmlsf_post_types', array() ) );
+
+	$public = get_post_types( array( 'public' => true ) );
+
+	return array_filter( $public, function($post_type) use($settings) { return isset( $settings[$post_type] ) && ! empty( $settings[$post_type]['active'] ); } );
 }
 
 /* -------------------------------------
@@ -444,7 +320,7 @@ if ( ! function_exists( 'get_firstpostdate' ) ) {
  * @param string $m The period to check in. Defaults to any, can be YYYY, YYYYMM or YYYYMMDD
  * @param string $w The week to check in. Defaults to any, can be one or two digit week number. Must be used with $m in YYYY format.
  *
- * @return string The date of the oldest modified post.
+ * @return string The date of the latest modified post.
  */
 if ( ! function_exists( 'get_lastmodified' ) ) {
 	function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '', $w = '' ) {

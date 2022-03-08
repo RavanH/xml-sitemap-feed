@@ -74,6 +74,7 @@ class XMLSitemapFeed_Uninstall {
 		// remove plugin settings
 		delete_option('xmlsf_version');
 		delete_option('xmlsf_sitemaps');
+		delete_option('xmlsf_core_sitemap');
 		delete_option('xmlsf_post_types');
 		delete_option('xmlsf_taxonomies');
 		delete_option('xmlsf_taxonomy_settings');

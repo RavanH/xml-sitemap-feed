@@ -1,11 +1,11 @@
 <fieldset>
 	<legend class="screen-reader-text"><?php _e('XML Sitemap URL','xml-sitemap-feed'); ?></legend>
 
-	<?php echo trailingslashit( get_home_url() ); ?><input type="text" name="xmlsf_sitemap_name" id="xmlsf_sitemap_name" placeholder="<?php echo $default; ?>" value="<?php echo $name; ?>" disabled>
+	<?php echo trailingslashit( get_home_url() ); ?><input type="text" name="xmlsf_sitemap_name" id="xmlsf_sitemap_name" placeholder="<?php echo $name; ?>" value="<?php echo $name; ?>" disabled>
 	<p class="description" id="xmlsf-sitemap-name-description">
 		<?php printf(
 			/* Translators: default sitemap.xml file name */
-			__('Set an alternative name for the sitemap index. Leave empty to use the default: %s','xml-sitemap-feed'), '<code>' . apply_filters( 'xmlsf_sitemap_filename', 'sitemap.xml' ) . '</code>'
+			__('Set an alternative name for the sitemap index. Leave empty to use the default: %s','xml-sitemap-feed'), '<code>' . apply_filters( 'xmlsf_sitemap_filename', $name ) . '</code>'
 		); ?><br/>
 		<?php printf (
 			/* Translators: XML Sitemap Advanced */

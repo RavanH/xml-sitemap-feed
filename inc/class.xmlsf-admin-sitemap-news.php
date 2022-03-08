@@ -36,8 +36,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		if ( ! isset( $_POST['xmlsf-ping-sitemap-news'] ) || ! xmlsf_verify_nonce('help') )
 			return;
 
-		$sitemaps = get_option( 'xmlsf_sitemaps' );
-		$result = xmlsf_ping( 'google', $sitemaps['sitemap-news'], 5 * MINUTE_IN_SECONDS );
+		$result = xmlsf_ping( 'google', 'news', 5 * MINUTE_IN_SECONDS );
 
 		switch( $result ) {
 			case 200:
@@ -61,7 +60,6 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		}
 
 		add_settings_error( 'ping_sitemap', 'ping_sitemap', $msg, $type );
-
 	}
 
 	/**
@@ -143,6 +141,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 	*/
 	public function settings_page()
 	{
+		global $wp_rewrite;
 		$this->options = (array) get_option( 'xmlsf_news_tags', array() );
 
 		$active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'general';
@@ -152,7 +151,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 		// prepare sitemap link url
 		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
-		$sitemap = xmlsf()->plain_permalinks() ? '?feed=sitemap-news' : $sitemaps['sitemap-news'];
+		$sitemap_url = xmlsf_sitemap_url( 'news' );
 
 		// remove WPML home url filter
 		global $wpml_url_filters;

@@ -127,7 +127,7 @@ class XMLSitemapFeed_Upgrade {
 				'active' => $active,
 				'priority' => '0.3',
 				'dynamic_priority' => '1',
-				'term_limit' => '5000'
+				'limit' => '5000'
 			);
 			add_option( 'xmlsf_taxonomy_settings', $taxonomy_settings );
 
@@ -167,6 +167,22 @@ class XMLSitemapFeed_Upgrade {
 			// clear comments meta
 			$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
 			update_option( 'xmlsf_comments_meta_primed', array() );
+		}
+
+		if ( version_compare( '5.4', $db_version, '>' ) ) {
+			// do not switch to core sitemap when upgrading
+			add_option( 'xmlsf_core_sitemap', '' );
+			// update taxonomy terms limit
+			$settings = (array) get_option( 'xmlsf_taxonomy_settings', array() );
+			$settings['limit'] = isset( $settings['term_limit'] ) ? $settings['term_limit'] : '3000';
+			unset( $settings['term_limit'] );
+			update_option( 'xmlsf_taxonomy_settings', $settings );
+			// update users limit
+			$settings = (array) get_option( 'xmlsf_author_settings', array() );
+			$settings['limit'] = isset( $settings['term_limit'] ) ? $settings['term_limit'] : '1000';
+			unset( $settings['term_limit'] );
+			update_option( 'xmlsf_author_settings', $settings );
+
 		}
 
 		$this->update_from_defaults();

@@ -36,57 +36,35 @@ function xmlsf_news_filter_where( $where = '' ) {
  */
 function xmlsf_sitemap_news_filter_request( $request ) {
 
-	// REPSONSE HEADERS filtering
- 	add_filter( 'nocache_headers', 'xmlsf_news_nocache_headers' );
 
-	/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
-	$request = apply_filters( 'xmlsf_news_request', $request );
-	/**
-	 * Developers: add your actions that should run when a news sitemap request is found with:
-	 *
-	 * add_filter( 'xmlsf_news_request', 'your_filter_function' );
-	 *
-	 * Filters hooked here already:
-	 * xmlsf_polylang_request - Polylang compatibility
-	 * xmlsf_wpml_request - WPML compatibility
-	 * xmlsf_bbpress_request - bbPress compatibility
-	 */
-
-	// prepare for news and return modified request
-	$options = get_option( 'xmlsf_news_tags' );
-	$post_types = is_array($options) && !empty($options['post_type']) ? $options['post_type'] : array('post');
-	$post_types = apply_filters( 'xmlsf_news_post_types', $post_types);
-
-	// disable caching
-	$request['cache_results'] = false;
-	if ( ! defined('DONOTCACHEPAGE') ) define('DONOTCACHEPAGE', true);
-	if ( ! defined('DONOTCACHEDB') ) define('DONOTCACHEDB', true);
-
-	// set up query filters
-	$live = false;
-	foreach ( $post_types as $post_type ) {
-		if ( strtotime( get_lastpostdate( 'gmt', $post_type ) ) > strtotime( gmdate( 'Y-m-d H:i:s', strtotime('-48 hours') ) ) ) {
-			$live = true;
-			break;
-		}
-	}
-
-	if ( $live ) {
-		add_filter( 'post_limits', function() { return 'LIMIT 0, 1000';	} );
-		add_filter( 'posts_where', 'xmlsf_news_filter_where', 10, 1 );
-	} else {
-		add_filter( 'post_limits', function() { return 'LIMIT 0, 1'; } );
-	}
-
-	// post type
-	$request['post_type'] = $post_types;
-
-	// categories
-	if ( is_array($options) && isset($options['categories']) && is_array($options['categories']) ) {
-		$request['cat'] = implode( ',', $options['categories'] );
-	}
 
 	return $request;
+}
+
+/**
+ * Get absolute URL
+ * Converts path or protocol relative URLs to absolute ones.
+ *
+ * @param string $url
+ *
+ * @return string|bool
+ */
+function xmlsf_get_absolute_url( $url = false ) {
+	// have a string or return false
+	if ( empty( $url ) || ! is_string( $url ) ) {
+		return false;
+	}
+
+	// check for scheme
+	if ( strpos( $url, 'http' ) !== 0 ) {
+		// check for relative url path
+		if ( strpos( $url, '//' ) !== 0 ) {
+			return ( strpos( $url, '/' ) === 0 ) ? untrailingslashit( home_url() ) . $url : trailingslashit( home_url() ) . $url;
+		}
+		return xmlsf()->scheme() . ':' . $url;
+	}
+
+	return $url;
 }
 
 /**
@@ -135,6 +113,10 @@ function xmlsf_news_get_images( $which ) {
 	return $images;
 }
 */
+
+/*****************
+ * COMPATIBILITY *
+ ****************/
 
 /**
  * Post language filter for Polylang

@@ -11,7 +11,7 @@ if ( ! defined( 'WPINC' ) ) die;
 echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 '; ?>
 <?php xmlsf_xml_stylesheet( 'root' ); ?>
-<?php xmlsf_generator(); ?>
+<?php do_action( 'xmlsf_generator' ); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 <?php do_action('xmlsf_urlset', 'home'); ?>
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

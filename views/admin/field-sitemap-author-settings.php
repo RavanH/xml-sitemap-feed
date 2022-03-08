@@ -5,7 +5,7 @@
 	<p>
 		<label>
 			<input type="checkbox" name="xmlsf_author_settings[active]" id="xmlsf_author_active" value="1"<?php checked( !empty( $author_settings['active'] ), true); ?> />
-			<?php _e( 'Include authors', 'xml-sitemap-feed' ); ?> (<?php echo count( get_users( array( 'fields' => 'ID', 'who' => 'authors', 'has_published_posts' => true, ) ) ); ?>)
+			<?php _e( 'Include authors', 'xml-sitemap-feed' ); ?> (<?php echo count( get_users( array( 'fields' => 'ID', 'has_published_posts' => xmlsf_active_post_types() ) ) ); ?>)
 		</label>
 	</p>
 	<p>
@@ -17,7 +17,7 @@
 	<p>
 		<label>
 			<?php _e( 'Maximum authors per sitemap', 'xml-sitemap-feed' ); ?>
-			<input type="number" step="100" min="0" max="50000" name="xmlsf_author_settings[term_limit]" id="xmlsf_author_term_limit" value="<?php echo ( isset($author_settings['term_limit']) ? $author_settings['term_limit'] : '' ); ?>" class="medium-text" />
+			<input type="number" step="100" min="0" max="50000" name="xmlsf_author_settings[limit]" id="xmlsf_author_limit" value="<?php echo ( isset($author_settings['limit']) ? $author_settings['limit'] : '' ); ?>" class="medium-text" />
 		</label>
 	</p>
 	<p class="description">

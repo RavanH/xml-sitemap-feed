@@ -1,67 +1,29 @@
 <?php
 
 /* ------------------------------
- *      XMLSF Controller CLASS
+ *      XMLSF Sitemap CLASS
  * ------------------------------ */
 
-class XMLSF_Sitemap
+abstract class XMLSF_Sitemap
 {
 	/**
 	 * Sitemap index name
 	 * @var string
 	 */
-	private $sitemap = 'sitemap.xml';
+	protected $sitemap;
 
 	/**
 	 * Post types included in sitemap index
 	 * @var array
 	 */
-	private $post_types = array();
+	protected $post_types = array();
 
 	/**
 	 * Rewrite rules
 	 * @var array
 	 */
-	public $rewrite_rules = array(
-		'regex' => 'sitemap(?:_index)?(-[a-z0-9\-_]+)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml(\.gz)?$',
-		'query' => '?feed=sitemap$matches[1]$matches[4]&m=$matches[2]&w=$matches[3]'
-	);
-
-	/**
-	 * CONSTRUCTOR
-	 * Runs on init
-	 */
-
-	function __construct( $sitemap )
-	{
-		if ( $sitemap ) $this->sitemap = $sitemap;
-
-		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
-
-		// Rewrite rules filter.
-		add_filter( 'rewrite_rules_array', array( $this, 'rewrite_rules' ), 99, 1 );
-
-		// Redirect wp-sitemap requests.
-		add_action( 'template_redirect', array( $this, 'redirect'),	0 );
-
-		// Cache clearance.
-		add_action( 'clean_post_cache', array( $this, 'clean_post_cache'), 99, 2 );
-
-		// Update term meta lastmod date.
-		add_action( 'transition_post_status', array( $this, 'update_term_modified_meta' ), 10, 3 );
-
-		// Update images post meta.
-		add_action( 'transition_post_status', array( $this, 'update_post_images_meta' ), 10, 3 );
-
-		// Update last comment date post meta.
-		add_action( 'transition_comment_status', array( $this, 'update_post_comment_meta' ), 10, 3 );
-		add_action( 'comment_post', array( $this, 'update_post_comment_meta_cp' ), 10, 3 ); // when comment is not held for moderation
-
-		// PINGING
-		add_action( 'transition_post_status', array( $this, 'do_pings' ), 10, 3 );
-
-	}
-
+	public $rewrite_rules = array();
+	
 	/**
 	 * Add sitemap rewrite rules
 	 * 
@@ -70,26 +32,17 @@ class XMLSF_Sitemap
 	 * @param array $rewrite_rules
 	 * @return array $rewrite_rules
 	 */
-	public function rewrite_rules( $rewrite_rules ) {
+	public function rewrite_rules( $rewrite_rules )
+	{
 		global $wp_rewrite;
 
-		$rewrite_rules = array_merge( array( $this->rewrite_rules['regex'] => $wp_rewrite->index . $this->rewrite_rules['query'] ), $rewrite_rules );
+		foreach( $this->rewrite_rules as $rewrite_rule ) {
+			$rewrite_rules = array_merge( array( $rewrite_rule['regex'] => $wp_rewrite->index . $rewrite_rule['query'] ), $rewrite_rules );
+		}
 
 		return $rewrite_rules;
 	}
-
-	/**
-	 * Do WP core sitemap index redirect
-	 *
-	 * @uses wp_redirect()
-	 */
-	public function redirect() { 
-		if ( ! empty( $_SERVER['REQUEST_URI'] ) && substr( $_SERVER['REQUEST_URI'], 0, 15) === '/wp-sitemap.xml' ) { 
-			wp_redirect( home_url( $this->sitemap ), 301, 'XML Sitemap & Google News for WordPress' ); 
-			exit(); 
-		} 
-	}
-
+	
 	/**
 	 * Do pings, hooked to transition post status
 	 *
@@ -122,7 +75,9 @@ class XMLSF_Sitemap
 		$ping = (array) get_option( 'xmlsf_ping', array() );
 		// PING !
 		foreach ( $ping as $se ) {
-			xmlsf_ping( $se, $this->sitemap, HOUR_IN_SECONDS );
+			if ( ! wp_next_scheduled( 'xmlsf_ping_'.$se ) ) {
+				wp_schedule_single_event( time() + 5, 'xmlsf_ping_'.$se, array( $se, $this->sitemap, HOUR_IN_SECONDS ) );
+			}
 		}
  	}
 
@@ -226,7 +181,6 @@ class XMLSF_Sitemap
 		delete_post_meta( $post->ID, '_xmlsf_image_'.$which );
 
 		$this->_add_images_meta( $post, $which );
-
 	}
 
 	/**
@@ -254,8 +208,6 @@ class XMLSF_Sitemap
   		date_default_timezone_set('UTC');
 		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date_gmt', date('Y-m-d H:i:s') );
 		date_default_timezone_set($tz);
-
-		// update comment meta data
 	}
 
 	/**
@@ -361,7 +313,6 @@ class XMLSF_Sitemap
 				update_option( 'xmlsf_comments_meta_primed', $primed );
 			}
 		}
-
 	}
 
 	/**
@@ -371,7 +322,7 @@ class XMLSF_Sitemap
 	 * @param array $post Post object
 	 * @param string $which
 	 */
-	private function _add_images_meta( $post, $which )
+	protected function _add_images_meta( $post, $which )
 	{
 		if ( ! is_object($post) || ! isset( $post->ID ) ) return;
 
@@ -390,7 +341,7 @@ class XMLSF_Sitemap
 	 * @since 5.2
 	 * @param array $post Post object
 	 */
-	private function _add_comment_meta( $post )
+	protected function _add_comment_meta( $post )
 	{
 		if ( ! is_object( $post ) || ! isset( $post->ID ) ) return;
 

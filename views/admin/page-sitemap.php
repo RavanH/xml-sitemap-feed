@@ -11,6 +11,7 @@
 	</p>
 
 	<nav class="nav-tab-wrapper">
+		<a class="nav-tab<?php echo $active_tab == 'general' ? ' nav-tab-active' : '" href="?page=xmlsf&tab=general'; ?>"><?php echo translate('General'); ?></a>
 		<a class="nav-tab<?php echo $active_tab == 'post_types' ? ' nav-tab-active' : '" href="?page=xmlsf&tab=post_types'; ?>"><?php _e('Post types','xml-sitemap-feed'); ?></a>
 		<a class="nav-tab<?php echo $active_tab == 'taxonomies' ? ' nav-tab-active' : '" href="?page=xmlsf&tab=taxonomies'; ?>"><?php _e('Taxonomies','xml-sitemap-feed'); ?></a>
 		<a class="nav-tab<?php echo $active_tab == 'authors' ? ' nav-tab-active' : '" href="?page=xmlsf&tab=authors'; ?>"><?php _e('Authors','xml-sitemap-feed'); ?></a>
@@ -37,7 +38,7 @@
 			printf (
 				/* translators: Sitemap name with URL */
 				__( 'Open your %s', 'xml-sitemap-feed' ),
-				'<strong><a href="' . home_url( $sitemap ) . '" target="_blank">' . __('XML Sitemap Index','xml-sitemap-feed') . '</a></strong><span class="dashicons dashicons-external"></span>'
+				'<strong><a href="' . $sitemap_url . '" target="_blank">' . __('XML Sitemap Index','xml-sitemap-feed') . '</a></strong><span class="dashicons dashicons-external"></span>'
 			); ?>
 		</p>
 
