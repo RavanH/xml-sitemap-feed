@@ -19,7 +19,7 @@ The main advantage of this plugin over other XML Sitemap plugins is **simplicity
 
 You, or site owners on your Multisite network, will not be bothered with overly complicated settings like most other XML Sitemap plugins. The default settings will suffice in most cases.
 
-An XML Sitemap Index becomes instantly available on **yourblog.url/sitemap.xml** (or yourblog.url/?feed=sitemap if you're not using a 'fancy' permalink structure) containing references to posts and pages by default, ready for indexing by search engines like Google, Bing, Yahoo, AOL and Ask. When the Google News Sitemap is activated, it will become available on **yourblog.url/sitemap-news.xml** (or yourblog.url/?feed=sitemap-news), ready for indexing by Google News. Both are automatically referenced in the dynamically created **robots.txt** on **yourblog.url/robots.txt** to tell search engines where to find your XML Sitemaps. Google and Bing will be pinged on each new publication.
+An XML Sitemap Index becomes instantly available on **yourblog.url/sitemap.xml** (or yourblog.url/?feed=sitemap if you're not using a 'fancy' permalink structure) containing references to posts and pages by default, ready for indexing by search engines like Google, Bing, Yahoo, Yandex, Baidu, AOL and Ask. When the Google News Sitemap is activated, it will become available on **yourblog.url/sitemap-news.xml** (or yourblog.url/?feed=sitemap-news), ready for indexing by Google News. Both are automatically referenced in the dynamically created **robots.txt** on **yourblog.url/robots.txt** to tell search engines where to find your XML Sitemaps. Google will be pinged on each new publication.
 
 Please read the FAQ's for info on how to get your articles listed on Google News.
 
@@ -46,7 +46,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Custom/static sitemaps can be added to the index.
 * Works out-of-the-box, even on **Multisite** installations.
 * Include featured images or attached images with title.
-* Pings Google, Bing & Yahoo on new post publication.
+* Pings sitemap to Google & Yandex on new post publication.
 * Options to define which post types and taxonomies get included in the sitemap.
 * Updates Lastmod on post modification or on comments.
 * Set Priority per post type, per taxonomy and per individual post.
@@ -161,13 +161,13 @@ Changefreq has been dropped since version 4.9 because it is no longer taken into
 
 No. In normal circumstances, your site will be indexed by the major search engines before you know it. The search engines will be looking for a robots.txt file and (with this plugin activated) find a pointer in it to the XML Sitemap on your blog. The search engines will return on a regular basis to see if your site has updates.
 
-Besides that, Google and Bing are pinged upon each new publication by default.
+Besides that, Google is pinged upon each new publication by default.
 
 **NOTE:** If you have a server _without rewrite rules_, use your blog _without fancy URLs_ (meaning, you have WordPress Permalinks set to the old default value) or have it installed in a _subdirectory_, then read **Do I need to change my robots.txt** for more instructions.
 
 = Does this plugin ping search engines? =
 
-Yes, Google and Bing are pinged upon each new publication. Unless you disable this feature on **Settings > Writing**.
+Google is pinged upon each new publication. Unless you disable this feature on **Settings > Writing**. Other search engines are not supported at this time, while the IndexNow API (Bing) is being condisered.
 
 = Do I need to change my robots.txt? =
 
@@ -302,10 +302,16 @@ Fix Bing ping 410 error response and help links.
 
 == Changelog ==
 
-= 5.3.4 =
+= 5.4 =
+TODO revisit transients solution in transients_actions() or at least prevent this from running on *every* AJAX call
+TODO fix visible news sitemap when deactivated
+TODO respond 404 for non existant (or deacctivated) sitemaps?
 * FIX: "Failed opening required" when no template
+* FIX: Nginx Helper purge urls
 * Filter domains in taxonomy and author sitemaps
 * NEW: xmlsf_generator action hook
+* FIX: Bing ping response code 410
+* Dropping Bing from Ping Services awaiting IndexNow support
 
 = 5.3.3 =
 * FIX: Undefined variable + Invalid argument supplied for foreach(), thanks @yankyaw09
