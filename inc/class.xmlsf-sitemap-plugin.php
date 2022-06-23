@@ -248,14 +248,14 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	function set_authors_args( $args ) {
 		$author_settings = get_option( 'xmlsf_author_settings' );
 
-		$args['number'] = ! empty( $author_settings['limit'] ) && is_numeric( $author_settings['limit'] ) ? intval($author_settings['limit']) : 2000;
+		$args['number'] = ! empty( $author_settings['limit'] ) && is_numeric( $author_settings['limit'] ) ? intval( $author_settings['limit'] ) : 2000;
 		if ( $args['number'] < 1 || $args['number'] > 50000 ) $args['number'] = 50000;
 
 		$args['orderby'] = 'post_count';
 		$args['order'] = 'DESC';
 		//$args['fields'] = array( 'ID' ); // must be an array
 		//$args['who'] = 'authors'; // Deprecated since 5.9.
-		$args['has_published_posts'] = xmlsf_active_post_types(); //array of post types that are included in the sitemap
+		$args['has_published_posts'] = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
 
 		return $args;
 	}

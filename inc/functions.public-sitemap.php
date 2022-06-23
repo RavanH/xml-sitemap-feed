@@ -87,7 +87,7 @@ function xmlsf_get_user_modified( $user ) {
 	$posts = get_posts(
 		array(
 			'author' => $user->ID,
-			'post_type' => apply_filters( 'xmlsf_author_post_type', 'post' ),
+			'post_type' => apply_filters( 'xmlsf_author_post_types', array( 'post' ) ),
 			'post_status' => 'publish',
 			'posts_per_page' => 1,
 			'numberposts' => 1,

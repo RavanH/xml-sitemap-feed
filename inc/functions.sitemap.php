@@ -204,20 +204,6 @@ function xmlsf_sanitize_priority( $priority, $min = .1, $max = 1 ) {
 }
 
 /**
- * Get active sitemap post types
- *
- * @since 5.4
- * @return array
- */
-function xmlsf_active_post_types() {
-	$settings = (array) apply_filters( 'xmlsf_post_types', get_option( 'xmlsf_post_types', array() ) );
-
-	$public = get_post_types( array( 'public' => true ) );
-
-	return array_filter( $public, function($post_type) use($settings) { return isset( $settings[$post_type] ) && ! empty( $settings[$post_type]['active'] ); } );
-}
-
-/**
  * Usage info for debugging
  *
  * @since
