@@ -171,7 +171,7 @@ class XMLSitemapFeed_Upgrade {
 
 		if ( version_compare( '5.4', $db_version, '>' ) ) {
 			// do not switch to core sitemap when upgrading
-			add_option( 'xmlsf_core_sitemap', '' );
+			add_option( 'xmlsf_general_settings', array( 'server' => 'plugin', 'limit' => '2000' ) );
 			// update taxonomy terms limit
 			$settings = (array) get_option( 'xmlsf_taxonomy_settings', array() );
 			$settings['limit'] = isset( $settings['term_limit'] ) ? $settings['term_limit'] : '3000';
@@ -182,7 +182,6 @@ class XMLSitemapFeed_Upgrade {
 			$settings['limit'] = isset( $settings['term_limit'] ) ? $settings['term_limit'] : '1000';
 			unset( $settings['term_limit'] );
 			update_option( 'xmlsf_author_settings', $settings );
-
 		}
 
 		$this->update_from_defaults();

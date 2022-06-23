@@ -12,6 +12,6 @@
 	<?php _e('Start each URL on a new line.','xml-sitemap-feed'); ?>
 	<br>
 	<span style="color: red" class="warning">
-		<?php _e('Only valid sitemaps are allowed in the Sitemap Index. Use your Google/Bing Webmaster Tools to verify!','xml-sitemap-feed'); ?>
+		<?php _e( 'Only valid sitemaps are allowed in the Sitemap Index. Use your Webmaster Tools account to verify!', 'xml-sitemap-feed' ); ?>
 	</span>
 </p>

@@ -21,9 +21,9 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	 * CONSTRUCTOR
 	 * Runs on init
 	 */
-	function __construct( $sitemap )
+	function __construct( $sitemap = 'sitemap.xml' )
 	{
-		$this->$sitemap = $sitemap ? $sitemap : 'sitemap.xml';
+		$this->sitemap = $sitemap;
 
 		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
 
@@ -85,7 +85,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		add_filter( 'split_the_query', '__return_false' );
 
 		// include shared public functions
-		require_once XMLSF_DIR . '/inc/functions.public-shared.php';
+		require_once XMLSF_DIR . '/inc/functions.public.php';
 
 		// Generator comments
 		add_action( 'xmlsf_generator', 'xmlsf_generator' );
@@ -93,7 +93,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		/** COMPRESSION */
 
 		// check for gz request
-		if ( substr($request['feed'], -3) == '.gz' ) {
+		if ( substr( $request['feed'], -3 ) == '.gz' ) {
 			// pop that .gz
 			$request['feed'] = substr($request['feed'], 0, -3);
 			// verify/apply compression settings
@@ -122,7 +122,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		// include public sitemap functions
 		require_once XMLSF_DIR . '/inc/functions.public-sitemap.php';
 
-		/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
+		/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
 
 		/**
 		 * Filters the request.
@@ -380,36 +380,39 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	 *
 	 * @return $urls array
 	 */
-	public function nginx_helper_purge_urls( $urls = array(), $redis = false )
+	public function nginx_helper_purge_urls( $urls = array(), $wildcard = false )
 	{
-		if ( $redis ) {
-			// wildcard allowed, this makes everything simple
+		if ( $wildcard ) {
+			// Wildcard makes everything simple.
 			$urls[] = '/sitemap*.xml';
 		} else {
-			// no wildcard, go through the motions
+			// No wildcard, go through the motions.
 			$urls[] = '/sitemap.xml';
 			$urls[] = '/sitemap-root.xml';
 			$urls[] = '/sitemap-author.xml';
 			$urls[] = '/sitemap-custom.xml';
 
-			// add public post types sitemaps
-			$post_types = get_option( 'xmlsf_post_types' );
-			if ( is_array($post_types) ) {
-				foreach ( $post_types as $post_type => $settings ) {
-					$archive = !empty($settings['archive']) ? $settings['archive'] : '';
-					foreach ( $this->get_index_archive_data( $post_type, $archive ) as $url ) {
-						$urls[] = parse_url( $url, PHP_URL_PATH);
-					}
-				}
-			}
+			// Add public post types sitemaps.
+			$post_types = xmlsf_get_post_types();
+			foreach ( $post_types as $post_type => $settings ) :
+				$archive = isset( $settings['archive'] ) ? $settings['archive'] : '';
+				$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
 
-			// add public post taxonomies sitemaps
-			$taxonomies = get_option('xmlsf_taxonomies');
-			if ( is_array($taxonomies) ) {
-				foreach ( $taxonomies as $taxonomy ) {
-					$urls[] = parse_url( xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
+				foreach ( $archive_data as $url => $lastmod ) {
+					$urls[] = parse_url( $url, PHP_URL_PATH);
 				}
+			endforeach;
+
+			// Add public post taxonomies sitemaps.
+			$taxonomies = xmlsf_get_taxonomies();
+			foreach ( $taxonomies as $taxonomy ) {
+				$urls[] = parse_url( xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
 			}
+		}
+
+		if ( defined('WP_DEBUG') && WP_DEBUG ) {
+			error_log( 'NGINX Helper purge urls array:' );
+			error_log( print_r( $urls, true ) );
 		}
 
 		return $urls;

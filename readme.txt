@@ -303,9 +303,10 @@ Fix Bing ping 410 error response and help links.
 == Changelog ==
 
 = 5.4 =
+TODO allow inclusion of taxonomies that belong to a post type that is not included
 TODO revisit transients solution in transients_actions() or at least prevent this from running on *every* AJAX call
 TODO fix visible news sitemap when deactivated
-TODO respond 404 for non existant (or deacctivated) sitemaps?
+TODO respond 404 for non existant (or deactivated) sitemaps?
 * FIX: "Failed opening required" when no template
 * FIX: Nginx Helper purge urls
 * Filter domains in taxonomy and author sitemaps

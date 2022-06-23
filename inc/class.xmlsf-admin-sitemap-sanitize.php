@@ -2,13 +2,15 @@
 
 class XMLSF_Admin_Sitemap_Sanitize
 {
-	public static function core_sitemap( $new )
+	public static function general_settings( $new )
 	{
-		$old = get_option( 'xmlsf_core_sitemap' );
-		$new = absint( $new );
+		$old = get_option( 'xmlsf_general_settings' );
 
-		if ( $old !== $new ) {
-			// when sitemap server has been changed, set transients
+		$old_server = is_array( $old ) && ! empty( $old['server'] ) ? $old['server'] : '';
+		$new_server = is_array( $new ) && ! empty( $new['server'] ) ? $new['server'] : '';
+
+		// When sitemap server has been changed, set transients.
+		if ( $old_server !== $new_server ) {
 			set_transient( 'xmlsf_flush_rewrite_rules', '' );
 			set_transient( 'xmlsf_check_static_files', '' );
 		}

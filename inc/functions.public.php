@@ -145,34 +145,6 @@ function xmlsf_generator() {
 	require XMLSF_DIR . '/views/_generator.php';
 }
 
-/**
- * Usage info for debugging
- */
-function xmlsf_usage() {
-	if ( defined('WP_DEBUG') && WP_DEBUG ) {
-		global $wpdb, $EZSQL_ERROR;
-		$num = get_num_queries();
-		$mem = function_exists('memory_get_peak_usage') ? round( memory_get_peak_usage()/1024/1024, 2 ) . 'M' : false;
-		$limit = ini_get('memory_limit');
-		// query errors
-		$errors = '';
-		if ( is_array($EZSQL_ERROR) && count($EZSQL_ERROR) ) {
-			$i = 1;
-			foreach ( $EZSQL_ERROR AS $e ) {
-				$errors .= PHP_EOL . $i . ': ' . implode(PHP_EOL, $e) . PHP_EOL;
-				$i += 1;
-			}
-		}
-		// saved queries
-		$saved = '';
-		if ( defined('SAVEQUERIES') && SAVEQUERIES ) {
-			$saved .= PHP_EOL . print_r($wpdb->queries, true);
-		}
-
-		require XMLSF_DIR . '/views/_usage.php';
-	}
-}
-
 /*****************
  * COMPATIBILITY *
  ****************/

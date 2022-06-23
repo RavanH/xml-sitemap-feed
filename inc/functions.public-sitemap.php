@@ -106,20 +106,21 @@ function xmlsf_get_user_modified( $user ) {
  * Do tags
  *
  * @param string $type
- *
+ *xmlsf_do_tags
  * @return array
  */
 function xmlsf_do_tags( $type = 'post' ) {
 
 	$post_types = get_option( 'xmlsf_post_types' );
 
-	// make sure it's an array we are returning
-	return (
-		is_string($type) &&
-		is_array($post_types) &&
-		!empty($post_types[$type]['tags'])
+	// Make sure it's an array we are returning
+	$tags = (
+		is_string( $type ) &&
+		is_array( $post_types ) &&
+		! empty( $post_types[$type]['tags'] )
 	) ? (array) $post_types[$type]['tags'] : array();
 
+	return $tags;
 }
 
 /**

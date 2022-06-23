@@ -8,6 +8,7 @@
  *
  * @return array
  */
+
 function xmlsf_news_nocache_headers( $headers ) {
 	// prevent proxy caches serving a cached news sitemap
 	$headers['Cache-Control'] .= ', no-store';
@@ -23,22 +24,9 @@ function xmlsf_news_nocache_headers( $headers ) {
  *
  * @return string
  */
+
 function xmlsf_news_filter_where( $where = '' ) {
 	return $where . ' AND post_date_gmt > \'' . gmdate( 'Y-m-d H:i:s', strtotime('-48 hours') ) . '\'';
-}
-
-/**
- * Filter request for news sitemap
- *
- * @param $request
- *
- * @return mixed
- */
-function xmlsf_sitemap_news_filter_request( $request ) {
-
-
-
-	return $request;
 }
 
 /**
@@ -49,6 +37,7 @@ function xmlsf_sitemap_news_filter_request( $request ) {
  *
  * @return string|bool
  */
+
 function xmlsf_get_absolute_url( $url = false ) {
 	// have a string or return false
 	if ( empty( $url ) || ! is_string( $url ) ) {
@@ -68,117 +57,65 @@ function xmlsf_get_absolute_url( $url = false ) {
 }
 
 /**
- * Get images
+ * Parse language string into two or three letter ISO 639 code.
  *
- * @param string $which
+ * @param string $lang unformatted language string
  *
- * @return array
+ * @return string
  */
-/*
-function xmlsf_news_get_images( $which ) {
-	global $post;
-	$images = array();
 
-	if ( 'attached' == $which ) {
-		$args = array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => 1, 'post_status' =>'inherit', 'post_parent' => $post->ID );
-		$attachments = get_posts($args);
-		if ( ! empty( $attachments[0] ) ) {
-			$url = wp_get_attachment_image_url( $attachments[0]->ID, 'full' );
-			$url = xmlsf_get_absolute_url( $url );
-			if ( !empty($url) ) {
-				$images[] = array(
-					'loc' => esc_attr( esc_url_raw( $url ) ),
-					'title' => apply_filters( 'the_title_xmlsitemap', $attachments[0]->post_title ),
-					'caption' => apply_filters( 'the_title_xmlsitemap', $attachments[0]->post_excerpt )
-					// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
-				);
-			}
-		}
-	} elseif ( 'featured' == $which ) {
-		if ( has_post_thumbnail( $post->ID ) ) {
-			$attachment = get_post( get_post_thumbnail_id( $post->ID ) );
-			$url = wp_get_attachment_image_url( get_post_thumbnail_id( $post->ID ), 'full' );
-			$url = xmlsf_get_absolute_url( $url );
-			if ( !empty($url) ) {
-				$images[] = array(
-					'loc' => esc_attr( esc_url_raw( $url ) ),
-					'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
-					'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
-					// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
-				);
-			}
-		}
-	}
+function xmlsf_parse_language_string( $lang ) {
+	// Lower case, no tags.
+	$lang = convert_chars( strtolower( strip_tags( $lang ) ) );
 
-	return $images;
+	// Convert underscores.
+	$lang = str_replace( '_', '-', $lang );
+
+	// No hyphens except...
+	if ( strpos( $lang, '-' ) ) :
+		if ( 0 === strpos( $lang, 'zh' ) ) {
+			$lang = strpos( $lang, 'hk' ) || strpos( $lang, 'tw' ) || strpos( $lang, 'hant' ) ? 'zh-tw' : 'zh-cn';
+		} else {
+			// Explode on hyphen and use only first part.
+			$expl = explode( '-', $lang );
+			$lang = $expl[0];
+		}
+	endif;
+
+	// Make sure it's max 3 letters.
+	$lang = substr( $lang, 0, 2 );
+
+	return $lang;
 }
-*/
 
 /*****************
  * COMPATIBILITY *
  ****************/
 
 /**
- * Post language filter for Polylang
+ * Post language filter for Polylang.
  *
- * @param $language
+ * @param $locale
  * @param $post_id
  *
  * @return string
  */
-function xmlsf_polylang_post_language_filter( $language, $post_id ) {
 
-	if ( function_exists('pll_get_post_language') ) {
-		$language = pll_get_post_language( $post_id, 'slug' );
-	}
-
-	return $language;
+function xmlsf_polylang_post_language_filter( $locale, $post_id ) {
+	return function_exists( 'pll_get_post_language' ) ? pll_get_post_language( $post_id, 'locale' ) : $locale;
 }
-add_filter( 'xmlsf_news_language', 'xmlsf_polylang_post_language_filter', 10, 2 );
 
 /**
- * Post language filter for WPML
+ * Post language filter for WPML.
  *
- * @param $language
+ * @param $locale
  * @param $post_id
  * @param $post_type
  *
  * @return string
  */
-function xmlsf_wpml_post_language_filter( $language, $post_id, $post_type = 'post' ) {
 
+function xmlsf_wpml_post_language_filter( $locale, $post_id, $post_type = 'post' ) {
  	global $sitepress;
-
-	if ( $sitepress )
-		$language = apply_filters( 'wpml_element_language_code', $language, array( 'element_id' => $post_id, 'element_type' => $post_type ) );
-
-	return $language;
+	return $sitepress ? apply_filters( 'wpml_element_language_code', $locale, array( 'element_id' => $post_id, 'element_type' => $post_type ) ) : $locale;
 }
-add_filter( 'xmlsf_news_language', 'xmlsf_wpml_post_language_filter', 10, 3 );
-
-/**
- * Parse language string
- *
- * @param string $lang unformatted language string
- *
- * @return string
- */
-function xmlsf_parse_language_string( $lang ) {
-
-	$lang = convert_chars( strtolower( strip_tags( $lang ) ) );
-
-	// no underscores
-	$lang = str_replace( '_', '-', $lang );
-
-	// no hyphens except...
-	if ( 0 === strpos( $lang, 'zh' ) ) {
-		$lang = strpos( $lang, 'hant' ) || strpos( $lang, 'hk' ) || strpos( $lang, 'tw' ) ? 'zh-tw' : 'zh-cn';
-	} else {
-		// explode on hyphen and use only first part
-		$expl = explode('-', $lang);
-		$lang = $expl[0];
-	}
-
-	return !empty($lang) ? $lang : 'en';
-}
-add_filter( 'xmlsf_news_language', 'xmlsf_parse_language_string', 99 );

@@ -44,13 +44,14 @@ if ( have_posts() ) :
 		<news:news>
 			<news:publication>
 				<news:name><?php
-					if( !empty($options['name']) )
+					if ( !empty($options['name']) ) {
 						echo apply_filters( 'xmlsf_news_publication_name', $options['name'] );
-					elseif(defined('XMLSF_GOOGLE_NEWS_NAME'))
+					} elseif ( defined('XMLSF_GOOGLE_NEWS_NAME') ) {
 						echo apply_filters( 'xmlsf_news_publication_name', XMLSF_GOOGLE_NEWS_NAME );
-					else
-						echo apply_filters( 'xmlsf_news_publication_name', get_bloginfo('name') ); ?></news:name>
-				<news:language><?php echo apply_filters( 'xmlsf_news_language', xmlsf()->blog_language(), $post->ID, $post->post_type ); ?></news:language>
+					} else {
+						echo apply_filters( 'xmlsf_news_publication_name', get_bloginfo( 'name' ) );
+					} ?></news:name>
+				<news:language><?php echo apply_filters( 'xmlsf_news_language', get_bloginfo( 'language' ), $post->ID, $post->post_type ); ?></news:language>
 			</news:publication>
 			<news:publication_date><?php echo get_date_from_gmt( $post->post_date_gmt, DATE_W3C ); ?></news:publication_date>
 			<news:title><?php echo apply_filters( 'xmlsf_news_title', get_the_title() ); ?></news:title>
@@ -66,7 +67,7 @@ if ( have_posts() ) :
 endif;
 
 if ( empty( $did_posts ) ) :
-	// No posts done? Then do at least the homepage to prevent error message in GWT.
+	// No posts done? Then do at least the homepage to prevent error message in Google Search Console.
 	?>
 	<url>
 		<loc><?php echo esc_url( home_url() ); ?></loc>

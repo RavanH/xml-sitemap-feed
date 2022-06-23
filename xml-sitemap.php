@@ -3,7 +3,7 @@
 Plugin Name: XML Sitemap & Google News
 Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
 Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
-Version: 5.4-beta-2
+Version: 5.4-beta-3
 Text Domain: xml-sitemap-feed
 Requires at least: 4.6
 Requires PHP: 5.6
@@ -14,7 +14,7 @@ Author URI: https://status301.net/
 define( 'XMLSF_VERSION', '5.3.3' );
 
 /**
- * Copyright 2021 RavanH
+ * Copyright 2022 RavanH
  * https://status301.net/
  * mailto: ravanhagen@gmail.com
 
@@ -57,7 +57,7 @@ define( 'XMLSF_VERSION', '5.3.3' );
  * xmlsf_root_data             -> Filters the root data urls (with priority and lastmod) array
  * xmlsf_custom_urls           -> Filters the custom urls array
  * xmlsf_custom_sitemaps       -> Filters the custom sitemaps array
- * xmlsf_post_language         -> Filters the post language tag used in the news sitemap.
+ * xmlsf_news_language         -> Filters the post language tag used in the news sitemap.
  *                                Passes variable $post_id; must return a 2 or 3 letter
  *                                language ISO 639 code with the exception of zh-cn and zh-tw.
  * xmlsf_post_types            -> Filters the post types array for the XML sitemaps index.
@@ -70,7 +70,7 @@ define( 'XMLSF_VERSION', '5.3.3' );
  * ACTIONS
  *
  * xmlsf_ping                  -> Fires when a search engine has been pinged. Carries four arguments:
- *                                search engine (google|bing), sitemap name, full ping url, ping repsonse code.
+ *                                search engine (google), sitemap name, full ping url, ping repsonse code.
  * xmlsf_generator             -> Fired before each sitemap's urlset tag.
  * xmlsf_urlset                -> Fired inside each sitemap's urlset tag. Can be used to
  *                                echo additional XML namespaces. Passes parameter home|post_type|taxonomy|custom
@@ -146,7 +146,7 @@ function xmlsf_init() {
 		new XMLSF_Admin();
 	}
 
-	$sitemaps = get_option( 'xmlsf_sitemaps' );
+	$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
 	// If nothing enabled, just disable core sitemap and bail.
 	if ( empty( $sitemaps ) ) {
@@ -176,13 +176,14 @@ function xmlsf_init() {
 
 		// Ping actions.
 		add_action( 'xmlsf_ping_google', 'xmlsf_ping', 10, 3 );
-		add_action( 'xmlsf_ping_bing', 'xmlsf_ping', 10, 3 );
+		add_action( 'xmlsf_ping_yandex', 'xmlsf_ping', 10, 3 );
 
-		if ( get_option( 'xmlsf_core_sitemap' ) ) {
+		if ( xmlsf_uses_core_server() ) {
+			// Extend core sitemap.
 			require XMLSF_DIR . '/inc/class.xmlsf-sitemap-core.php';
 			$xmlsf_sitemap = new XMLSF_Sitemap_Core( 'wp-sitemap.xml' );
 		} else {
-			// Remove core sitemap.
+			// Replace core sitemap.
 			remove_action( 'init', 'wp_sitemaps_get_server' );
 
 			// Sitemap title element filters.
@@ -296,14 +297,15 @@ function xmlsf_robots_txt( $output ) {
 	$output .= $robots_custom ? $robots_custom . PHP_EOL : '';
 
 	// SITEMAPS
-	$sitemaps = get_option( 'xmlsf_sitemaps' );
+	$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
+
 	$output .= PHP_EOL . '# XML Sitemap & Google News version ' . XMLSF_VERSION . ' - https://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
 	if ( '1' != get_option('blog_public') ) {
 		$output .= '# XML Sitemaps are disabled because of this site\'s privacy settings.' . PHP_EOL;
 	} elseif( ! is_array($sitemaps) || empty( $sitemaps ) ) {
 		$output .= '# No XML Sitemaps are enabled on this site.' . PHP_EOL;
 	} else {
-		$output .= ! empty( $sitemaps['sitemap'] ) && ! get_option( 'xmlsf_core_sitemap' ) ? 'Sitemap: ' . xmlsf_sitemap_url() . PHP_EOL : PHP_EOL;
+		$output .= ! empty( $sitemaps['sitemap'] ) && ! xmlsf_uses_core_server() ? 'Sitemap: ' . xmlsf_sitemap_url() . PHP_EOL : PHP_EOL;
 		$output .= ! empty( $sitemaps['sitemap-news'] ) ? 'Sitemap: ' . xmlsf_sitemap_url( 'news' ) . PHP_EOL : '';
 	}
 

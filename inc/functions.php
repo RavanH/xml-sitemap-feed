@@ -5,7 +5,7 @@
  *
  * @since 5.1
  *
- * @param $se google|bing
+ * @param $se google|yandex
  * @param $sitemap sitemap
  * @param $interval seconds
  *
@@ -14,7 +14,7 @@
 function xmlsf_ping( $se, $sitemap, $interval ) {
 	$se_urls = array(
 		'google' => 'https://www.google.com/ping',
-		'bing'   => 'https://www.bing.com/webmaster/ping.aspx'
+		'yandex' => 'https://webmaster.yandex.com/ping'
 	);
 
 	if ( ! array_key_exists( $se, $se_urls ) ) {
@@ -63,7 +63,8 @@ function xmlsf_sitemap_url( $sitemap = 'index', $args = array() ) {
 		return $wp_rewrite->using_permalinks() ? esc_url( trailingslashit( home_url() ) . 'sitemap-news.xml' ) : esc_url( trailingslashit( home_url() ) . '?feed=sitemap-news' );
 	}
 
-	if ( get_option( 'xmlsf_core_sitemap' ) ) {
+	// Use core function get_sitemap_url if using core sitemaps.
+	if ( xmlsf_uses_core_server() ) {
 		return get_sitemap_url( $sitemap );
 	}
 
@@ -108,7 +109,7 @@ function xmlsf_untrailingslash( $request ) {
 
 /**
  * Print XML Stylesheet
- * 
+ *
  * @param string|false $sitemap
  */
 function xmlsf_xml_stylesheet( $sitemap = false ) {
@@ -122,9 +123,9 @@ function xmlsf_xml_stylesheet( $sitemap = false ) {
 
 /**
  * Get XML Stylesheet URL
- * 
+ *
  * @since 5.4
- * 
+ *
  * @param string|false $sitemap
  * @return string|false
  */

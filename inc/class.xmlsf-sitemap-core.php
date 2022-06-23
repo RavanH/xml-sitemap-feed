@@ -37,6 +37,8 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 		} else {
 			// MAIN REQUEST filter.
 			add_filter( 'request', array( $this, 'filter_request' ) );
+			// FIX core sitemap bugs
+			add_filter( 'wp_sitemaps_posts_pre_url_list', array( $this, 'posts_url_list' ), 10, 3 );
 		}
 
 		// Add lastmod to index.
@@ -44,7 +46,7 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 		// Add lastmod & priority to authors.
 		add_filter( 'wp_sitemaps_users_entry',               array( $this, 'users_entry' ),        10, 2 );
 		// Add lastmod & priority to terms.
-		add_filter( 'wp_sitemaps_taxonomies_entry',          array( $this, 'taxonomies_entry' ),   10, 3 );
+		add_filter( 'wp_sitemaps_taxonomies_entry',          array( $this, 'taxonomies_entry' ),   10, 4 );
 		// Add lastmod & priority to posts.
 		add_filter( 'wp_sitemaps_posts_entry',               array( $this, 'posts_entry' ),        10, 3 );
 		add_filter( 'wp_sitemaps_posts_show_on_front_entry', array( $this, 'posts_show_on_front_entry' ) );
@@ -54,9 +56,9 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 		//TODO: for post types
 
 		// Maybe disable taxonomy or author sitemaps.
-		add_filter( 'wp_sitemaps_add_provider', array( $this, 'add_provider' ), 10, 2 );
+		add_filter( 'wp_sitemaps_add_provider',     array( $this, 'add_provider' ), 10, 2 );
 		// Maybe disable certain post type sitemaps.
-		add_filter( 'wp_sitemaps_post_types', array( $this, 'post_types' ) );
+		add_filter( 'wp_sitemaps_post_types',       array( $this, 'post_types' ) );
 		// Maybe exclude individual posts.
 		add_filter(	'wp_sitemaps_posts_query_args',	array( $this, 'posts_query_args' ) );
 
@@ -103,14 +105,10 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 
 		// Stylesheet
 		add_filter( 'wp_sitemaps_stylesheet_index_url', array( $this, 'stylesheet_index_url' ) );
-		add_filter( 'wp_sitemaps_stylesheet_url', array( $this, 'stylesheet_url' ) );
+		add_filter( 'wp_sitemaps_stylesheet_url',       array( $this, 'stylesheet_url' ) );
 
 		// NGINX HELPER PURGE URLS
 		add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
-
-		// FIX core sitemap bugs
-		add_filter( 'wp_sitemaps_posts_pre_url_list', array( $this, 'posts_url_list' ), 10, 3 );
-
 	}
 
 	/**
@@ -148,16 +146,16 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 			// Make sure we have the proper locale setting for calculations.
 			setlocale( LC_NUMERIC, 'C' );
 
-			// Debugging.
-			if ( ! is_admin() && current_user_can('manage_options') ) {
-				add_action( 'shutdown', array( $this, 'usage' ) );
-			}
-
 			// save a few db queries
 			//add_filter( 'split_the_query', '__return_false' ); // TODO test?
 
 			// Include public sitemap functions.
 			require_once XMLSF_DIR . '/inc/functions.public-sitemap.php';
+
+			// Debugging.
+			if ( ! is_admin() && current_user_can('manage_options') ) {
+				add_action( 'shutdown', 'xmlsf_usage' );
+			}
 
 			/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
 			//$request = apply_filters( 'xmlsf_request', $request );
@@ -179,8 +177,9 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 					wp_raise_memory_limit( 'wp-sitemap-posts-'.$subtype );
 
 					// Alter main query request parameters to fit wp-sitemap.
-					$request['orderby']                = 'ID';
-					$request['order']                  = 'ASC';
+					$request['orderby']                = 'modified';
+					$request['order']                  = 'DESC';
+					$request['ignore_sticky_posts']    = true;
 					$request['post_type']              = $subtype;
 					$request['posts_per_page']         = wp_sitemaps_get_max_urls( 'post' );
 					$request['post_status']            = array( 'publish' );
@@ -301,14 +300,20 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 	 *
 	 * @since 5.4
 	 *
-	 * @param  array  $entry
-	 * @param  obj    $term_object
-	 * @param  string $taxonomy
+	 * @param  array     $entry
+	 * @param  int|obj   $term         Either the term ID or the WP_Term object depending on query arguments (WP 5.9)
+	 * @param  string    $taxonomy
+	 * @param  obj|null  $term_object  The WP_Term object, available starting WP 6.0 otherwise null
 	 *
-	 * @return array  $entry
+	 * @return array     $entry
 	 */
-	public function taxonomies_entry( $entry, $term_object, $taxonomy )
+	public function taxonomies_entry( $entry, $term, $taxonomy, $term_object = null )
 	{
+		// Make sure we have a WP_Term object.
+		if ( null === $term_object ) {
+			$term_object = get_term( $term );
+		}
+
 		// Add priority.
 		$entry['priority'] = xmlsf_get_term_priority( $term_object );
 
@@ -397,15 +402,18 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 		switch( $object_type ) {
 			case 'users':
 				$settings = (array) get_option( 'xmlsf_author_settings' );
-				return ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
+				$max_urls = ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
+				break;
 
 			case 'term':
 				$settings = (array) get_option( 'xmlsf_taxonomy_settings' );
-				return ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
+				$max_urls = ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
+				break;
 
 			case 'post':
-				$settings = (array) get_option( 'xmlsf_post_type_settings' );
-				return ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
+			default:
+				$settings = (array) get_option( 'xmlsf_general_settings' );
+				$max_urls = ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
 		}
 
 		return $max_urls;
@@ -531,54 +539,36 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 	 *
 	 * @return array $urls
 	 */
-	public function nginx_helper_purge_urls( $urls = array(), $redis = false )
+	public function nginx_helper_purge_urls( $urls = array(), $wildcard = false )
 	{
-		if ( $redis ) {
+		if ( $wildcard ) {
 			// wildcard allowed, this makes everything simple
 			$urls[] = '/wp-sitemap*.xml';
 		} else {
 			// no wildcard, go through the motions
 			$urls[] = '/wp-sitemap.xml';
-			$urls[] = '/wp-sitemap-users.xml';
 			$urls[] = '/wp-sitemap-custom.xml';
 
-			// TODO check if nginx helper does not already purge wp-sitemap urls on its own...
-			// if not: use wp_get_sitemap_providers for array of provider names (where array key is provider name)
+			// TODO use wp_get_sitemap_providers for array of provider names (where array key is provider name)
 			// then use $provider->get_sitemap_type_data() for nested arrays with max number of sitemaps for each subtype
 			// then use that data to build urls... /wp-sitemap-PROVIDER-SUBTYPENAME-PAGENUM++.xml
+
+			// Include public sitemap functions.
+			require_once XMLSF_DIR . '/inc/functions.public-sitemap.php';
+
+			$sitemaps = wp_sitemaps_get_server();
+			foreach ( $sitemaps->index->get_sitemap_list() as $sitemap ) {
+				// Add each element loc value.
+				$urls[] = parse_url( $sitemap['loc'], PHP_URL_PATH);
+			}
+		}
+
+		if ( defined('WP_DEBUG') && WP_DEBUG ) {
+			error_log( 'NGINX Helper purge urls array:' );
+			error_log( print_r( $urls, true ) );
 		}
 
 		return $urls;
-	}
-
-	/**
-	 * Usage info for debugging.
-	 *
-	 * @since 5.4
-	 */
-	function usage() {
-		if ( defined('WP_DEBUG') && WP_DEBUG ) {
-			global $wpdb, $EZSQL_ERROR;
-			$num = get_num_queries();
-			$mem = function_exists('memory_get_peak_usage') ? round( memory_get_peak_usage()/1024/1024, 2 ) . 'M' : false;
-			$limit = ini_get('memory_limit');
-			// query errors
-			$errors = '';
-			if ( is_array($EZSQL_ERROR) && count($EZSQL_ERROR) ) {
-				$i = 1;
-				foreach ( $EZSQL_ERROR AS $e ) {
-					$errors .= PHP_EOL . $i . ': ' . implode(PHP_EOL, $e) . PHP_EOL;
-					$i += 1;
-				}
-			}
-			// saved queries
-			$saved = '';
-			if ( defined('SAVEQUERIES') && SAVEQUERIES ) {
-				$saved .= PHP_EOL . print_r($wpdb->queries, true);
-			}
-
-			require XMLSF_DIR . '/views/_usage.php';
-		}
 	}
 
 	/**

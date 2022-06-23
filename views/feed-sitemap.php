@@ -7,7 +7,7 @@
 
 if ( ! defined( 'WPINC' ) ) die;
 
-// do xml tag via echo or SVN parser is going to freak out
+// Do xml tag via echo or SVN parser is going to freak out.
 echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>'; ?>
 <?php xmlsf_xml_stylesheet(); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
@@ -21,30 +21,25 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>'; ?>
 	</sitemap>
 <?php
 
-// public post types
-$post_types = (array) apply_filters( 'xmlsf_post_types', get_option( 'xmlsf_post_types', array() ) );
-if ( ! empty( $post_types ) ) :
-	foreach ( $post_types as $post_type => $settings ) {
-		if ( empty( $settings['active'] ) || ! post_type_exists( $post_type ) )
-			continue;
+// Public post types.
+$post_types = xmlsf_get_post_types();
+foreach ( $post_types as $post_type => $settings ) :
+	$archive = isset( $settings['archive'] ) ? $settings['archive'] : '';
+	$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
 
-		$archive = isset( $settings['archive'] ) ? $settings['archive'] : '';
-
-		$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
-
-		foreach ( $archive_data as $url => $lastmod ) {
+	foreach ( $archive_data as $url => $lastmod ) {
 ?>
 	<sitemap>
 		<loc><?php echo $url; ?></loc>
 		<lastmod><?php echo $lastmod; ?></lastmod>
 	</sitemap>
 <?php
-		}
 	}
-endif;
+endforeach;
 
-// public taxonomies
-foreach ( xmlsf_get_taxonomies() as $taxonomy ) : ?>
+// Public taxonomies.
+$taxonomies = xmlsf_get_taxonomies();
+foreach ( $taxonomies as $taxonomy ) : ?>
 	<sitemap>
 		<loc><?php echo xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ); ?></loc>
 <?php if ( $lastmod = xmlsf_get_taxonomy_modified( $taxonomy ) ) { ?>
@@ -54,7 +49,7 @@ foreach ( xmlsf_get_taxonomies() as $taxonomy ) : ?>
 <?php
 endforeach;
 
-// authors
+// Authors.
 if ( xmlsf_do_authors() ) : ?>
 	<sitemap>
 		<loc><?php echo xmlsf_sitemap_url( 'author' ); ?></loc>
@@ -63,7 +58,7 @@ if ( xmlsf_do_authors() ) : ?>
 <?php
 endif;
 
-// custom URLs sitemap
+// Custom URLs sitemap.
 if ( apply_filters( 'xmlsf_custom_urls', get_option( 'xmlsf_urls' ) ) ) :
 ?>
 	<sitemap>
@@ -72,7 +67,7 @@ if ( apply_filters( 'xmlsf_custom_urls', get_option( 'xmlsf_urls' ) ) ) :
 <?php
 endif;
 
-// custom sitemaps
+// Custom sitemaps.
 $custom_sitemaps = apply_filters( 'xmlsf_custom_sitemaps', get_option( 'xmlsf_custom_sitemaps', array() ) );
 if ( is_array( $custom_sitemaps ) ) :
 	foreach ( $custom_sitemaps as $url ) {

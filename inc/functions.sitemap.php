@@ -1,6 +1,56 @@
 <?php
 
 /**
+ * Are we using the WP core server?
+ * Returns whether the WordPress core sitemap server name used or not.
+ *
+ * @since 5.4
+ * @param void
+ * @return bool
+ */
+function xmlsf_uses_core_server() {
+	// SimpeXML not available.
+	if ( ! class_exists( 'SimpleXMLElement' ) ) {
+		return false;
+	}
+
+	// Sitemap disabled.
+	$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
+	if ( empty( $sitemaps['sitemap'] ) ) {
+		return false;
+	}
+
+	// Check settings.
+	$settings = (array) get_option( 'xmlsf_general_settings', array() );
+	if ( ! empty( $settings['server'] ) && 'core' === $settings['server'] ) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Get post types.
+ * Returns an array of taxonomy names to be included in the index.
+ *
+ * @since 5.4
+ * @param void
+ * @return array
+ */
+function xmlsf_get_post_types() {
+	$post_types = (array) apply_filters( 'xmlsf_post_types', get_option( 'xmlsf_post_types', array() ) );
+
+	foreach( $post_types as $post_type => &$settings ) {
+		if ( empty( $settings['active'] ) || ! post_type_exists( $post_type ) ) {
+			unset( $post_types[$post_type] );
+		}
+	}
+	unset( $settings );
+
+	return $post_types;
+}
+
+/**
  * Get taxonomies
  * Returns an array of taxonomy names to be included in the index
  *
@@ -9,7 +59,6 @@
  * @return array
  */
 function xmlsf_get_taxonomies() {
-
 	$taxonomy_settings = get_option('xmlsf_taxonomy_settings');
 
 	$tax_array = array();
@@ -33,7 +82,6 @@ function xmlsf_get_taxonomies() {
 	}
 
 	return $tax_array;
-
 }
 
 /**
@@ -169,6 +217,37 @@ function xmlsf_active_post_types() {
 	return array_filter( $public, function($post_type) use($settings) { return isset( $settings[$post_type] ) && ! empty( $settings[$post_type]['active'] ); } );
 }
 
+/**
+ * Usage info for debugging
+ *
+ * @since
+ * @return void
+ */
+function xmlsf_usage() {
+	if ( defined('WP_DEBUG') && WP_DEBUG ) {
+		global $wpdb, $EZSQL_ERROR;
+		$num = get_num_queries();
+		$mem = function_exists('memory_get_peak_usage') ? round( memory_get_peak_usage()/1024/1024, 2 ) . 'M' : false;
+		$limit = ini_get('memory_limit');
+		// query errors
+		$errors = '';
+		if ( is_array($EZSQL_ERROR) && count($EZSQL_ERROR) ) {
+			$i = 1;
+			foreach ( $EZSQL_ERROR AS $e ) {
+				$errors .= PHP_EOL . $i . ': ' . implode(PHP_EOL, $e) . PHP_EOL;
+				$i += 1;
+			}
+		}
+		// saved queries
+		$saved = '';
+		if ( defined('SAVEQUERIES') && SAVEQUERIES ) {
+			$saved .= PHP_EOL . print_r($wpdb->queries, true);
+		}
+
+		require XMLSF_DIR . '/views/_usage.php';
+	}
+}
+
 /* -------------------------------------
  *      MISSING WORDPRESS FUNCTIONS
  * ------------------------------------- */
@@ -188,17 +267,17 @@ function xmlsf_active_post_types() {
  */
 if ( ! function_exists( '_get_post_time' ) ) {
 	function _get_post_time( $timezone, $field, $post_type = 'any', $which = 'last', $m = '', $w = '' ) {
-   
+
 	   global $wpdb;
-   
+
 	   if ( !in_array( $field, array( 'date', 'modified' ) ) ) {
 		   return false;
 	   }
-   
+
 	   $timezone = strtolower( $timezone );
-   
+
 	   $m = preg_replace('|[^0-9]|', '', $m);
-   
+
 	   if ( ! empty( $w ) ) {
 		   // when a week number is set make sure 'm' is year only
 		   $m = substr( $m, 0, 4 );
@@ -207,16 +286,16 @@ if ( ! function_exists( '_get_post_time' ) ) {
 	   } else {
 		   $key = "{$which}post{$field}{$m}.{$w}:$timezone";
 	   }
-   
+
 	   if ( 'any' !== $post_type ) {
 		   $key .= ':' . sanitize_key( $post_type );
 	   }
-   
+
 	   $date = wp_cache_get( $key, 'timeinfo' );
 	   if ( false !== $date ) {
 		   return $date;
 	   }
-   
+
 	   if ( $post_type === 'any' ) {
 		   $post_types = get_post_types( array( 'public' => true ) );
 		   array_walk( $post_types, array( &$wpdb, 'escape_by_ref' ) );
@@ -233,9 +312,9 @@ if ( ! function_exists( '_get_post_time' ) ) {
 			   return false;
 		   $post_types = "'" . addslashes($post_type) . "'";
 	   }
-   
+
 	   $where = "post_status='publish' AND post_type IN ({$post_types}) AND post_date_gmt";
-   
+
 	   // If a period is specified in the querystring, add that to the query
 	   if ( !empty($m) ) {
 		   $where .= " AND YEAR(post_date)=" . substr($m, 0, 4);
@@ -250,9 +329,9 @@ if ( ! function_exists( '_get_post_time' ) ) {
 		   $week     = _wp_mysql_week( 'post_date' );
 		   $where .= " AND $week=$w";
 	   }
-   
+
 	   $order = ( $which == 'last' ) ? 'DESC' : 'ASC';
-   
+
 	   /* CODE SUGGESTION BY Frédéric Demarle
 	   * to make this language aware:
 	   "SELECT post_{$field}_gmt FROM $wpdb->posts" . PLL()->model->post->join_clause()
@@ -263,28 +342,28 @@ if ( ! function_exists( '_get_post_time' ) ) {
 		   case 'gmt':
 			   $date = $wpdb->get_var("SELECT post_{$field}_gmt FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
 			   break;
-   
+
 		   case 'blog':
 			   $date = $wpdb->get_var("SELECT post_{$field} FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
 			   break;
-   
+
 		   case 'server':
 			   $add_seconds_server = date('Z');
 			   $date = $wpdb->get_var("SELECT DATE_ADD(post_{$field}_gmt, INTERVAL '$add_seconds_server' SECOND) FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
 			   break;
 	   }
-   
+
 	   if ( $date ) {
 		   wp_cache_set( $key, $date, 'timeinfo' );
-   
+
 		   return $date;
 	   }
-   
+
 	   return false;
-   
+
 	}
 }
-   
+
 /**
  * Retrieve the date that the first post/page was published.
  * Variation of function get_lastpostdate, uses _get_post_time
@@ -300,9 +379,9 @@ if ( ! function_exists( '_get_post_time' ) ) {
  */
 if ( ! function_exists( 'get_firstpostdate' ) ) {
 	function get_firstpostdate( $timezone = 'server', $post_type = 'any' ) {
-   
+
 	   return apply_filters( 'get_firstpostdate', _get_post_time( $timezone, 'date', $post_type, 'first' ), $timezone );
-   
+
 	}
 }
 
@@ -324,8 +403,8 @@ if ( ! function_exists( 'get_firstpostdate' ) ) {
  */
 if ( ! function_exists( 'get_lastmodified' ) ) {
 	function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '', $w = '' ) {
-   
+
 	   return apply_filters( 'get_lastmodified', _get_post_time( $timezone, 'modified', $post_type, 'last', $m, $w ), $timezone );
-   
+
 	}
 }

@@ -23,10 +23,10 @@ abstract class XMLSF_Sitemap
 	 * @var array
 	 */
 	public $rewrite_rules = array();
-	
+
 	/**
 	 * Add sitemap rewrite rules
-	 * 
+	 *
 	 * Hooked into rewrite_rules_array filter
 	 *
 	 * @param array $rewrite_rules
@@ -42,7 +42,7 @@ abstract class XMLSF_Sitemap
 
 		return $rewrite_rules;
 	}
-	
+
 	/**
 	 * Do pings, hooked to transition post status
 	 *
@@ -247,12 +247,11 @@ abstract class XMLSF_Sitemap
 
 		$post_type = $wp_query->get( 'post_type' );
 
-		if ( empty($post_type) || ! is_string($post_type) ) {
-			set_transient( 'xmlsf_prefetch_post_meta_failed', 'Unexpected post type in WP_Query: '.print_r($post_type, true) );
+		// Bail if unexpected post type.
+		if ( empty( $post_type ) || ! is_string( $post_type ) || ! isset( $this->post_types[$post_type] ) ) {
+			//set_transient( 'xmlsf_prefetch_post_meta_failed', 'Unexpected post type in WP_Query: ' . print_r( $post_type, true ) );
+			return;
 		};
-
-		// bail if post type not set
-		if ( ! isset($this->post_types[$post_type]) ) return;
 
 		$y = $wp_query->get( 'year' );
 		$m = $wp_query->get( 'm' );
@@ -260,7 +259,7 @@ abstract class XMLSF_Sitemap
 
 		// if image tag active then prefetch images
 		if (
-			isset($this->post_types[$post_type]['tags']) &&
+			isset( $this->post_types[$post_type]['tags'] ) &&
 			is_array( $this->post_types[$post_type]['tags'] ) &&
 			!empty( $this->post_types[$post_type]['tags']['image'] )
 		) {
@@ -289,7 +288,7 @@ abstract class XMLSF_Sitemap
 		}
 
 		// if update_lastmod_on_comments active then prefetch comments
-		if ( !empty($this->post_types[$post_type]['update_lastmod_on_comments']) ) {
+		if ( ! empty( $this->post_types[$post_type]['update_lastmod_on_comments'] ) ) {
 			$primed = (array) get_option( 'xmlsf_comments_meta_primed', array() );
 
 			if (

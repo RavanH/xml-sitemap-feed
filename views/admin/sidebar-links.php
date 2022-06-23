@@ -1,4 +1,4 @@
-<h3><span class="dashicons dashicons-admin-links"></span> <?php echo translate('Links'); ?></h3>
+<h3><span class="dashicons dashicons-admin-links"></span> <?php echo translate( 'Links' ); ?></h3>
 <ul>
 	<li>
 		<a href="https://search.google.com/search-console" target="_blank"><?php _e( /* Translators: Site title https://search.google.com/search-console */ 'Google Search Console', 'xml-sitemap-feed' ); ?></a>

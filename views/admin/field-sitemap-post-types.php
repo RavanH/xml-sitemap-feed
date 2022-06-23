@@ -11,7 +11,7 @@
 	</p>
 
 	<?php
-	if ( empty($obj->hierarchical) && ! get_option( 'xmlsf_core_sitemap' ) ) {
+	if ( empty($obj->hierarchical) && ! xmlsf_uses_core_server() ) {
 	$archive = isset($options[$obj->name]['archive']) ? $options[$obj->name]['archive'] : 'yearly';
 	?>
 	<p>
@@ -62,7 +62,7 @@
 	</p>
 
 	<?php
-	if ( ! get_option( 'xmlsf_core_sitemap' ) ) {
+	if ( ! xmlsf_uses_core_server() ) {
 	?>
 	<p>
 		<label>

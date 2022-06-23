@@ -61,25 +61,35 @@ class XMLSF_Sitemap_News
 
 		/** IT'S A NEWS SITEMAP */
 
-		// set the sitemap conditional flag
+		// Set the sitemap conditional flags.
 		$xmlsf->is_sitemap = true;
-		// set the news sitemap conditional flag
 		$xmlsf->is_news = true;
 
-		// save a few db queries
+		// Include public functions.
+		require_once XMLSF_DIR . '/inc/functions.public.php';
+		require_once XMLSF_DIR . '/inc/functions.public-sitemap-news.php';
+
+		// Save a few db queries.
 		add_filter( 'split_the_query', '__return_false' );
 
-		// make sure we have the proper locale setting for calculations
+		// Make sure we have the proper locale setting for calculations.
 		setlocale( LC_NUMERIC, 'C' );
 
-		// include shared public functions
-		require_once XMLSF_DIR . '/inc/functions.public-shared.php';
-
-		// Generator comments
+		// Generator comments.
 		add_action( 'xmlsf_generator', 'xmlsf_generator' );
 
-		// REPSONSE HEADERS filtering
+		// REPSONSE HEADERS filtering.
 		add_filter( 'wp_headers', 'xmlsf_headers' );
+
+		// Language filters.
+		add_filter( 'xmlsf_news_language', 'xmlsf_polylang_post_language_filter', 10, 2 );
+		add_filter( 'xmlsf_news_language', 'xmlsf_wpml_post_language_filter', 10, 3 );
+		add_filter( 'xmlsf_news_language', 'xmlsf_parse_language_string', 99 );
+
+		// Disable caching.
+		add_filter( 'nocache_headers', 'xmlsf_news_nocache_headers' );
+		defined('DONOTCACHEPAGE') || define('DONOTCACHEPAGE', true);
+		defined('DONOTCACHEDB') || define('DONOTCACHEDB', true);
 
 		/** COMPRESSION */
 
@@ -105,16 +115,9 @@ class XMLSF_Sitemap_News
 		$request['post_status'] = 'publish';
 		$request['no_found_rows'] = true; // found rows calc is slow and only needed for pagination
 
-		// SPECIFIC REQUEST FILTERING AND PREPARATIONS
-
-		// include public news functions
-		require_once XMLSF_DIR . '/inc/functions.public-sitemap-news.php';
-
-		// REPSONSE HEADERS filtering
-		add_filter( 'nocache_headers', 'xmlsf_news_nocache_headers' );
-
 		/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
 		$request = apply_filters( 'xmlsf_news_request', $request );
+
 		/**
 		 * Developers: add your actions that should run when a news sitemap request is found with:
 		 *
@@ -126,17 +129,21 @@ class XMLSF_Sitemap_News
 		 * xmlsf_bbpress_request - bbPress compatibility
 		 */
 
-		// prepare for news and return modified request
-		$options = get_option( 'xmlsf_news_tags' );
-		$post_types = is_array($options) && !empty($options['post_type']) ? $options['post_type'] : array('post');
-		$post_types = apply_filters( 'xmlsf_news_post_types', $post_types);
-
-		// disable caching
+		// No caching.
 		$request['cache_results'] = false;
-		if ( ! defined('DONOTCACHEPAGE') ) define('DONOTCACHEPAGE', true);
-		if ( ! defined('DONOTCACHEDB') ) define('DONOTCACHEDB', true);
 
-		// set up query filters
+		// Post type(s).
+		$options = (array) get_option( 'xmlsf_news_tags' );
+		$post_types = ! empty( $options['post_type'] ) ? $options['post_type'] : array('post');
+		$post_types = apply_filters( 'xmlsf_news_post_types', $post_types );
+		$request['post_type'] = $post_types;
+
+		// Categories.
+		if ( is_array($options) && isset($options['categories']) && is_array($options['categories']) ) {
+			$request['cat'] = implode( ',', $options['categories'] );
+		}
+
+		// Set up query filters.
 		$live = false;
 		foreach ( $post_types as $post_type ) {
 			if ( strtotime( get_lastpostdate( 'gmt', $post_type ) ) > strtotime( gmdate( 'Y-m-d H:i:s', strtotime('-48 hours') ) ) ) {
@@ -144,7 +151,6 @@ class XMLSF_Sitemap_News
 				break;
 			}
 		}
-
 		if ( $live ) {
 			add_filter( 'post_limits', function() { return 'LIMIT 0, 1000';	} );
 			add_filter( 'posts_where', 'xmlsf_news_filter_where', 10, 1 );
@@ -152,20 +158,12 @@ class XMLSF_Sitemap_News
 			add_filter( 'post_limits', function() { return 'LIMIT 0, 1'; } );
 		}
 
-		// post type
-		$request['post_type'] = $post_types;
-
-		// categories
-		if ( is_array($options) && isset($options['categories']) && is_array($options['categories']) ) {
-			$request['cat'] = implode( ',', $options['categories'] );
-		}
-
 		/** GENERAL MISC. PREPARATIONS */
 
-		// prevent public errors breaking xml
+		// Prevent public errors breaking xml.
 		@ini_set( 'display_errors', 0 );
 
-		// Remove filters to prevent stuff like cdn urls for xml stylesheet and images
+		// Remove filters to prevent stuff like cdn urls for xml stylesheet and images.
 		remove_all_filters( 'plugins_url' );
 		remove_all_filters( 'wp_get_attachment_url' );
 		remove_all_filters( 'image_downsize' );

@@ -35,19 +35,23 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd<?php echo $image_schema; ?>">
 <?php
 global $wp_query, $post;
-// loop away!
+
+// Loop away!
 if ( have_posts() ) :
+	$wp_query->in_the_loop = true;
 	while ( have_posts() ) :
-		// don't do the_post() here to avoid expensive setup_postdata(), just do:
-		$wp_query->in_the_loop = true;
+		// Don't do the_post() here to avoid expensive setup_postdata(), just do:
 		$post = $wp_query->next_post();
 
-		// check if page is in the exclusion list (like front page or post meta)
+		// Check if page is in the exclusion list (like front page or post meta)
 		// or if we are dealing with an external URL :: Thanks to Francois Deschenes :)
-		if ( $post->ID == get_option('page_on_front')
-			|| apply_filters( 'xmlsf_excluded', get_post_meta( $post->ID, '_xmlsf_exclude', true ), $post->ID )
-			|| !xmlsf_is_allowed_domain( get_permalink() )
-		) continue;
+		if (
+			$post->ID == get_option('page_on_front') ||
+			apply_filters( 'xmlsf_excluded', get_post_meta( $post->ID, '_xmlsf_exclude', true ), $post->ID ) ||
+			! xmlsf_is_allowed_domain( get_permalink() )
+		) {
+			continue;
+		}
 
 		$did_posts = true;
 
@@ -80,6 +84,7 @@ if ( have_posts() ) :
  	</url>
 <?php	do_action( 'xmlsf_url_after', 'post_type' );
 	endwhile;
+	$wp_query->in_the_loop = false;
 endif;
 
 if ( empty( $did_posts ) ) :

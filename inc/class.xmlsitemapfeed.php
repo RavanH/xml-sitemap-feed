@@ -44,12 +44,6 @@ class XMLSitemapFeed {
 	public $is_news = false;
 
 	/**
-	 * Default language
-	 * @var null/string $blog_language
-	 */
-	public $blog_language = null;
-
-	/**
 	 * Allowed domain names
 	 *
 	 * @var null|array $domains
@@ -70,7 +64,6 @@ class XMLSitemapFeed {
 	 * @var array
 	 */
 	private $disabled_taxonomies = array(
-		'post_format',
 		'product_shipping_class'
 	);
 
@@ -135,53 +128,52 @@ class XMLSitemapFeed {
 			);
 
 			$this->defaults = array(
-				'sitemaps' => $sitemaps,
-				'core_sitemap' => class_exists( 'SimpleXMLElement' ) ? '1' : '',
-				'post_types' => array(
+				'sitemaps'          => $sitemaps,
+				'general_settings'  => array(
+					'server' => class_exists( 'SimpleXMLElement' ) ? 'core' : 'plugin',
+					'limit'  => '2000'
+				),
+				'post_types'        => array(
 					'post' => array(
-						'active' => '1',
-						'archive' => 'yearly',
-						'priority' => '0.7',
+						'active'           => '1',
+						'archive'          => 'yearly',
+						'priority'         => '0.7',
 						'dynamic_priority' => '',
-						'tags' => array(
+						'tags'             => array(
 							'image' => 'featured'
 							/*'video' => ''*/
 						)
 					),
 					'page' => array(
-						'active' => '1',
-						'priority' => '0.5',
+						'active'           => '1',
+						'priority'         => '0.5',
 						'dynamic_priority' => '',
-						'tags' => array(
+						'tags'             => array(
 							'image' => 'attached'
 							/*'video' => ''*/
 						)
 					)
 				),
-				'post_type_settings' => array(
-					'limit' => '2000'
-				),
-				'taxonomies' => '',
+				'taxonomies'        => '',
 				'taxonomy_settings' => array(
 					'active' => '',
 					'priority' => '0.3',
 					'dynamic_priority' => '',
-					'limit' => '2000'
+					'limit' => ''
 				),
-				'authors' => '',
-				'author_settings' => array(
-					'active' => '1',
+				'authors'           => '',
+				'author_settings'   => array(
+					'active'   => '1',
 					'priority' => '0.3',
-					'limit' => '2000'
+					'limit'    => ''
 				),
-				'ping' => array(
-					'google',
-					'bing'
+				'ping'              => array(
+					'google'
 				),
-				'robots' => '',
-				'urls' => '',
-				'custom_sitemaps' => '',
-				'domains' => ''
+				'robots'            => '',
+				'urls'              => '',
+				'custom_sitemaps'   => '',
+				'domains'           => ''
 			);
 
 		endif;
@@ -197,7 +189,7 @@ class XMLSitemapFeed {
 
 	/**
 	 * Get domain
-	 * 
+	 *
 	 * @return array
 	 */
 	public function get_allowed_domains()
@@ -216,20 +208,6 @@ class XMLSitemapFeed {
 		}
 
 		return $this->domains;
-	}
-
-	/**
-	 * Get scheme
-	 * @return string
-	 */
-	public function blog_language()
-	{
-		if ( $this->blog_language === null ) {
-			// get site language for default language
-			$this->blog_language = xmlsf_parse_language_string( get_bloginfo('language') );
-		}
-
-		return $this->blog_language;
 	}
 
 	/**

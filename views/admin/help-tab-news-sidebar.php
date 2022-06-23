@@ -3,10 +3,10 @@
 </p>
 <ul>
 	<li>
-		<a href="https://support.google.com/googlenews/" target="_blank"><?php _e( /* Translators: Site title https://support.google.com/googlenews/ */ 'Google News Help Center', 'xml-sitemap-feed' ); ?></a>
+		<a href="https://support.google.com/news/publisher-center/" target="_blank"><?php _e( /* Translators: Site title https://support.google.com/news/publisher-center/ */ 'Publisher Center Help', 'xml-sitemap-feed' ); ?></a>
 	</li>
 	<li>
-		<a href="https://support.google.com/googlenews/community" target="_blank"><?php _e( /* Translators: Forum title https://support.google.com/googlenews/community */ 'Publisher Help Forum', 'xml-sitemap-feed' ); ?></a>
+		<a href="https://support.google.com/news/publisher-center/threads" target="_blank"><?php _e( /* Translators: Forum title https://support.google.com/news/publisher-center/threads */ 'Google Publisher Center Community', 'xml-sitemap-feed' ); ?></a>
 	</li>
 </ul>
 <p>
