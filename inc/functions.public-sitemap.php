@@ -87,11 +87,10 @@ function xmlsf_get_user_modified( $user ) {
 	$posts = get_posts(
 		array(
 			'author' => $user->ID,
-			'post_type' => xmlsf_active_post_types(),
+			'post_type' => apply_filters( 'xmlsf_author_post_type', 'post' ), // Filter allows to add (array) or change post type when author archive page shows custom post types.
 			'post_status' => 'publish',
 			'posts_per_page' => 1,
-			'order' => 'DESC',
-			'orderby ' => 'post_date',
+			'numberposts' => 1,
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
 			'update_cache' => false,
@@ -106,7 +105,6 @@ function xmlsf_get_user_modified( $user ) {
  * Do tags
  *
  * @param string $type
- *xmlsf_do_tags
  * @return array
  */
 function xmlsf_do_tags( $type = 'post' ) {
@@ -137,6 +135,7 @@ function xmlsf_do_authors() {
 
 /**
  * Get front pages
+ * 
  * @return array
  */
 function xmlsf_get_frontpages() {
@@ -158,6 +157,7 @@ function xmlsf_get_frontpages() {
 
 /**
  * Get blog_pages
+ * 
  * @return array
  */
 function xmlsf_get_blogpages() {

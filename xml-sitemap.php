@@ -33,7 +33,7 @@ define( 'XMLSF_VERSION', '5.3.3' );
  *  AVAILABLE HOOKS
  * --------------------
  *
- * FILTERS
+ * FILTERS *
  *
  * xmlsf_defaults              -> Filters the default array values for different option groups.
  * xmlsf_request               -> Filters request when an xml sitemap request is found,
@@ -65,9 +65,11 @@ define( 'XMLSF_VERSION', '5.3.3' );
  *                                Must return a float value between 0.1 and 1.0
  * xmlsf_term_priority         -> Filters a taxonomy term priority value. Passes variables $priority and $term->slug.
  *                                Must return a float value between 0.1 and 1.0
+ * xmlsf_author_post_type      -> Filters the post type that is used to get author archive lastmod date. Passes string 'post'.
+ *                                Must return a string or an array of post type slugs.
  * xmlsf_news_post_types       -> Filters the post types array for the Google News sitemap settings page.
  *
- * ACTIONS
+ * ACTIONS *
  *
  * xmlsf_ping                  -> Fires when a search engine has been pinged. Carries four arguments:
  *                                search engine (google), sitemap name, full ping url, ping repsonse code.

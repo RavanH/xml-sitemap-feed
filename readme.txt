@@ -311,6 +311,7 @@ TODO respond 404 for non existant (or deactivated) sitemaps?
 * FIX: Nginx Helper purge urls
 * Filter domains in taxonomy and author sitemaps
 * NEW: xmlsf_generator action hook
+* NEW: xmlsf_author_post_type filter 
 * FIX: Bing ping response code 410
 * Dropping Bing from Ping Services awaiting IndexNow support
 
