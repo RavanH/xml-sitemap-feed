@@ -1,6 +1,6 @@
 <?php
 
-class XMLSF_Admin_Sitemap extends XMLSF_Admin
+class XMLSF_Admin_Sitemap
 {
 	/**
 	* Holds the values to be used in the fields callbacks
@@ -97,7 +97,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 			}
 
 			// check wpseo sitemap option
-			if ( !in_array( 'wpseo_sitemap', parent::$dismissed ) ) {
+			if ( !in_array( 'wpseo_sitemap', XMLSF_Admin::$dismissed ) ) {
 				$wpseo = get_option( 'wpseo' );
 				if ( !empty( $wpseo['enable_xml_sitemap'] ) ) {
 					add_action(
@@ -130,7 +130,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 
 
 			// check seopress sitemap option
-			if ( !in_array( 'seopress_sitemap', parent::$dismissed ) ) {
+			if ( !in_array( 'seopress_sitemap', XMLSF_Admin::$dismissed ) ) {
 				$seopress_xml_sitemap = get_option( 'seopress_xml_sitemap_option_name' );
 				if ( ! empty( $seopress_toggle['toggle-xml-sitemap'] ) && !empty( $seopress_xml_sitemap['seopress_xml_sitemap_general_enable'] ) ) {
 					add_action(
@@ -160,7 +160,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 			}
 
 			// check rank math sitemap option
-			if ( !in_array( 'rankmath_sitemap', parent::$dismissed ) ) {
+			if ( !in_array( 'rankmath_sitemap', XMLSF_Admin::$dismissed ) ) {
 				$rankmath_modules = (array) get_option( 'rank_math_modules' );
 				if ( in_array( 'sitemap', $rankmath_modules ) ) {
 					add_action(
@@ -174,7 +174,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		// All in One SEO Pack conflict notices
 		if ( is_plugin_active('all-in-one-seo-pack/all_in_one_seo_pack.php') ) {
 			// check aioseop sitemap module
-			if ( !in_array( 'aioseop_sitemap', parent::$dismissed ) ) {
+			if ( !in_array( 'aioseop_sitemap', XMLSF_Admin::$dismissed ) ) {
 				$aioseop_options = (array) get_option( 'aioseop_options' );
 
 				if ( isset( $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) && "on" === $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) {
@@ -192,7 +192,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 		//
 		if ( is_plugin_active('autodescription/autodescription.php') ) {
 			// check sfw sitemap module
-			if ( !in_array( 'seoframework_sitemap', parent::$dismissed ) ) {
+			if ( !in_array( 'seoframework_sitemap', XMLSF_Admin::$dismissed ) ) {
 				$sfw_options = (array) get_option( 'autodescription-site-settings' );
 
 				if ( ! empty( $sfw_options['sitemaps_output'] ) ) {

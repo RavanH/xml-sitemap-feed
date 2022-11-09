@@ -1,14 +1,14 @@
 <?php
 
-class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
+class XMLSF_Admin_Sitemap_News
 {
 	/**
-	* Holds the values to be used in the fields callbacks
+	* Holds the values to be used in the fields callbacks.
 	*/
 	private $options;
 
 	/**
-	* Start up
+	* Start up.
 	*/
 	public function __construct()
 	{
