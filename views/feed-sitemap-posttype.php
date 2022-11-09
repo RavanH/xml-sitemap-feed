@@ -7,32 +7,15 @@
 
 if ( ! defined( 'WPINC' ) ) die;
 
-extract ( xmlsf_do_tags( get_query_var('post_type') ) );
-
 global $xmlsf_sitemap;
 $xmlsf_sitemap->prefetch_posts_meta();
 
-if ( !empty($image) ) {
-	$image_xmlns = '	xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'.PHP_EOL;
-	$image_schema = '
-		http://www.google.com/schemas/sitemap-image/1.1
-		http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd';
-} else {
-	$image_xmlns = '';
-	$image_schema = '';
-}
-
-// do xml tag via echo or SVN parser is going to freak out
+// Do xml tag via echo or SVN parser is going to freak out.
 echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 '; ?>
 <?php xmlsf_xml_stylesheet( 'posttype' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-<?php do_action('xmlsf_urlset', 'post_type'); ?>
-<?php echo $image_xmlns; ?>
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd<?php echo $image_schema; ?>">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action( 'xmlsf_urlset', 'post_type' ); ?>>
 <?php
 global $wp_query, $post;
 
@@ -59,28 +42,11 @@ if ( have_posts() ) :
 		?>
 	<url>
 		<loc><?php echo esc_url( get_permalink() ); ?></loc>
-		<priority><?php echo xmlsf_get_post_priority( $post ); ?></priority>
+		<priority><?php echo htmlspecialchars( xmlsf_get_post_priority( $post ), ENT_COMPAT, get_bloginfo('charset') ); ?></priority>
 <?php if ( $lastmod = xmlsf_get_post_modified( $post ) ) { ?>
-		<lastmod><?php echo $lastmod; ?></lastmod>
+		<lastmod><?php echo htmlspecialchars( $lastmod, ENT_COMPAT, get_bloginfo('charset') ); ?></lastmod>
 <?php } ?>
-<?php
-		if ( !empty($image) ) :
-			foreach ( get_post_meta( $post->ID, '_xmlsf_image_'.$image ) as $img_data ) {
-
-				if ( empty($img_data['loc']) )
-					continue; ?>
-		<image:image>
-			<image:loc><?php echo utf8_uri_encode( $img_data['loc'] ); ?></image:loc>
-<?php			if ( !empty($img_data['title']) ) { ?>
-			<image:title><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $img_data['title']); ?>]]></image:title>
-<?php			}; if ( !empty($img_data['caption']) ) { ?>
-			<image:caption><![CDATA[<?php echo str_replace(']]>', ']]&gt;', $img_data['caption']); ?>]]></image:caption>
-<?php			}
-				do_action( 'xmlsf_image_tags_inner', 'post_type' ); ?>
-		</image:image>
-<?php		}
-		endif;
-		do_action( 'xmlsf_tags_after', 'post_type' ); ?>
+<?php	do_action( 'xmlsf_tags_after', 'post_type', $post, $image ); ?>
  	</url>
 <?php	do_action( 'xmlsf_url_after', 'post_type' );
 	endwhile;

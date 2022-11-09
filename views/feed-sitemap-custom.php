@@ -12,11 +12,7 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 '; ?>
 <?php xmlsf_xml_stylesheet( 'custom' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-<?php do_action('xmlsf_urlset', 'custom'); ?>
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action('xmlsf_urlset', 'custom'); ?>>
 <?php
 
 // get our custom urls array
@@ -28,7 +24,7 @@ if ( is_array($urls) ) :
 	?>
 	<url>
 		<loc><?php echo esc_url( $url[0] ); ?></loc>
-		<priority><?php echo ( isset($url[1]) && is_numeric($url[1]) ) ? $url[1] : '0.5'; ?></priority>
+		<priority><?php echo ( isset($url[1]) && is_numeric($url[1]) ) ? htmlspecialchars( $url[1], ENT_COMPAT, get_bloginfo('charset') ) : '0.5'; ?></priority>
 <?php 	do_action( 'xmlsf_tags_after', 'custom' ); ?>
  	</url>
 <?php

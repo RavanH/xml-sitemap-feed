@@ -153,11 +153,6 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin
 
 		$sitemap_url = xmlsf_sitemap_url( 'news' );
 
-		// remove WPML home url filter
-		global $wpml_url_filters;
-		if ( is_object($wpml_url_filters) )
-			remove_filter( 'home_url', array( $wpml_url_filters, 'home_url_filter' ), - 10 );
-
 		include XMLSF_DIR . '/views/admin/page-sitemap-news.php';
 	}
 

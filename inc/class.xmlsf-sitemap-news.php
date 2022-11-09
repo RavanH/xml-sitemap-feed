@@ -51,7 +51,7 @@ class XMLSF_Sitemap_News
 	 */
 	public function filter_request( $request ) {
 
-		global $xmlsf;
+		global $xmlsf, $wp_rewrite;
 		$xmlsf->request_filtered = true;
 
 		// short-circuit if request is not a feed or it does not start with 'sitemap-news'
@@ -65,12 +65,15 @@ class XMLSF_Sitemap_News
 		$xmlsf->is_sitemap = true;
 		$xmlsf->is_news = true;
 
-		// Include public functions.
-		require_once XMLSF_DIR . '/inc/functions.public.php';
-		require_once XMLSF_DIR . '/inc/functions.public-sitemap-news.php';
+		// Set rewrite trailingslash to false.
+		$wp_rewrite->use_trailing_slashes = false;
 
 		// Save a few db queries.
 		add_filter( 'split_the_query', '__return_false' );
+
+		// Include public functions.
+		require_once XMLSF_DIR . '/inc/functions.public.php';
+		require_once XMLSF_DIR . '/inc/functions.public-sitemap-news.php';
 
 		// Make sure we have the proper locale setting for calculations.
 		setlocale( LC_NUMERIC, 'C' );
@@ -167,6 +170,10 @@ class XMLSF_Sitemap_News
 		remove_all_filters( 'plugins_url' );
 		remove_all_filters( 'wp_get_attachment_url' );
 		remove_all_filters( 'image_downsize' );
+
+		// Remove actions that we do not need.
+		remove_all_actions( 'widgets_init' );
+		remove_all_actions( 'wp_footer' );
 
 		return $request;
 	}

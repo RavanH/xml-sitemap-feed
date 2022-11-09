@@ -5,7 +5,7 @@
 	<p>
 		<label>
 			<input type="checkbox" name="xmlsf_author_settings[active]" id="xmlsf_author_active" value="1"<?php checked( !empty( $author_settings['active'] ), true); ?> />
-			<?php _e( 'Include authors', 'xml-sitemap-feed' ); ?> (<?php echo count( get_users( array( 'fields' => 'ID', 'has_published_posts' => apply_filters( 'xmlsf_author_post_types', array( 'post' ) ) ) ) ); ?>)
+			<?php _e( 'Include authors', 'xml-sitemap-feed' ); ?> (<?php echo count( get_users( array( 'fields' => 'ID', 'has_published_posts' => $post_type_array ) ) ); ?>)
 		</label>
 	</p>
 	<p>

@@ -10,7 +10,7 @@
  */
 
 function xmlsf_news_nocache_headers( $headers ) {
-	// prevent proxy caches serving a cached news sitemap
+	// Prevent proxy caches serving a cached news sitemap.
 	$headers['Cache-Control'] .= ', no-store';
 
 	return $headers;

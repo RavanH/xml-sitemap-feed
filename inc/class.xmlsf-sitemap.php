@@ -155,6 +155,31 @@ abstract class XMLSF_Sitemap
 	}
 
 	/**
+	 * Update user modified meta, hooked to transition post status
+	 *
+	 * @since 5.4
+	 *
+	 * @param string  $new_status
+	 * @param string  $old_status
+	 * @param WP_Post $post
+	 */
+	public function update_user_modified_meta( $new_status, $old_status, $post )
+	{
+		// Bail when no status transition or not moving in or out of 'publish' status.
+		if ( $old_status == $new_status || ( 'publish' != $new_status && 'publish' != $old_status )	) {
+			return;
+		}
+
+		// TODO: maybe only for activated users
+
+		$time = date('Y-m-d H:i:s');
+
+		$user_id = get_post_field( 'post_author', $post );
+
+		update_user_meta( $user_id, 'user_modified', $time );
+	}
+
+	/**
 	 * Update post images meta, hooked to transition post status
 	 *
 	 * @since 5.2
@@ -249,7 +274,6 @@ abstract class XMLSF_Sitemap
 
 		// Bail if unexpected post type.
 		if ( empty( $post_type ) || ! is_string( $post_type ) || ! isset( $this->post_types[$post_type] ) ) {
-			//set_transient( 'xmlsf_prefetch_post_meta_failed', 'Unexpected post type in WP_Query: ' . print_r( $post_type, true ) );
 			return;
 		};
 

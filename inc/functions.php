@@ -5,7 +5,7 @@
  *
  * @since 5.1
  *
- * @param $se google|yandex
+ * @param $se google
  * @param $sitemap sitemap
  * @param $interval seconds
  *
@@ -13,8 +13,7 @@
  */
 function xmlsf_ping( $se, $sitemap, $interval ) {
 	$se_urls = array(
-		'google' => 'https://www.google.com/ping',
-		'yandex' => 'https://webmaster.yandex.com/ping'
+		'google' => 'https://www.google.com/ping'
 	);
 
 	if ( ! array_key_exists( $se, $se_urls ) ) {
@@ -93,18 +92,6 @@ function xmlsf_sitemap_url( $sitemap = 'index', $args = array() ) {
 	}
 
 	return esc_url( trailingslashit( home_url() ) . $name );
-}
-
-/**
- * Remove the trailing slash from permalinks that have an extension,
- * such as /sitemap.xml (thanks to Permalink Editor plugin for WordPress)
- *
- * @param string $request
- *
- * @return mixed
- */
-function xmlsf_untrailingslash( $request ) {
-	return pathinfo($request, PATHINFO_EXTENSION) ? untrailingslashit($request) : $request;
 }
 
 /**
@@ -198,3 +185,20 @@ function xmlsf_filter_post_types( $post_types ) {
 
 	return array_filter( $post_types );
 }
+
+/**
+ * WPML compatibility hooked into xmlsf_add_settings and xmlsf_news_add_settings actions
+ *
+ * @param void
+ *
+ * @return void
+ */
+function xmlsf_wpml_remove_home_url_filter() {
+	// remove WPML home url filter
+	global $wpml_url_filters;
+	if ( is_object($wpml_url_filters) ) {
+		remove_filter( 'home_url', array( $wpml_url_filters, 'home_url_filter' ), - 10 );
+	}
+}
+add_action( 'xmlsf_add_settings', 'xmlsf_wpml_remove_home_url_filter' );
+add_action( 'xmlsf_news_add_settings', 'xmlsf_wpml_remove_home_url_filter' );

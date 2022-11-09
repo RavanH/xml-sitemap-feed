@@ -5,7 +5,7 @@
 	<p>
 		<label>
 			<input type="radio" name="xmlsf_general_settings[server]" value="core"<?php disabled(  $nosimplexml, true ); ?><?php checked( $server === 'core' && ! $nosimplexml, true ); ?> />
-			<?php _e( 'Use WordPress core XML sitemaps (recommended)', 'xml-sitemap-feed' ); ?>
+			<?php _e( 'Use WordPress core XML sitemaps', 'xml-sitemap-feed' ); ?>
 		</label>
 		<br>
 		<label>
@@ -18,7 +18,7 @@
 		if ( $nosimplexml ) {
 			printf( __( 'It appears the SimpleXML module is not available. Please use the alternative XML sitemap server or install the missing PHP module. See recommendations on %s.', 'xml-sitemap-feed' ), '<a href="' . admin_url( 'site-health.php' ). '">' . translate('Site Health') . '</a>' );
 		} else {
-			_e( 'The alternative server is provided by the plugin XML Sitemaps & Google News. It generates the sitemap in a different way, allowing some additional configuration options. However, it is not garanteed to be compatible with your specific WordPress installation.', 'xml-sitemap-feed' );
+			_e( 'The alternative server is provided by the plugin XML Sitemaps & Google News. It generates the sitemap in a different way, allowing some additional configuration options. However, it is not garanteed to be compatible with your specific WordPress installation and it is generally more resource intensive than the WordPress core sitemap.', 'xml-sitemap-feed' );
 		}
 		?>
 	</p>

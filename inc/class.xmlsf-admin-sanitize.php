@@ -15,9 +15,8 @@ class XMLSF_Admin_Sanitize
 		$sanitized = array();
 
 		if ( $old !== $new ) {
-			// when sitemaps are added or removed, set transients
-			set_transient( 'xmlsf_flush_rewrite_rules', '' );
-			set_transient( 'xmlsf_check_static_files', '' );
+			// when sitemaps are added or removed, ask for rewrite rules flush
+			update_option( 'xmlsf_permalinks_flushed', 0 );
 
 			// switched on news sitemap
 			if ( ! empty( $new['sitemap-news'] ) && empty( $old['sitemap-news'] ) ) {
@@ -87,9 +86,6 @@ class XMLSF_Admin_Sanitize
 			$new = array_filter( $new );
 			$new = reset( $new );
 		}
-
-		if ( empty($old) && !empty($new) )
-			set_transient('xmlsf_check_static_files','');
 
 		return strip_tags( $new );
 	}

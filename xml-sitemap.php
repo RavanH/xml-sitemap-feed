@@ -3,7 +3,7 @@
 Plugin Name: XML Sitemap & Google News
 Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
 Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
-Version: 5.4-beta-3
+Version: 5.4-beta4
 Text Domain: xml-sitemap-feed
 Requires at least: 4.6
 Requires PHP: 5.6
@@ -11,7 +11,7 @@ Author: RavanH
 Author URI: https://status301.net/
 */
 
-define( 'XMLSF_VERSION', '5.3.3' );
+define( 'XMLSF_VERSION', '5.4-beta4' );
 
 /**
  * Copyright 2022 RavanH
@@ -77,11 +77,10 @@ define( 'XMLSF_VERSION', '5.3.3' );
  * xmlsf_urlset                -> Fired inside each sitemap's urlset tag. Can be used to
  *                                echo additional XML namespaces. Passes parameter home|post_type|taxonomy|custom
  *                                to allow identification of the current sitemap.
- * xmlsf_url                   -> Fired inside the XML Sitemap loop at the start of each sitemap url tag. Can be used to
- *                                echo additional XML namespaces. Passes parameter home|post_type|taxonomy|custom
- *                                to allow identification of the current sitemap.
- * xmlsf_image_tags_inner      -> Fired inside the XML Sitemap loop just before each closing </image:image> is generated. Can be used to
- *                                echo custom <image:image> tags or trigger another action in the background.
+ * xmlsf_url                   -> Fired inside the XML Sitemap loop at the start of each sitemap url tag. Passes parameter
+ *                                sitemap type (currently only 'post_type') to allow identification of the current sitemap.
+ * xmlsf_image_tags_inner      -> Fired inside the XML Sitemap loop just before each closing </image:image> is generated.
+ *                                Can be used to echo custom <image:image> tags or trigger another action in the background.
  * xmlsf_tags_after            -> Fired inside the XML Sitemap loop at the end of the tags, just before each
  *                                closing </url> is generated. Can be used to echo custom tags or trigger another
  *                                action in the background. Passes parameter home|post_type|taxonomy|custom
@@ -136,6 +135,12 @@ function xmlsf_init() {
 	// Add robots.txt filter.
 	add_filter( 'robots_txt', 'xmlsf_robots_txt', 0 );
 
+	// If XML Sitemaps Manager is installed, remove its init and admin_init hooks.
+	if ( function_exists( 'xmlsm_init' ) ) {
+		remove_action( 'init',       'xmlsm_init'       );
+		remove_action( 'admin_init', 'xmlsm_admin_init' );
+	}
+
 	// Upgrade/install, maybe...
 	$db_version = get_option( 'xmlsf_version', 0 );
 	if ( ! version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
@@ -159,9 +164,6 @@ function xmlsf_init() {
 	// main functions
 	require XMLSF_DIR . '/inc/functions.php';
 
-	// force remove url trailing slash
-	add_filter( 'user_trailingslashit', 'xmlsf_untrailingslash' );
-
 	add_action( 'xmlsf_ping', 'xmlsf_debug_ping', 9, 5 );
 
 	// post types filter
@@ -178,7 +180,6 @@ function xmlsf_init() {
 
 		// Ping actions.
 		add_action( 'xmlsf_ping_google', 'xmlsf_ping', 10, 3 );
-		add_action( 'xmlsf_ping_yandex', 'xmlsf_ping', 10, 3 );
 
 		if ( xmlsf_uses_core_server() ) {
 			// Extend core sitemap.
@@ -228,6 +229,12 @@ function xmlsf_init() {
 		new XMLSF_Sitemap_News( $sitemaps['sitemap-news'] );
 	}
 
+	// Maybe flush rewrite rules.
+	if ( ! get_option( 'xmlsf_permalinks_flushed' ) ) {
+		flush_rewrite_rules( false );
+		update_option( 'xmlsf_permalinks_flushed', 1 );
+	}
+
 }
 
 /**
@@ -237,8 +244,7 @@ function xmlsf_init() {
  * @return void
  */
 function xmlsf_activate() {
-	set_transient( 'xmlsf_flush_rewrite_rules', '' );
-	set_transient( 'xmlsf_check_static_files', '' );
+	update_option( 'xmlsf_permalinks_flushed', 0 );
 }
 
 /**
@@ -248,9 +254,6 @@ function xmlsf_activate() {
  * @return void
  */
 function xmlsf_deactivate() {
-	delete_transient( 'xmlsf_flush_rewrite_rules' );
-	delete_transient( 'xmlsf_check_static_files' );
-
 	// remove metadata
 	global $wpdb;
 	// posts meta
@@ -262,7 +265,6 @@ function xmlsf_deactivate() {
 
 	// remove rules so they can be REGENERATED on the next page load (without this plugin active)
 	delete_option( 'rewrite_rules' );
-
 }
 
 /**
@@ -326,6 +328,14 @@ if ( ! function_exists( 'is_sitemap' ) ) {
 	 * @return bool
 	 */
 	function is_sitemap() {
+		if ( function_exists( 'wp_sitemaps_loaded' ) ) {
+			global $wp_query;
+			if ( ! isset( $wp_query ) ) {
+				_doing_it_wrong( __FUNCTION__, translate( 'Conditional query tags do not work before the query is run. Before then, they always return false.' ), '3.1.0' );
+				return false;
+			}
+			return property_exists( $wp_query, 'is_sitemap' ) ? $wp_query->is_sitemap : false;
+		}
 		global $xmlsf;
 		if ( ! is_object( $xmlsf ) || $xmlsf->request_filtered === false ) {
 			_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );

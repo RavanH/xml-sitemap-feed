@@ -34,7 +34,6 @@ class XMLSF_Admin
 	 */
 	function __construct()
 	{
-		require XMLSF_DIR . '/inc/functions.admin.php';
 		require XMLSF_DIR . '/inc/class.xmlsf-admin-sanitize.php';
 
 		$this->sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
@@ -50,15 +49,14 @@ class XMLSF_Admin
 		}
 
 		// ACTION LINK
-		add_filter( 'plugin_action_links_' . XMLSF_BASENAME, 'xmlsf_add_action_link' );
-		add_filter( 'plugin_row_meta', 'xmlsf_plugin_meta_links', 10, 2);
+		add_filter( 'plugin_action_links_' . XMLSF_BASENAME, array( $this, 'add_action_link' )          );
+		add_filter( 'plugin_row_meta',                       array( $this, 'plugin_meta_links' ), 10, 2 );
 
 		// REGISTER SETTINGS
 		add_action( 'admin_init', array( $this, 'register_settings' ), 0 );
 
 		// ACTIONS & CHECKS
 		add_action( 'admin_init', array( $this, 'notices_actions' ) );
-		add_action( 'admin_init', array( $this, 'transients_actions' ) );
 		add_action( 'admin_init', array( $this, 'tools_actions' ) );
 		add_action( 'admin_init', array( $this, 'static_files' ) );
 		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
@@ -281,8 +279,6 @@ class XMLSF_Admin
 			update_option( 'xmlsf_' . $option, $settings );
 		}
 
-		delete_transient( 'xmlsf_static_files' );
-
 		add_settings_error(
 			'notice_clear_settings',
 			'notice_clear_settings',
@@ -399,7 +395,8 @@ class XMLSF_Admin
 		}
 
 		// When core sitemap server is used.
-		if ( xmlsf_uses_core_server() && ! empty( $check_for['sitemap'] ) ) {
+		$settings = (array) get_option( 'xmlsf_general_settings', array() );
+		if ( ! empty( $check_for['sitemap'] ) && ! empty( $settings['server'] ) && 'core' === $settings['server'] ) {
 			$check_for['sitemap'] = 'wp-sitemap.xml';
 		}
 
@@ -439,7 +436,7 @@ class XMLSF_Admin
 		}
 
 		// Catch Box Pro feed redirect
-		if ( /*!in_array( 'catchbox_feed_redirect', self::$dismissed ) &&*/ function_exists( 'catchbox_is_feed_url_present' ) && catchbox_is_feed_url_present(null) ) {
+		if ( function_exists( 'catchbox_is_feed_url_present' ) && catchbox_is_feed_url_present(null) ) {
 			add_action(
 				'admin_notices',
 				function() { include XMLSF_DIR . '/views/admin/notice-catchbox-feed-redirect.php'; }
@@ -447,7 +444,7 @@ class XMLSF_Admin
 		}
 
 		// Ad Inserter XML setting incompatibility warning
-		if ( /*!in_array( 'ad_inserter_feed', parent::$dismissed ) &&*/ is_plugin_active('ad-inserter/ad-inserter.php') ) {
+		if ( is_plugin_active('ad-inserter/ad-inserter.php') ) {
 			$adsettings = get_option( 'ad_inserter' );
 			if ( is_array($adsettings) && !empty($adsettings) ) {
 				foreach ( $adsettings as $ad => $settings ) {
@@ -575,13 +572,38 @@ class XMLSF_Admin
 		}
 	}
 
-	public function transients_actions()
-	{
-		// CATCH TRANSIENT for flushing rewrite rules after the sitemaps setting has changed.
-		delete_transient( 'xmlsf_flush_rewrite_rules' ) && flush_rewrite_rules();
+	// plugin action links
 
-		// CATCH TRANSIENT for static file check.
-		delete_transient( 'xmlsf_check_static_files' ) && $this->check_static_files();
+	public function add_action_link( $links ) {
+		$settings_link = '<a href="' . admin_url('options-reading.php') . '#xmlsf_sitemaps">' . translate('Settings') . '</a>';
+		array_unshift( $links, $settings_link );
+		return $links;
 	}
 
+	public function plugin_meta_links( $links, $file ) {
+		if ( $file == XMLSF_BASENAME ) {
+			$links[] = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/">' . __('Support','xml-sitemap-feed') . '</a>';
+			$links[] = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/?filter=5#new-post">' . __('Rate ★★★★★','xml-sitemap-feed') . '</a>';
+		}
+		return $links;
+	}
+
+	// verification
+
+	public static function verify_nonce( $context ) {
+
+		if ( isset( $_POST['_xmlsf_'.$context.'_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_'.$context.'_nonce'], XMLSF_BASENAME.'-'.$context ) )
+			return true;
+
+		// Still here? Then add security check failed error message and return false.
+		add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') /* . ' Context: '. $context */ );
+
+		return false;
+	}
+
+}
+
+// Backward compatibility
+function xmlsf_verify_nonce( $context ) {
+	return XMLSF_Admin::verify_nonce( $context );
 }

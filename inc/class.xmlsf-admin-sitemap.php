@@ -37,8 +37,7 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 			return;
 
 		$search_engines = array(
-			'google' => __('Google','xml-sitemap-feed'),
-			'yandex'   => __('Yandex','xml-sitemap-feed')
+			'google' => __('Google','xml-sitemap-feed')
 		);
 
 		foreach ( $search_engines as $se => $name ) {
@@ -375,11 +374,6 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 
 		$sitemap_url = xmlsf_sitemap_url();
 
-		// remove WPML home url filter
-		global $wpml_url_filters;
-		if ( is_object($wpml_url_filters) )
-			remove_filter( 'home_url', array( $wpml_url_filters, 'home_url_filter' ), - 10 );
-
 		include XMLSF_DIR . '/views/admin/page-sitemap.php';
 	}
 
@@ -522,6 +516,18 @@ class XMLSF_Admin_Sitemap extends XMLSF_Admin
 	public function author_settings_field()
 	{
 		$author_settings = (array) get_option( 'xmlsf_author_settings', array() );
+
+		/**
+		 * Filters the post types present in the author archive. Must return an array of one or multiple post types.
+		 * Allows to add or change post type when theme author archive page shows custom post types.
+		 *
+		 * @since 0.1
+		 *
+		 * @param array Array with post type slugs. Default array('post').
+		 *
+		 * @return array
+		 */
+		$post_type_array = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
 
 		// The actual fields for data entry
 		include XMLSF_DIR . '/views/admin/field-sitemap-author-settings.php';

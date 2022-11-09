@@ -14,9 +14,7 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 '; ?>
 <?php xmlsf_xml_stylesheet( 'news' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-<?php do_action('xmlsf_urlset', 'news'); ?>
-	xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" <?php do_action('xmlsf_urlset', 'news'); ?>>
 <?php
 global $wp_query, $post;
 // loop away!
@@ -45,18 +43,18 @@ if ( have_posts() ) :
 			<news:publication>
 				<news:name><?php
 					if ( !empty($options['name']) ) {
-						echo apply_filters( 'xmlsf_news_publication_name', $options['name'] );
+						echo htmlspecialchars( apply_filters( 'xmlsf_news_publication_name', $options['name'] ), ENT_COMPAT, get_bloginfo('charset') );
 					} elseif ( defined('XMLSF_GOOGLE_NEWS_NAME') ) {
-						echo apply_filters( 'xmlsf_news_publication_name', XMLSF_GOOGLE_NEWS_NAME );
+						echo htmlspecialchars( apply_filters( 'xmlsf_news_publication_name', XMLSF_GOOGLE_NEWS_NAME ), ENT_COMPAT, get_bloginfo('charset') );
 					} else {
-						echo apply_filters( 'xmlsf_news_publication_name', get_bloginfo( 'name' ) );
+						echo htmlspecialchars( apply_filters( 'xmlsf_news_publication_name', get_bloginfo( 'name' ) ), ENT_COMPAT, get_bloginfo('charset') );
 					} ?></news:name>
-				<news:language><?php echo apply_filters( 'xmlsf_news_language', get_bloginfo( 'language' ), $post->ID, $post->post_type ); ?></news:language>
+				<news:language><?php echo htmlspecialchars( apply_filters( 'xmlsf_news_language', get_bloginfo( 'language' ), $post->ID, $post->post_type ), ENT_COMPAT, get_bloginfo('charset') ); ?></news:language>
 			</news:publication>
 			<news:publication_date><?php echo get_date_from_gmt( $post->post_date_gmt, DATE_W3C ); ?></news:publication_date>
-			<news:title><?php echo apply_filters( 'xmlsf_news_title', get_the_title() ); ?></news:title>
-			<news:keywords><?php echo implode( ', ', apply_filters( 'xmlsf_news_keywords', array() ) ); ?></news:keywords>
-			<news:stock_tickers><?php echo implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ); ?></news:stock_tickers>
+			<news:title><?php echo htmlspecialchars( apply_filters( 'xmlsf_news_title', get_the_title() ), ENT_COMPAT, get_bloginfo('charset') ); ?></news:title>
+			<news:keywords><?php echo htmlspecialchars( implode( ', ', apply_filters( 'xmlsf_news_keywords', array() ) ), ENT_COMPAT, get_bloginfo('charset') ); ?></news:keywords>
+			<news:stock_tickers><?php echo htmlspecialchars( implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ), ENT_COMPAT, get_bloginfo('charset') ); ?></news:stock_tickers>
 <?php do_action( 'xmlsf_news_tags_inner' ); ?>
 		</news:news>
 <?php do_action( 'xmlsf_news_tags_after' ); ?>

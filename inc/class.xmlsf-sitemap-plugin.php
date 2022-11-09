@@ -42,6 +42,9 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		// Update term meta lastmod date.
 		add_action( 'transition_post_status', array( $this, 'update_term_modified_meta' ), 10, 3 );
 
+		// Update user meta lastmod date.
+		add_action( 'transition_post_status', array( $this, 'update_user_modified_meta' ), 10, 3 );
+
 		// Update images post meta.
 		add_action( 'transition_post_status', array( $this, 'update_post_images_meta' ), 10, 3 );
 
@@ -68,58 +71,57 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	 */
 	public function filter_request( $request )
 	{
-		global $xmlsf;
-		$xmlsf->request_filtered = true;
+		global $xmlsf, $wp_rewrite;
+		// Short-circuit if request was already filtered by this plugin.
+		if ( $xmlsf->request_filtered ) {
+			return $request;
+		} else {
+			$xmlsf->request_filtered = true;
+		}
 
-		// short-circuit if request is not a feed, news sitemap request was already detected or it does not start with 'sitemap'
-		if ( empty( $request['feed'] ) || $xmlsf->is_news || strpos( $request['feed'], 'sitemap' ) !== 0 ) {
+		// Short-circuit if request is not a feed, news sitemap, does not start with 'sitemap'.
+		if ( empty( $request['feed'] ) || 'sitemap-news' === $request['feed'] || strpos( $request['feed'], 'sitemap' ) !== 0 ) {
 			return $request;
 		}
 
 		/** IT'S A SITEMAP */
 
-		// set the sitemap conditional flag
+		// Set the sitemap conditional flag.
 		$xmlsf->is_sitemap = true;
 
-		// save a few db queries
+		// Set rewrite trailingslash to false.
+		$wp_rewrite->use_trailing_slashes = false;
+
+		// Save a few db queries.
 		add_filter( 'split_the_query', '__return_false' );
 
-		// include shared public functions
+		// Include public functions.
 		require_once XMLSF_DIR . '/inc/functions.public.php';
 
-		// Generator comments
+		// Generator comments.
 		add_action( 'xmlsf_generator', 'xmlsf_generator' );
 
 		/** COMPRESSION */
 
-		// check for gz request
+		// Check for gz request.
 		if ( substr( $request['feed'], -3 ) == '.gz' ) {
-			// pop that .gz
+			// Pop that .gz
 			$request['feed'] = substr($request['feed'], 0, -3);
-			// verify/apply compression settings
+			// Verify/apply compression settings.
 			xmlsf_output_compression();
 		}
-
-		/** PREPARE TO LOAD TEMPLATE */
-
-		add_action (
-			'do_feed_' . $request['feed'],
-			'xmlsf_load_template',
-			10,
-			2
-		);
 
 		/** MODIFY REQUEST PARAMETERS */
 
 		$request['post_status'] = 'publish';
-		$request['no_found_rows'] = true; // found rows calc is slow and only needed for pagination
+		$request['no_found_rows'] = true; // Found rows calc is slow and only needed for pagination.
 
-		// make sure we have the proper locale setting for calculations
+		// Make sure we have the proper locale setting for calculations.
 		setlocale( LC_NUMERIC, 'C' );
 
 		// SPECIFIC REQUEST FILTERING AND PREPARATIONS
 
-		// include public sitemap functions
+		// Include public sitemap functions.
 		require_once XMLSF_DIR . '/inc/functions.public-sitemap.php';
 
 		/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
@@ -138,39 +140,42 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 
 		$feed = explode( '-' , $request['feed'], 3 );
 
-		switch( isset( $feed[1] ) ? $feed[1] : '' ) {
+		switch( isset($feed[1]) ? $feed[1] : '' ) {
 
 			case 'posttype':
-				if ( ! isset( $feed[2] ) ) break;
+				$settings = (array) get_option( 'xmlsf_post_types' );
+				if ( ! isset( $feed[2] ) || empty( $settings[$feed[2]] ) || ! is_array( $settings[$feed[2]] ) || empty( $settings[$feed[2]]['active'] ) ) {
+					return $request;
+				}
 
-				// try to raise memory limit, context added for filters
+				// Try to raise memory limit, context added for filters.
 				wp_raise_memory_limit( 'sitemap-posttype-'.$feed[2] );
 
-				// prepare priority calculation
+				// Prepare priority calculation.
 				if ( ! empty($this->post_types[$feed[2]]['dynamic_priority']) ) {
-					// last of this post type modified date in Unix seconds
+					// Last of this post type modified date in Unix seconds.
 					xmlsf()->lastmodified = get_date_from_gmt( get_lastpostmodified( 'GMT', $feed[2] ), 'U' );
-					// calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php !
+					// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
 					xmlsf()->timespan = xmlsf()->lastmodified - get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2]), 'U' );
-					// total post type comment count
+					// Total post type comment count.
 					xmlsf()->comment_count = wp_count_comments()->approved;
 					// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
 					// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/
 				};
 
-				// setup filters
+				// Setup filters.
 				add_filter( 'post_limits', function() { return 'LIMIT 0, 50000'; } );
 
-				// modify request
+				// Modify request.
 				$request['post_type'] = $feed[2];
 				$request['orderby'] = 'modified';
 				$request['order'] = 'DESC';
 
-				// prevent term cache update query unless needed for permalinks
+				// Prevent term cache update query unless needed for permalinks.
 				if ( strpos( get_option( 'permalink_structure' ), '%category%' ) === false )
 					$request['update_post_term_cache'] = false;
 
-				// make sure to update meta cache for:
+				// Make sure to update meta cache for:
 				// 1. excluded posts
 				// 2. image data (if activated)
 				// 3. lasmod on comments (if activated)
@@ -178,35 +183,62 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 				break;
 
 			case 'taxonomy':
-				if ( !isset( $feed[2] ) ) break;
-				// try to raise memory limit, context added for filters
+				$settings = get_option( 'xmlsf_taxonomy_settings' );
+				if ( ! isset( $feed[2] ) || ! is_array( $settings ) || empty( $settings['active'] ) ) {
+					return $request;
+				}
+
+				$taxonomies = get_option( 'xmlsf_taxonomies' );
+				if ( ! empty( $taxonomies ) && ! in_array( $feed[2], (array) $taxonomies ) ) {
+					return $request;
+				}
+
+				// Try to raise memory limit, context added for filters.
 				wp_raise_memory_limit( 'sitemap-taxonomy-'.$feed[2] );
-				// pass on taxonomy name via request
+				// Pass on taxonomy name via request.
 				$request['taxonomy'] = $feed[2];
-				// set terms args
+				// Set terms args.
 				add_filter( 'get_terms_args', array( $this, 'set_terms_args' ) );
 				break;
 
 			case 'author':
-				// set users args
+				$settings = get_option( 'xmlsf_author_settings' );
+				if ( ! is_array( $settings ) || empty( $settings['active'] ) ) {
+					return $request;
+				}
+
+				// Set users args.
 				add_filter( 'get_users_args', array( $this, 'set_authors_args' ) );
+				break;
 
 			default:
-				// Do nothing.
+				// We're on the index. Do nothing.
 		}
+
+		/** PREPARE TO LOAD TEMPLATE */
+		add_action (
+			'do_feed_' . $request['feed'],
+			'xmlsf_load_template',
+			10,
+			2
+		);
 
 		/** GENERAL MISC. PREPARATIONS */
 
-		// prevent public errors breaking xml
+		// Prevent public errors breaking xml.
 		@ini_set( 'display_errors', 0 );
 
-		// REPSONSE HEADERS filtering
+		// REPSONSE HEADERS filtering.
 		add_filter( 'wp_headers', 'xmlsf_headers' );
 
-		// Remove filters to prevent stuff like cdn urls for xml stylesheet and images
+		// Remove filters to prevent stuff like cdn urls for xml stylesheet and images.
 		remove_all_filters( 'plugins_url' );
 		remove_all_filters( 'wp_get_attachment_url' );
 		remove_all_filters( 'image_downsize' );
+
+		// Remove actions that we do not need.
+		remove_all_actions( 'widgets_init' );
+		remove_all_actions( 'wp_footer' );
 
 		return $request;
 	}
@@ -248,6 +280,18 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	function set_authors_args( $args ) {
 		$author_settings = get_option( 'xmlsf_author_settings' );
 
+		/**
+		 * Filters the post types present in the author archive. Must return an array of one or multiple post types.
+		 * Allows to add or change post type when theme author archive page shows custom post types.
+		 *
+		 * @since 0.1
+		 *
+		 * @param array Array with post type slugs. Default array('post').
+		 *
+		 * @return array
+		 */
+		$post_type_array = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
+
 		$args['number'] = ! empty( $author_settings['limit'] ) && is_numeric( $author_settings['limit'] ) ? intval( $author_settings['limit'] ) : 2000;
 		if ( $args['number'] < 1 || $args['number'] > 50000 ) $args['number'] = 50000;
 
@@ -255,7 +299,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		$args['order'] = 'DESC';
 		//$args['fields'] = array( 'ID' ); // must be an array
 		//$args['who'] = 'authors'; // Deprecated since 5.9.
-		$args['has_published_posts'] = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
+		$args['has_published_posts'] = $post_type_array;
 
 		return $args;
 	}

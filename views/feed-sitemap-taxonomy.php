@@ -12,11 +12,7 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 '; ?>
 <?php xmlsf_xml_stylesheet( 'taxonomy' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-<?php do_action( 'xmlsf_urlset', 'taxonomy' ); ?>
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action( 'xmlsf_urlset', 'taxonomy' ); ?>>
 <?php
 $terms = get_terms( array('taxonomy'=>get_query_var('taxonomy')) );
 
@@ -27,10 +23,10 @@ if ( is_array($terms) ) :
 		if ( ! xmlsf_is_allowed_domain( $url ) ) continue;
 		?>
 	<url>
-		<loc><?php echo $url; ?></loc>
-	 	<priority><?php echo xmlsf_get_term_priority( $term ); ?></priority>
+		<loc><?php echo esc_url( $url ); ?></loc>
+	 	<priority><?php echo htmlspecialchars( xmlsf_get_term_priority( $term ), ENT_COMPAT, get_bloginfo('charset') ); ?></priority>
 <?php if ( $lastmod = xmlsf_get_term_modified( $term ) ) { ?>
-		<lastmod><?php echo $lastmod; ?></lastmod>
+		<lastmod><?php echo htmlspecialchars( $lastmod, ENT_COMPAT, get_bloginfo('charset') ); ?></lastmod>
 <?php }
  		do_action( 'xmlsf_tags_after', 'taxonomy' );
 ?>

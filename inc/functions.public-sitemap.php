@@ -83,43 +83,134 @@ function xmlsf_get_user_priority( $user ) {
  */
 function xmlsf_get_user_modified( $user ) {
 
-	// last publication date
-	$posts = get_posts(
-		array(
-			'author' => $user->ID,
-			'post_type' => apply_filters( 'xmlsf_author_post_types', array( 'post' ) ),
-			'post_status' => 'publish',
-			'posts_per_page' => 1,
-			'numberposts' => 1,
-			'update_post_meta_cache' => false,
-			'update_post_term_cache' => false,
-			'update_cache' => false,
-			'lang' => '' // TODO make multilanguage compatible
-		)
-	);
+	if ( function_exists( 'get_metadata_raw' ) ) {
+		/**
+		 * Use get_metadata_raw if it exists (since WP 5.5) because it will return null if the key does not exist.
+		 */
+		$lastmod = get_metadata_raw( 'user', $user->ID, 'user_modified', true );
+	} else {
+		/**
+		 * Getting ALL meta here because if checking for single key, we cannot
+		 * distiguish between empty value or non-exisiting key as both return ''.
+		 */
+		$meta = get_user_meta( $user->ID );
+		$lastmod = array_key_exists( 'user_modified', $meta ) ? get_user_meta( $user->ID, 'user_modified', true ) : null;
+	}
 
-	return $posts ? get_the_date( DATE_W3C, $posts[0] ) : false;
+	if ( null === $lastmod ) {
+		/**
+		 * Filters the post types present in the author archive. Must return an array of one or multiple post types.
+		 * Allows to add or change post type when theme author archive page shows custom post types.
+		 *
+		 * @since 0.1
+		 *
+		 * @param array Array with post type slugs. Default array('post').
+		 *
+		 * @return array
+		 */
+		$post_type_array = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
+
+		// Get lastmod from last publication date.
+		$posts = get_posts(
+			array(
+				'author' => $user->ID,
+				'post_type' => $post_type_array,
+				'post_status' => 'publish',
+				'posts_per_page' => 1,
+				'numberposts' => 1,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'update_cache' => false,
+				'lang' => '' // TODO make multilanguage compatible
+			)
+		);
+		$lastmod = ! empty( $posts ) ? get_post_field( 'post_date', $posts[0] ) : '';
+		// Cache lastmod as user_modified meta data.
+		add_user_meta( $user->ID, 'user_modified', $lastmod );
+	}
+
+	/*
+	* Getting ALL meta here because if checking for single key, we cannot
+	* distiguish between empty value or non-exisiting key as both return ''.
+	*/
+	$meta = get_user_meta( $user->ID );
+
+	if ( ! array_key_exists( 'user_modified', $meta ) ) {
+		// Last publication date.
+
+
+	} else {
+
+		$lastmod = get_user_meta( $user->ID, 'user_modified', true );
+
+	}
+
+	return ! empty( $lastmod ) ? mysql2date( DATE_W3C, $lastmod, false ) : false;
 }
 
 /**
- * Do tags
+ * Do image tag
  *
  * @param string $type
- * @return array
+ * @uses WP_Post $post
+ * @return void
  */
-function xmlsf_do_tags( $type = 'post' ) {
+function xmlsf_image_tag( $type ) {
+	if ( 'post_type' !== $type ) {
+		return;
+	}
+	global $post;
+	$post_types = (array) get_option( 'xmlsf_post_types' );
+	if (
+		isset( $post_types[$post->post_type] ) &&
+		is_array( $post_types[$post->post_type] ) &&
+		isset( $post_types[$post->post_type]['tags'] ) &&
+		is_array( $post_types[$post->post_type]['tags'] ) &&
+		! empty( $post_types[$post->post_type]['tags']['image'] )  &&
+		is_string( $post_types[$post->post_type]['tags']['image'] )
+	) {
+		$images = get_post_meta( $post->ID, '_xmlsf_image_'.$post_types[$post->post_type]['tags']['image'] );
+		foreach ( $images as $img ) {
+			if ( empty($img['loc']) ) continue;
 
-	$post_types = get_option( 'xmlsf_post_types' );
-
-	// Make sure it's an array we are returning
-	$tags = (
-		is_string( $type ) &&
-		is_array( $post_types ) &&
-		! empty( $post_types[$type]['tags'] )
-	) ? (array) $post_types[$type]['tags'] : array();
-
-	return $tags;
+			echo '		<image:image>
+			<image:loc>' . utf8_uri_encode( $img['loc'] ) . '</image:loc>';
+			if ( !empty($img['title']) ) {
+				echo '
+			<image:title><![CDATA[' . str_replace(']]>', ']]&gt;', $img['title']) . ']]></image:title>';
+			}
+			if ( !empty($img['caption']) ) {
+				echo '
+			<image:caption><![CDATA[' . str_replace(']]>', ']]&gt;', $img['caption']) . ']]></image:caption>';
+			}
+			do_action( 'xmlsf_image_tags_inner', 'post_type' );
+			echo '
+		</image:image>
+';
+		}
+	}
 }
+add_action( 'xmlsf_tags_after', 'xmlsf_image_tag' );
+
+
+function xmlsf_image_schema( $type ) {
+	if ( 'post_type' !== $type ) {
+		return;
+	}
+	global $post;
+	$post_types = (array) get_option( 'xmlsf_post_types' );
+	if (
+		isset( $post_types[$post->post_type] ) &&
+		is_array( $post_types[$post->post_type] ) &&
+		isset( $post_types[$post->post_type]['tags'] ) &&
+		is_array( $post_types[$post->post_type]['tags'] ) &&
+		! empty( $post_types[$post->post_type]['tags']['image'] )
+	) {
+		echo 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"';
+	}
+}
+add_action( 'xmlsf_urlset', 'xmlsf_image_schema' );
+
 
 /**
  * Do authors
@@ -135,7 +226,7 @@ function xmlsf_do_authors() {
 
 /**
  * Get front pages
- * 
+ *
  * @return array
  */
 function xmlsf_get_frontpages() {
@@ -157,7 +248,7 @@ function xmlsf_get_frontpages() {
 
 /**
  * Get blog_pages
- * 
+ *
  * @return array
  */
 function xmlsf_get_blogpages() {
@@ -211,7 +302,6 @@ function xmlsf_get_post_modified( $post ) {
 	}
 
 	return ! empty( $lastmod ) ? get_date_from_gmt( $lastmod, DATE_W3C ) : false;
-
 }
 
 /**
@@ -221,19 +311,27 @@ function xmlsf_get_post_modified( $post ) {
  * @return string|false
  */
 function xmlsf_get_term_modified( $term ) {
+
 	if ( is_numeric($term) ) {
 		$term = get_term( $term );
 	}
 
-	/*
-	* Getting ALL meta here because if checking for single key, we cannot
-	* distiguish between empty value or non-exisiting key as both return ''.
-	*/
-	$meta = get_term_meta( $term->term_id );
+	if ( function_exists( 'get_metadata_raw' ) ) {
+		/**
+		* Use get_metadata_raw if it exists (since WP 5.5) because it will return null if the key does not exist.
+		*/
+		$lastmod = get_metadata_raw( 'term', $term->term_id, 'term_modified', true );
+	} else {
+		/**
+		* Getting ALL meta here because if checking for single key, we cannot
+		* distiguish between empty value or non-exisiting key as both return ''.
+		*/
+		$meta = get_term_meta( $term->term_id );
+		$lastmod = array_key_exists( 'term_modified', $meta ) ? get_term_meta( $term->term_id, 'term_modified', true ) : null;
+	}
 
-	if ( ! array_key_exists( 'term_modified', $meta ) ) {
-
-		// get the latest post in this taxonomy item, to use its post_date as lastmod
+	if ( null === $lastmod ) {
+		// Get lastmod from last publication date.
 		$posts = get_posts (
 			array(
 				'post_type' => 'any',
@@ -243,7 +341,6 @@ function xmlsf_get_term_modified( $term ) {
 				'update_post_term_cache' => false,
 				'update_cache' => false,
 				'lang' => '',
-				'has_password' => false,
 				'tax_query' => array(
 					array(
 						'taxonomy' => $term->taxonomy,
@@ -253,17 +350,9 @@ function xmlsf_get_term_modified( $term ) {
 				)
 			)
 		);
-
 		$lastmod = isset($posts[0]->post_date) ? $posts[0]->post_date : '';
-		// get post date here, not modified date because we're only
-		// concerned about new entries on the (first) taxonomy page
-
+		// Cache lastmod as term_modified meta data.
 		add_term_meta( $term->term_id, 'term_modified', $lastmod );
-
-	} else {
-
-		$lastmod = get_term_meta( $term->term_id, 'term_modified', true ); // only get one
-
 	}
 
 	return ! empty( $lastmod ) ? mysql2date( DATE_W3C, $lastmod, false ) : false;
@@ -282,8 +371,6 @@ function xmlsf_get_taxonomy_modified( $taxonomy ) {
 	$lastmodified = array();
 	foreach ( (array)$obj->object_type as $object_type ) {
 		$lastmodified[] = get_lastpostdate( 'GMT', $object_type );
-		// get last post date here, not modified date because we're only
-		// concerned about new entries on the (first) taxonomy page
 	}
 
 	sort( $lastmodified );
@@ -371,4 +458,5 @@ function xmlsf_get_term_priority( $term ) {
 
 	// a final check for limits and round it
 	return xmlsf_sanitize_priority( $priority );
+
 }

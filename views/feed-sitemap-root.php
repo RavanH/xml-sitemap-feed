@@ -12,18 +12,14 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 '; ?>
 <?php xmlsf_xml_stylesheet( 'root' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-<?php do_action('xmlsf_urlset', 'home'); ?>
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action('xmlsf_urlset', 'home'); ?>>
 <?php
 foreach ( xmlsf_get_root_data() as $url => $data ) {
 ?>
 	<url>
 		<loc><?php echo esc_url( $url ); ?></loc>
-		<priority><?php echo $data['priority']; ?></priority>
-		<lastmod><?php echo $data['lastmod']; ?></lastmod>
+		<priority><?php echo htmlspecialchars( $data['priority'], ENT_COMPAT, get_bloginfo('charset') ); ?></priority>
+		<lastmod><?php echo htmlspecialchars( $data['lastmod'], ENT_COMPAT, get_bloginfo('charset') ); ?></lastmod>
 <?php do_action( 'xmlsf_tags_after', 'home' ); ?>
 	</url>
 <?php

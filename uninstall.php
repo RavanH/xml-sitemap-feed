@@ -12,18 +12,18 @@
  * define('XMLSF_MULTISITE_UNINSTALL', true);
  */
 
-// exit if uninstall not called from WordPress
+// Exit if uninstall not called from WordPress.
 defined('WP_UNINSTALL_PLUGIN') || exit();
 
 /*
- * XML Sitemap Feed uninstallation
+ * XML Sitemap Feed uninstallation.
  *
  * @since 4.4
  */
 class XMLSitemapFeed_Uninstall {
 
-	/*
-	 * constructor: manages uninstall for multisite
+	/**
+	 * Constructor: manages uninstall for multisite.
 	 *
 	 * @since 4.4
 	 */
@@ -31,8 +31,8 @@ class XMLSitemapFeed_Uninstall {
 	{
 		global $wpdb;
 
-		// check if it is a multisite and if XMLSF_MULTISITE_UNINSTALL constant is defined
-		// if so, run the uninstall function for each blog id
+		// Check if it is a multisite and if XMLSF_MULTISITE_UNINSTALL constant is defined
+		// if so, run the uninstall function for each blog id.
 		if ( is_multisite() && defined('XMLSF_MULTISITE_UNINSTALL') && XMLSF_MULTISITE_UNINSTALL ) {
 			error_log('Clearing XML Sitemap Feeds settings from each site before uninstall:');
 			$field = 'blog_id';
@@ -47,8 +47,8 @@ class XMLSitemapFeed_Uninstall {
 		}
 	}
 
-	/*
-	 * remove plugin data
+	/**
+	 * Remove plugin data.
 	 *
 	 * @since 4.4
 	 */
@@ -66,11 +66,6 @@ class XMLSitemapFeed_Uninstall {
 	  	// terms meta
 	  	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
 
-		// remove transients
-		delete_transient( 'xmlsf_flush_rewrite_rules' );
-	  	delete_transient( 'xmlsf_check_static_files' );
-		delete_transient( 'xmlsf_prefetch_post_meta_failed' );
-
 		// remove plugin settings
 		delete_option('xmlsf_version');
 		delete_option('xmlsf_sitemaps');
@@ -87,6 +82,7 @@ class XMLSitemapFeed_Uninstall {
 		delete_option('xmlsf_news_tags');
 		delete_option('xmlsf_images_meta_primed');
 		delete_option('xmlsf_comments_meta_primed');
+		delete_option( 'xmlsf_permalinks_flushed' );
 
 		// flush rules
 		flush_rewrite_rules();

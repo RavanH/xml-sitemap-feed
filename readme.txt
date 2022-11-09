@@ -6,6 +6,8 @@ Requires at least: 4.4
 Requires PHP: 5.4
 Tested up to: 5.9
 Stable tag: 5.3.3
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -88,7 +90,7 @@ Data actively transmitted to search engines is your sitemap location and time of
 
 = Contribute =
 
-If you're happy with this plugin as it is, please consider writing a quick [rating](https://wordpress.org/support/plugin/xml-sitemap-feed/review/#new-post) or helping other users out on the [support forum](https://wordpress.org/support/plugin/xml-sitemap-feed).
+If you're happy with this plugin as it is, please consider writing a quick [rating](https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/#new-post) or helping other users out on the [support forum](https://wordpress.org/support/plugin/xml-sitemap-feed).
 
 If you wish to help build this plugin, you're very welcome to [translate it into your language](https://translate.wordpress.org/projects/wp-plugins/xml-sitemap-feed/) or contribute code on [Github](https://github.com/RavanH/xml-sitemap-feed/).
 
@@ -303,15 +305,14 @@ Fix Bing ping 410 error response and help links.
 == Changelog ==
 
 = 5.4 =
+TODO allow CPT taxonomies selection in news sitemap
 TODO allow inclusion of taxonomies that belong to a post type that is not included
-TODO revisit transients solution in transients_actions() or at least prevent this from running on *every* AJAX call
-TODO fix visible news sitemap when deactivated
-TODO respond 404 for non existant (or deactivated) sitemaps?
+* FIX: Don't use transients if not strictly needed
 * FIX: "Failed opening required" when no template
 * FIX: Nginx Helper purge urls
 * Filter domains in taxonomy and author sitemaps
 * NEW: xmlsf_generator action hook
-* NEW: xmlsf_author_post_type filter 
+* NEW: xmlsf_author_post_types filter
 * FIX: Bing ping response code 410
 * Dropping Bing from Ping Services awaiting IndexNow support
 

@@ -14,9 +14,7 @@ class XMLSitemapFeed_Upgrade {
 	function __construct( $db_version = null )
 	{
 		// make sure rules are regenerated when admin is visited.
-		set_transient( 'xmlsf_flush_rewrite_rules', '' );
-		// static files checking
-		set_transient( 'xmlsf_check_static_files', '' );
+		update_option( 'xmlsf_permalinks_flushed', 0 );
 
 		if ( $db_version )
 			$this->upgrade( $db_version );
@@ -133,7 +131,7 @@ class XMLSitemapFeed_Upgrade {
 
 			// update ping option
 			$ping = get_option( 'xmlsf_ping' );
-			$new = array( 'google', 'bing' );
+			$new = array( 'google' );
 			if ( is_array($ping) ) {
 				foreach ( $ping as $key => $value ) {
 					if ( is_array($value) && empty( $value['active'] ) && isset( $new[$key] ) ) {
@@ -153,6 +151,7 @@ class XMLSitemapFeed_Upgrade {
 		}
 
 		if ( version_compare( '5.1', $db_version, '>' ) ) {
+			// Delete old transients.
 			delete_transient('xmlsf_ping_google_sitemap_news');
 			delete_transient('xmlsf_ping_google_sitemap');
 			delete_transient('xmlsf_ping_bing_sitemap');
@@ -170,14 +169,19 @@ class XMLSitemapFeed_Upgrade {
 		}
 
 		if ( version_compare( '5.4', $db_version, '>' ) ) {
-			// do not switch to core sitemap when upgrading
+			// Delete old transients.
+			delete_transient( 'xmlsf_flush_rewrite_rules' );
+			delete_transient( 'xmlsf_check_static_files' );
+			delete_transient( 'xmlsf_prefetch_post_meta_failed' );
+
+			// Do not switch to core sitemap when upgrading.
 			add_option( 'xmlsf_general_settings', array( 'server' => 'plugin', 'limit' => '2000' ) );
-			// update taxonomy terms limit
+			// Update taxonomy terms limit.
 			$settings = (array) get_option( 'xmlsf_taxonomy_settings', array() );
 			$settings['limit'] = isset( $settings['term_limit'] ) ? $settings['term_limit'] : '3000';
 			unset( $settings['term_limit'] );
 			update_option( 'xmlsf_taxonomy_settings', $settings );
-			// update users limit
+			// Update users limit.
 			$settings = (array) get_option( 'xmlsf_author_settings', array() );
 			$settings['limit'] = isset( $settings['term_limit'] ) ? $settings['term_limit'] : '1000';
 			unset( $settings['term_limit'] );

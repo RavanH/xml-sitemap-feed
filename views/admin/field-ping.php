@@ -6,12 +6,6 @@
 		<?php _e('Google','xml-sitemap-feed'); ?>
 	</label>
 
-	<br>
-
-	<label>
-		<input type="checkbox" name="xmlsf_ping[]" id="xmlsf_ping_yandex" value="yandex"<?php echo checked( is_array($options) && in_array('yandex',$options), true, false); ?> />
-		<?php _e('Yandex','xml-sitemap-feed'); ?>
-	</label>
 </fieldset>
 <script>
 jQuery( 'document' ).ready( function( $ ) {

@@ -12,11 +12,7 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 '; ?>
 <?php xmlsf_xml_stylesheet( 'author' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-<?php do_action( 'xmlsf_urlset', 'home' ); ?>
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action( 'xmlsf_urlset', 'home' ); ?>>
 <?php
 $users = get_users( apply_filters( 'get_users_args', array() ) );
 foreach ( $users as $user ) {
@@ -30,9 +26,9 @@ foreach ( $users as $user ) {
 ?>
 	<url>
 		<loc><?php echo esc_url( $url ); ?></loc>
-		<priority><?php echo xmlsf_get_user_priority( $user ); ?></priority>
+		<priority><?php echo htmlspecialchars( xmlsf_get_user_priority( $user ), ENT_COMPAT, get_bloginfo('charset') ); ?></priority>
 <?php if ( $lastmod = xmlsf_get_user_modified( $user ) ) { ?>
-		<lastmod><?php echo $lastmod; ?></lastmod>
+		<lastmod><?php echo htmlspecialchars( $lastmod, ENT_COMPAT, get_bloginfo('charset') ); ?></lastmod>
 <?php }
 	do_action( 'xmlsf_tags_after', 'author' );
 ?>

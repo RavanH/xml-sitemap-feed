@@ -11,10 +11,7 @@ if ( ! defined( 'WPINC' ) ) die;
 echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>'; ?>
 <?php xmlsf_xml_stylesheet(); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-		http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<sitemap>
 		<loc><?php echo xmlsf_sitemap_url( 'root' ); ?></loc>
 		<lastmod><?php echo get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ); ?></lastmod>
@@ -30,8 +27,8 @@ foreach ( $post_types as $post_type => $settings ) :
 	foreach ( $archive_data as $url => $lastmod ) {
 ?>
 	<sitemap>
-		<loc><?php echo $url; ?></loc>
-		<lastmod><?php echo $lastmod; ?></lastmod>
+		<loc><?php echo esc_url( $url ); ?></loc>
+		<lastmod><?php echo htmlspecialchars( $lastmod, ENT_COMPAT, get_bloginfo('charset') ); ?></lastmod>
 	</sitemap>
 <?php
 	}
@@ -43,7 +40,7 @@ foreach ( $taxonomies as $taxonomy ) : ?>
 	<sitemap>
 		<loc><?php echo xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ); ?></loc>
 <?php if ( $lastmod = xmlsf_get_taxonomy_modified( $taxonomy ) ) { ?>
-		<lastmod><?php echo $lastmod; ?></lastmod>
+		<lastmod><?php echo htmlspecialchars( $lastmod, ENT_COMPAT, get_bloginfo('charset') ); ?></lastmod>
 <?php } ?>
 	</sitemap>
 <?php

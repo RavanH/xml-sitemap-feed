@@ -25,6 +25,9 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 		// Update term meta lastmod date.
 		add_action( 'transition_post_status', array( $this, 'update_term_modified_meta' ), 10, 3 );
 
+		// Update user meta lastmod date.
+		add_action( 'transition_post_status', array( $this, 'update_user_modified_meta' ), 10, 3 );
+
 		// Update images post meta.
 		add_action( 'transition_post_status', array( $this, 'update_post_images_meta' ), 10, 3 );
 
@@ -123,6 +126,11 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 		if ( ! empty( $wp->query_vars['sitemap'] ) ) {
 			// Include public sitemap functions.
 			require_once XMLSF_DIR . '/inc/functions.public-sitemap.php';
+
+			// Debugging.
+			if ( ! is_admin() && current_user_can('manage_options') ) {
+				add_action( 'shutdown', 'xmlsf_usage' );
+			}
 		}
 	}
 
@@ -262,7 +270,8 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 				break;
 
 			case 'user':
-				$entry['lastmod'] = get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ); // absolute last post date
+				// TODO make this xmlsf_author_post_types filter compatible.
+				$entry['lastmod'] = get_date_from_gmt( get_lastpostdate( 'GMT', 'post' ), DATE_W3C ); // Absolute last post date.
 				break;
 
 			default:
@@ -400,7 +409,7 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 	function max_urls( $max_urls, $object_type )
 	{
 		switch( $object_type ) {
-			case 'users':
+			case 'user':
 				$settings = (array) get_option( 'xmlsf_author_settings' );
 				$max_urls = ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
 				break;
@@ -553,9 +562,6 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 			// then use $provider->get_sitemap_type_data() for nested arrays with max number of sitemaps for each subtype
 			// then use that data to build urls... /wp-sitemap-PROVIDER-SUBTYPENAME-PAGENUM++.xml
 
-			// Include public sitemap functions.
-			require_once XMLSF_DIR . '/inc/functions.public-sitemap.php';
-
 			$sitemaps = wp_sitemaps_get_server();
 			foreach ( $sitemaps->index->get_sitemap_list() as $sitemap ) {
 				// Add each element loc value.
@@ -585,6 +591,10 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 	public function posts_url_list( $url_list, $post_type, $page_num )
 	{
 		global $wp_query;
+
+		if ( null === $wp_query->posts ) {
+			return $url_list;
+		}
 
 		$url_list = array();
 

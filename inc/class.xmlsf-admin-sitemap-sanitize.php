@@ -9,10 +9,9 @@ class XMLSF_Admin_Sitemap_Sanitize
 		$old_server = is_array( $old ) && ! empty( $old['server'] ) ? $old['server'] : '';
 		$new_server = is_array( $new ) && ! empty( $new['server'] ) ? $new['server'] : '';
 
-		// When sitemap server has been changed, set transients.
+		// When sitemap server has been changed, ask for rewrite rules to be flushed.
 		if ( $old_server !== $new_server ) {
-			set_transient( 'xmlsf_flush_rewrite_rules', '' );
-			set_transient( 'xmlsf_check_static_files', '' );
+			update_option( 'xmlsf_permalinks_flushed', 0 );
 		}
 
 		return $new;
