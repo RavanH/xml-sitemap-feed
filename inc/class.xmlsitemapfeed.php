@@ -38,6 +38,12 @@ class XMLSitemapFeed {
 	public $is_sitemap = false;
 
 	/**
+	* Signifies whether the request has been filtered for news.
+	* @var bool
+	*/
+	public $request_filtered_news = false;
+
+	/**
 	* Signifies whether the current query is for a news feed.
 	* @var bool
 	*/

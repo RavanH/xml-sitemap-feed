@@ -72,6 +72,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	public function filter_request( $request )
 	{
 		global $xmlsf, $wp_rewrite;
+
 		// Short-circuit if request was already filtered by this plugin.
 		if ( $xmlsf->request_filtered ) {
 			return $request;

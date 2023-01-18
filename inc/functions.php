@@ -123,7 +123,7 @@ function xmlsf_get_stylesheet_url( $sitemap = false ) {
 	 *
 	 * DEVELOPERS: a custom stylesheet file in the active (parent or child) theme /assets subdirectory, will be used when found there
 	 *
-	 * Must start with 'sitemap', optionally followed by another designator, serparated by a hyphen.
+	 * Must start with 'sitemap', optionally followed by another designator, separated by a hyphen.
 	 * It should always end with the xsl extension.
 	 *
 	 * Examples:

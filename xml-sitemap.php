@@ -3,7 +3,7 @@
 Plugin Name: XML Sitemap & Google News
 Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
 Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
-Version: 5.4-beta5
+Version: 5.4-beta6
 Text Domain: xml-sitemap-feed
 Requires at least: 4.6
 Requires PHP: 5.6
@@ -354,7 +354,7 @@ if ( ! function_exists( 'is_news' ) ) {
 	 */
 	function is_news() {
 		global $xmlsf;
-		if ( ! is_object( $xmlsf ) || $xmlsf->request_filtered === false ) {
+		if ( ! is_object( $xmlsf ) || $xmlsf->request_filtered_news === false ) {
 			_doing_it_wrong( __FUNCTION__, __( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
 			return false;
 		}

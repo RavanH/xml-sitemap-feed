@@ -3,7 +3,7 @@ Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 4.4
-Requires PHP: 5.4
+Requires PHP: 5.6
 Tested up to: 6.1
 Stable tag: 5.3.3
 License: GPLv2 or later
@@ -305,6 +305,7 @@ Fix Bing ping 410 error response and help links.
 == Changelog ==
 
 = 5.4 =
+TODO core sitemap stylesheets (per sitemap type)
 TODO allow CPT taxonomies selection in news sitemap
 TODO allow inclusion of taxonomies that belong to a post type that is not included
 TODO test User Role Editor auhtor issue reported by Harry Reigel harry@whispert.de

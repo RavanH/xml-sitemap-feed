@@ -52,9 +52,15 @@ class XMLSF_Sitemap_News
 	public function filter_request( $request ) {
 
 		global $xmlsf, $wp_rewrite;
-		$xmlsf->request_filtered = true;
 
-		// short-circuit if request is not a feed or it does not start with 'sitemap-news'
+		// Short-circuit if request was already filtered by this plugin.
+		if ( $xmlsf->request_filtered_news ) {
+			return $request;
+		} else {
+			$xmlsf->request_filtered_news = true;
+		}
+
+		// Short-circuit if request is not a feed or it does not start with 'sitemap-news'.
 		if ( empty( $request['feed'] ) || strpos( $request['feed'], 'sitemap-news' ) !== 0 ) {
 			return $request;
 		}

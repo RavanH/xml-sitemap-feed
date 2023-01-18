@@ -513,7 +513,7 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 	 */
 	public function stylesheet_url( $url )
 	{
-		//if ( ! get_option( 'xmlsf_core_sitemap_stylesheet' ) ) { // TODO make these optional
+		//if ( ! get_option( 'xmlsf_core_sitemap_stylesheet' ) ) { // TODO make these match sitemap type
 			$url = xmlsf_get_stylesheet_url( 'root' );
 		//}
 
