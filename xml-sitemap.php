@@ -11,7 +11,7 @@ Author: RavanH
 Author URI: https://status301.net/
 */
 
-define( 'XMLSF_VERSION', '5.4-beta5' );
+define( 'XMLSF_VERSION', '5.4-beta7' );
 
 /**
  * Copyright 2022 RavanH
