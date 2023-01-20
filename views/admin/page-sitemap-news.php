@@ -34,7 +34,7 @@
 
 	<div class="sidebar">
 
-		<?php if ( defined( 'XMLSF_NEWS_ADV_VERSION' ) && version_compare( XMLSF_NEWS_ADV_VERSION, parent::$compat_pro_min, '<' ) ) {
+		<?php if ( defined( 'XMLSF_NEWS_ADV_VERSION' ) && version_compare( XMLSF_NEWS_ADV_VERSION, XMLSF_Admin::$compat_pro_min, '<' ) ) {
 			$class = 'update-nag';
 			include XMLSF_DIR . '/views/admin/section-advanced-compat-message.php';
 		} ?>
