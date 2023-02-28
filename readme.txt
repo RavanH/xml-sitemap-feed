@@ -305,6 +305,9 @@ Fix Bing ping 410 error response and help links.
 == Changelog ==
 
 = 5.4 =
+
+TODO fix WPML incompatibility https://wordpress.org/support/topic/multilingual-url-issue/
+TODO add option for priority support link in the sidebar help section and help tab
 TODO core sitemap stylesheets (per sitemap type)
 TODO allow CPT taxonomies selection in news sitemap
 TODO allow inclusion of taxonomies that belong to a post type that is not included
