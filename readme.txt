@@ -312,6 +312,7 @@ TODO core sitemap stylesheets (per sitemap type)
 TODO allow CPT taxonomies selection in news sitemap
 TODO allow inclusion of taxonomies that belong to a post type that is not included
 TODO test User Role Editor auhtor issue reported by Harry Reigel harry@whispert.de
+TODO add filter for taxonomy terms
 * FIX: Don't use transients if not strictly needed
 * FIX: "Failed opening required" when no template
 * FIX: Nginx Helper purge urls
