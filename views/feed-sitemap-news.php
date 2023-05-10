@@ -53,7 +53,7 @@ if ( have_posts() ) :
 			</news:publication>
 			<news:publication_date><?php echo get_date_from_gmt( $post->post_date_gmt, DATE_W3C ); ?></news:publication_date>
 			<news:title><?php echo htmlspecialchars( apply_filters( 'xmlsf_news_title', get_the_title() ), ENT_COMPAT, get_bloginfo('charset') ); ?></news:title>
-			<news:keywords><?php echo htmlspecialchars( implode( ', ', apply_filters( 'xmlsf_news_keywords', array() ) ), ENT_COMPAT, get_bloginfo('charset') ); ?></news:keywords>
+			<news:keywords><?php echo htmlspecialchars( implode( ', ', (array) apply_filters( 'xmlsf_news_keywords', array(), $post->ID ) ), ENT_COMPAT, get_bloginfo('charset') ); ?></news:keywords>
 			<news:stock_tickers><?php echo htmlspecialchars( implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ), ENT_COMPAT, get_bloginfo('charset') ); ?></news:stock_tickers>
 <?php do_action( 'xmlsf_news_tags_inner' ); ?>
 		</news:news>

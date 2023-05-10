@@ -9,8 +9,8 @@
 			__( 'XML Sitemap & Google News', 'xml-sitemap-feed' )
 		); ?>
 		<?php printf( /* translators: Sitemap page name (linked to SEOPress plugin settings), XML Sitemap Index, Reading Settings admin page (linked to Reading settings) */
-			__( 'Please either disable the XML Sitemap under %1$s in your SEO settings or disable the option %2$s on %3$s.', 'xml-sitemap-feed'),
-			'<a href="' . admin_url('admin.php') . '?page=wpseo_dashboard#top#features">' . translate('Features','wordpress-seo') . '</a>',
+			__( 'Please either disable the XML Sitemap under %1$s in your SEO settings or disable the option %2$s on %3$s.', 'xml-sitemap-feed'),
+			'<a href="' . admin_url('admin.php') . '?page=wpseo_page_settings#/site-features">' . translate('Site features','wordpress-seo') . '</a>',
 			__('XML Sitemap Index','xml-sitemap-feed'),
 			'<a href="' . admin_url('options-reading.php') . '#xmlsf_sitemaps">' . translate('Reading Settings') . '</a>'
 		); ?>
