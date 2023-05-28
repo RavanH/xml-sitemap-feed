@@ -312,17 +312,17 @@ function xmlsf_images_data( $post, $which ) {
  */
 if ( ! function_exists( '_get_post_time' ) ) {
 	function _get_post_time( $timezone, $field, $post_type = 'any', $which = 'last', $m = '', $w = '' ) {
-   
+
 	   global $wpdb;
-   
+
 	   if ( !in_array( $field, array( 'date', 'modified' ) ) ) {
 		   return false;
 	   }
-   
+
 	   $timezone = strtolower( $timezone );
-   
+
 	   $m = preg_replace('|[^0-9]|', '', $m);
-   
+
 	   if ( ! empty( $w ) ) {
 		   // when a week number is set make sure 'm' is year only
 		   $m = substr( $m, 0, 4 );
@@ -331,16 +331,16 @@ if ( ! function_exists( '_get_post_time' ) ) {
 	   } else {
 		   $key = "{$which}post{$field}{$m}.{$w}:$timezone";
 	   }
-   
+
 	   if ( 'any' !== $post_type ) {
 		   $key .= ':' . sanitize_key( $post_type );
 	   }
-   
+
 	   $date = wp_cache_get( $key, 'timeinfo' );
 	   if ( false !== $date ) {
 		   return $date;
 	   }
-   
+
 	   if ( $post_type === 'any' ) {
 		   $post_types = get_post_types( array( 'public' => true ) );
 		   array_walk( $post_types, array( &$wpdb, 'escape_by_ref' ) );
@@ -357,9 +357,9 @@ if ( ! function_exists( '_get_post_time' ) ) {
 			   return false;
 		   $post_types = "'" . addslashes($post_type) . "'";
 	   }
-   
+
 	   $where = "post_status='publish' AND post_type IN ({$post_types}) AND post_date_gmt";
-   
+
 	   // If a period is specified in the querystring, add that to the query
 	   if ( !empty($m) ) {
 		   $where .= " AND YEAR(post_date)=" . substr($m, 0, 4);
@@ -374,9 +374,9 @@ if ( ! function_exists( '_get_post_time' ) ) {
 		   $week     = _wp_mysql_week( 'post_date' );
 		   $where .= " AND $week=$w";
 	   }
-   
+
 	   $order = ( $which == 'last' ) ? 'DESC' : 'ASC';
-   
+
 	   /* CODE SUGGESTION BY Frédéric Demarle
 	   * to make this language aware:
 	   "SELECT post_{$field}_gmt FROM $wpdb->posts" . PLL()->model->post->join_clause()
@@ -387,28 +387,28 @@ if ( ! function_exists( '_get_post_time' ) ) {
 		   case 'gmt':
 			   $date = $wpdb->get_var("SELECT post_{$field}_gmt FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
 			   break;
-   
+
 		   case 'blog':
 			   $date = $wpdb->get_var("SELECT post_{$field} FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
 			   break;
-   
+
 		   case 'server':
 			   $add_seconds_server = date('Z');
 			   $date = $wpdb->get_var("SELECT DATE_ADD(post_{$field}_gmt, INTERVAL '$add_seconds_server' SECOND) FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
 			   break;
 	   }
-   
+
 	   if ( $date ) {
 		   wp_cache_set( $key, $date, 'timeinfo' );
-   
+
 		   return $date;
 	   }
-   
+
 	   return false;
-   
+
 	}
 }
-   
+
 /**
  * Retrieve the date that the first post/page was published.
  * Variation of function get_lastpostdate, uses _get_post_time
@@ -424,9 +424,9 @@ if ( ! function_exists( '_get_post_time' ) ) {
  */
 if ( ! function_exists( 'get_firstpostdate' ) ) {
 	function get_firstpostdate( $timezone = 'server', $post_type = 'any' ) {
-   
+
 	   return apply_filters( 'get_firstpostdate', _get_post_time( $timezone, 'date', $post_type, 'first' ), $timezone );
-   
+
 	}
 }
 
@@ -448,8 +448,19 @@ if ( ! function_exists( 'get_firstpostdate' ) ) {
  */
 if ( ! function_exists( 'get_lastmodified' ) ) {
 	function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '', $w = '' ) {
-   
-	   return apply_filters( 'get_lastmodified', _get_post_time( $timezone, 'modified', $post_type, 'last', $m, $w ), $timezone );
-   
+
+		// Get last post publication and modification dates.
+		$date = _get_post_time( $timezone, 'date', $post_type, 'last', $m, $w );
+		$modified = _get_post_time( $timezone, 'modified', $post_type, 'last', $m, $w );
+
+		// Make sure post date is not later than modified date. Can happen when scheduling publication of posts.
+		$date_time = strtotime( $date );
+		$mod_time = strtotime( $modified );
+		if ( ! $mod_time || ( $date_time && $date_time > $mod_time ) ) {
+			$modified = $date;
+		}
+
+		return apply_filters( 'get_lastmodified', _get_post_time( $timezone, 'modified', $post_type, 'last', $m, $w ), $timezone );
+
 	}
 }
