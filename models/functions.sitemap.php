@@ -460,7 +460,7 @@ if ( ! function_exists( 'get_lastmodified' ) ) {
 			$modified = $date;
 		}
 
-		return apply_filters( 'get_lastmodified', _get_post_time( $timezone, 'modified', $post_type, 'last', $m, $w ), $timezone );
+		return apply_filters( 'get_lastmodified', $modified, $timezone );
 
 	}
 }
