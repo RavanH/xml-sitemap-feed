@@ -4,8 +4,8 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravan
 Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Google News, Yahoo, Bing, Yandex, Baidu, seo, feed, Polylang, WPML, image sitemap
 Requires at least: 4.4
 Requires PHP: 5.4
-Tested up to: 6.1
-Stable tag: 5.3.3
+Tested up to: 6.2
+Stable tag: 5.3.4
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -296,11 +296,15 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.3.3 =
+= 5.3.4 =
 
-Fix Bing ping 410 error response and help links.
+Bugfixes: lastmod on scheduled posts + template file not found.
 
 == Changelog ==
+
+= 5.3.4 =
+* FIX: File not found error on invalid sitemap requests
+* FIX: Lastmod date older than post date on scheduled posts
 
 = 5.3.3 =
 * FIX: Undefined variable + Invalid argument supplied for foreach(), thanks @yankyaw09
