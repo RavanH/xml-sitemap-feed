@@ -179,9 +179,15 @@ function xmlsf_load_template( $is_comment_feed, $feed ) {
 		$templates[] = "{$parts[0]}.php";
 	}
 
-	// find theme template file and load that
+	// Find theme template file and load that.
 	locate_template( $templates, true );
 
-	// still here, then fall back on plugin template file
-	load_template( XMLSF_DIR . '/views/feed-' . implode( '-', array_slice( $parts, 0, 2 ) ) . '.php' );
+	// Still here, then fall back on plugin template file.
+	$template = XMLSF_DIR . '/views/feed-' . implode( '-', array_slice( $parts, 0, 2 ) ) . '.php';
+	if ( file_exists( $template ) ) {
+		load_template( $template );
+	} else {
+		load_template( XMLSF_DIR . '/views/feed-sitemap.php' );
+	}
+
 }
