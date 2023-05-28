@@ -319,7 +319,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	}
 
 	/**
-	 * Get post archives data
+	 * Post archives data
 	 *
 	 * @param array $data
 	 * @param string $post_type
