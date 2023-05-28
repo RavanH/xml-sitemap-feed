@@ -9,14 +9,17 @@
  * @return array
  */
 function xmlsf_headers( $headers ) {
-	// force status 200
+	// Force status 200.
 	$headers['Status'] = '200';
-	// set noindex
+
+	// Set noindex.
 	$headers['X-Robots-Tag'] = 'noindex, follow';
-	// force content type
+
+	// Force content type
 	$headers['Content-Type'] = 'application/xml; charset=' . get_bloginfo('charset');
 
-	return $headers;
+	// And return, merged with nocache headers
+	return array_merge( $headers, wp_get_nocache_headers() );
 }
 
 /**

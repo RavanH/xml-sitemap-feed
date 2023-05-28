@@ -1,16 +1,18 @@
-<xsl:stylesheet version="1.1"
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="2.0"
+	xmlns:html="http://www.w3.org/TR/REC-html40"
 	xmlns:sitemap="http://www.sitemaps.org/schemas/sitemap/0.9"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes"/>
 <xsl:template match="/">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title>XML Sitemap — Index</title>
+	<title>XML Sitemap Feed - Index</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<style type="text/css">body{font-family:"Lucida Grande","Lucida Sans Unicode",Tahoma,Verdana,sans-serif;font-size:13px}#header,#footer{padding:2px;margin:10px;font-size:8pt;color:gray}a{color:black}td{font-size:11px}th{text-align:left;padding-right:30px;font-size:11px}tr.high{background-color:whitesmoke}#footer img{vertical-align:middle}</style>
 </head>
 <body>
-	<h1>XML Sitemap — Index</h1>
+	<h1>XML Sitemap Feed - Index</h1>
 	<div id="header">
 		<p>This is the XML Sitemap Index to aid search engines like <a href="https://www.google.com">Google</a>, <a href="https://www.bing.com/">Bing</a>, <a href="https://www.yahoo.com">Yahoo!</a> and <a href="https://www.ask.com">Ask</a> indexing your site better. Read more about XML sitemaps on <a href="https://www.sitemaps.org/">Sitemaps.org</a></p>
 	</div>

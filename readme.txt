@@ -5,7 +5,7 @@ Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Googl
 Requires at least: 4.4
 Requires PHP: 5.4
 Tested up to: 5.9
-Stable tag: 5.3
+Stable tag: 5.3.2
 
 XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
 
@@ -76,7 +76,7 @@ This plugin does not collect any user or visitor data nor set browser cookies. U
 
 **Data that is published**
 
-An XML Sitemap index, referencing other sitemaps containing your web site's public post URLs of selected post types that are already public, along with their last modification date and associated image URLs, and any selected public archive URLs.
+An XML Sitemap index, referencing other sitemaps containing your web site's public post URLs of selected post types that are already public, along with their last modification date and associated image URLs, and any selected public archive URLs.
 
 A Google News Sitemap containing your web site's public and recent (last 48 hours) URLs of selected news post type, along with their publication time stamp and associated image URL.
 An author sitemap can be included, which will contain links to author archive pages. These urls contain author/user slugs, and the author archives can contain author bio information. If you wish to keep this out of public domain, then deactivate the author sitemap and use an SEO plugin to add noindex headers.
@@ -296,11 +296,20 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.3 =
+= 5.3.2 =
 
-Author sitemap, custom theme template, speed improvements and bugfixes.
+Fix Bing ping 410 error response and help links.
 
 == Changelog ==
+
+= 5.3.2 =
+* FIX: Bing ping 410 error response
+* FIX: Outdated help & forum links
+
+= 5.3.1 =
+* FIX: Restore wp-sitemap.xml rewrite rules after deactivation
+* FIX: Call to undefined function xmlsf_get_archives()
+* Use nocache_headers()
 
 = 5.3 =
 * NEW: Author sitemap
@@ -399,7 +408,7 @@ Author sitemap, custom theme template, speed improvements and bugfixes.
 * FIX Custom post types with a hyphen not showing
 * FIX Admin static files message fatal error, thanks @kitchin
 * FIX Improper if statement in upgrade routine, thanks @kitchin
-* FIX PHP 5.4 compatibility issues
+* FIX PHP 5.4 compatibility issues
 
 = 5.0 =
 * Complete code restructure and cleanup: MVC and JIT inclusion
@@ -449,7 +458,7 @@ Author sitemap, custom theme template, speed improvements and bugfixes.
 
 = 4.8.3 =
 * fix get_lastpostdate array/string
-* restore pre PHP 5.4 compatibility (popular request)
+* restore pre PHP 5.4 compatibility (popular request)
 
 = 4.8 =
 * NEW: Conditional functions is_sitemap() and is_news()

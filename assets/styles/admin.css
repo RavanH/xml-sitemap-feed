@@ -1,0 +1,19 @@
+div.main {
+	width: 68%;
+	float: left;
+}
+div.sidebar {
+	width: 29%;
+	padding: .9em 0 2em 2%;
+	border-left: 1px solid #ccc;
+	float: right;
+	background: linear-gradient(to right, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%);
+}
+@media screen and (max-width: 600px) {
+	div.main, div.sidebar {
+	    width: 100%;
+		float: none;
+		border: none;
+		padding: 0
+	}
+}

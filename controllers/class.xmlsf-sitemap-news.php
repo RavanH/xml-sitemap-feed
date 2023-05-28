@@ -18,6 +18,15 @@ class XMLSF_Sitemap_News
 	private $post_types;
 
 	/**
+	 * Rewrite rules
+	 * @var array
+	 */
+	public $rewrite_rules = array(
+		'regex' => 'sitemap-news\.xml(\.gz)?$',
+		'query' => '?feed=sitemap-news$matches[1]'
+	);
+
+	/**
 	 * CONSTRUCTOR
 	 * Runs on init
 	 */
@@ -26,14 +35,29 @@ class XMLSF_Sitemap_News
 	{
 		if ( $sitemap ) $this->sitemap = $sitemap;
 
-		// add sitemap rewrite rule
-		if ( $ruleset = xmlsf()->rewrite_ruleset( $this->sitemap ) )
-			add_rewrite_rule( $ruleset['regex'], $ruleset['query'], 'top' );
+		// Rewrite rules filter.
+		add_filter( 'rewrite_rules_array', array( $this, 'rewrite_rules' ), 99, 1 );
 
 		// PINGING
 		add_action( 'transition_post_status', array( $this, 'do_ping' ), 999, 3 );
 	}
 
+	/**
+	 * Add sitemap rewrite rules
+	 * 
+	 * Hooked into rewrite_rules_array filter
+	 *
+	 * @param array $rewrite_rules
+	 * @return array $rewrite_rules
+	 */
+	public function rewrite_rules( $rewrite_rules ) {
+		global $wp_rewrite;
+
+		$rewrite_rules = array_merge( array( $this->rewrite_rules['regex'] => $wp_rewrite->index . $this->rewrite_rules['query'] ), $rewrite_rules );
+
+		return $rewrite_rules;
+	}
+	
 	/**
 	 * Do pings, hooked to transition post status
 	 *

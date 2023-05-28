@@ -8,9 +8,9 @@
  *
  * @return array
  */
-function xmlsf_news_headers( $headers ) {
+function xmlsf_news_nocache_headers( $headers ) {
 	// prevent proxy caches serving a cached news sitemap
-	$headers['Cache-Control'] = 'no-store';
+	$headers['Cache-Control'] .= ', no-store';
 
 	return $headers;
 }
@@ -37,7 +37,7 @@ function xmlsf_news_filter_where( $where = '' ) {
 function xmlsf_sitemap_news_filter_request( $request ) {
 
 	// REPSONSE HEADERS filtering
- 	add_filter( 'wp_headers', 'xmlsf_news_headers' );
+ 	add_filter( 'nocache_headers', 'xmlsf_news_nocache_headers' );
 
 	/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
 	$request = apply_filters( 'xmlsf_news_request', $request );
