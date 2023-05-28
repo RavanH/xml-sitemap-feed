@@ -157,7 +157,7 @@ class XMLSF_Admin
 
 		else :
 
-			_e( 'XML Sitemaps are not available because of your site&#8217;s visibility settings (above).', 'xml-sitemap-feed' );
+			_e( 'XML Sitemaps are not available because of your site&#8217;s visibility settings (above).', 'xml-sitemap-feed' );
 
 		endif;
 	}

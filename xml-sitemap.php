@@ -3,7 +3,7 @@
 Plugin Name: XML Sitemap & Google News
 Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
 Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
-Version: 5.3.2
+Version: 5.3.3
 Text Domain: xml-sitemap-feed
 Requires at least: 4.6
 Requires PHP: 5.6
@@ -11,7 +11,7 @@ Author: RavanH
 Author URI: https://status301.net/
 */
 
-define( 'XMLSF_VERSION', '5.3.2' );
+define( 'XMLSF_VERSION', '5.3.3' );
 /**
  * Copyright 2021 RavanH
  * https://status301.net/
@@ -343,20 +343,18 @@ function is_news() {
 /*
 spl_autoload_register( function( $class ) {
 
-	$namespace = 'Justin\\';
-	$path      = 'src';
+	$namespace = 'XMLSF\\';
 
 	// Bail if the class is not in our namespace.
 	if ( 0 !== strpos( $class, $namespace ) ) {
 		return;
 	}
 
-	// Remove the namespace.
-	$class = str_replace( $namespace, '', $class );
-
 	// Build the filename.
-	$file = realpath( __DIR__ . "/{$path}" );
-	$file = $file . DIRECTORY_SEPARATOR . str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
+	$class = str_replace( $namespace, '', $class );
+	$class = strtolower( $class );
+	$class = str_replace( '_', '-', $class );
+	$file = realpath( __DIR__ ) . DIRECTORY_SEPARATOR . str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
 
 	// If the file exists for the class name, load it.
 	if ( file_exists( $file ) ) {
