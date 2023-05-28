@@ -249,14 +249,14 @@ function xmlsf_usage() {
  * @param string $m year, month or day period. Can be empty or integer.
  * @param string $w week. Can be empty or integer.
  *
- * @return string The date.
+ * @return string|false The date.
  */
 if ( ! function_exists( '_get_post_time' ) ) {
 	function _get_post_time( $timezone, $field, $post_type = 'any', $which = 'last', $m = '', $w = '' ) {
 
 	   global $wpdb;
 
-	   if ( !in_array( $field, array( 'date', 'modified' ) ) ) {
+	   if ( ! in_array( $field, array( 'date', 'modified' ) ) ) {
 		   return false;
 	   }
 
@@ -294,7 +294,7 @@ if ( ! function_exists( '_get_post_time' ) ) {
 		   array_walk( $post_type, array( &$wpdb, 'escape_by_ref' ) );
 		   $post_types = "'" . implode( "', '", $post_type ) . "'";
 	   } else {
-		   if ( !in_array( $post_type, get_post_types( array( 'public' => true ) ) ) )
+		   if ( ! in_array( $post_type, get_post_types( array( 'public' => true ) ) ) )
 			   return false;
 		   $post_types = "'" . addslashes($post_type) . "'";
 	   }
@@ -302,7 +302,7 @@ if ( ! function_exists( '_get_post_time' ) ) {
 	   $where = "post_status='publish' AND post_type IN ({$post_types}) AND post_date_gmt";
 
 	   // If a period is specified in the querystring, add that to the query
-	   if ( !empty($m) ) {
+	   if ( ! empty($m) ) {
 		   $where .= " AND YEAR(post_date)=" . substr($m, 0, 4);
 		   if ( strlen($m) > 5 ) {
 			   $where .= " AND MONTH(post_date)=" . substr($m, 4, 2);
@@ -311,7 +311,7 @@ if ( ! function_exists( '_get_post_time' ) ) {
 			   }
 		   }
 	   }
-	   if ( !empty($w) ) {
+	   if ( ! empty($w) ) {
 		   $week     = _wp_mysql_week( 'post_date' );
 		   $where .= " AND $week=$w";
 	   }
@@ -385,12 +385,23 @@ if ( ! function_exists( 'get_firstpostdate' ) ) {
  * @param string $m The period to check in. Defaults to any, can be YYYY, YYYYMM or YYYYMMDD
  * @param string $w The week to check in. Defaults to any, can be one or two digit week number. Must be used with $m in YYYY format.
  *
- * @return string The date of the latest modified post.
+ * @return string|false The date of the latest modified post.
  */
 if ( ! function_exists( 'get_lastmodified' ) ) {
 	function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '', $w = '' ) {
 
-	   return apply_filters( 'get_lastmodified', _get_post_time( $timezone, 'modified', $post_type, 'last', $m, $w ), $timezone );
+		// Get last post publication and modification dates.
+		$date = _get_post_time( $timezone, 'date', $post_type, 'last', $m, $w );
+		$modified = _get_post_time( $timezone, 'modified', $post_type, 'last', $m, $w );
+
+		// Make sure post date is not later than modified date. Can happen when scheduling publication of posts.
+		$date_time = strtotime( $date );
+		$mod_time = strtotime( $modified );
+		if ( ! $mod_time || ( $date_time && $date_time > $mod_time ) ) {
+			$modified = $date;
+		}
+
+		return apply_filters( 'get_lastmodified', $modified, $timezone );
 
 	}
 }
