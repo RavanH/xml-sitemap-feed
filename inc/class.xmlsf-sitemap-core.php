@@ -185,6 +185,8 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 					wp_raise_memory_limit( 'wp-sitemap-posts-'.$subtype );
 
 					// Alter main query request parameters to fit wp-sitemap.
+					$request['orderby']                = 'modified'; // Needed to get correct lastmod for the first sitemap!
+					$request['order']                  = 'DESC';
 					$request['ignore_sticky_posts']    = true;
 					$request['post_type']              = $subtype;
 					$request['posts_per_page']         = wp_sitemaps_get_max_urls( 'post' );
@@ -256,8 +258,12 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 	 */
 	public function index_entry( $entry, $type, $subtype, $page )
 	{
+		// TODO account for $page 2 and up...
+		if ( $page > 1 ) {
+			return $entry;
+		}
+
 		// Add lastmod.
-		// TODO account for $page ... but how?
 		switch( $type ) {
 			case 'post':
 				$entry['lastmod'] = get_date_from_gmt( get_lastpostmodified( 'GMT', $subtype ), DATE_W3C );
