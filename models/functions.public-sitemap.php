@@ -515,8 +515,6 @@ function xmlsf_sitemap_filter_request( $request ) {
 
 			// modify request
 			$request['post_type'] = $feed[2];
-			$request['orderby'] = 'modified';
-			$request['order'] = 'DESC';
 
 			// prevent term cache update query unless needed for permalinks
 			if ( strpos( get_option( 'permalink_structure' ), '%category%' ) === false )
