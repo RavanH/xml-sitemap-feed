@@ -169,8 +169,6 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 
 				// Modify request.
 				$request['post_type'] = $feed[2];
-				$request['orderby'] = 'modified';
-				$request['order'] = 'DESC';
 
 				// Prevent term cache update query unless needed for permalinks.
 				if ( strpos( get_option( 'permalink_structure' ), '%category%' ) === false )
