@@ -185,7 +185,7 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 					wp_raise_memory_limit( 'wp-sitemap-posts-'.$subtype );
 
 					// Alter main query request parameters to fit wp-sitemap.
-					$request['orderby']                = 'modified'; // Needed to get correct lastmod for the first sitemap!
+					$request['orderby']                = 'modified'; // Needed to get at least one correct lastmod for the first sitemap!
 					$request['order']                  = 'DESC';
 					$request['ignore_sticky_posts']    = true;
 					$request['post_type']              = $subtype;
