@@ -3,7 +3,7 @@
 Plugin Name: XML Sitemap & Google News
 Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
 Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
-Version: 5.3.4
+Version: 5.3.5
 Text Domain: xml-sitemap-feed
 Requires at least: 4.6
 Requires PHP: 5.6
@@ -11,7 +11,8 @@ Author: RavanH
 Author URI: https://status301.net/
 */
 
-define( 'XMLSF_VERSION', '5.3.4' );
+define( 'XMLSF_VERSION', '5.3.5' );
+
 /**
  * Copyright 2023 RavanH
  * https://status301.net/
@@ -337,28 +338,3 @@ function is_news() {
 	}
 	return $xmlsf->is_news;
 }
-
-// TODO start with namespacing and autoload
-// http://justintadlock.com/archives/2018/12/14/php-namespaces-for-wordpress-developers
-/*
-spl_autoload_register( function( $class ) {
-
-	$namespace = 'XMLSF\\';
-
-	// Bail if the class is not in our namespace.
-	if ( 0 !== strpos( $class, $namespace ) ) {
-		return;
-	}
-
-	// Build the filename.
-	$class = str_replace( $namespace, '', $class );
-	$class = strtolower( $class );
-	$class = str_replace( '_', '-', $class );
-	$file = realpath( __DIR__ ) . DIRECTORY_SEPARATOR . str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
-
-	// If the file exists for the class name, load it.
-	if ( file_exists( $file ) ) {
-		include( $file );
-	}
-} );
-*/
