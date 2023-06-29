@@ -296,11 +296,14 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.3.4 =
+= 5.3.5 =
 
-Bugfixes: lastmod on scheduled posts + template file not found.
+Bugfix: conflict with Etag headers.
 
 == Changelog ==
+
+= 5.3.5 =
+* FIX: Forced Status 200 response conflict with Etag/If-None-Match headers, thanks @revolutionnaire
 
 = 5.3.4 =
 * FIX: File not found error on invalid sitemap requests

@@ -9,9 +9,6 @@
  * @return array
  */
 function xmlsf_headers( $headers ) {
-	// Force status 200.
-	$headers['Status'] = '200';
-
 	// Set noindex.
 	$headers['X-Robots-Tag'] = 'noindex, follow';
 
