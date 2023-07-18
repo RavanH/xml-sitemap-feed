@@ -306,6 +306,7 @@ Fix Bing ping 410 error response and help links.
 
 = 5.4 =
 
+TODO test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 TODO fix WPML incompatibility https://wordpress.org/support/topic/multilingual-url-issue/
 TODO add option for priority support link in the sidebar help section and help tab
 TODO core sitemap stylesheets (per sitemap type)
