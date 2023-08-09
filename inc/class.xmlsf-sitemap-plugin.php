@@ -207,7 +207,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 				}
 
 				// Set users args.
-				add_filter( 'get_users_args', array( $this, 'set_authors_args' ) );
+				add_filter( 'xmlsf_get_author_args', array( $this, 'set_authors_args' ) );
 				break;
 
 			default:
@@ -277,8 +277,6 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	 * @return array
 	 */
 	function set_authors_args( $args ) {
-		$author_settings = get_option( 'xmlsf_author_settings' );
-
 		/**
 		 * Filters the post types present in the author archive. Must return an array of one or multiple post types.
 		 * Allows to add or change post type when theme author archive page shows custom post types.
@@ -290,15 +288,11 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		 * @return array
 		 */
 		$post_type_array = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
+		$args['has_published_posts'] = $post_type_array;
 
+		$author_settings = get_option( 'xmlsf_author_settings' );
 		$args['number'] = ! empty( $author_settings['limit'] ) && is_numeric( $author_settings['limit'] ) ? intval( $author_settings['limit'] ) : 2000;
 		if ( $args['number'] < 1 || $args['number'] > 50000 ) $args['number'] = 50000;
-
-		$args['orderby'] = 'post_count';
-		$args['order'] = 'DESC';
-		//$args['fields'] = array( 'ID' ); // must be an array
-		//$args['who'] = 'authors'; // Deprecated since 5.9.
-		$args['has_published_posts'] = $post_type_array;
 
 		return $args;
 	}

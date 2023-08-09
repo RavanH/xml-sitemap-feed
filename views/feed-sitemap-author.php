@@ -14,7 +14,13 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
 <?php do_action( 'xmlsf_generator' ); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action( 'xmlsf_urlset', 'home' ); ?>>
 <?php
-$users = get_users( apply_filters( 'get_users_args', array() ) );
+$users = get_users( apply_filters( 'xmlsf_get_author_args', array(
+	'orderby'             => 'post_count',
+	'order'               => 'DESC',
+	'number'              => '1000',
+	'fields'              => array( 'ID', 'user_login',	'spam', 'deleted' ),
+	'has_published_posts' => true, // Means all post types by default.
+) ) );
 foreach ( $users as $user ) {
 	$url = get_author_posts_url( $user->ID );
 
