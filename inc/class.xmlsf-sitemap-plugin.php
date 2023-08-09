@@ -208,6 +208,8 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 
 				// Set users args.
 				add_filter( 'xmlsf_get_author_args', array( $this, 'set_authors_args' ) );
+				// Set user filter for multisite.
+				add_filter( 'xmlsf_skip_user', array( $this, 'skip_deleted_or_spam_authors' ) );
 				break;
 
 			default:
@@ -295,6 +297,29 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		if ( $args['number'] < 1 || $args['number'] > 50000 ) $args['number'] = 50000;
 
 		return $args;
+	}
+
+	/**
+	 * Exclude spammed or deleted Authors in a multisite environment.
+	 * Does not check if we are really in a sitemap feed.
+	 *
+	 * @uses is_multisite()
+	 */
+	public function skip_deleted_or_spam_authors( $skip, $user )
+	{
+		if ( ! is_multisite() ) {
+			return $skip;
+		}
+
+		if ( property_exists( $user, 'deleted' ) && $user->deleted ) {
+			return true;
+		}
+
+		if ( property_exists( $user, 'spam' ) && $user->spam ) {
+			return true;
+		}
+
+		return $skip;
 	}
 
 	/**
