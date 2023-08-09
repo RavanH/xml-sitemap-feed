@@ -68,6 +68,10 @@ define( 'XMLSF_VERSION', '5.4-beta9' );
  * xmlsf_author_post_types     -> Filters the post type that is used to get author archive lastmod date. Passes variable array('post').
  *                                Must return an array of one or more (public) post type slugs.
  * xmlsf_news_post_types       -> Filters the post types array for the Google News sitemap settings page.
+ * xmlsf_get_author_args       -> Filters the get_users() arguments before author sitemap creation.
+ * xmlsf_skip_user             -> Allows excluding users from the author sitemap. Passes the $user object with ID, login, spam, deleted properties,
+ * 								  unless set otherwise via the fields argument through the xmlsf_get_author_args filter.
+ *                                Expects a boolean value (true|false) in return. False by default.
  *
  * ACTIONS *
  *
