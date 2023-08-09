@@ -325,6 +325,7 @@ TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to 
 * NEW: xmlsf_author_post_types filter
 * FIX: Bing ping response code 410
 * Dropping Bing from Ping Services awaiting IndexNow support
+* Exclude spammed or deleted authors on multisite
 
 = 5.3.3 =
 * FIX: Undefined variable + Invalid argument supplied for foreach(), thanks @yankyaw09
