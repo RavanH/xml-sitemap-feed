@@ -62,7 +62,7 @@ function xmlsf_get_author_data() {
 			'number'              => ! empty( $author_settings['term_limit'] ) && is_numeric( $author_settings['term_limit'] ) ? $author_settings['term_limit'] : '1000',
 			'fields'              => array( 'ID' ), // must be an array
 			'has_published_posts' => true, // means all post types
-			'who'                 => 'authors'
+			//'who'                 => 'authors'
 		)
 	);
 	// make sure 'fields' is an array and includes 'ID'
