@@ -9,7 +9,7 @@
 			'<a href="' . admin_url('admin.php') . '?page=wpseo_page_settings#/date-archives">' . translate('Date archives','wordpress-seo') . '</a>',
 			__( 'Split by', 'xml-sitemap-feed' ),
 			translate('None'),
-			'<a href="' . admin_url('options-general.php') . '?page=xmlsf">' . __('Included post types','xml-sitemap-feed') . '</a>'
+			'<a href="' . admin_url('options-general.php') . '?page=xmlsf&tab=post_types">' . __('Included post types','xml-sitemap-feed') . '</a>'
 		); ?>
   </p>
 </div>
