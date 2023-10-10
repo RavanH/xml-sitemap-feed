@@ -419,18 +419,16 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 
 		global $wpdb;
 
-		$key = md5($query);
-		$cache = wp_cache_get( 'xmlsf_get_archives' , 'general');
+		$key = md5( $query );
+		$_cache = wp_cache_get( 'xmlsf_get_archives' , 'general' );
+		$cache = false === $_cache ? array() : $_cache;
 
-		if ( !isset( $cache[ $key ] ) ) {
-			$arcresults = $wpdb->get_results($query);
-			$cache[ $key ] = $arcresults;
+		if ( ! isset( $cache[ $key ] ) ) {
+			$cache[ $key ] = $wpdb->get_results( $query );
 			wp_cache_set( 'xmlsf_get_archives', $cache, 'general' );
-		} else {
-			$arcresults = $cache[ $key ];
 		}
 
-		return $arcresults;
+		return $cache[ $key ];
 	}
 
 	/**
