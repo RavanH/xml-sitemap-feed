@@ -298,23 +298,23 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.3.3 =
+= 5.4 =
 
-Fix Bing ping 410 error response and help links.
 
 == Changelog ==
 
 = 5.4 =
 
-* FIX: Don't use transients if not strictly needed
-* FIX: "Failed opening required" when no template
-* FIX: Nginx Helper purge urls
 * Filter domains in taxonomy and author sitemaps
 * NEW: xmlsf_generator action hook
 * NEW: xmlsf_author_post_types filter
-* FIX: Bing ping response code 410
 * Dropping Bing from Ping Services awaiting IndexNow support
 * Exclude spammed or deleted authors on multisite
+* Updated help links
+* FIX: Don't use transients if not strictly needed
+* FIX: "Failed opening required" when no template
+* FIX: Nginx Helper purge urls
+* FIX: Conversion of false to array deprecated warning
 
 = 5.3.3 =
 * FIX: Undefined variable + Invalid argument supplied for foreach(), thanks @yankyaw09
