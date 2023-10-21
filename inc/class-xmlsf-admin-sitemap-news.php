@@ -31,10 +31,10 @@ class XMLSF_Admin_Sitemap_News
 	* TOOLS ACTIONS
 	*/
 
-	public function ping_sitemap()
-	{
-		if ( ! isset( $_POST['xmlsf-ping-sitemap-news'] ) || ! xmlsf_verify_nonce('help') )
+	public function ping_sitemap() {
+		if ( isset( $_POST['xmlsf-ping-sitemap-news'] ) || ! isset( $_POST[ '_xmlsf_help_nonce' ] ) || ! wp_verify_nonce( wp_unslash( $_POST[ '_xmlsf_help_nonce' ] ), XMLSF_BASENAME . '-help' ) ) {
 			return;
+		}
 
 		$result = xmlsf_ping( 'google', 'news', 5 * MINUTE_IN_SECONDS );
 

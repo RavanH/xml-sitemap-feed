@@ -1,28 +1,33 @@
 <?php
+/**
+ * Plugin Sitemap
+ *
+ * @package XML Sitemap & Google News
+ */
 
-/* -------------------------------
- *   XMLSF Sitemap Plugin CLASS
- * ------------------------------- */
-
-class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
-{
+/**
+ * XMLSF Sitemap Plugin CLASS.
+ */
+class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 	/**
 	 * Rewrite rules
+	 *
 	 * @var array
 	 */
 	public $rewrite_rules = array(
 		array(
 			'regex' => 'sitemap(?:_index)?(-[a-z0-9\-_]+)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml(\.gz)?$',
-			'query' => '?feed=sitemap$matches[1]$matches[4]&m=$matches[2]&w=$matches[3]'
-		)
+			'query' => '?feed=sitemap$matches[1]$matches[4]&m=$matches[2]&w=$matches[3]',
+		),
 	);
 
 	/**
 	 * CONSTRUCTOR
 	 * Runs on init
+	 *
+	 * @param string $sitemap Sitemap name.
 	 */
-	function __construct( $sitemap = 'sitemap.xml' )
-	{
+	private function __construct( $sitemap = 'sitemap.xml' ) {
 		$this->sitemap = $sitemap;
 
 		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
@@ -31,13 +36,13 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		add_filter( 'rewrite_rules_array', array( $this, 'rewrite_rules' ), 99, 1 );
 
 		// Redirect wp-sitemap requests.
-		add_action( 'template_redirect', array( $this, 'redirect'),	0 );
+		add_action( 'template_redirect', array( $this, 'redirect' ), 0 );
 
 		// Pings.
 		add_action( 'transition_post_status', array( $this, 'do_pings' ), 10, 3 );
 
 		// Cache clearance.
-		add_action( 'clean_post_cache', array( $this, 'clean_post_cache'), 99, 2 );
+		add_action( 'clean_post_cache', array( $this, 'clean_post_cache' ), 99, 2 );
 
 		// Update term meta lastmod date.
 		add_action( 'transition_post_status', array( $this, 'update_term_modified_meta' ), 10, 3 );
@@ -50,7 +55,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 
 		// Update last comment date post meta.
 		add_action( 'transition_comment_status', array( $this, 'update_post_comment_meta' ), 10, 3 );
-		add_action( 'comment_post', array( $this, 'update_post_comment_meta_cp' ), 10, 3 ); // when comment is not held for moderation
+		add_action( 'comment_post', array( $this, 'update_post_comment_meta_cp' ), 10, 3 ); // When comment is not held for moderation.
 
 		// MAIN REQUEST filter.
 		add_filter( 'request', array( $this, 'filter_request' ), 1 );
@@ -58,19 +63,18 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		// Add index archive data filter.
 		add_filter( 'xmlsf_index_archive_data', array( $this, 'index_archive_data' ), 10, 3 );
 
-		// NGINX HELPER PURGE URLS
+		// Add RT Camp Nginx Helper NGINX HELPER PURGE URLS filter.
 		add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
 	}
 
 	/**
 	 * Filter request
 	 *
-	 * @param array $request
+	 * @param array $request Original request.
 	 *
-	 * @return array $request filtered
+	 * @return array $request Filtered request.
 	 */
-	public function filter_request( $request )
-	{
+	public function filter_request( $request ) {
 		global $xmlsf, $wp_rewrite;
 
 		// Short-circuit if request was already filtered by this plugin.
@@ -86,6 +90,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		}
 
 		/** IT'S A SITEMAP */
+		do_action( 'xmlsf_sitemap_loaded' );
 
 		// Set the sitemap conditional flag.
 		$xmlsf->is_sitemap = true;
@@ -97,7 +102,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		add_filter( 'split_the_query', '__return_false' );
 
 		// Include public functions.
-		require_once XMLSF_DIR . '/inc/functions.public.php';
+		require_once XMLSF_DIR . '/inc/functions-public.php';
 
 		// Generator comments.
 		add_action( 'xmlsf_generator', 'xmlsf_generator' );
@@ -106,8 +111,8 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 
 		// Check for gz request.
 		if ( substr( $request['feed'], -3 ) == '.gz' ) {
-			// Pop that .gz
-			$request['feed'] = substr($request['feed'], 0, -3);
+			// Pop that .gz.
+			$request['feed'] = substr( $request['feed'], 0, -3 );
 			// Verify/apply compression settings.
 			xmlsf_output_compression();
 		}
@@ -120,17 +125,17 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		// Make sure we have the proper locale setting for calculations.
 		setlocale( LC_NUMERIC, 'C' );
 
-		// SPECIFIC REQUEST FILTERING AND PREPARATIONS
+		// SPECIFIC REQUEST FILTERING AND PREPARATIONS.
 
 		// Include public sitemap functions.
-		require_once XMLSF_DIR . '/inc/functions.public-sitemap.php';
+		require_once XMLSF_DIR . '/inc/functions-public-sitemap.php';
 
 		/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
 
 		/**
 		 * Filters the request.
 		 *
-		 * add_filter( 'xmlsf_request', 'your_filter_function' );
+		 * Use add_filter( 'xmlsf_request', 'your_filter_function' );
 		 *
 		 * Filters hooked here already:
 		 * xmlsf_polylang_request - Polylang compatibility
@@ -139,45 +144,51 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		 */
 		$request = apply_filters( 'xmlsf_request', $request );
 
-		$feed = explode( '-' , $request['feed'], 3 );
+		$feed = explode( '-', $request['feed'], 3 );
 
-		switch( isset($feed[1]) ? $feed[1] : '' ) {
+		switch ( isset( $feed[1] ) ? $feed[1] : '' ) {
 
 			case 'posttype':
 				$settings = (array) get_option( 'xmlsf_post_types' );
-				if ( ! isset( $feed[2] ) || empty( $settings[$feed[2]] ) || ! is_array( $settings[$feed[2]] ) || empty( $settings[$feed[2]]['active'] ) ) {
+				if ( ! isset( $feed[2] ) || empty( $settings[ $feed[2] ] ) || ! is_array( $settings[ $feed[2] ] ) || empty( $settings[ $feed[2] ]['active'] ) ) {
 					return $request;
 				}
 
 				// Try to raise memory limit, context added for filters.
-				wp_raise_memory_limit( 'sitemap-posttype-'.$feed[2] );
+				wp_raise_memory_limit( 'sitemap-posttype-' . $feed[2] );
 
 				// Prepare priority calculation.
-				if ( ! empty($this->post_types[$feed[2]]['dynamic_priority']) ) {
+				if ( ! empty( $this->post_types[ $feed[2] ]['dynamic_priority'] ) ) {
 					// Last of this post type modified date in Unix seconds.
 					xmlsf()->lastmodified = get_date_from_gmt( get_lastpostmodified( 'GMT', $feed[2] ), 'U' );
 					// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
-					xmlsf()->timespan = xmlsf()->lastmodified - get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2]), 'U' );
+					xmlsf()->timespan = xmlsf()->lastmodified - get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2] ), 'U' );
 					// Total post type comment count.
 					xmlsf()->comment_count = wp_count_comments()->approved;
 					// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
-					// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/
+					// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/.
 				};
 
 				// Setup filters.
-				add_filter( 'post_limits', function() { return 'LIMIT 0, 50000'; } );
+				add_filter(
+					'post_limits',
+					function () {
+						return 'LIMIT 0, 50000';
+					}
+				);
 
 				// Modify request.
 				$request['post_type'] = $feed[2];
 
 				// Prevent term cache update query unless needed for permalinks.
-				if ( strpos( get_option( 'permalink_structure' ), '%category%' ) === false )
+				if ( strpos( get_option( 'permalink_structure' ), '%category%' ) === false ) {
 					$request['update_post_term_cache'] = false;
+				}
 
 				// Make sure to update meta cache for:
-				// 1. excluded posts
-				// 2. image data (if activated)
-				// 3. lasmod on comments (if activated)
+				// 1. excluded posts.
+				// 2. image data (if activated).
+				// 3. lasmod on comments (if activated).
 				$request['update_post_meta_cache'] = true;
 				break;
 
@@ -193,7 +204,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 				}
 
 				// Try to raise memory limit, context added for filters.
-				wp_raise_memory_limit( 'sitemap-taxonomy-'.$feed[2] );
+				wp_raise_memory_limit( 'sitemap-taxonomy-' . $feed[2] );
 				// Pass on taxonomy name via request.
 				$request['taxonomy'] = $feed[2];
 				// Set terms args.
@@ -217,7 +228,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		}
 
 		/** PREPARE TO LOAD TEMPLATE */
-		add_action (
+		add_action(
 			'do_feed_' . $request['feed'],
 			'xmlsf_load_template',
 			10,
@@ -227,7 +238,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 		/** GENERAL MISC. PREPARATIONS */
 
 		// Prevent public errors breaking xml.
-		@ini_set( 'display_errors', 0 );
+		@ini_set( 'display_errors', 0 ); // phpcs:ignore WordPress.PHP.IniSet.display_errors_Disallowed
 
 		// REPSONSE HEADERS filtering.
 		add_filter( 'wp_headers', 'xmlsf_headers' );
@@ -248,17 +259,20 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	 * Terms arguments filter
 	 * Does not check if we are really in a sitemap feed.
 	 *
-	 * @param $args
+	 * @param array $args Term arguments.
 	 *
 	 * @return array
 	 */
-	function set_terms_args( $args ) {
-		// https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
+	public function set_terms_args( $args ) {
+		// Read more on https://developer.wordpress.org/reference/classes/wp_term_query/__construct/.
 
-		$options = get_option('xmlsf_taxonomy_settings');
+		$options = get_option( 'xmlsf_taxonomy_settings' );
 
-		$args['number'] = isset($options['limit']) && is_numeric( $options['limit'] ) ? intval($options['limit']) : 2000;
-		if ( $args['number'] < 1 || $args['number'] > 50000 ) $args['number'] = 50000;
+		$args['number'] = isset( $options['limit'] ) && is_numeric( $options['limit'] ) ? intval( $options['limit'] ) : 2000;
+
+		if ( $args['number'] < 1 || $args['number'] > 50000 ) {
+			$args['number'] = 50000;
+		}
 
 		$args['order']           = 'DESC';
 		$args['orderby']         = 'count';
@@ -274,11 +288,11 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	 * Authors arguments filter
 	 * Does not check if we are really in a sitemap feed.
 	 *
-	 * @param $args
+	 * @param array $args Author arguments.
 	 *
 	 * @return array
 	 */
-	function set_authors_args( $args ) {
+	public function set_authors_args( $args ) {
 		/**
 		 * Filters the post types present in the author archive. Must return an array of one or multiple post types.
 		 * Allows to add or change post type when theme author archive page shows custom post types.
@@ -294,7 +308,10 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 
 		$author_settings = get_option( 'xmlsf_author_settings' );
 		$args['number'] = ! empty( $author_settings['limit'] ) && is_numeric( $author_settings['limit'] ) ? intval( $author_settings['limit'] ) : 2000;
-		if ( $args['number'] < 1 || $args['number'] > 50000 ) $args['number'] = 50000;
+
+		if ( $args['number'] < 1 || $args['number'] > 50000 ) {
+			$args['number'] = 50000;
+		}
 
 		return $args;
 	}
@@ -303,10 +320,14 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	 * Exclude spammed or deleted Authors in a multisite environment.
 	 * Does not check if we are really in a sitemap feed.
 	 *
+	 * @param bool $skip Skip or not skip.
+	 * @param obj  $user User object.
+	 *
 	 * @uses is_multisite()
+	 *
+	 * @return bool
 	 */
-	public function skip_deleted_or_spam_authors( $skip, $user )
-	{
+	public function skip_deleted_or_spam_authors( $skip, $user ) {
 		if ( ! is_multisite() ) {
 			return $skip;
 		}
@@ -327,10 +348,9 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	 *
 	 * @uses wp_redirect()
 	 */
-	public function redirect()
-	{
-		if ( ! empty( $_SERVER['REQUEST_URI'] ) && substr( $_SERVER['REQUEST_URI'], 0, 15) === '/wp-sitemap.xml' ) {
-			wp_redirect( home_url( $this->sitemap ), 301, 'XML Sitemap & Google News for WordPress' );
+	public function redirect() {
+		if ( ! empty( $_SERVER['REQUEST_URI'] ) && substr( wp_unslash( $_SERVER['REQUEST_URI'] ), 0, 15 ) === '/wp-sitemap.xml' ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			wp_safe_redirect( home_url( $this->sitemap ), 301, 'XML Sitemap & Google News for WordPress' );
 			exit();
 		}
 	}
@@ -338,9 +358,9 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	/**
 	 * Post archives data
 	 *
-	 * @param array $data
-	 * @param string $post_type
-	 * @param string $archive_type
+	 * @param array  $data         Data.
+	 * @param string $post_type    Post type.
+	 * @param string $archive_type Archive type.
 	 *
 	 * @return array $data
 	 */
@@ -351,56 +371,74 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	/**
 	 * Get post archives data
 	 *
-	 * @param string $post_type
-	 * @param string $archive_type
+	 * @param string $post_type    Post type.
+	 * @param string $archive_type Archive type.
 	 *
 	 * @return array
 	 */
-	public function get_index_archive_data( $post_type, $archive_type )
-	{
+	public function get_index_archive_data( $post_type, $archive_type ) {
 		global $wpdb;
 
 		$return = array();
 
-		if ( 'weekly' == $archive_type ) :
+		if ( 'weekly' === $archive_type ) :
 
 			$week       = _wp_mysql_week( '`post_date`' );
-			$query      = "SELECT DISTINCT LPAD($week,2,'0') AS `week`, YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD($week,2,'0') ORDER BY `year` DESC, `week` DESC";
+			$query      = $wpdb->prepare( "SELECT DISTINCT LPAD(%d,2,'0') AS `week`, YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM %s WHERE `post_type` = %s AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD(%d,2,'0') ORDER BY `year` DESC, `week` DESC", array( $week, $wpdb->posts, $post_type, $week ) );
 			$arcresults = $this->cache_get_archives( $query );
 
 			foreach ( (array) $arcresults as $arcresult ) {
-				$url = xmlsf_sitemap_url( 'posttype', array( 'type' => $post_type, 'm' => $arcresult->year, 'w' => $arcresult->week ) );
-				$return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year, $arcresult->week ), DATE_W3C );
-			};
+				$url            = xmlsf_sitemap_url(
+					'posttype',
+					array(
+						'type' => $post_type,
+						'm'    => $arcresult->year,
+						'w'    => $arcresult->week,
+					)
+				);
+				$return[ $url ] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year, $arcresult->week ), DATE_W3C );
+			}
 
-		elseif ( 'monthly' == $archive_type ) :
+		elseif ( 'monthly' === $archive_type ) :
 
-			$query = "SELECT YEAR(`post_date`) AS `year`, LPAD(MONTH(`post_date`),2,'0') AS `month`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD(MONTH(`post_date`),2,'0') ORDER BY `year` DESC, `month` DESC";
+			$query      = $wpdb->prepare( "SELECT YEAR(`post_date`) AS `year`, LPAD(MONTH(`post_date`),2,'0') AS `month`, COUNT(`ID`) AS `posts` FROM %s WHERE `post_type` = %s AND `post_status` = 'publish' GROUP BY YEAR(`post_date`), LPAD(MONTH(`post_date`),2,'0') ORDER BY `year` DESC, `month` DESC", array( $wpdb->posts, $post_type ) );
 			$arcresults = $this->cache_get_archives( $query );
 
 			foreach ( (array) $arcresults as $arcresult ) {
-				$url = xmlsf_sitemap_url( 'posttype', array( 'type' => $post_type, 'm' => $arcresult->year . $arcresult->month ) );
-				$return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year . $arcresult->month ), DATE_W3C );
-			};
+				$url            = xmlsf_sitemap_url(
+					'posttype',
+					array(
+						'type' => $post_type,
+						'm'    => $arcresult->year . $arcresult->month,
+					)
+				);
+				$return[ $url ] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year . $arcresult->month ), DATE_W3C );
+			}
 
-		elseif ( 'yearly' == $archive_type ) :
+		elseif ( 'yearly' === $archive_type ) :
 
-			$query      = "SELECT YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' GROUP BY YEAR(`post_date`) ORDER BY `year` DESC";
+			$query      = $wpdb->prepare( "SELECT YEAR(`post_date`) AS `year`, COUNT(`ID`) AS `posts` FROM $wpdb->posts WHERE `post_type` = %s AND `post_status` = 'publish' GROUP BY YEAR(`post_date`) ORDER BY `year` DESC", $post_type );
 			$arcresults = $this->cache_get_archives( $query );
 
 			foreach ( (array) $arcresults as $arcresult ) {
-				$url = xmlsf_sitemap_url( 'posttype', array( 'type' => $post_type, 'm' => $arcresult->year ) );
-				$return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year ), DATE_W3C );
-			};
+				$url            = xmlsf_sitemap_url(
+					'posttype',
+					array(
+						'type' => $post_type,
+						'm'    => $arcresult->year,
+					)
+				);
+				$return[ $url ] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type, $arcresult->year ), DATE_W3C );
+			}
 
 		else :
 
-			$query      = "SELECT COUNT(ID) AS `posts` FROM {$wpdb->posts} WHERE `post_type` = '{$post_type}' AND `post_status` = 'publish' ORDER BY `post_date` DESC";
+			$query      = $wpdb->prepare( "SELECT COUNT(ID) AS `posts` FROM $wpdb->posts WHERE `post_type` = %s AND `post_status` = 'publish' ORDER BY `post_date` DESC", $post_type );
 			$arcresults = $this->cache_get_archives( $query );
 
-			if ( is_object($arcresults[0]) && $arcresults[0]->posts > 0 ) {
-				$url = xmlsf_sitemap_url( 'posttype', array( 'type' => $post_type ) );
-				$return[$url] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type ), DATE_W3C );
+			if ( is_object( $arcresults[0] ) && $arcresults[0]->posts > 0 ) {
+				$url            = xmlsf_sitemap_url( 'posttype', array( 'type' => $post_type ) );
+				$return[ $url ] = get_date_from_gmt( get_lastmodified( 'GMT', $post_type ), DATE_W3C );
 			};
 
 		endif;
@@ -411,20 +449,20 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	/**
 	 * Get archives from wp_cache
 	 *
-	 * @param string $query
+	 * @param string $sql The prepared query.
 	 *
 	 * @return array
 	 */
-	function cache_get_archives( $query ) {
+	private function cache_get_archives( $sql ) {
 
 		global $wpdb;
 
-		$key = md5( $query );
-		$_cache = wp_cache_get( 'xmlsf_get_archives' , 'general' );
-		$cache = false === $_cache ? array() : $_cache;
+		$key    = md5( $sql );
+		$_cache = wp_cache_get( 'xmlsf_get_archives', 'general' );
+		$cache  = false === $_cache ? array() : $_cache;
 
 		if ( ! isset( $cache[ $key ] ) ) {
-			$cache[ $key ] = $wpdb->get_results( $query );
+			$cache[ $key ] = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			wp_cache_set( 'xmlsf_get_archives', $cache, 'general' );
 		}
 
@@ -435,13 +473,12 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 	 * Nginx helper purge urls
 	 * adds sitemap urls to the purge array.
 	 *
-	 * @param $urls array
-	 * @param $redis bool|false
+	 * @param array $urls     URLs array.
+	 * @param bool  $wildcard Use wildcard or not.
 	 *
 	 * @return $urls array
 	 */
-	public function nginx_helper_purge_urls( $urls = array(), $wildcard = false )
-	{
+	public function nginx_helper_purge_urls( $urls = array(), $wildcard = false ) {
 		if ( $wildcard ) {
 			// Wildcard makes everything simple.
 			$urls[] = '/sitemap*.xml';
@@ -459,23 +496,19 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap
 				$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
 
 				foreach ( $archive_data as $url => $lastmod ) {
-					$urls[] = parse_url( $url, PHP_URL_PATH);
+					$urls[] = wp_parse_url( $url, PHP_URL_PATH );
 				}
 			endforeach;
 
 			// Add public post taxonomies sitemaps.
 			$taxonomies = xmlsf_get_taxonomies();
 			foreach ( $taxonomies as $taxonomy ) {
-				$urls[] = parse_url( xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
+				$urls[] = wp_parse_url( xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
 			}
 		}
 
-		if ( defined('WP_DEBUG') && WP_DEBUG ) {
-			error_log( 'NGINX Helper purge urls array:' );
-			error_log( print_r( $urls, true ) );
-		}
+		do_action( 'xmlsf_nginx_helper_purge_urls', $urls );
 
 		return $urls;
 	}
-
 }

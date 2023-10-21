@@ -1,22 +1,32 @@
 <?php
+/**
+ * Admin for Sitemap
+ *
+ * @package XML Sitemap & Google News
+ */
 
-class XMLSF_Admin_Sitemap
-{
+/**
+ * Admin Sitemap Class
+ */
+class XMLSF_Admin_Sitemap {
 	/**
-	* Holds the values to be used in the fields callbacks
-	*/
+	 * Holds the values to be used in the fields callbacks
+	 *
+	 * @var array $screen_id Admin screen id array.
+	 */
 	private $screen_id;
 
 	/**
-	* Holds the public taxonomies array
-	*/
+	 * Holds the public taxonomies array
+	 *
+	 * @var array $public_taxonomies Public taxonomies.
+	 */
 	private $public_taxonomies;
 
 	/**
-	* Start up
-	*/
-	public function __construct()
-	{
+	 * Start up
+	 */
+	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'ping_sitemap' ) );
 		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
@@ -24,17 +34,17 @@ class XMLSF_Admin_Sitemap
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_metadata' ) );
 
-		// placeholders for advanced options
+		// Placeholders for advanced options.
 		add_action( 'xmlsf_posttype_archive_field_options', array( $this, 'advanced_archive_field_options' ) );
 	}
 
 	/**
 	 * Ping sitemaps
 	 */
-	public function ping_sitemap()
-	{
-		if ( ! isset( $_POST['xmlsf-ping-sitemap'] ) || ! xmlsf_verify_nonce('help') )
+	public function ping_sitemap() {
+		if ( ! isset( $_POST['xmlsf-ping-sitemap'] ) || ! isset( $_POST['_xmlsf_help_nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
 			return;
+		}
 
 		$search_engines = array(
 			'google' => __('Google','xml-sitemap-feed')

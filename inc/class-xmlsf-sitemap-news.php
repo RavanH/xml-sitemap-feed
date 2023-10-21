@@ -78,8 +78,8 @@ class XMLSF_Sitemap_News
 		add_filter( 'split_the_query', '__return_false' );
 
 		// Include public functions.
-		require_once XMLSF_DIR . '/inc/functions.public.php';
-		require_once XMLSF_DIR . '/inc/functions.public-sitemap-news.php';
+		require_once XMLSF_DIR . '/inc/functions-public.php';
+		require_once XMLSF_DIR . '/inc/functions-public-sitemap-news.php';
 
 		// Make sure we have the proper locale setting for calculations.
 		setlocale( LC_NUMERIC, 'C' );

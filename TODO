@@ -9,3 +9,28 @@ TODO test User Role Editor auhtor issue reported by Harry Reigel harry@whispert.
 TODO add filter for taxonomy terms
 TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to verify results
 TODO make "hide empty" an option for taxonomy terms
+
+TODO start with namespacing and autoload
+// http://justintadlock.com/archives/2018/12/14/php-namespaces-for-wordpress-developers
+/*
+spl_autoload_register( function( $class ) {
+
+	$namespace = 'XMLSF\\';
+
+	// Bail if the class is not in our namespace.
+	if ( 0 !== strpos( $class, $namespace ) ) {
+		return;
+	}
+
+	// Build the filename.
+	$class = str_replace( $namespace, '', $class );
+	$class = strtolower( $class );
+	$class = str_replace( '_', '-', $class );
+	$file = realpath( __DIR__ ) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'class-' . $class . '.php';
+
+	// If the file exists for the class name, load it.
+	if ( file_exists( $file ) ) {
+		include( $file );
+	}
+} );
+*/

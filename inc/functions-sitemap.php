@@ -1,6 +1,23 @@
 <?php
 
 /**
+ * Deprecated verify nonce function.
+ * Keep for Backward compatibility with older versions of XMLSF Advanced.
+ *
+ * @param string $context Context to verify against.
+ */
+function xmlsf_verify_nonce( $context ) {
+	if ( isset( $_POST[ '_xmlsf_' . $context . '_nonce' ] ) && wp_verify_nonce( $_POST[ '_xmlsf_' . $context . '_nonce' ], XMLSF_BASENAME . '-' . $context ) ) {
+		return true;
+	}
+
+	// Still here? Then add security check failed error message and return false.
+	add_settings_error( 'security_check_failed', 'security_check_failed', translate( 'Security check failed.' ) /* . ' Context: '. $context */ );
+
+	return false;
+}
+
+/**
  * Are we using the WP core server?
  * Returns whether the WordPress core sitemap server name used or not.
  *

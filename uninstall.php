@@ -1,4 +1,9 @@
 <?php
+/**
+ * Plugin Uninstallation
+ *
+ * @package XML Sitemap & Google News
+ */
 
 /**
  * XMLSF_MULTISITE_UNINSTALL
@@ -9,91 +14,72 @@
  * There is NO batch-processing so it does not scale on large networks!
  * The constant is ignored on networks over 10k sites.
  *
- * example:
+ * Example:
  * define( 'XMLSF_MULTISITE_UNINSTALL', true);
  */
 
 // Exit if uninstall not called from WordPress.
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit();
 
+global $wpdb;
+
+// Check if it is a multisite and if XMLSF_MULTISITE_UNINSTALL constant is defined
+// if so, run the uninstall function for each blog id.
+if ( is_multisite() && defined( 'XMLSF_MULTISITE_UNINSTALL' ) && XMLSF_MULTISITE_UNINSTALL && ! wp_is_large_network() ) {
+	// Logging.
+	WP_DEBUG_LOG && error_log( 'Clearing XML Sitemap Feeds settings from each site before uninstall:' );
+
+	$blogs = $wpdb->get_col( $wpdb->prepare( 'SELECT %s FROM %s', array( 'blog_id', $wpdb->prefix . 'blogs' ) ) );
+
+	foreach ( $blogs as $_id ) {
+		switch_to_blog( $_id );
+		xmlsf_uninstall();
+		restore_current_blog();
+		// Logging.
+		WP_DEBUG_LOG && error_log( $_id );
+	}
+} else {
+	xmlsf_uninstall();
+
+	// Logging.
+	WP_DEBUG_LOG && error_log( 'XML Sitemap Feeds settings cleared on uninstall.' );
+}
+
+
 /**
- * XML Sitemap Feed uninstallation.
+ * Remove plugin data.
  *
  * @since 4.4
  */
-class XMLSitemapFeed_Uninstall {
+function xmlsf_uninstall() {
+	// Remove metadata.
+	global $wpdb;
+	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
+	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
+	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_comment_date_gmt' ) );
+	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_priority' ) );
+	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_exclude' ) );
+	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_news_exclude' ) );
+	$wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified' ) );
 
-	/**
-	 * Constructor: manages uninstall for multisite.
-	 *
-	 * @since 4.4
-	 */
-	function __construct()
-	{
-		global $wpdb;
+	// Remove plugin settings.
+	delete_option( 'xmlsf_version' );
+	delete_option( 'xmlsf_sitemaps' );
+	delete_option( 'xmlsf_general_settings' );
+	delete_option( 'xmlsf_post_types' );
+	delete_option( 'xmlsf_taxonomies' );
+	delete_option( 'xmlsf_taxonomy_settings' );
+	delete_option( 'xmlsf_author_settings' );
+	delete_option( 'xmlsf_ping' );
+	delete_option( 'xmlsf_robots' );
+	delete_option( 'xmlsf_urls' );
+	delete_option( 'xmlsf_custom_sitemaps' );
+	delete_option( 'xmlsf_domains' );
+	delete_option( 'xmlsf_news_tags' );
+	delete_option( 'xmlsf_images_meta_primed' );
+	delete_option( 'xmlsf_comments_meta_primed' );
+	delete_option( 'xmlsf_permalinks_flushed' );
 
-		// Check if it is a multisite and if XMLSF_MULTISITE_UNINSTALL constant is defined
-		// if so, run the uninstall function for each blog id.
-		if ( is_multisite() && defined( 'XMLSF_MULTISITE_UNINSTALL' ) && XMLSF_MULTISITE_UNINSTALL && ! wp_is_large_network() ) {
-			error_log( 'Clearing XML Sitemap Feeds settings from each site before uninstall:' );
-			$field = 'blog_id';
-			$table = $wpdb->prefix.'blogs';
-			foreach ( $wpdb->get_col("SELECT {$field} FROM {$table}") as $blog_id ) {
-				switch_to_blog($blog_id);
-				$this->uninstall($blog_id);
-			}
-			restore_current_blog();
-		} else {
-			$this->uninstall();
-		}
-	}
-
-	/**
-	 * Remove plugin data.
-	 *
-	 * @since 4.4
-	 */
-	function uninstall($blog_id = false)
-	{
-		// Remove metadata.
-	  	global $wpdb;
-	  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
-	  	$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
-		$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_comment_date_gmt' ) );
-		$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_priority' ) );
-		$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_exclude' ) );
-		$wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => '_xmlsf_news_exclude' ) );
-	  	$wpdb->delete( $wpdb->prefix.'termmeta', array( 'meta_key' => 'term_modified' ) );
-
-		// Remove plugin settings.
-		delete_option( 'xmlsf_version' );
-		delete_option( 'xmlsf_sitemaps' );
-		delete_option( 'xmlsf_general_settings' );
-		delete_option( 'xmlsf_post_types' );
-		delete_option( 'xmlsf_taxonomies' );
-		delete_option( 'xmlsf_taxonomy_settings' );
-		delete_option( 'xmlsf_author_settings' );
-		delete_option( 'xmlsf_ping' );
-		delete_option( 'xmlsf_robots' );
-		delete_option( 'xmlsf_urls' );
-		delete_option( 'xmlsf_custom_sitemaps' );
-		delete_option( 'xmlsf_domains' );
-		delete_option( 'xmlsf_news_tags' );
-		delete_option( 'xmlsf_images_meta_primed' );
-		delete_option( 'xmlsf_comments_meta_primed' );
-		delete_option( 'xmlsf_permalinks_flushed' );
-
-		// Flush rules.
-		flush_rewrite_rules();
-
-		// Kilroy was here.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			if ($blog_id)
-				error_log( $blog_id );
-			else
-				error_log( 'XML Sitemap Feeds settings cleared on uninstall.' );
-		}
-	}
+	// Flush rules.
+	flush_rewrite_rules();
 }
-
-new XMLSitemapFeed_Uninstall();

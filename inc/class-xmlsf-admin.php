@@ -34,18 +34,18 @@ class XMLSF_Admin
 	 */
 	function __construct()
 	{
-		require XMLSF_DIR . '/inc/class.xmlsf-admin-sanitize.php';
+		require XMLSF_DIR . '/inc/class-xmlsf-admin-sanitize.php';
 
 		$this->sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
 		if ( isset($this->sitemaps['sitemap']) ) {
-			require XMLSF_DIR . '/inc/class.xmlsf-admin-sitemap-sanitize.php';
-			require XMLSF_DIR . '/inc/class.xmlsf-admin-sitemap.php';
+			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap-sanitize.php';
+			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap.php';
 		}
 
 		if ( isset($this->sitemaps['sitemap-news']) ) {
-			require XMLSF_DIR . '/inc/class.xmlsf-admin-sitemap-news-sanitize.php';
-			require XMLSF_DIR . '/inc/class.xmlsf-admin-sitemap-news.php';
+			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap-news-sanitize.php';
+			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap-news.php';
 		}
 
 		// ACTION LINK
@@ -114,7 +114,7 @@ class XMLSF_Admin
 			register_setting(
 				'reading',
 				'xmlsf_robots',
-				array( 'XMLSF_Admin_Sanitize', 'robots_settings' )
+				'sanitize_textarea_field'
 			);
 			add_settings_field(
 				'xmlsf_robots',
@@ -129,12 +129,13 @@ class XMLSF_Admin
 			register_setting(
 				'writing',
 				'xmlsf_ping',
-				array( 'XMLSF_Admin_Sanitize', 'ping_settings' )
+				'array_filter'
 			);
 			add_settings_field(
 				'xmlsf_ping',
 				__( 'Ping Services', 'xml-sitemap-feed' ),
-				array( $this, 'ping_settings_field' ), 'writing'
+				array( $this, 'ping_settings_field' ),
+				'writing'
 			);
 			add_action(
 				'load-options-writing.php',
@@ -461,114 +462,105 @@ class XMLSF_Admin
 		}
 	}
 
-	public function tools_actions()
-	{
+	public function tools_actions() {
+		if ( ! isset( $_POST[ '_xmlsf_help_nonce' ] ) || ! wp_verify_nonce( wp_unslash( $_POST[ '_xmlsf_help_nonce' ] ), XMLSF_BASENAME . '-help' ) ) {
+			return;
+		}
+
 		if ( isset( $_POST['xmlsf-clear-settings-submit'] ) && isset( $_POST['xmlsf-clear-settings'] ) ) {
-			if ( xmlsf_verify_nonce('help') ) {
-				$this->clear_settings( $_POST['xmlsf-clear-settings'] );
-			}
+			this->clear_settings( $_POST['xmlsf-clear-settings'] );
 		}
 
 		if ( isset( $_POST['xmlsf-check-conflicts'] ) ) {
-			if ( xmlsf_verify_nonce('help') ) {
-				// Reset ignored warnings.
-				delete_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
-				self::$dismissed = array();
+			// Reset ignored warnings.
+			delete_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
+			self::$dismissed = array();
 
-				$this->check_static_files();
-				if ( empty( self::$static_files ) ) {
-					add_settings_error(
-						'static_files_notice',
-						'static_files',
-						__( 'No conflicting static files found.', 'xml-sitemap-feed' ),
-						'notice-info'
-					);
-				}
+			$this->check_static_files();
+			if ( empty( self::$static_files ) ) {
+				add_settings_error(
+					'static_files_notice',
+					'static_files',
+					__( 'No conflicting static files found.', 'xml-sitemap-feed' ),
+					'notice-info'
+				);
 			}
 		}
 
 		if ( isset( $_POST['xmlsf-flush-rewrite-rules'] ) ) {
-			if ( xmlsf_verify_nonce('help') ) {
-				// Flush rewrite rules.
-				flush_rewrite_rules();
-				add_settings_error(
-					'flush_admin_notice',
-					'flush_admin_notice',
-					__( 'WordPress rewrite rules have been flushed.', 'xml-sitemap-feed' ),
-					'updated'
-				);
-			}
+			// Flush rewrite rules.
+			flush_rewrite_rules();
+			add_settings_error(
+				'flush_admin_notice',
+				'flush_admin_notice',
+				__( 'WordPress rewrite rules have been flushed.', 'xml-sitemap-feed' ),
+				'updated'
+			);
 		}
 
 		if ( isset( $_POST['xmlsf-clear-term-meta'] ) ) {
-			if ( xmlsf_verify_nonce('help') ) {
-				// Remove terms metadata.
-				global $wpdb;
-				$wpdb->delete(
-					$wpdb->prefix.'termmeta',
-					array( 'meta_key' => 'term_modified' )
-				);
-				add_settings_error(
-					'clear_meta_notice',
-					'clear_meta_notice',
-					__( 'Sitemap term meta cache has been cleared.', 'xml-sitemap-feed' ),
-					'updated'
-				);
-			}
+			// Remove terms metadata.
+			global $wpdb;
+			$wpdb->delete(
+				$wpdb->prefix.'termmeta',
+				array( 'meta_key' => 'term_modified' )
+			);
+			add_settings_error(
+				'clear_meta_notice',
+				'clear_meta_notice',
+				__( 'Sitemap term meta cache has been cleared.', 'xml-sitemap-feed' ),
+				'updated'
+			);
 		}
 
 		if ( isset( $_POST['xmlsf-clear-post-meta'] ) ) {
-			if ( xmlsf_verify_nonce('help') ) {
-				// Remove metadata.
-				global $wpdb;
-				// Images meta.
-				$wpdb->delete(
-					$wpdb->prefix.'postmeta',
-					array( 'meta_key' => '_xmlsf_image_attached' )
-				);
-				$wpdb->delete(
-					$wpdb->prefix.'postmeta',
-					array( 'meta_key' => '_xmlsf_image_featured' )
-				);
-				update_option( 'xmlsf_images_meta_primed', array() );
-				// Comments meta.
-				$wpdb->delete(
-					$wpdb->prefix.'postmeta',
-					array( 'meta_key' => '_xmlsf_comment_date_gmt' )
-				);
-				update_option( 'xmlsf_comments_meta_primed', array() );
+			// Remove metadata.
+			global $wpdb;
+			// Images meta.
+			$wpdb->delete(
+				$wpdb->prefix.'postmeta',
+				array( 'meta_key' => '_xmlsf_image_attached' )
+			);
+			$wpdb->delete(
+				$wpdb->prefix.'postmeta',
+				array( 'meta_key' => '_xmlsf_image_featured' )
+			);
+			update_option( 'xmlsf_images_meta_primed', array() );
+			// Comments meta.
+			$wpdb->delete(
+				$wpdb->prefix.'postmeta',
+				array( 'meta_key' => '_xmlsf_comment_date_gmt' )
+			);
+			update_option( 'xmlsf_comments_meta_primed', array() );
 
-				add_settings_error(
-					'clear_meta_notice',
-					'clear_meta_notice',
-					__( 'Sitemap post meta caches have been cleared.', 'xml-sitemap-feed' ),
-					'updated'
-				);
-			}
+			add_settings_error(
+				'clear_meta_notice',
+				'clear_meta_notice',
+				__( 'Sitemap post meta caches have been cleared.', 'xml-sitemap-feed' ),
+				'updated'
+			);
 		}
-
 	}
 
-	public function notices_actions()
-	{
+	public function notices_actions() {
+		if ( ! isset( $_POST[ '_xmlsf_notice_nonce' ] ) || ! wp_verify_nonce( wp_unslash( $_POST[ '_xmlsf_notice_nonce' ] ), XMLSF_BASENAME . '-notice' ) ) {
+			return;
+		}
+
 		self::$dismissed = (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
 
 		if ( isset( $_POST['xmlsf-delete-submit'] ) ) {
-			if ( xmlsf_verify_nonce('notice') ) {
-				$this->delete_static_files();
-			}
+			$this->delete_static_files();
 		}
 
 		if ( isset( $_POST['xmlsf-dismiss-submit'] ) && isset( $_POST['xmlsf-dismiss'] ) ) {
-			if ( xmlsf_verify_nonce('notice') ) {
-				add_user_meta(
-					get_current_user_id(),
-					'xmlsf_dismissed',
-					$_POST['xmlsf-dismiss'],
-					false
-				);
-				self::$dismissed[] = $_POST['xmlsf-dismiss'];
-			}
+			add_user_meta(
+				get_current_user_id(),
+				'xmlsf_dismissed',
+				$_POST['xmlsf-dismiss'],
+				false
+			);
+			self::$dismissed[] = $_POST['xmlsf-dismiss'];
 		}
 	}
 
@@ -587,23 +579,4 @@ class XMLSF_Admin
 		}
 		return $links;
 	}
-
-	// verification
-
-	public static function verify_nonce( $context ) {
-
-		if ( isset( $_POST['_xmlsf_'.$context.'_nonce'] ) && wp_verify_nonce( $_POST['_xmlsf_'.$context.'_nonce'], XMLSF_BASENAME.'-'.$context ) )
-			return true;
-
-		// Still here? Then add security check failed error message and return false.
-		add_settings_error( 'security_check_failed', 'security_check_failed', translate('Security check failed.') /* . ' Context: '. $context */ );
-
-		return false;
-	}
-
-}
-
-// Backward compatibility
-function xmlsf_verify_nonce( $context ) {
-	return XMLSF_Admin::verify_nonce( $context );
 }

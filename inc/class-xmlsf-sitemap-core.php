@@ -1,26 +1,30 @@
 <?php
+/**
+ * Core Functions
+ *
+ * @package XML Sitemap & Google News
+ */
 
-/* ------------------------------
- *    XMLSF Sitemap Core CLASS
- * ------------------------------ */
-
-class XMLSF_Sitemap_Core extends XMLSF_Sitemap
-{
+/**
+ * XMLSF Sitemap Core CLASS.
+ */
+class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	/**
 	 * CONSTRUCTOR
 	 * Runs on init
+	 *
+	 * @param string $sitemap Sitemap name.
 	 */
-	function __construct( $sitemap )
-	{
+	public function __construct( $sitemap ) {
 		$this->sitemap = $sitemap ? $sitemap : 'wp-sitemap.xml';
 
 		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
 
-		// Pings
+		// Pings.
 		add_action( 'transition_post_status', array( $this, 'do_pings' ), 10, 3 );
 
 		// Cache clearance.
-		add_action( 'clean_post_cache', array( $this, 'clean_post_cache'), 99, 2 );
+		add_action( 'clean_post_cache', array( $this, 'clean_post_cache' ), 99, 2 );
 
 		// Update term meta lastmod date.
 		add_action( 'transition_post_status', array( $this, 'update_term_modified_meta' ), 10, 3 );
@@ -33,37 +37,37 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 
 		// Update last comment date post meta.
 		add_action( 'transition_comment_status', array( $this, 'update_post_comment_meta' ), 10, 3 );
-		add_action( 'comment_post', array( $this, 'update_post_comment_meta_cp' ), 10, 3 ); // when comment is not held for moderation
+		add_action( 'comment_post', array( $this, 'update_post_comment_meta_cp' ), 10, 3 ); // When comment is not held for moderation.
 
 		if ( function_exists( 'wp_sitemaps_loaded' ) ) {
-			add_action( 'parse_request', array( $this, 'sitemaps_loaded' ), 9);
+			add_action( 'parse_request', array( $this, 'sitemaps_loaded' ), 9 );
 		} else {
 			// MAIN REQUEST filter.
 			add_filter( 'request', array( $this, 'filter_request' ) );
-			// FIX core sitemap bugs
+			// FIX core sitemap bugs.
 			add_filter( 'wp_sitemaps_posts_pre_url_list', array( $this, 'posts_url_list' ), 10, 3 );
 		}
 
 		// Add lastmod to index.
-		add_filter( 'wp_sitemaps_index_entry',               array( $this, 'index_entry' ),        10, 4 );
+		add_filter( 'wp_sitemaps_index_entry', array( $this, 'index_entry' ), 10, 4 );
 		// Add lastmod & priority to authors.
-		add_filter( 'wp_sitemaps_users_entry',               array( $this, 'users_entry' ),        10, 2 );
+		add_filter( 'wp_sitemaps_users_entry', array( $this, 'users_entry' ), 10, 2 );
 		// Add lastmod & priority to terms.
-		add_filter( 'wp_sitemaps_taxonomies_entry',          array( $this, 'taxonomies_entry' ),   10, 4 );
+		add_filter( 'wp_sitemaps_taxonomies_entry', array( $this, 'taxonomies_entry' ), 10, 4 );
 		// Add lastmod & priority to posts.
-		add_filter( 'wp_sitemaps_posts_entry',               array( $this, 'posts_entry' ),        10, 3 );
+		add_filter( 'wp_sitemaps_posts_entry', array( $this, 'posts_entry' ), 10, 3 );
 		add_filter( 'wp_sitemaps_posts_show_on_front_entry', array( $this, 'posts_show_on_front_entry' ) );
 
 		// Set url limit.
 		add_filter( 'wp_sitemaps_max_urls', array( $this, 'max_urls' ), 10, 2 );
-		//TODO: for post types
+		// TODO: for post types.
 
 		// Maybe disable taxonomy or author sitemaps.
-		add_filter( 'wp_sitemaps_add_provider',     array( $this, 'add_provider' ), 10, 2 );
+		add_filter( 'wp_sitemaps_add_provider', array( $this, 'add_provider' ), 10, 2 );
 		// Maybe disable certain post type sitemaps.
-		add_filter( 'wp_sitemaps_post_types',       array( $this, 'post_types' ) );
+		add_filter( 'wp_sitemaps_post_types', array( $this, 'post_types' ) );
 		// Maybe exclude individual posts.
-		add_filter(	'wp_sitemaps_posts_query_args',	array( $this, 'posts_query_args' ) );
+		add_filter( 'wp_sitemaps_posts_query_args', array( $this, 'posts_query_args' ) );
 
 		// Maybe exclude taxonomies.
 		add_filter( 'wp_sitemaps_taxonomies', array( $this, 'taxonomies' ) );
@@ -71,8 +75,7 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 		/**
 		 * Add sitemaps.
 		 */
-		// Maybe add dedicated Media sitemap if image tags are (still) not possible OR completely replace the renderer?
-		// TODO
+		// TODO Maybe add dedicated Media sitemap if image tags are (still) not possible OR completely replace the renderer?
 
 		// TODO
 		// add custom post type root pages...
@@ -81,73 +84,71 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 				$sitemap_entry = array( 'loc' => $post_type_archive_url );
 				$url_list[] = apply_filters( 'xmlsf_post_type_archive_entry', $sitemap_entry, $post_type );;
 			}*/
-		// OR with a separate "root" sitemap
+		// OR with a separate "root" sitemap.
 
-		// Additional URLs sitemap provider
+		// Additional URLs sitemap provider.
 		if ( get_option( 'xmlsf_urls' ) ) {
 			add_filter(
 				'init',
-				function() {
-					require XMLSF_DIR . '/inc/class.xmlsf-sitemaps-urls.php';
+				function () {
+					require XMLSF_DIR . '/inc/class-xmlsf-sitemaps-urls.php';
 					wp_register_sitemap_provider( 'urls', new XMLSF_Sitemaps_URLs() );
 				},
 				11
 			);
 		}
-		// External XML Sitemaps provider
+		// External XML Sitemaps provider.
 		if ( get_option( 'xmlsf_custom_sitemaps' ) ) {
 			add_filter(
 				'init',
-				function() {
-					require XMLSF_DIR . '/inc/class.xmlsf-sitemaps-custom.php';
+				function () {
+					require XMLSF_DIR . '/inc/class-xmlsf-sitemaps-custom.php';
 					wp_register_sitemap_provider( 'custom', new XMLSF_Sitemaps_Custom() );
 				},
 				11
 			);
 		}
 
-		// Stylesheet
+		// Stylesheet.
 		add_filter( 'wp_sitemaps_stylesheet_index_url', array( $this, 'stylesheet_index_url' ) );
-		add_filter( 'wp_sitemaps_stylesheet_url',       array( $this, 'stylesheet_url' ) );
+		add_filter( 'wp_sitemaps_stylesheet_url', array( $this, 'stylesheet_url' ) );
 
-		// NGINX HELPER PURGE URLS
+		// NGINX HELPER PURGE URLS.
 		add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
 	}
 
 	/**
-	 * Filter request
+	 * Parse request
+	 * Hooked into parse_request action.
 	 *
-	 * @param WP $wp
-	 *
-	 * @return void
+	 * @param WP $wp WP object.
 	 */
-	public function sitemaps_loaded( $wp )
-	{
+	public function sitemaps_loaded( $wp ) {
 		if ( ! empty( $wp->query_vars['sitemap'] ) ) {
 			// Include public sitemap functions.
-			require_once XMLSF_DIR . '/inc/functions.public-sitemap.php';
-
-			// Debugging.
-			if ( ! is_admin() && current_user_can('manage_options') ) {
-				add_action( 'shutdown', 'xmlsf_usage' );
-			}
+			require_once XMLSF_DIR . '/inc/functions-public-sitemap.php';
 		}
+
+		do_action( 'xmlsf_sitemap_loaded' );
 	}
 
 	/**
 	 * Filter request
+	 * Hooked into request filter.
 	 *
-	 * @param array $request
+	 * @param array $request Request.
 	 *
 	 * @return array $request filtered
 	 */
-	public function filter_request( $request )
-	{
+	public function filter_request( $request ) {
 		global $xmlsf;
 		$xmlsf->request_filtered = true;
 
 		if ( ! empty( $request['sitemap'] ) ) {
+
 			/** IT'S A SITEMAP */
+			do_action( 'xmlsf_sitemap_loaded' );
+
 			// Set the sitemap conditional flag.
 			$xmlsf->is_sitemap = true;
 
@@ -155,34 +156,29 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 			setlocale( LC_NUMERIC, 'C' );
 
 			// save a few db queries
-			//add_filter( 'split_the_query', '__return_false' ); // TODO test?
+			// add_filter( 'split_the_query', '__return_false' ); // TODO test?
 
 			// Include public sitemap functions.
-			require_once XMLSF_DIR . '/inc/functions.public-sitemap.php';
-
-			// Debugging.
-			if ( ! is_admin() && current_user_can('manage_options') ) {
-				add_action( 'shutdown', 'xmlsf_usage' );
-			}
+			require_once XMLSF_DIR . '/inc/functions-public-sitemap.php';
 
 			/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
-			//$request = apply_filters( 'xmlsf_request', $request );
 			/**
 			 * Developers: add your actions that should run when a sitemap request is with:
 			 *
-			 * add_filter( 'xmlsf_request', 'your_filter_function' );
+			 * Use add_filter( 'xmlsf_core_request', 'your_filter_function' );
 			 *
 			 * Filters hooked here already:
 			 * ! functions.public-sitemap.php
 			 */
+			$request = apply_filters( 'xmlsf_core_request', $request );
 
 			$subtype = isset( $request['sitemap-subtype'] ) ? $request['sitemap-subtype'] : '';
 
-			switch( $request['sitemap'] ) {
+			switch ( $request['sitemap'] ) {
 
 				case 'posts':
 					// Try to raise memory limit, context added for filters.
-					wp_raise_memory_limit( 'wp-sitemap-posts-'.$subtype );
+					wp_raise_memory_limit( 'wp-sitemap-posts-' . $subtype );
 
 					// Alter main query request parameters to fit wp-sitemap.
 					$request['orderby']                = 'modified'; // Needed to get at least one correct lastmod for the first sitemap!
@@ -203,23 +199,29 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 					);
 
 					// Prepare priority calculation.
-					if ( $subtype && ! empty($this->post_types[$subtype]['dynamic_priority']) ) {
+					if ( $subtype && ! empty( $this->post_types[ $subtype ]['dynamic_priority'] ) ) {
 						// Last of this post type modified date in Unix seconds.
 						xmlsf()->lastmodified = get_date_from_gmt( get_lastpostmodified( 'GMT', $subtype ), 'U' );
 						// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
-						xmlsf()->timespan = xmlsf()->lastmodified - get_date_from_gmt( get_firstpostdate( 'GMT', $subtype), 'U' );
+						xmlsf()->timespan = xmlsf()->lastmodified - get_date_from_gmt( get_firstpostdate( 'GMT', $subtype ), 'U' );
 						// Total post type comment count.
 						xmlsf()->comment_count = wp_count_comments()->approved;
 						// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
-						// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/
+						// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/.
 					};
 					break;
 
 				case 'taxonomies':
 					// Try to raise memory limit, context added for filters.
-					wp_raise_memory_limit( 'wp-sitemap-taxonomies-'.$subtype );
-					// Make sure the term query returns term objects, not just ids. See bugreport: https://core.trac.wordpress.org/ticket/55239
-					add_filter( 'wp_sitemaps_taxonomies_query_args', function($args) { $args['fields'] = 'all'; return $args; } );
+					wp_raise_memory_limit( 'wp-sitemap-taxonomies-' . $subtype );
+					// Make sure the term query returns term objects, not just ids. See bugreport: https://core.trac.wordpress.org/ticket/55239.
+					add_filter(
+						'wp_sitemaps_taxonomies_query_args',
+						function ( $args ) {
+							$args['fields'] = 'all';
+							return $args;
+						}
+					);
 					break;
 
 				case 'users':
@@ -555,28 +557,25 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap
 	public function nginx_helper_purge_urls( $urls = array(), $wildcard = false )
 	{
 		if ( $wildcard ) {
-			// wildcard allowed, this makes everything simple
+			// Wildcard allowed, this makes everything simple.
 			$urls[] = '/wp-sitemap*.xml';
 		} else {
-			// no wildcard, go through the motions
+			// No wildcard, go through the motions.
 			$urls[] = '/wp-sitemap.xml';
 			$urls[] = '/wp-sitemap-custom.xml';
 
 			// TODO use wp_get_sitemap_providers for array of provider names (where array key is provider name)
 			// then use $provider->get_sitemap_type_data() for nested arrays with max number of sitemaps for each subtype
-			// then use that data to build urls... /wp-sitemap-PROVIDER-SUBTYPENAME-PAGENUM++.xml
+			// then use that data to build urls... /wp-sitemap-PROVIDER-SUBTYPENAME-PAGENUM++.xml.
 
 			$sitemaps = wp_sitemaps_get_server();
 			foreach ( $sitemaps->index->get_sitemap_list() as $sitemap ) {
 				// Add each element loc value.
-				$urls[] = parse_url( $sitemap['loc'], PHP_URL_PATH);
+				$urls[] = wp_parse_url( $sitemap['loc'], PHP_URL_PATH );
 			}
 		}
 
-		if ( defined('WP_DEBUG') && WP_DEBUG ) {
-			error_log( 'NGINX Helper purge urls array:' );
-			error_log( print_r( $urls, true ) );
-		}
+		do_action( 'xmlsf_nginx_helper_purge_urls', $urls );
 
 		return $urls;
 	}
