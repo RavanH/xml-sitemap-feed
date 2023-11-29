@@ -1,28 +1,16 @@
 <?php
-
 /**
- * Deprecated verify nonce function.
- * Keep for Backward compatibility with older versions of XMLSF Advanced.
+ * Sitemap Functions
  *
- * @param string $context Context to verify against.
+ * @package XML Sitemap & Google News
  */
-function xmlsf_verify_nonce( $context ) {
-	if ( isset( $_POST[ '_xmlsf_' . $context . '_nonce' ] ) && wp_verify_nonce( $_POST[ '_xmlsf_' . $context . '_nonce' ], XMLSF_BASENAME . '-' . $context ) ) {
-		return true;
-	}
-
-	// Still here? Then add security check failed error message and return false.
-	add_settings_error( 'security_check_failed', 'security_check_failed', translate( 'Security check failed.' ) /* . ' Context: '. $context */ );
-
-	return false;
-}
 
 /**
  * Are we using the WP core server?
  * Returns whether the WordPress core sitemap server name used or not.
  *
  * @since 5.4
- * @param void
+ *
  * @return bool
  */
 function xmlsf_uses_core_server() {
@@ -51,15 +39,15 @@ function xmlsf_uses_core_server() {
  * Returns an array of taxonomy names to be included in the index.
  *
  * @since 5.4
- * @param void
+ *
  * @return array
  */
 function xmlsf_get_post_types() {
 	$post_types = (array) apply_filters( 'xmlsf_post_types', get_option( 'xmlsf_post_types', array() ) );
 
-	foreach( $post_types as $post_type => &$settings ) {
+	foreach ( $post_types as $post_type => $settings ) {
 		if ( empty( $settings['active'] ) || ! post_type_exists( $post_type ) ) {
-			unset( $post_types[$post_type] );
+			unset( $post_types[ $post_type ] );
 		}
 	}
 	unset( $settings );
@@ -72,30 +60,33 @@ function xmlsf_get_post_types() {
  * Returns an array of taxonomy names to be included in the index
  *
  * @since 5.0
- * @param void
+ *
  * @return array
  */
 function xmlsf_get_taxonomies() {
-	$taxonomy_settings = get_option('xmlsf_taxonomy_settings');
+	$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
 
 	$tax_array = array();
 
-	if ( !empty( $taxonomy_settings['active'] ) ) {
+	if ( ! empty( $taxonomy_settings['active'] ) ) {
 
-		$taxonomies = get_option('xmlsf_taxonomies');
+		$taxonomies = get_option( 'xmlsf_taxonomies' );
 
-		if ( is_array($taxonomies) ) {
+		if ( is_array( $taxonomies ) ) {
 			foreach ( $taxonomies as $taxonomy ) {
-				$count = wp_count_terms( $taxonomy, array('hide_empty'=>true) );
-				if ( !is_wp_error($count) && $count > 0 )
+				$count = wp_count_terms( $taxonomy );
+				if ( ! is_wp_error( $count ) && $count > 0 ) {
 					$tax_array[] = $taxonomy;
+				}
 			}
 		} else {
-			foreach ( xmlsf_public_taxonomies() as $name => $label )
-				if ( 0 < wp_count_terms( $name, array('hide_empty'=>true) ) )
+			foreach ( xmlsf_public_taxonomies() as $name => $label ) {
+				$count = wp_count_terms( $name );
+				if ( ! is_wp_error( $count ) && $count > 0 ) {
 					$tax_array[] = $name;
+				}
+			}
 		}
-
 	}
 
 	return $tax_array;
@@ -104,59 +95,54 @@ function xmlsf_get_taxonomies() {
 /**
  * Get post attached | featured image(s)
  *
- * @param object $post
- * @param string $which
+ * @param object $post  Post object.
+ * @param string $which Image type.
  *
  * @return array
  */
 function xmlsf_images_data( $post, $which ) {
 	$attachments = array();
 
-	if ( 'featured' == $which ) {
-
+	if ( 'featured' === $which ) {
 		if ( has_post_thumbnail( $post->ID ) ) {
 			$featured = get_post( get_post_thumbnail_id( $post->ID ) );
-			if ( is_object($featured) ) {
+			if ( is_object( $featured ) ) {
 				$attachments[] = $featured;
 			}
 		}
-
-	} elseif ( 'attached' == $which ) {
-
+	} elseif ( 'attached' === $which ) {
 		$args = array(
-			'post_type' => 'attachment',
+			'post_type'      => 'attachment',
 			'post_mime_type' => 'image',
-			'numberposts' => -1,
-			'post_status' =>'inherit',
-			'post_parent' => $post->ID
+			'numberposts'    => -1,
+			'post_status'    => 'inherit',
+			'post_parent'    => $post->ID,
 		);
 
 		$attachments = get_posts( $args );
-
 	}
 
-	if ( empty( $attachments ) ) return array();
+	if ( empty( $attachments ) ) {
+		return array();
+	}
 
-	// gather all data
+	// Gather all data.
 	$images_data = array();
 
 	foreach ( $attachments as $attachment ) {
 
 		$url = wp_get_attachment_url( $attachment->ID );
 
-		if ( !empty($url) ) {
-
+		if ( ! empty( $url ) ) {
 			$url = esc_attr( esc_url_raw( $url ) );
 
-			$images_data[$url] = array(
-				'loc' => $url,
-				'title' => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
-				'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt )
-				// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) )
+			$images_data[ $url ] = array(
+				'loc'     => $url,
+				'title'   => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
+				'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt ),
+				// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) ),
 			);
-
 		}
-
 	}
 
 	return $images_data;
@@ -167,7 +153,7 @@ function xmlsf_images_data( $post, $which ) {
  * Returns an array associated taxonomy object names and labels.
  *
  * @since 5.0
- * @param void
+ *
  * @return array
  */
 function xmlsf_public_taxonomies() {
@@ -176,16 +162,16 @@ function xmlsf_public_taxonomies() {
 
 	foreach ( (array) get_option( 'xmlsf_post_types' ) as $post_type => $settings ) {
 
-		if ( empty($settings['active']) ) continue;
-
-		// check each tax public flag and term count and append name to array
-		foreach ( get_object_taxonomies( $post_type, 'objects' ) as $taxonomy ) {
-
-			if ( !empty( $taxonomy->public ) && !in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) )
-				$tax_array[$taxonomy->name] = $taxonomy->label;
-
+		if ( empty( $settings['active'] ) ) {
+			continue;
 		}
 
+		// Check each tax public flag and term count and append name to array.
+		foreach ( get_object_taxonomies( $post_type, 'objects' ) as $taxonomy ) {
+			if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) ) {
+				$tax_array[ $taxonomy->name ] = $taxonomy->label;
+			}
+		}
 	}
 
 	return $tax_array;
@@ -198,9 +184,11 @@ function xmlsf_public_taxonomies() {
  * Returns a float within the set limits.
  *
  * @since 5.2
- * @param float $priority
- * @param float $min
- * @param float $max
+ *
+ * @param float $priority Priority value.
+ * @param float $min      Minimum value.
+ * @param float $max      Maximum value.
+ *
  * @return float
  */
 function xmlsf_sanitize_priority( $priority, $min = .1, $max = 1 ) {
@@ -208,8 +196,8 @@ function xmlsf_sanitize_priority( $priority, $min = .1, $max = 1 ) {
 	setlocale( LC_NUMERIC, 'C' );
 
 	$priority = (float) $priority;
-	$min = (float) $min;
-	$max = (float) $max;
+	$min      = (float) $min;
+	$max      = (float) $max;
 
 	if ( $priority <= $min ) {
 		return number_format( $min, 1 );
@@ -220,160 +208,160 @@ function xmlsf_sanitize_priority( $priority, $min = .1, $max = 1 ) {
 	}
 }
 
-/* -------------------------------------
- *      MISSING WORDPRESS FUNCTIONS
- * ------------------------------------- */
-
 /**
- * Retrieve first or last post type date data based on timezone.
- * Variation of function _get_last_post_time
- *
- * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
- * @param string $field Field to check. Can be 'date' or 'modified'.
- * @param string $post_type Post type to check. Defaults to 'any'.
- * @param string $which Which to check. Can be 'first' or 'last'. Defaults to 'last'.
- * @param string $m year, month or day period. Can be empty or integer.
- * @param string $w week. Can be empty or integer.
- *
- * @return string|false The date.
+ * MISSING WORDPRESS FUNCTIONS
  */
-if ( ! function_exists( '_get_post_time' ) ) {
+
+if ( ! function_exists( '_get_post_time' ) ) :
+	/**
+	 * Retrieve first or last post type date data based on timezone.
+	 * Variation of function _get_last_post_time
+	 *
+	 * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
+	 * @param string $field Field to check. Can be 'date' or 'modified'.
+	 * @param string $post_type Post type to check. Defaults to 'any'.
+	 * @param string $which Which to check. Can be 'first' or 'last'. Defaults to 'last'.
+	 * @param string $m year, month or day period. Can be empty or integer.
+	 * @param string $w week. Can be empty or integer.
+	 *
+	 * @return string|false The date.
+	 */
 	function _get_post_time( $timezone, $field, $post_type = 'any', $which = 'last', $m = '', $w = '' ) {
 
-	   global $wpdb;
+		global $wpdb;
 
-	   if ( ! in_array( $field, array( 'date', 'modified' ) ) ) {
-		   return false;
-	   }
+		if ( ! in_array( $field, array( 'date', 'modified' ), true ) ) {
+			return false;
+		}
 
-	   $timezone = strtolower( $timezone );
+		$timezone = strtolower( $timezone );
 
-	   $m = preg_replace('|[^0-9]|', '', $m);
+		$m = preg_replace( '|[^0-9]|', '', $m );
 
-	   if ( ! empty( $w ) ) {
-		   // when a week number is set make sure 'm' is year only
-		   $m = substr( $m, 0, 4 );
-		   // and append 'w' to the cache key
-		   $key = "{$which}post{$field}{$m}.{$w}:$timezone";
-	   } else {
-		   $key = "{$which}post{$field}{$m}.{$w}:$timezone";
-	   }
+		if ( ! empty( $w ) ) {
+			// When a week number is set make sure 'm' is year only.
+			$m = substr( $m, 0, 4 );
+			// And append 'w' to the cache key.
+			$key = "{$which}post{$field}{$m}.{$w}:$timezone";
+		} else {
+			$key = "{$which}post{$field}{$m}.{$w}:$timezone";
+		}
 
-	   if ( 'any' !== $post_type ) {
-		   $key .= ':' . sanitize_key( $post_type );
-	   }
+		if ( 'any' !== $post_type ) {
+			$key .= ':' . sanitize_key( $post_type );
+		}
 
-	   $date = wp_cache_get( $key, 'timeinfo' );
-	   if ( false !== $date ) {
-		   return $date;
-	   }
+		$date = wp_cache_get( $key, 'timeinfo' );
+		if ( false !== $date ) {
+			return $date;
+		}
 
-	   if ( $post_type === 'any' ) {
-		   $post_types = get_post_types( array( 'public' => true ) );
-		   array_walk( $post_types, array( &$wpdb, 'escape_by_ref' ) );
-		   $post_types = "'" . implode( "', '", $post_types ) . "'";
-	   } elseif ( is_array($post_type) ) {
-		   $types = get_post_types( array( 'public' => true ) );
-		   foreach ( $post_type as $type )
-			   if ( !in_array( $type, $types ) )
-				   return false;
-		   array_walk( $post_type, array( &$wpdb, 'escape_by_ref' ) );
-		   $post_types = "'" . implode( "', '", $post_type ) . "'";
-	   } else {
-		   if ( ! in_array( $post_type, get_post_types( array( 'public' => true ) ) ) )
-			   return false;
-		   $post_types = "'" . addslashes($post_type) . "'";
-	   }
+		if ( 'any' === $post_type ) {
+			$post_types = get_post_types( array( 'public' => true ) );
+			array_walk( $post_types, array( $wpdb, 'escape_by_ref' ) );
+			$post_types = "'" . implode( "', '", $post_types ) . "'";
+		} elseif ( is_array( $post_type ) ) {
+			$types = get_post_types( array( 'public' => true ) );
+			foreach ( $post_type as $type ) {
+				if ( ! in_array( $type, $types ) ) {
+					return false;
+				}
+			}
+			array_walk( $post_type, array( $wpdb, 'escape_by_ref' ) );
+			$post_types = "'" . implode( "', '", $post_type ) . "'";
+		} else {
+			if ( ! in_array( $post_type, get_post_types( array( 'public' => true ) ), true ) ) {
+				return false;
+			}
+			$post_types = "'" . addslashes( $post_type ) . "'";
+		}
 
-	   $where = "post_status='publish' AND post_type IN ({$post_types}) AND post_date_gmt";
+		$where = "post_status='publish' AND post_type IN ({$post_types}) AND post_date_gmt";
 
-	   // If a period is specified in the querystring, add that to the query
-	   if ( ! empty($m) ) {
-		   $where .= " AND YEAR(post_date)=" . substr($m, 0, 4);
-		   if ( strlen($m) > 5 ) {
-			   $where .= " AND MONTH(post_date)=" . substr($m, 4, 2);
-			   if ( strlen($m) > 7 ) {
-				   $where .= " AND DAY(post_date)=" . substr($m, 6, 2);
-			   }
-		   }
-	   }
-	   if ( ! empty($w) ) {
-		   $week     = _wp_mysql_week( 'post_date' );
-		   $where .= " AND $week=$w";
-	   }
+		// If a period is specified in the querystring, add that to the query.
+		if ( ! empty( $m ) ) {
+			$where .= ' AND YEAR(post_date)=' . substr( $m, 0, 4 );
+			if ( strlen( $m ) > 5 ) {
+				$where .= ' AND MONTH(post_date)=' . substr( $m, 4, 2 );
+				if ( strlen( $m ) > 7 ) {
+					$where .= ' AND DAY(post_date)=' . substr( $m, 6, 2 );
+				}
+			} elseif ( ! empty( $w ) ) {
+				$week   = _wp_mysql_week( 'post_date' );
+				$where .= " AND $week=$w";
+			}
+		}
 
-	   $order = ( $which == 'last' ) ? 'DESC' : 'ASC';
+		$order = ( 'last' === $which ) ? 'DESC' : 'ASC';
 
-	   /* CODE SUGGESTION BY Frédéric Demarle
-	   * to make this language aware:
-	   "SELECT post_{$field}_gmt FROM $wpdb->posts" . PLL()->model->post->join_clause()
-	   ."WHERE post_status = 'publish' AND post_type IN ({$post_types})" . PLL()->model->post->where_clause( $lang )
-	   . ORDER BY post_{$field}_gmt DESC LIMIT 1
-	   */
-	   switch ( $timezone ) {
-		   case 'gmt':
-			   $date = $wpdb->get_var("SELECT post_{$field}_gmt FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
-			   break;
+		/**
+		 * CODE SUGGESTION BY Frédéric Demarle
+		 * to make this language aware:
+		 * "SELECT post_{$field}_gmt FROM $wpdb->posts" . PLL()->model->post->join_clause()
+		 * ."WHERE post_status = 'publish' AND post_type IN ({$post_types})" . PLL()->model->post->where_clause( $lang )
+		 * . ORDER BY post_{$field}_gmt DESC LIMIT 1
+		 */
+		switch ( $timezone ) {
+			case 'gmt':
+				$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_%s_gmt FROM $wpdb->posts WHERE %s ORDER BY post_%s_gmt %s LIMIT 1", array( $field, $where, $field, $order ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				break;
 
-		   case 'blog':
-			   $date = $wpdb->get_var("SELECT post_{$field} FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
-			   break;
+			case 'blog':
+				$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_%s FROM $wpdb->posts WHERE %s ORDER BY post_%s_gmt %s LIMIT 1", array( $field, $where, $field, $order ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				break;
 
-		   case 'server':
-			   $add_seconds_server = date('Z');
-			   $date = $wpdb->get_var("SELECT DATE_ADD(post_{$field}_gmt, INTERVAL '$add_seconds_server' SECOND) FROM $wpdb->posts WHERE $where ORDER BY post_{$field}_gmt $order LIMIT 1");
-			   break;
-	   }
+			case 'server':
+				$add  = gmdate( 'Z' );
+				$date = $wpdb->get_var( $wpdb->prepare( "SELECT DATE_ADD(post_%s_gmt, INTERVAL %d SECOND) FROM $wpdb->posts WHERE %s ORDER BY post_%s_gmt %s LIMIT 1", array( $field, $add, $where, $field, $order ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				break;
+		}
 
-	   if ( $date ) {
-		   wp_cache_set( $key, $date, 'timeinfo' );
+		if ( $date ) {
+			wp_cache_set( $key, $date, 'timeinfo' );
 
-		   return $date;
-	   }
+			return $date;
+		}
 
-	   return false;
-
+		return false;
 	}
-}
+endif;
 
-/**
- * Retrieve the date that the first post/page was published.
- * Variation of function get_lastpostdate, uses _get_post_time
- *
- * The server timezone is the default and is the difference between GMT and
- * server time. The 'blog' value is the date when the last post was posted. The
- * 'gmt' is when the last post was posted in GMT formatted date.
- *
- * @uses apply_filters() Calls 'get_firstpostdate' filter
- * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
- * @param string $post_type Post type to check.
- * @return string The date of the last post.
- */
-if ( ! function_exists( 'get_firstpostdate' ) ) {
+if ( ! function_exists( 'get_firstpostdate' ) ) :
+	/**
+	 * Retrieve the date that the first post/page was published.
+	 * Variation of function get_lastpostdate, uses _get_post_time
+	 *
+	 * The server timezone is the default and is the difference between GMT and
+	 * server time. The 'blog' value is the date when the last post was posted. The
+	 * 'gmt' is when the last post was posted in GMT formatted date.
+	 *
+	 * @uses apply_filters() Calls 'get_firstpostdate' filter
+	 * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
+	 * @param string $post_type Post type to check.
+	 * @return string The date of the last post.
+	 */
 	function get_firstpostdate( $timezone = 'server', $post_type = 'any' ) {
-
-	   return apply_filters( 'get_firstpostdate', _get_post_time( $timezone, 'date', $post_type, 'first' ), $timezone );
-
+		return apply_filters( 'get_firstpostdate', _get_post_time( $timezone, 'date', $post_type, 'first' ), $timezone );
 	}
-}
+endif;
 
-/**
- * Retrieve last post/page modified date depending on timezone.
- * Variation of function get_lastpostmodified, uses _get_post_time
- *
- * The server timezone is the default and is the difference between GMT and
- * server time. The 'blog' value is the date when the last post was posted. The
- * 'gmt' is when the last post was posted in GMT formatted date.
- *
- * @uses apply_filters() Calls 'get_lastmodified' filter
- * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
- * @param string $post_type The post type to get the last modified date for.
- * @param string $m The period to check in. Defaults to any, can be YYYY, YYYYMM or YYYYMMDD
- * @param string $w The week to check in. Defaults to any, can be one or two digit week number. Must be used with $m in YYYY format.
- *
- * @return string|false The date of the latest modified post.
- */
-if ( ! function_exists( 'get_lastmodified' ) ) {
+if ( ! function_exists( 'get_lastmodified' ) ) :
+	/**
+	 * Retrieve last post/page modified date depending on timezone.
+	 * Variation of function get_lastpostmodified, uses _get_post_time
+	 *
+	 * The server timezone is the default and is the difference between GMT and
+	 * server time. The 'blog' value is the date when the last post was posted. The
+	 * 'gmt' is when the last post was posted in GMT formatted date.
+	 *
+	 * @uses apply_filters() Calls 'get_lastmodified' filter
+	 * @param string $timezone The location to get the time. Can be 'gmt', 'blog', or 'server'.
+	 * @param string $post_type The post type to get the last modified date for.
+	 * @param string $m The period to check in. Defaults to any, can be YYYY, YYYYMM or YYYYMMDD.
+	 * @param string $w The week to check in. Defaults to any, can be one or two digit week number. Must be used with $m in YYYY format.
+	 *
+	 * @return string|false The date of the latest modified post.
+	 */
 	function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '', $w = '' ) {
 
 		// Get last post publication and modification dates.
@@ -388,6 +376,5 @@ if ( ! function_exists( 'get_lastmodified' ) ) {
 		}
 
 		return apply_filters( 'get_lastmodified', $modified, $timezone );
-
 	}
-}
+endif;

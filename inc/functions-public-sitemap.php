@@ -12,43 +12,42 @@
  */
 function xmlsf_get_root_data() {
 
-	// language roots
+	// Language roots.
 	global $sitepress;
 
-	// Polylang and WPML compat
-	if ( function_exists('pll_languages_list') && function_exists('pll_home_url') ) {
+	// Polylang and WPML compat.
+	if ( function_exists( 'pll_languages_list' ) && function_exists( 'pll_home_url' ) ) {
 		$languages = pll_languages_list();
-		if ( is_array($languages) ) {
+		if ( is_array( $languages ) ) {
 			foreach ( $languages as $language ) {
-				$url = pll_home_url( $language );
-				$data[$url] = array(
+				$url          = pll_home_url( $language );
+				$data[ $url ] = array(
 					'priority' => '1.0',
-					'lastmod' => get_date_from_gmt( get_lastpostdate('GMT'), DATE_W3C )
-					// TODO make lastmod date language specific
+					'lastmod'  => get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C )
+					// TODO make lastmod date language specific.
 				);
 			}
 		}
-	} elseif ( is_object($sitepress) && method_exists($sitepress, 'get_languages') && method_exists($sitepress, 'language_url') ) {
-		foreach ( array_keys ( $sitepress->get_languages(false,true) ) as $term ) {
-			$url = $sitepress->language_url($term);
-			$data[$url] = array(
+	} elseif ( is_object( $sitepress ) && method_exists( $sitepress, 'get_languages' ) && method_exists( $sitepress, 'language_url' ) ) {
+		foreach ( array_keys( $sitepress->get_languages( false, true ) ) as $term ) {
+			$url          = $sitepress->language_url( $term );
+			$data[ $url ] = array(
 				'priority' => '1.0',
-				'lastmod' => get_date_from_gmt( get_lastpostdate('GMT'), DATE_W3C )
-				// TODO make lastmod date language specific
+				'lastmod'  => get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C )
+				// TODO make lastmod date language specific.
 			);
 		}
 	} else {
-		// single site root
+		// Single site root.
 		$data = array(
 			trailingslashit( home_url() ) => array(
 				'priority' => '1.0',
-				'lastmod' => get_date_from_gmt( get_lastpostdate('GMT'), DATE_W3C )
+				'lastmod'  => get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C )
 			)
 		);
 	}
 
 	return apply_filters( 'xmlsf_root_data', $data );
-
 }
 
 /**
@@ -56,20 +55,20 @@ function xmlsf_get_root_data() {
  *
  * @since 5.4
  *
- * @param int $user User ID
+ * @param int $user User ID.
  * @return float
  */
 function xmlsf_get_user_priority( $user ) {
 
 	$author_settings = get_option( 'xmlsf_author_settings' );
 
-	$priority = isset( $author_settings['priority'] ) && is_numeric( $author_settings['priority'] ) ? floatval( $author_settings['priority'] ) : 0.5 ;
+	$priority = isset( $author_settings['priority'] ) && is_numeric( $author_settings['priority'] ) ? floatval( $author_settings['priority'] ) : 0.5;
 
 	// TODO dynamic priority calculation?
 
 	$priority = apply_filters( 'xmlsf_user_priority', $priority, $user );
 
-	// a final check for limits and round it
+	// A final check for limits and round it.
 	return xmlsf_sanitize_priority( $priority );
 }
 
@@ -78,7 +77,8 @@ function xmlsf_get_user_priority( $user ) {
  *
  * @since 5.4
  *
- * @param WP_User $user
+ * @param WP_User $user User object.
+ *
  * @return string|false GMT date
  */
 function xmlsf_get_user_modified( $user ) {
@@ -93,7 +93,7 @@ function xmlsf_get_user_modified( $user ) {
 		 * Getting ALL meta here because if checking for single key, we cannot
 		 * distiguish between empty value or non-exisiting key as both return ''.
 		 */
-		$meta = get_user_meta( $user->ID );
+		$meta    = get_user_meta( $user->ID );
 		$lastmod = array_key_exists( 'user_modified', $meta ) ? get_user_meta( $user->ID, 'user_modified', true ) : null;
 	}
 
@@ -111,17 +111,17 @@ function xmlsf_get_user_modified( $user ) {
 		$post_type_array = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
 
 		// Get lastmod from last publication date.
-		$posts = get_posts(
+		$posts   = get_posts(
 			array(
-				'author' => $user->ID,
-				'post_type' => $post_type_array,
-				'post_status' => 'publish',
-				'posts_per_page' => 1,
-				'numberposts' => 1,
+				'author'                 => $user->ID,
+				'post_type'              => $post_type_array,
+				'post_status'            => 'publish',
+				'posts_per_page'         => 1,
+				'numberposts'            => 1,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
-				'update_cache' => false,
-				'lang' => '' // TODO make multilanguage compatible
+				'update_cache'           => false,
+				'lang'                   => '', // TODO make multilanguage compatible.
 			)
 		);
 		$lastmod = ! empty( $posts ) ? get_post_field( 'post_date', $posts[0] ) : '';
@@ -137,12 +137,9 @@ function xmlsf_get_user_modified( $user ) {
 
 	if ( ! array_key_exists( 'user_modified', $meta ) ) {
 		// Last publication date.
-
-
+		// TODO.
 	} else {
-
 		$lastmod = get_user_meta( $user->ID, 'user_modified', true );
-
 	}
 
 	return ! empty( $lastmod ) ? mysql2date( DATE_W3C, $lastmod, false ) : false;
