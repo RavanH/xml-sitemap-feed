@@ -220,7 +220,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 				// Set users args.
 				add_filter( 'xmlsf_get_author_args', array( $this, 'set_authors_args' ) );
 				// Set user filter for multisite.
-				add_filter( 'xmlsf_skip_user', array( $this, 'skip_deleted_or_spam_authors' ) );
+				add_filter( 'xmlsf_skip_user', array( $this, 'skip_deleted_or_spam_authors' ), 10, 2 );
 				break;
 
 			default:
