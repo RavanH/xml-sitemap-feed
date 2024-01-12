@@ -21,13 +21,13 @@ class XMLSF_Admin_Sanitize {
 		if ( '1' !== get_option( 'blog_public' ) ) {
 			return '';
 		}
-
-		$old       = get_option( 'xmlsf_sitemaps' );
+		$save      = (array) $save;
+		$old       = (array) get_option( 'xmlsf_sitemaps' );
 		$sanitized = array();
 
 		if ( $old !== $save ) {
-			// When sitemaps are added or removed, ask for rewrite rules flush.
-			update_option( 'xmlsf_permalinks_flushed', 0 );
+			// When sitemaps are added or removed, make rewrite rules REGENERATE on next page load.
+			delete_option( 'rewrite_rules' );
 
 			// Switched on news sitemap.
 			if ( ! empty( $save['sitemap-news'] ) && empty( $old['sitemap-news'] ) ) {

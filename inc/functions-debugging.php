@@ -7,32 +7,6 @@
  */
 
 /**
- * Error messages for ping
- *
- * @param string $se       Search engine name.
- * @param string $sitemap  Sitemap name.
- * @param string $ping_url Pinged URL.
- * @param int    $code     Response code.
- * @param string $response Response.
- */
-function xmlsf_debug_ping( $se, $sitemap, $ping_url, $code, $response = '' ) {
-	if ( ! WP_DEBUG_LOG ) {
-		return;
-	}
-
-	if ( 999 === $code ) {
-		error_log( 'Ping ' . $se . ' skipped.' );
-	} else {
-		error_log( 'Pinged ' . $ping_url . ' with response code: ' . $code );
-	}
-
-	if ( ! empty( $response ) ) {
-		error_log( 'Response: ' . print_r( $response, true ) );
-	}
-}
-add_action( 'xmlsf_ping', 'xmlsf_debug_ping', 9, 5 );
-
-/**
  * Error messages for Nginx Helper Purge URLs
  *
  * @param array $urls Purged URLs.
@@ -107,18 +81,16 @@ function xmlsf_debug_usage() {
 		$load = 'Not available.';
 	}
 
-	echo '<!-- Queries executed: ' . htmlentities( $num, ENT_COMPAT, get_bloginfo( 'charset' ) ) . ' | Peak memory usage: ' . htmlentities( $mem, ENT_COMPAT, get_bloginfo( 'charset' ) ) . '| Memory limit: ' . htmlspecialchars( $limit, ENT_COMPAT, get_bloginfo( 'charset' ) ) . ' -->' . PHP_EOL;
-	echo '<!-- Query errors: ' . htmlentities( $err, ENT_COMPAT, get_bloginfo( 'charset' ) ) . ' -->' . PHP_EOL;
-	echo '<!-- Queries: ' . htmlentities( $saved, ENT_COMPAT, get_bloginfo( 'charset' ) ) . ' -->' . PHP_EOL;
-	echo '<!-- Average system load during the last minute: ' . htmlentities( $load[0], ENT_COMPAT, get_bloginfo( 'charset' ) ) . ' -->' . PHP_EOL;
+	echo '<!-- Queries executed: ' . esc_xml( $num ) . ' | Peak memory usage: ' . esc_xml( $mem ) . '| Memory limit: ' . esc_xml( $limit ) . ' -->' . PHP_EOL;
+	echo '<!-- Query errors: ' . esc_xml( $err ) . ' -->' . PHP_EOL;
+	echo '<!-- Queries: ' . $saved . ' -->' . PHP_EOL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo '<!-- Average system load during the last minute: ' . esc_xml( $load ) . ' -->' . PHP_EOL;
 }
 
 add_action(
 	'xmlsf_sitemap_loaded',
 	function () {
-		if ( ! is_admin() && current_user_can( 'manage_options' ) ) {
-			add_action( 'shutdown', 'xmlsf_debug_usage' );
-		}
+		WP_DEBUG_LOG && add_action( 'shutdown', 'xmlsf_debug_usage' );
 	}
 );
 

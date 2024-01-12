@@ -27,7 +27,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 	 *
 	 * @param string $sitemap Sitemap name.
 	 */
-	private function __construct( $sitemap = 'sitemap.xml' ) {
+	public function __construct( $sitemap = 'sitemap.xml' ) {
 		$this->sitemap = $sitemap;
 
 		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
@@ -37,9 +37,6 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 
 		// Redirect wp-sitemap requests.
 		add_action( 'template_redirect', array( $this, 'redirect' ), 0 );
-
-		// Pings.
-		add_action( 'transition_post_status', array( $this, 'do_pings' ), 10, 3 );
 
 		// Cache clearance.
 		add_action( 'clean_post_cache', array( $this, 'clean_post_cache' ), 99, 2 );
@@ -110,7 +107,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 		/** COMPRESSION */
 
 		// Check for gz request.
-		if ( substr( $request['feed'], -3 ) == '.gz' ) {
+		if ( substr( $request['feed'], -3 ) === '.gz' ) {
 			// Pop that .gz.
 			$request['feed'] = substr( $request['feed'], 0, -3 );
 			// Verify/apply compression settings.
@@ -119,7 +116,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 
 		/** MODIFY REQUEST PARAMETERS */
 
-		$request['post_status'] = 'publish';
+		$request['post_status']   = 'publish';
 		$request['no_found_rows'] = true; // Found rows calc is slow and only needed for pagination.
 
 		// Make sure we have the proper locale setting for calculations.
@@ -167,7 +164,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 					xmlsf()->comment_count = wp_count_comments()->approved;
 					// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
 					// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/.
-				};
+				}
 
 				// Setup filters.
 				add_filter(
@@ -266,12 +263,13 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 	public function set_terms_args( $args ) {
 		// Read more on https://developer.wordpress.org/reference/classes/wp_term_query/__construct/.
 
-		$options = get_option( 'xmlsf_taxonomy_settings' );
+		$options  = get_option( 'xmlsf_taxonomy_settings' );
+		$defaults = xmlsf()->defaults( 'taxonomy_settings' );
 
-		$args['number'] = isset( $options['limit'] ) && is_numeric( $options['limit'] ) ? intval( $options['limit'] ) : 2000;
+		$args['number'] = isset( $options['limit'] ) && is_numeric( $options['limit'] ) ? intval( $options['limit'] ) : $defaults['limit'];
 
 		if ( $args['number'] < 1 || $args['number'] > 50000 ) {
-			$args['number'] = 50000;
+			$args['number'] = $defaults['limit'];
 		}
 
 		$args['order']           = 'DESC';
@@ -304,13 +302,15 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 		 * @return array
 		 */
 		$post_type_array = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
-		$args['has_published_posts'] = $post_type_array;
 
 		$author_settings = get_option( 'xmlsf_author_settings' );
-		$args['number'] = ! empty( $author_settings['limit'] ) && is_numeric( $author_settings['limit'] ) ? intval( $author_settings['limit'] ) : 2000;
+		$defaults        = xmlsf()->defaults( 'author_settings' );
+
+		$args['has_published_posts'] = $post_type_array;
+		$args['number']              = ! empty( $author_settings['limit'] ) && is_numeric( $author_settings['limit'] ) ? intval( $author_settings['limit'] ) : $defaults['limit'];
 
 		if ( $args['number'] < 1 || $args['number'] > 50000 ) {
-			$args['number'] = 50000;
+			$args['number'] = $defaults['limit'];
 		}
 
 		return $args;

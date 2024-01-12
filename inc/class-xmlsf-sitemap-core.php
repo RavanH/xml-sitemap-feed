@@ -20,9 +20,6 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 
 		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
 
-		// Pings.
-		add_action( 'transition_post_status', array( $this, 'do_pings' ), 10, 3 );
-
 		// Cache clearance.
 		add_action( 'clean_post_cache', array( $this, 'clean_post_cache' ), 99, 2 );
 
@@ -79,11 +76,12 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 
 		// TODO
 		// add custom post type root pages...
-		// EITHER with wp_sitemaps_posts_pre_url_list (replacing the whole posts provider url_list);
-			/* if ( $post_type_archive_url = get_post_type_archive_link( $post_type ) ) {
-				$sitemap_entry = array( 'loc' => $post_type_archive_url );
-				$url_list[] = apply_filters( 'xmlsf_post_type_archive_entry', $sitemap_entry, $post_type );;
-			}*/
+		// EITHER with:
+		// wp_sitemaps_posts_pre_url_list (replacing the whole posts provider url_list);
+		// * if ( $post_type_archive_url = get_post_type_archive_link( $post_type ) ) {
+		// *     $sitemap_entry = array( 'loc' => $post_type_archive_url );
+		// *     $url_list[] = apply_filters( 'xmlsf_post_type_archive_entry', $sitemap_entry, $post_type );;
+		// * }*/
 		// OR with a separate "root" sitemap.
 
 		// Additional URLs sitemap provider.
@@ -208,7 +206,7 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 						xmlsf()->comment_count = wp_count_comments()->approved;
 						// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
 						// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/.
-					};
+					}
 					break;
 
 				case 'taxonomies':
@@ -251,22 +249,21 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  array  $entry
-	 * @param  string $type
-	 * @param  string $subtype
-	 * @param  int    $page
+	 * @param array  $entry   Entry.
+	 * @param string $type    Type.
+	 * @param string $subtype Subtype.
+	 * @param int    $page    Page number.
 	 *
 	 * @return array  $entry
 	 */
-	public function index_entry( $entry, $type, $subtype, $page )
-	{
+	public function index_entry( $entry, $type, $subtype, $page ) {
 		// TODO account for $page 2 and up...
 		if ( $page > 1 ) {
 			return $entry;
 		}
 
 		// Add lastmod.
-		switch( $type ) {
+		switch ( $type ) {
 			case 'post':
 				$entry['lastmod'] = get_date_from_gmt( get_lastpostmodified( 'GMT', $subtype ), DATE_W3C );
 				break;
@@ -293,13 +290,12 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  array  $entry
-	 * @param  obj    $user_object
+	 * @param array $entry       Entry.
+	 * @param obj   $user_object User object.
 	 *
 	 * @return array  $entry
 	 */
-	public function users_entry( $entry, $user_object )
-	{
+	public function users_entry( $entry, $user_object ) {
 		// Add priority.
 		$entry['priority'] = xmlsf_get_user_priority( $user_object );
 
@@ -315,15 +311,14 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  array     $entry
-	 * @param  int|obj   $term         Either the term ID or the WP_Term object depending on query arguments (WP 5.9)
-	 * @param  string    $taxonomy
-	 * @param  obj|null  $term_object  The WP_Term object, available starting WP 6.0 otherwise null
+	 * @param array    $entry       Entry.
+	 * @param int|obj  $term        Either the term ID or the WP_Term object depending on query arguments (WP 5.9).
+	 * @param string   $taxonomy    Taxonomy.
+	 * @param obj|null $term_object The WP_Term object, available starting WP 6.0 otherwise null.
 	 *
 	 * @return array     $entry
 	 */
-	public function taxonomies_entry( $entry, $term, $taxonomy, $term_object = null )
-	{
+	public function taxonomies_entry( $entry, $term, $taxonomy, $term_object = null ) {
 		// Make sure we have a WP_Term object.
 		if ( null === $term_object ) {
 			$term_object = get_term( $term );
@@ -344,18 +339,23 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  array $taxonomies
-	 * @return array  $taxonomies
+	 * @param array $taxonomies Taxonomies.
+	 *
+	 * @return array
 	 */
-	public function taxonomies( $taxonomies )
-	{
+	public function taxonomies( $taxonomies ) {
 		$only = get_option( 'xmlsf_taxonomies' );
 
 		if ( empty( $only ) || ! is_array( $only ) ) {
 			return $taxonomies;
 		}
 
-		return array_filter( $taxonomies, function($tax) use($only) { return in_array( $tax->name, $only ); } );
+		return array_filter(
+			$taxonomies,
+			function ( $tax ) use ( $only ) {
+				return in_array( $tax->name, $only, true );
+			}
+		);
 	}
 
 	/**
@@ -364,14 +364,13 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  array  $entry
-	 * @param  obj    $post_object
-	 * @param  string $post_type
+	 * @param array  $entry       Entry.
+	 * @param obj    $post_object Post object.
+	 * @param string $post_type   Post type. Not used.
 	 *
-	 * @return array  $entry
+	 * @return array
 	 */
-	public function posts_entry( $entry, $post_object, $post_type )
-	{
+	public function posts_entry( $entry, $post_object, $post_type ) {
 		// Add priority.
 		$entry['priority'] = xmlsf_get_post_priority( $post_object );
 
@@ -387,12 +386,11 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  array  $entry
+	 * @param array $entry Entry.
 	 *
-	 * @return array  $entry
+	 * @return array
 	 */
-	public function posts_show_on_front_entry( $entry )
-	{
+	public function posts_show_on_front_entry( $entry ) {
 		// Front blog page priority always 1.
 		$entry['priority'] = '1';
 
@@ -407,14 +405,13 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  int    $max_urls
-	 * @param  string $object_type
+	 * @param int    $max_urls    Max URLs.
+	 * @param string $object_type Object type.
 	 *
-	 * @return int    $max_urls
+	 * @return int
 	 */
-	function max_urls( $max_urls, $object_type )
-	{
-		switch( $object_type ) {
+	public function max_urls( $max_urls, $object_type ) {
+		switch ( $object_type ) {
 			case 'user':
 				$settings = (array) get_option( 'xmlsf_author_settings' );
 				$max_urls = ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
@@ -439,13 +436,12 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  obj       $provider
-	 * @param  string    $name
+	 * @param obj    $provider Sitemap provider.
+	 * @param string $name     Sitemap name.
 	 *
-	 * @return false|obj $provider or false if disabled
+	 * @return false|obj Provider or false if disabled.
 	 */
-	public function add_provider( $provider, $name )
-	{
+	public function add_provider( $provider, $name ) {
 		// Verify author sitemap settings.
 		if ( 'users' === $name ) {
 			$settings = (array) get_option( 'xmlsf_author_settings' );
@@ -453,7 +449,7 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 		}
 		// Verify taxonomy sitemaps settings.
 		if ( 'taxonomies' === $name ) {
-			$settings = (array) get_option( 'xmlsf_taxonomy_settings' );
+			$settings   = (array) get_option( 'xmlsf_taxonomy_settings' );
 			$taxonomies = xmlsf_public_taxonomies();
 			return empty( $settings['active'] ) || empty( $taxonomies ) ? false : $provider;
 		}
@@ -466,19 +462,16 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  array $post_types
+	 * @param array $post_types Post types array.
 	 *
-	 * @return array $post_types
+	 * @return array
 	 */
-	public function post_types( $post_types )
-	{
+	public function post_types( $post_types ) {
 		foreach ( $this->post_types as $post_type => $settings ) {
 			if ( empty( $settings['active'] ) ) {
-				unset( $post_types[$post_type] );
-			} else {
-				if ( ! isset( $post_types[$post_type] ) ) {
-					$post_types[] = $post_type;
-				}
+				unset( $post_types[ $post_type ] );
+			} elseif ( ! isset( $post_types[ $post_type ] ) ) {
+				$post_types[] = $post_type;
 			}
 		}
 
@@ -490,17 +483,17 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  array $args
-	 * @return array $args
+	 * @param array $args Arguments.
+	 *
+	 * @return array
 	 */
-	public function posts_query_args( $args )
-	{
+	public function posts_query_args( $args ) {
 		// Exclude posts.
 		$args['meta_query'] = array(
 			array(
-				'key' => '_xmlsf_exclude',
-				'compare' => 'NOT EXISTS'
-			)
+				'key'     => '_xmlsf_exclude',
+				'compare' => 'NOT EXISTS',
+			),
 		);
 
 		// Update meta cache in one query instead of many, coming from get_post_meta() in xmlsf_get_post_priority().
@@ -514,14 +507,14 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  string $url
-	 * @return string $url
+	 * @param string $url URL.
+	 *
+	 * @return string
 	 */
-	public function stylesheet_url( $url )
-	{
-		//if ( ! get_option( 'xmlsf_core_sitemap_stylesheet' ) ) { // TODO make these match sitemap type
-			$url = xmlsf_get_stylesheet_url( 'root' );
-		//}
+	public function stylesheet_url( $url ) {
+		// TODO make this optional: get_option( 'xmlsf_core_sitemap_stylesheet' )
+		// TODO make these match sitemap type.
+		$url = xmlsf_get_stylesheet_url( 'root' );
 
 		return $url;
 	}
@@ -531,14 +524,13 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  string $url
-	 * @return string $url
+	 * @param string $url URL.
+	 *
+	 * @return string
 	 */
-	public function stylesheet_index_url( $url )
-	{
-		//if ( ! get_option( 'xmlsf_core_sitemap_stylesheet' ) ) {
-			$url = xmlsf_get_stylesheet_url();
-		//}
+	public function stylesheet_index_url( $url ) {
+		// TODO make this optional: get_option( 'xmlsf_core_sitemap_stylesheet' ).
+		$url = xmlsf_get_stylesheet_url();
 
 		return $url;
 	}
@@ -549,13 +541,12 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 *
 	 * @since 5.4
 	 *
-	 * @param  array $urls
-	 * @param  bool  $redis default false
+	 * @param array $urls     URLs.
+	 * @param bool  $wildcard Allow wildcard. Default false.
 	 *
 	 * @return array $urls
 	 */
-	public function nginx_helper_purge_urls( $urls = array(), $wildcard = false )
-	{
+	public function nginx_helper_purge_urls( $urls = array(), $wildcard = false ) {
 		if ( $wildcard ) {
 			// Wildcard allowed, this makes everything simple.
 			$urls[] = '/wp-sitemap*.xml';
@@ -591,8 +582,7 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 * @param int          $page_num  Page of results.
 	 * @return array[]     The URL list.
 	 */
-	public function posts_url_list( $url_list, $post_type, $page_num )
-	{
+	public function posts_url_list( $url_list, $post_type, $page_num ) {
 		global $wp_query;
 
 		if ( null === $wp_query->posts ) {
@@ -642,5 +632,4 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 
 		return $url_list;
 	}
-
 }

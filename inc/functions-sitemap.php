@@ -6,35 +6,6 @@
  */
 
 /**
- * Are we using the WP core server?
- * Returns whether the WordPress core sitemap server name used or not.
- *
- * @since 5.4
- *
- * @return bool
- */
-function xmlsf_uses_core_server() {
-	// SimpeXML not available.
-	if ( ! class_exists( 'SimpleXMLElement' ) ) {
-		return false;
-	}
-
-	// Sitemap disabled.
-	$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
-	if ( empty( $sitemaps['sitemap'] ) ) {
-		return false;
-	}
-
-	// Check settings.
-	$settings = (array) get_option( 'xmlsf_general_settings', array() );
-	if ( ! empty( $settings['server'] ) && 'core' === $settings['server'] ) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-/**
  * Get post types.
  * Returns an array of taxonomy names to be included in the index.
  *
@@ -178,34 +149,29 @@ function xmlsf_public_taxonomies() {
 }
 
 /**
- * Santize priority value
+ * Santize number value
  * Expects proper locale setting for calculations: setlocale( LC_NUMERIC, 'C' );
  *
- * Returns a float within the set limits.
+ * Returns a float or integer within the set limits.
  *
  * @since 5.2
  *
- * @param float $priority Priority value.
- * @param float $min      Minimum value.
- * @param float $max      Maximum value.
+ * @param float|int|string $number Number value.
+ * @param float|int        $min    Minimum value.
+ * @param float|int        $max    Maximum value.
+ * @param bool             $_float Formating, can be float or integer.
  *
- * @return float
+ * @return float|int
  */
-function xmlsf_sanitize_priority( $priority, $min = .1, $max = 1 ) {
-
+function xmlsf_sanitize_number( $number, $min = .1, $max = 1, $_float = true ) {
 	setlocale( LC_NUMERIC, 'C' );
 
-	$priority = (float) $priority;
-	$min      = (float) $min;
-	$max      = (float) $max;
+	$number = $_float ? str_replace( ',', '.', $number ) : str_replace( ',', '', $number );
+	$number = $_float ? floatval( $number ) : intval( $number );
 
-	if ( $priority <= $min ) {
-		return number_format( $min, 1 );
-	} elseif ( $priority >= $max ) {
-		return number_format( $max, 1 );
-	} else {
-		return number_format( $priority, 1 );
-	}
+	$number = min( max( $min, $number ), $max );
+
+	return $_float ? number_format( $number, 1 ) : $number;
 }
 
 /**
@@ -303,16 +269,16 @@ if ( ! function_exists( '_get_post_time' ) ) :
 		 */
 		switch ( $timezone ) {
 			case 'gmt':
-				$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_%s_gmt FROM $wpdb->posts WHERE %s ORDER BY post_%s_gmt %s LIMIT 1", array( $field, $where, $field, $order ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$date = $wpdb->get_var( "SELECT `post_{$field}_gmt` FROM `$wpdb->posts` WHERE $where ORDER BY `post_{$field}_gmt` $order LIMIT 1" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				break;
 
 			case 'blog':
-				$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_%s FROM $wpdb->posts WHERE %s ORDER BY post_%s_gmt %s LIMIT 1", array( $field, $where, $field, $order ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$date = $wpdb->get_var( "SELECT `post_{$field}` FROM `$wpdb->posts` WHERE $where ORDER BY `post_{$field}` $order LIMIT 1" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				break;
 
 			case 'server':
-				$add  = gmdate( 'Z' );
-				$date = $wpdb->get_var( $wpdb->prepare( "SELECT DATE_ADD(post_%s_gmt, INTERVAL %d SECOND) FROM $wpdb->posts WHERE %s ORDER BY post_%s_gmt %s LIMIT 1", array( $field, $add, $where, $field, $order ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$sec  = gmdate( 'Z' );
+				$date = $wpdb->get_var( "SELECT DATE_ADD(`post_{$field}_gmt`, INTERVAL '$sec' SECOND) FROM `$wpdb->posts` WHERE $where ORDER BY `post_{$field}_gmt` $order LIMIT 1" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				break;
 		}
 

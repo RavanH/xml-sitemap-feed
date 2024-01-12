@@ -1,36 +1,44 @@
+<?php
+/**
+ * Sitemaps settings view
+ *
+ * @package XML Sitemap & Google News
+ */
+
+?>
 <fieldset id="xmlsf_sitemaps">
 	<legend class="screen-reader-text">
-		<?php _e('Enable XML sitemaps','xml-sitemap-feed'); ?>
+		<?php esc_html_e( 'Enable XML sitemaps', 'xml-sitemap-feed' ); ?>
 	</legend>
 	<label>
-		<input type="checkbox" name="xmlsf_sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="sitemap.xml"<?php echo checked(isset($this->sitemaps['sitemap']), true, false); ?> />
-		<?php _e('XML Sitemap Index','xml-sitemap-feed'); ?>
+		<input type="checkbox" name="xmlsf_sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="sitemap.xml"<?php echo checked( isset( $this->sitemaps['sitemap'] ), true, false ); ?> />
+		<?php esc_html_e( 'XML Sitemap Index', 'xml-sitemap-feed' ); ?>
 	</label>
 
-	<?php if ( isset($this->sitemaps['sitemap']) ) {
-		$sitemap_url = xmlsf_sitemap_url();
-	?>
+	<?php if ( isset( $this->sitemaps['sitemap'] ) ) { ?>
 	<span class="description">
 		&nbsp;&ndash;&nbsp;
-		<a href="<?php echo admin_url('options-general.php'); ?>?page=xmlsf" id="xmlsf_link"><?php echo translate('Settings'); ?></a> |
-		<a href="<?php echo $sitemap_url; ?>" target="_blank"><?php echo translate('View'); ?></a>
+		<a href="<?php echo esc_attr( admin_url( 'options-general.php' ) ); ?>?page=xmlsf" id="xmlsf_link"><?php echo esc_html( translate( 'Settings' ) ); ?></a> |
+		<a href="<?php echo esc_attr( xmlsf_sitemap_url() ); ?>" target="_blank"><?php echo esc_html( translate( 'View' ) ); ?></a>
 	</span>
 	<?php } ?>
 
 	<br>
 
 	<label>
-		<input type="checkbox" name="xmlsf_sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="sitemap-news.xml"<?php echo checked(isset($this->sitemaps['sitemap-news']), true, false); ?> />
-		<?php _e('Google News Sitemap','xml-sitemap-feed'); ?>
+		<input type="checkbox" name="xmlsf_sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="sitemap-news.xml"<?php echo checked( isset( $this->sitemaps['sitemap-news'] ), true, false ); ?> />
+		<?php esc_html_e( 'Google News Sitemap', 'xml-sitemap-feed' ); ?>
 	</label>
 
-	<?php if (isset($this->sitemaps['sitemap-news'])) {
-		$news_url = trailingslashit(get_bloginfo('url')) . ( $wp_rewrite->using_permalinks() ? $this->sitemaps['sitemap-news'] : '?feed=sitemap-news' );
-	?>
+	<?php
+	if ( isset( $this->sitemaps['sitemap-news'] ) ) {
+		global $wp_rewrite;
+		$news_url = trailingslashit( get_bloginfo( 'url' ) ) . ( $wp_rewrite->using_permalinks() ? $this->sitemaps['sitemap-news'] : '?feed=sitemap-news' );
+		?>
 	<span class="description">
 		&nbsp;&ndash;&nbsp;
-		<a href="<?php echo admin_url('options-general.php'); ?>?page=xmlsf_news" id="xmlsf_news_link"><?php echo translate('Settings'); ?></a> |
-		<a href="<?php echo $news_url; ?>" target="_blank"><?php echo translate('View'); ?></a>
+		<a href="<?php echo esc_attr( admin_url( 'options-general.php' ) ); ?>?page=xmlsf_news" id="xmlsf_news_link"><?php echo esc_html( translate( 'Settings' ) ); ?></a> |
+		<a href="<?php echo esc_attr( $news_url ); ?>" target="_blank"><?php echo esc_html( translate( 'View' ) ); ?></a>
 	</span>
 	<?php } ?>
 

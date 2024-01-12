@@ -120,7 +120,7 @@ function xmlsf_xml_stylesheet( $sitemap = false ) {
 	$url = xmlsf_get_stylesheet_url( $sitemap );
 
 	if ( $url ) {
-		echo '<?xml-stylesheet type="text/xsl" href="' . esc_url( wp_make_link_relative( $url ) ) . '?ver=' . esc_url( XMLSF_VERSION ) . '"?>' . PHP_EOL;
+		echo '<?xml-stylesheet type="text/xsl" href="' . esc_url( wp_make_link_relative( $url ) ) . '?ver=' . esc_xml( XMLSF_VERSION ) . '"?>' . PHP_EOL;
 	}
 }
 
@@ -202,3 +202,32 @@ function xmlsf_wpml_remove_home_url_filter() {
 }
 add_action( 'xmlsf_add_settings', 'xmlsf_wpml_remove_home_url_filter' );
 add_action( 'xmlsf_news_add_settings', 'xmlsf_wpml_remove_home_url_filter' );
+
+/**
+ * Are we using the WP core server?
+ * Returns whether the WordPress core sitemap server name used or not.
+ *
+ * @since 5.4
+ *
+ * @return bool
+ */
+function xmlsf_uses_core_server() {
+	// SimpeXML not available.
+	if ( ! class_exists( 'SimpleXMLElement' ) ) {
+		return false;
+	}
+
+	// Sitemap disabled.
+	$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
+	if ( empty( $sitemaps['sitemap'] ) ) {
+		return false;
+	}
+
+	// Check settings.
+	$settings = (array) get_option( 'xmlsf_general_settings', array() );
+	if ( ! empty( $settings['server'] ) && 'core' === $settings['server'] ) {
+		return true;
+	} else {
+		return false;
+	}
+}

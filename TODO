@@ -1,3 +1,8 @@
+TODO streamline help tab entries on XML Sitemap admin tabs (like Google News admin page)
+TODO when on core server, the sitemap URL still shows as sitemap.xml on advanced tab
+TODO get debugging info back on NEWS sitemap
+TODO author sitemap lastmod === last publication date
+TODO replace clearing meta data db calls with delete_metadata( ... $delete_all = true )
 TODO integrate IndexNOW pings?
 TODO test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 TODO fix WPML incompatibility https://wordpress.org/support/topic/multilingual-url-issue/
@@ -9,6 +14,7 @@ TODO test User Role Editor auhtor issue reported by Harry Reigel harry@whispert.
 TODO add filter for taxonomy terms
 TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to verify results
 TODO make "hide empty" an option for taxonomy terms
+TODO revisit xmlsf_output_compression (can we force gzip over brotli when .gz is used?)
 
 TODO start with namespacing and autoload
 // http://justintadlock.com/archives/2018/12/14/php-namespaces-for-wordpress-developers

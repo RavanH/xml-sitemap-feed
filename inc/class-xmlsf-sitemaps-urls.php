@@ -91,14 +91,16 @@ class XMLSF_Sitemaps_URLs extends WP_Sitemaps_Provider {
 		$url_list = array();
 
 		foreach ( $urls as $url ) {
-			if ( ! wp_http_validate_url( $url[0] ) ) continue;
+			if ( ! wp_http_validate_url( $url[0] ) ) {
+				continue;
+			}
 
 			$sitemap_entry = array(
 				'loc' => $url[0],
 			);
 
 			if ( isset( $url[1] ) && is_numeric( $url[1] ) ) {
-				$sitemap_entry['priority'] = xmlsf_sanitize_priority( $url[1] );
+				$sitemap_entry['priority'] = xmlsf_sanitize_number( $url[1] );
 			}
 
 			/**
@@ -125,10 +127,9 @@ class XMLSF_Sitemaps_URLs extends WP_Sitemaps_Provider {
 	 * @return int Total number of pages.
 	 */
 	public function get_max_num_pages( $object_subtype = '' ) {
-		
-		$max_num_pages = is_numeric( $this->max_urls ) && (int) $this->max_urls > 0 ? ceil ( count( $this->urls ) / $this->max_urls ) : 0;
+
+		$max_num_pages = is_numeric( $this->max_urls ) && (int) $this->max_urls > 0 ? ceil( count( $this->urls ) / $this->max_urls ) : 0;
 
 		return $max_num_pages;
 	}
-
 }

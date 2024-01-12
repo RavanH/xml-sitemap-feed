@@ -23,7 +23,7 @@ function xmlsf_get_root_data() {
 				$url          = pll_home_url( $language );
 				$data[ $url ] = array(
 					'priority' => '1.0',
-					'lastmod'  => get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C )
+					'lastmod'  => get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ),
 					// TODO make lastmod date language specific.
 				);
 			}
@@ -33,7 +33,7 @@ function xmlsf_get_root_data() {
 			$url          = $sitepress->language_url( $term );
 			$data[ $url ] = array(
 				'priority' => '1.0',
-				'lastmod'  => get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C )
+				'lastmod'  => get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ),
 				// TODO make lastmod date language specific.
 			);
 		}
@@ -42,8 +42,8 @@ function xmlsf_get_root_data() {
 		$data = array(
 			trailingslashit( home_url() ) => array(
 				'priority' => '1.0',
-				'lastmod'  => get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C )
-			)
+				'lastmod'  => get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ),
+			),
 		);
 	}
 
@@ -69,7 +69,7 @@ function xmlsf_get_user_priority( $user ) {
 	$priority = apply_filters( 'xmlsf_user_priority', $priority, $user );
 
 	// A final check for limits and round it.
-	return xmlsf_sanitize_priority( $priority );
+	return xmlsf_sanitize_number( $priority );
 }
 
 /**
@@ -104,7 +104,7 @@ function xmlsf_get_user_modified( $user ) {
 		 *
 		 * @since 0.1
 		 *
-		 * @param array Array with post type slugs. Default array('post').
+		 * @param array Array with post type slugs. Default array( 'post' ).
 		 *
 		 * @return array
 		 */
@@ -148,7 +148,7 @@ function xmlsf_get_user_modified( $user ) {
 /**
  * Do image tag
  *
- * @param string $type
+ * @param string $type Type.
  * @uses WP_Post $post
  * @return void
  */
@@ -159,37 +159,40 @@ function xmlsf_image_tag( $type ) {
 	global $post;
 	$post_types = (array) get_option( 'xmlsf_post_types' );
 	if (
-		isset( $post_types[$post->post_type] ) &&
-		is_array( $post_types[$post->post_type] ) &&
-		isset( $post_types[$post->post_type]['tags'] ) &&
-		is_array( $post_types[$post->post_type]['tags'] ) &&
-		! empty( $post_types[$post->post_type]['tags']['image'] )  &&
-		is_string( $post_types[$post->post_type]['tags']['image'] )
+		isset( $post_types[ $post->post_type ] ) &&
+		is_array( $post_types[ $post->post_type ] ) &&
+		isset( $post_types[ $post->post_type ]['tags'] ) &&
+		is_array( $post_types[ $post->post_type ]['tags'] ) &&
+		! empty( $post_types[ $post->post_type ]['tags']['image'] ) &&
+		is_string( $post_types[ $post->post_type ]['tags']['image'] )
 	) {
-		$images = get_post_meta( $post->ID, '_xmlsf_image_'.$post_types[$post->post_type]['tags']['image'] );
+		$images = get_post_meta( $post->ID, '_xmlsf_image_' . $post_types[ $post->post_type ]['tags']['image'] );
 		foreach ( $images as $img ) {
-			if ( empty($img['loc']) ) continue;
-
-			echo '		<image:image>
-			<image:loc>' . utf8_uri_encode( $img['loc'] ) . '</image:loc>';
-			if ( !empty($img['title']) ) {
-				echo '
-			<image:title><![CDATA[' . str_replace(']]>', ']]&gt;', $img['title']) . ']]></image:title>';
+			if ( empty( $img['loc'] ) ) {
+				continue;
 			}
-			if ( !empty($img['caption']) ) {
-				echo '
-			<image:caption><![CDATA[' . str_replace(']]>', ']]&gt;', $img['caption']) . ']]></image:caption>';
+
+			echo '<image:image><image:loc>' . esc_xml( utf8_uri_encode( $img['loc'] ) ) . '</image:loc>';
+			if ( ! empty( $img['title'] ) ) {
+				echo '<image:title><![CDATA[' . esc_xml( $img['title'] ) . ']]></image:title>';
+			}
+			if ( ! empty( $img['caption'] ) ) {
+				echo '<image:caption><![CDATA[' . esc_xml( $img['caption'] ) . ']]></image:caption>';
 			}
 			do_action( 'xmlsf_image_tags_inner', 'post_type' );
-			echo '
-		</image:image>
-';
+			echo '</image:image>';
 		}
 	}
 }
 add_action( 'xmlsf_tags_after', 'xmlsf_image_tag' );
 
-
+/**
+ * Image schema
+ *
+ * @param string $type Type.
+ * @uses WP_Post $post
+ * @return void
+ */
 function xmlsf_image_schema( $type ) {
 	if ( 'post_type' !== $type ) {
 		return;
@@ -197,11 +200,11 @@ function xmlsf_image_schema( $type ) {
 	global $post;
 	$post_types = (array) get_option( 'xmlsf_post_types' );
 	if (
-		isset( $post_types[$post->post_type] ) &&
-		is_array( $post_types[$post->post_type] ) &&
-		isset( $post_types[$post->post_type]['tags'] ) &&
-		is_array( $post_types[$post->post_type]['tags'] ) &&
-		! empty( $post_types[$post->post_type]['tags']['image'] )
+		isset( $post_types[ $post->post_type ] ) &&
+		is_array( $post_types[ $post->post_type ] ) &&
+		isset( $post_types[ $post->post_type ]['tags'] ) &&
+		is_array( $post_types[ $post->post_type ]['tags'] ) &&
+		! empty( $post_types[ $post->post_type ]['tags']['image'] )
 	) {
 		echo 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"';
 	}
@@ -216,7 +219,7 @@ add_action( 'xmlsf_urlset', 'xmlsf_image_schema' );
  */
 function xmlsf_do_authors() {
 
-	$settings = get_option( 'xmlsf_author_settings', xmlsf()->defaults('author_settings') );
+	$settings = get_option( 'xmlsf_author_settings', xmlsf()->defaults( 'author_settings' ) );
 
 	return is_array( $settings ) && ! empty( $settings['active'] );
 }
@@ -231,8 +234,8 @@ function xmlsf_get_frontpages() {
 	if ( null === xmlsf()->frontpages ) :
 
 		$frontpages = array();
-		if ( 'page' == get_option('show_on_front') ) {
-			$frontpage = (int) get_option('page_on_front');
+		if ( 'page' === get_option( 'show_on_front' ) ) {
+			$frontpage  = (int) get_option( 'page_on_front' );
 			$frontpages = (array) apply_filters( 'xmlsf_frontpages', $frontpage );
 		}
 		xmlsf()->frontpages = $frontpages;
@@ -240,7 +243,6 @@ function xmlsf_get_frontpages() {
 	endif;
 
 	return xmlsf()->frontpages;
-
 }
 
 /**
@@ -252,27 +254,27 @@ function xmlsf_get_blogpages() {
 
 	if ( null === xmlsf()->blogpages ) :
 		$blogpages = array();
-		if ( 'page' == get_option('show_on_front') ) {
-			$blogpage = (int) get_option('page_for_posts');
+		if ( 'page' === get_option( 'show_on_front' ) ) {
+			$blogpage  = (int) get_option( 'page_for_posts' );
 			$blogpages = (array) apply_filters( 'xmlsf_blogpages', $blogpage );
 		}
 		xmlsf()->blogpages = $blogpages;
 	endif;
 
 	return xmlsf()->blogpages;
-
 }
 
 /**
  * Post Modified
  *
- * @param WP_Post $post
+ * @param WP_Post $post Post object.
+ *
  * @return string|false GMT date
  */
 function xmlsf_get_post_modified( $post ) {
 
-	// if blog or home page then simply look for last post date
-	if ( $post->post_type == 'page' && ( in_array( $post->ID, xmlsf_get_blogpages() ) || in_array( $post->ID, xmlsf_get_frontpages() ) ) ) {
+	// If blog or home page then simply look for last post date.
+	if ( 'page' === $post->post_type && ( in_array( $post->ID, xmlsf_get_blogpages(), true ) || in_array( $post->ID, xmlsf_get_frontpages() ) ) ) {
 
 		$lastmod = get_lastpostdate( 'GMT', 'post' );
 
@@ -280,22 +282,22 @@ function xmlsf_get_post_modified( $post ) {
 
 		$lastmod = $post->post_modified_gmt;
 
-		// make sure lastmod is not older than publication date (happens on scheduled posts)
+		// make sure lastmod is not older than publication date (happens on scheduled posts).
 		if ( isset( $post->post_date_gmt ) && strtotime( $post->post_date_gmt ) > strtotime( $lastmod ) ) {
 			$lastmod = $post->post_date_gmt;
 		};
 
-		// maybe update lastmod to latest comment
+		// maybe update lastmod to latest comment.
 		$options = (array) get_option( 'xmlsf_post_types', array() );
 
-		if ( !empty($options[$post->post_type]['update_lastmod_on_comments']) ) {
-			// assuming post meta data has been primed here
-			$lastcomment = get_post_meta( $post->ID, '_xmlsf_comment_date_gmt', true ); // only get one
+		if ( ! empty( $options[ $post->post_type ]['update_lastmod_on_comments'] ) ) {
+			// assuming post meta data has been primed here.
+			$lastcomment = get_post_meta( $post->ID, '_xmlsf_comment_date_gmt', true ); // only get one.
 
-			if ( ! empty( $lastcomment ) && strtotime( $lastcomment ) > strtotime( $lastmod ) )
+			if ( ! empty( $lastcomment ) && strtotime( $lastcomment ) > strtotime( $lastmod ) ) {
 				$lastmod = $lastcomment;
+			}
 		}
-
 	}
 
 	return ! empty( $lastmod ) ? get_date_from_gmt( $lastmod, DATE_W3C ) : false;
@@ -304,12 +306,12 @@ function xmlsf_get_post_modified( $post ) {
 /**
  * Term Modified
  *
- * @param WP_Term|int $term
+ * @param WP_Term|int $term Term object or ID.
  * @return string|false
  */
 function xmlsf_get_term_modified( $term ) {
 
-	if ( is_numeric($term) ) {
+	if ( is_numeric( $term ) ) {
 		$term = get_term( $term );
 	}
 
@@ -329,25 +331,25 @@ function xmlsf_get_term_modified( $term ) {
 
 	if ( null === $lastmod ) {
 		// Get lastmod from last publication date.
-		$posts = get_posts (
+		$posts   = get_posts(
 			array(
-				'post_type' => 'any',
-				'post_status' => 'publish',
-				'posts_per_page' => 1,
+				'post_type'              => 'any',
+				'post_status'            => 'publish',
+				'posts_per_page'         => 1,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
-				'update_cache' => false,
-				'lang' => '',
-				'tax_query' => array(
+				'update_cache'           => false,
+				'lang'                   => '',
+				'tax_query'              => array(
 					array(
 						'taxonomy' => $term->taxonomy,
-						'field' => 'slug',
-						'terms' => $term->slug
-					)
-				)
+						'field'    => 'slug',
+						'terms'    => $term->slug,
+					),
+				),
 			)
 		);
-		$lastmod = isset($posts[0]->post_date) ? $posts[0]->post_date : '';
+		$lastmod = isset( $posts[0]->post_date ) ? $posts[0]->post_date : '';
 		// Cache lastmod as term_modified meta data.
 		add_term_meta( $term->term_id, 'term_modified', $lastmod );
 	}
@@ -358,7 +360,7 @@ function xmlsf_get_term_modified( $term ) {
 /**
  * Taxonomy Modified
  *
- * @param string $taxonomy
+ * @param string $taxonomy Taxonomy slug.
  * @return string
  */
 function xmlsf_get_taxonomy_modified( $taxonomy ) {
@@ -366,13 +368,13 @@ function xmlsf_get_taxonomy_modified( $taxonomy ) {
 	$obj = get_taxonomy( $taxonomy );
 
 	$lastmodified = array();
-	foreach ( (array)$obj->object_type as $object_type ) {
+	foreach ( (array) $obj->object_type as $object_type ) {
 		$lastmodified[] = get_lastpostdate( 'GMT', $object_type );
 	}
 
 	sort( $lastmodified );
 	$lastmodified = array_filter( $lastmodified );
-	$lastmod = end( $lastmodified );
+	$lastmod      = end( $lastmodified );
 
 	return get_date_from_gmt( $lastmod, DATE_W3C );
 }
@@ -380,31 +382,41 @@ function xmlsf_get_taxonomy_modified( $taxonomy ) {
 /**
  * Get post priority
  *
- * @param WP_Post $post
+ * @param WP_Post $post Post object.
  * @return float
  */
 function xmlsf_get_post_priority( $post ) {
 	// locale LC_NUMERIC should be set to C for these calculations
 	// it is assumed to be done once at the request filter
-	//setlocale( LC_NUMERIC, 'C' );
+	// setlocale( LC_NUMERIC, 'C' );.
 
-	$options = get_option( 'xmlsf_post_types' );
-	$priority = isset($options[$post->post_type]['priority']) && is_numeric($options[$post->post_type]['priority']) ? floatval($options[$post->post_type]['priority']) : 0.5;
+	// Check for front page.
+	if ( in_array( $post->ID, xmlsf_get_frontpages(), true ) ) {
+		$priority = apply_filters( 'xmlsf_post_priority', 1, $post->ID );
 
-	if ( in_array( $post->ID, xmlsf_get_frontpages() ) ) {
+		// A final check for limits and round it.
+		return xmlsf_sanitize_number( $priority );
+	}
 
-		$priority = 1;
+	// Check for meta data.
+	$priority_meta = get_post_meta( $post->ID, '_xmlsf_priority', true );
+	if ( $priority_meta ) {
+		$priority = floatval( str_replace( ',', '.', $priority_meta ) );
+		$priority = apply_filters( 'xmlsf_post_priority', $priority, $post->ID );
 
-	} elseif ( $priority_meta = get_post_meta( $post->ID, '_xmlsf_priority', true ) ) {
+		// A final check for limits and round it.
+		return xmlsf_sanitize_number( $priority );
+	}
 
-		$priority = floatval(str_replace(',','.',$priority_meta));
+	// Still here? Then get calculating...
+	$options  = get_option( 'xmlsf_post_types' );
+	$priority = isset( $options[ $post->post_type ]['priority'] ) && is_numeric( $options[ $post->post_type ]['priority'] ) ? floatval( $options[ $post->post_type ]['priority'] ) : 0.5;
 
-	} elseif ( ! empty($options[$post->post_type]['dynamic_priority']) ) {
-
-		$post_modified = mysql2date('U',$post->post_modified);
+	if ( ! empty( $options[ $post->post_type ]['dynamic_priority'] ) ) {
+		$post_modified = mysql2date( 'U', $post->post_modified );
 
 		// Reduce by age.
-		// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age
+		// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age.
 		if ( xmlsf()->timespan > 0 && ! is_sticky( $post->ID ) && ! in_array( $post->ID, xmlsf_get_blogpages() ) ) {
 			$priority -= $priority * ( xmlsf()->lastmodified - $post_modified ) / xmlsf()->timespan;
 		}
@@ -413,37 +425,36 @@ function xmlsf_get_post_priority( $post ) {
 		if ( $post->comment_count > 0 && $priority < 1 && xmlsf()->comment_count > 0 ) {
 			$priority += 0.1 + ( 1 - $priority ) * $post->comment_count / xmlsf()->comment_count;
 		}
-
 	}
 
 	$priority = apply_filters( 'xmlsf_post_priority', $priority, $post->ID );
 
 	// A final check for limits and round it.
-	return xmlsf_sanitize_priority( $priority );
+	return xmlsf_sanitize_number( $priority );
 }
 
 /**
  * Get taxonomy priority
  *
- * @param WP_Term|int $term
+ * @param WP_Term|int $term Term.
  *
  * @return float
  */
 function xmlsf_get_term_priority( $term ) {
 	// locale LC_NUMERIC should be set to C for these calculations
 	// it is assumed to be done at the request filter
-	//setlocale( LC_NUMERIC, 'C' );
+	// setlocale( LC_NUMERIC, 'C' );.
 
 	$options = get_option( 'xmlsf_taxonomy_settings' );
 
 	$priority = isset( $options['priority'] ) && is_numeric( $options['priority'] ) ? floatval( $options['priority'] ) : 0.5 ;
 
-	if ( is_numeric($term) ) {
+	if ( is_numeric( $term) ) {
 		$term = get_term( $term );
 	}
 
-	if ( !empty($options['dynamic_priority']) && $priority > 0.1 ) {
-		// set first and highest term post count as maximum
+	if ( ! empty( $options['dynamic_priority'] ) && $priority > 0.1 ) {
+		// set first and highest term post count as maximum.
 		if ( null == xmlsf()->taxonomy_termmaxposts ) {
 			xmlsf()->taxonomy_termmaxposts = $term->count;
 		}
@@ -453,7 +464,6 @@ function xmlsf_get_term_priority( $term ) {
 
 	$priority = apply_filters( 'xmlsf_term_priority', $priority, $term->slug );
 
-	// a final check for limits and round it
-	return xmlsf_sanitize_priority( $priority );
-
+	// a final check for limits and round it.
+	return xmlsf_sanitize_number( $priority );
 }

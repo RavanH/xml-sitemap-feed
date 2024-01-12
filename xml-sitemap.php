@@ -3,9 +3,9 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.4-beta10
+ * Version: 5.4-beta30
  * Text Domain: xml-sitemap-feed
- * Requires at least: 4.6
+ * Requires at least: 5.5
  * Requires PHP: 5.6
  * Author: RavanH
  * Author URI: https://status301.net/
@@ -13,10 +13,10 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.4-beta10' );
+define( 'XMLSF_VERSION', '5.4-beta14' );
 
 /**
- * Copyright 2023 RavanH
+ * Copyright 2024 RavanH
  * https://status301.net/
  * mailto: ravanhagen@gmail.com
 
@@ -77,8 +77,6 @@ define( 'XMLSF_VERSION', '5.4-beta10' );
  *
  * ACTIONS *
  *
- * xmlsf_ping                  -> Fires when a search engine has been pinged. Carries four arguments:
- *                                search engine (google), sitemap name, full ping url, ping repsonse code.
  * xmlsf_generator             -> Fired before each sitemap's urlset tag.
  * xmlsf_urlset                -> Fired inside each sitemap's urlset tag. Can be used to
  *                                echo additional XML namespaces. Passes parameter home|post_type|taxonomy|custom
@@ -184,9 +182,6 @@ function xmlsf_init() {
 		require XMLSF_DIR . '/inc/class-xmlsf-sitemap.php';
 		require XMLSF_DIR . '/inc/functions-sitemap.php';
 
-		// Ping actions.
-		add_action( 'xmlsf_ping_google', 'xmlsf_ping', 10, 3 );
-
 		if ( xmlsf_uses_core_server() ) {
 			// Extend core sitemap.
 			require XMLSF_DIR . '/inc/class-xmlsf-sitemap-core.php';
@@ -214,9 +209,6 @@ function xmlsf_init() {
 	}
 
 	if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-		// Ping action.
-		add_action( 'xmlsf_news_pings', 'xmlsf_ping', 10, 3 );
-
 		// Common sitemap element filters.
 		if ( function_exists( 'esc_xml' ) ) {
 			// Since WP 5.5.
@@ -234,12 +226,6 @@ function xmlsf_init() {
 		require XMLSF_DIR . '/inc/class-xmlsf-sitemap-news.php';
 		new XMLSF_Sitemap_News( $sitemaps['sitemap-news'] );
 	}
-
-	// Maybe flush rewrite rules.
-	if ( ! get_option( 'xmlsf_permalinks_flushed' ) ) {
-		flush_rewrite_rules( false );
-		update_option( 'xmlsf_permalinks_flushed', 1 );
-	}
 }
 
 /**
@@ -249,7 +235,8 @@ function xmlsf_init() {
  * @return void
  */
 function xmlsf_activate() {
-	update_option( 'xmlsf_permalinks_flushed', 0 );
+	// Remove rules so they will be REGENERATED either on the next page load (with old plugin settings) or on install/upgrade.
+	delete_option( 'rewrite_rules' );
 }
 
 /**

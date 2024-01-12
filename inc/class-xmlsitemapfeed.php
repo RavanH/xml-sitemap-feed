@@ -1,21 +1,31 @@
 <?php
+/**
+ * XMLSitemapFeed CLASS
+ *
+ * @package XML Sitemap & Google News
+ */
 
+/**
+ * XMLSitemapFeed CLASS
+ */
 class XMLSitemapFeed {
 
 	/**
 	 * Defaults
+	 *
 	 * @var array
 	 */
 	private $defaults = array();
 
 	/**
 	 * News defaults
+	 *
 	 * @var array
 	 */
 	public $default_news_tags = array(
-		'name' => '',
-		'post_type' => array('post'),
-		'categories' => ''
+		'name'       => '',
+		'post_type'  => array( 'post' ),
+		'categories' => '',
 	);
 
 	/**
@@ -26,27 +36,31 @@ class XMLSitemapFeed {
 	public $frontpages = null;
 
 	/**
-	* Signifies whether the request has been filtered.
-	* @var bool
-	*/
+	 * Signifies whether the request has been filtered.
+	 *
+	 * @var bool
+	 */
 	public $request_filtered = false;
 
 	/**
-	* Signifies whether the current query is for a sitemap feed.
-	* @var bool
-	*/
+	 * Signifies whether the current query is for a sitemap feed.
+	 *
+	 * @var bool
+	 */
 	public $is_sitemap = false;
 
 	/**
-	* Signifies whether the request has been filtered for news.
-	* @var bool
-	*/
+	 * Signifies whether the request has been filtered for news.
+	 *
+	 * @var bool
+	 */
 	public $request_filtered_news = false;
 
 	/**
-	* Signifies whether the current query is for a news feed.
-	* @var bool
-	*/
+	 * Signifies whether the current query is for a news feed.
+	 *
+	 * @var bool
+	 */
 	public $is_news = false;
 
 	/**
@@ -65,12 +79,12 @@ class XMLSitemapFeed {
 
 	/**
 	 * Excluded taxonomies
+	 * post format taxonomy is disabled.
 	 *
-	 * post format taxonomy is disabled
 	 * @var array
 	 */
 	private $disabled_taxonomies = array(
-		'product_shipping_class'
+		'product_shipping_class',
 	);
 
 	/**
@@ -109,35 +123,32 @@ class XMLSitemapFeed {
 	public $blogpages = null;
 
 	/**
-	* METHODS
-	*/
-
-	/**
 	 * Constructor
+	 *
 	 * @return void
 	 */
-	function __construct() {}
+	public function __construct() {}
 
 	/**
 	 * Default options
 	 *
-	 * @param $key
+	 * @param bool $key Which key to get.
+	 *
 	 * @return array
 	 */
-	public function defaults( $key = false )
-	{
-		if ( empty($this->defaults) ) :
+	public function defaults( $key = false ) {
+		if ( empty( $this->defaults ) ) :
 
-			// sitemaps
-			$sitemaps = ( '1' !== get_option('blog_public') ) ? '' : array(
-				'sitemap' => 'sitemap.xml'
+			// sitemaps.
+			$sitemaps = ( '1' !== get_option( 'blog_public' ) ) ? array() : array(
+				'sitemap' => 'sitemap.xml',
 			);
 
 			$this->defaults = array(
 				'sitemaps'          => $sitemaps,
 				'general_settings'  => array(
 					'server' => class_exists( 'SimpleXMLElement' ) ? 'core' : 'plugin',
-					'limit'  => '2000'
+					'limit'  => 2000,
 				),
 				'post_types'        => array(
 					'post' => array(
@@ -146,46 +157,43 @@ class XMLSitemapFeed {
 						'priority'         => '0.7',
 						'dynamic_priority' => '',
 						'tags'             => array(
-							'image' => 'featured'
+							'image' => 'featured',
 							/*'video' => ''*/
-						)
+						),
 					),
 					'page' => array(
 						'active'           => '1',
 						'priority'         => '0.5',
 						'dynamic_priority' => '',
 						'tags'             => array(
-							'image' => 'attached'
+							'image' => 'attached',
 							/*'video' => ''*/
-						)
-					)
+						),
+					),
 				),
 				'taxonomies'        => '',
 				'taxonomy_settings' => array(
-					'active' => '',
-					'priority' => '0.3',
+					'active'           => '',
+					'priority'         => '0.3',
 					'dynamic_priority' => '',
-					'limit' => ''
+					'limit'            => 2000,
 				),
 				'authors'           => '',
 				'author_settings'   => array(
 					'active'   => '1',
 					'priority' => '0.3',
-					'limit'    => ''
-				),
-				'ping'              => array(
-					'google'
+					'limit'    => 2000,
 				),
 				'robots'            => '',
 				'urls'              => '',
 				'custom_sitemaps'   => '',
-				'domains'           => ''
+				'domains'           => '',
 			);
 
 		endif;
 
 		if ( $key ) {
-			$return = ( isset($this->defaults[$key]) ) ? $this->defaults[$key] : '';
+			$return = ( isset( $this->defaults[ $key ] ) ) ? $this->defaults[ $key ] : '';
 		} else {
 			$return = $this->defaults;
 		}
@@ -198,19 +206,16 @@ class XMLSitemapFeed {
 	 *
 	 * @return array
 	 */
-	public function get_allowed_domains()
-	{
-		// allowed domain
+	public function get_allowed_domains() {
+		// Allowed domain.
 		if ( null === $this->domains ) {
+			$host          = wp_parse_url( home_url(), PHP_URL_HOST );
+			$this->domains = ( ! empty( $host ) ) ? (array) $host : array();
+			$domains       = get_option( 'xmlsf_domains' );
 
-			$host = parse_url( home_url(), PHP_URL_HOST );
-
-			$this->domains = ( !empty($host) ) ? (array) $host : array();
-
-			$domains = get_option('xmlsf_domains');
-
-			if ( !empty( $domains ) )
+			if ( ! empty( $domains ) ) {
 				$this->domains = array_merge( $this->domains, (array) $domains );
+			}
 		}
 
 		return $this->domains;
@@ -218,13 +223,13 @@ class XMLSitemapFeed {
 
 	/**
 	 * Get scheme
+	 *
 	 * @return string
 	 */
-	public function scheme()
-	{
-		// scheme to use
-		if ( empty($this->scheme) ) {
-			$scheme = parse_url( home_url(), PHP_URL_SCHEME );
+	public function scheme() {
+		// Scheme to use.
+		if ( empty( $this->scheme ) ) {
+			$scheme       = wp_parse_url( home_url(), PHP_URL_SCHEME );
 			$this->scheme = $scheme ? $scheme : 'http';
 		}
 
@@ -233,11 +238,10 @@ class XMLSitemapFeed {
 
 	/**
 	 * Get disabled taxonomies
+	 *
 	 * @return array
 	 */
-	public function disabled_taxonomies()
-	{
+	public function disabled_taxonomies() {
 		return apply_filters( 'xmlsf_disabled_taxonomies', $this->disabled_taxonomies );
 	}
-
 }

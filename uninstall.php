@@ -78,7 +78,6 @@ function xmlsf_uninstall() {
 	delete_option( 'xmlsf_news_tags' );
 	delete_option( 'xmlsf_images_meta_primed' );
 	delete_option( 'xmlsf_comments_meta_primed' );
-	delete_option( 'xmlsf_permalinks_flushed' );
 
 	// Flush rules.
 	flush_rewrite_rules();

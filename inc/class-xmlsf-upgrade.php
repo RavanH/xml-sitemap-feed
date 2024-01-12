@@ -20,8 +20,8 @@ class XMLSF_Upgrade {
 	 * @since 5.1
 	 */
 	public function __construct( $db_version = null ) {
-		// make sure rules are regenerated when admin is visited.
-		update_option( 'xmlsf_permalinks_flushed', 0 );
+		// Make sure rules are REGENERATED on next pageload.
+		delete_option( 'rewrite_rules' );
 
 		if ( $db_version ) {
 			$this->upgrade( $db_version );
@@ -38,16 +38,8 @@ class XMLSF_Upgrade {
 	 * @since 5.1
 	 */
 	private function install() {
-		$defaults = xmlsf()->defaults();
-
-		foreach ( $defaults as $option => $default ) {
-			delete_option( 'xmlsf_' . $option );
-			if ( in_array( $option, array( 'ping', 'robots' ) ) ) {
-				add_option( 'xmlsf_' . $option, $default, null, false );
-			} else {
-				add_option( 'xmlsf_' . $option, $default );
-			}
-		}
+		// Add or update all defaults.
+		$this->update_from_defaults();
 
 		do_action( 'xmlsf_install' );
 	}
@@ -141,20 +133,8 @@ class XMLSF_Upgrade {
 			);
 			add_option( 'xmlsf_taxonomy_settings', $taxonomy_settings );
 
-			// Update ping option.
-			$ping = get_option( 'xmlsf_ping' );
-			$new  = array( 'google' );
-			if ( is_array( $ping ) ) {
-				foreach ( $ping as $key => $value ) {
-					if ( is_array( $value ) && empty( $value['active'] ) && isset( $new[ $key ] ) ) {
-						unset( $new[ $key ] );
-					}
-				}
-			}
-			update_option( 'xmlsf_ping', $new, false );
-
 			// Make sure no pong option remains.
-			delete_option( 'xmlsf_pong');
+			delete_option( 'xmlsf_pong' );
 
 			// Update or create robots option.
 			$robots = get_option( 'xmlsf_robots', '' );
@@ -187,20 +167,31 @@ class XMLSF_Upgrade {
 			delete_transient( 'xmlsf_prefetch_post_meta_failed' );
 
 			// Do not switch to core sitemap when upgrading.
-			add_option( 'xmlsf_general_settings', array( 'server' => 'plugin', 'limit' => '2000' ) );
+			add_option(
+				'xmlsf_general_settings',
+				array(
+					'server' => 'plugin',
+					'limit'  => '2000',
+				)
+			);
 			// Update taxonomy terms limit.
 			$settings          = (array) get_option( 'xmlsf_taxonomy_settings', array() );
 			$settings['limit'] = isset( $settings['term_limit'] ) ? $settings['term_limit'] : '3000';
 			unset( $settings['term_limit'] );
 			update_option( 'xmlsf_taxonomy_settings', $settings );
 			// Update users limit.
-			$settings = (array) get_option( 'xmlsf_author_settings', array() );
+			$settings          = (array) get_option( 'xmlsf_author_settings', array() );
 			$settings['limit'] = isset( $settings['term_limit'] ) ? $settings['term_limit'] : '1000';
 			unset( $settings['term_limit'] );
 			update_option( 'xmlsf_author_settings', $settings );
+
+			// Delete old settings.
+			delete_option( 'xmlsf_ping' );
+			delete_option( 'xmlsf_permalinks_flushed' );
 		}
 
-		$this->update_from_defaults();
+		// Add missing new defaults.
+		$this->update_from_defaults( false );
 
 		do_action( 'xmlsf_upgrade', $db_version );
 	}
@@ -209,11 +200,17 @@ class XMLSF_Upgrade {
 	 * Update from defaults.
 	 *
 	 * @since 5.1
+	 *
+	 * @param bool $update Wether to add or update options.
 	 */
-	private function update_from_defaults() {
-		$not_autoload = array( 'ping', 'robots' );
+	private function update_from_defaults( $update = true ) {
+		// Options that need not be autoloaded.
+		$not_autoload = array( 'robots' );
+
 		foreach ( xmlsf()->defaults() as $option => $default ) {
-			if ( false === get_option( 'xmlsf_' . $option, false ) ) {
+			if ( $update ) {
+				update_option( 'xmlsf_' . $option, $default, '', ! in_array( $option, $not_autoload, true ) );
+			} else {
 				add_option( 'xmlsf_' . $option, $default, '', ! in_array( $option, $not_autoload, true ) );
 			}
 		}
