@@ -13,7 +13,7 @@ TODO allow inclusion of taxonomies that belong to a post type that is not includ
 TODO test User Role Editor auhtor issue reported by Harry Reigel harry@whispert.de
 TODO add filter for taxonomy terms
 TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to verify results
-TODO make "hide empty" an option for taxonomy terms
+TODO make "hide empty" an option for taxonomy terms, see issue #40
 TODO revisit xmlsf_output_compression (can we force gzip over brotli when .gz is used?)
 
 TODO start with namespacing and autoload
