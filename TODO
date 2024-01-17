@@ -15,6 +15,7 @@ TODO add filter for taxonomy terms
 TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to verify results
 TODO make "hide empty" an option for taxonomy terms, see issue #40
 TODO revisit xmlsf_output_compression (can we force gzip over brotli when .gz is used?)
+TODO make conflicting file removal respect DISALLOW_FILE_EDIT
 
 TODO start with namespacing and autoload
 // http://justintadlock.com/archives/2018/12/14/php-namespaces-for-wordpress-developers
