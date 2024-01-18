@@ -64,9 +64,6 @@
 		<form action="" method="post">
 			<?php wp_nonce_field( XMLSF_BASENAME . '-help', '_xmlsf_help_nonce' ); ?>
 			<p>
-				<input type="submit" name="xmlsf-ping-sitemap-news" class="button button-small" value="<?php esc_html_e( 'Ping Google News', 'xml-sitemap-feed' ); ?>" />
-			</p>
-			<p>
 				<input type="submit" name="xmlsf-flush-rewrite-rules" class="button button-small" value="<?php esc_html_e( 'Flush rewrite rules', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>

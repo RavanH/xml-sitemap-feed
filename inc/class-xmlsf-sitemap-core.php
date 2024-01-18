@@ -166,7 +166,7 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 			 * Use add_filter( 'xmlsf_core_request', 'your_filter_function' );
 			 *
 			 * Filters hooked here already:
-			 * ! functions.public-sitemap.php
+			 * ! functions-public-sitemap.php
 			 */
 			$request = apply_filters( 'xmlsf_core_request', $request );
 
