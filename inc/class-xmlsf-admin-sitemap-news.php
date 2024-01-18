@@ -220,7 +220,7 @@ class XMLSF_Admin_Sitemap_News {
 			// Source labels - deprecated.
 			add_settings_field(
 				'xmlsf_news_labels',
-				__( 'Source labels', 'xml-sitemap-feed' ),
+				__( 'Content labels', 'xml-sitemap-feed' ),
 				function () {
 					include XMLSF_DIR . '/views/admin/field-news-labels.php';
 				},
@@ -295,7 +295,7 @@ class XMLSF_Admin_Sitemap_News {
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-news-labels',
-						'title'   => __( 'Source labels', 'xml-sitemap-feed' ),
+						'title'   => __( 'Content labels', 'xml-sitemap-feed' ),
 						'content' => $content,
 					)
 				);
