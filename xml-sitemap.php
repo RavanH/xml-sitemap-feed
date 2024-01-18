@@ -46,7 +46,7 @@ define( 'XMLSF_VERSION', '5.4-beta14' );
  *                                Passes variable $url; must return true or false.
  * xmlsf_index_url_args        -> Filters the index url arguments array
  * xmlsf_excluded              -> Filters the response when checking the post for exclusion flags in
- *                                XML Sitemap context. Passes the post exclusion flag and $post_id; must return true or false.
+ *                                XML Sitemap context. Passes the post exclusion flag and $post_id; must return true or false.
  * xmlsf_news_excluded         -> Filters the response when checking the post for exclusion flags in
  *                                Google News sitemap context. Passes variable $post_id; must exclusion flag, return true or false.
  * xmlsf_news_keywords         -> Filters the news keywords array

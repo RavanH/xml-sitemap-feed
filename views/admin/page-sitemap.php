@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		jQuery(window).on('beforeunload', function(event) {
 			if (!isSubmitting && mainform.length && mainform.serialize() != mainform.data('initial-state')){
 				event.preventDefault();
-				return "<?php esc_html_e( 'The changes you made will be lost if you navigate away from this page.' ) ?>";
+				return "<?php esc_html_e( 'The changes you made will be lost if you navigate away from this page.' ); ?>";
 			}
 		});
 	});
