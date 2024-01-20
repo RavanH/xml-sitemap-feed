@@ -5,6 +5,8 @@
  * @package XML Sitemap & Google News
  */
 
+esc_html__( 'Advanced options', 'xml-sitemap-feed' );
+
 sprintf( /* translators: Plugin name (linked to plugin installation modal) */ esc_html__( 'To use the Google News Advanced options, please install and activate %s.', 'xml-sitemap-feed' ), '<a href="' . esc_url( network_admin_url( 'plugin-install.php?tab=plugin-information&plugin=xml-sitemap-feed&TB_iframe=true&width=600&height=550' ) ) . '" target="_blank" class="thickbox"><strong>' . esc_html__( 'XML Sitemap & Google News', 'xml-sitemap-feed' ) . '</strong></a>' );
 
 sprintf( /* translators: Google News Sitemap option (linked to admin Reading page) */ esc_html__( 'To use the Google News Advanced options, please activate %s.', 'xml-sitemap-feed' ), '<a href="' . esc_url( admin_url( 'options-reading.php' ) ) . '#xmlsf_sitemaps">' . esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ) . '</a>' );
