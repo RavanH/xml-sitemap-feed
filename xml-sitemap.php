@@ -83,6 +83,8 @@ define( 'XMLSF_VERSION', '5.4-beta14' );
  *                                to allow identification of the current sitemap.
  * xmlsf_url                   -> Fired inside the XML Sitemap loop at the start of each sitemap url tag. Passes parameter
  *                                sitemap type (currently only 'post_type') to allow identification of the current sitemap.
+ * xmlsf_sitemap_index_pre     -> Fired before any sitemap are added to the index.
+ * xmlsf_sitemap_index_post    -> Fired after all sitemaps are added to the index.
  * xmlsf_image_tags_inner      -> Fired inside the XML Sitemap loop just before each closing </image:image> is generated.
  *                                Can be used to echo custom <image:image> tags or trigger another action in the background.
  * xmlsf_tags_after            -> Fired inside the XML Sitemap loop at the end of the tags, just before each

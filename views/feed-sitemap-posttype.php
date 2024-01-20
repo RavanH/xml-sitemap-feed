@@ -24,7 +24,7 @@ if ( have_posts() ) :
 	$wp_query->in_the_loop = true;
 	while ( have_posts() ) :
 		// Don't do the_post() here to avoid expensive setup_postdata(), just do the following.
-		$post = $wp_query->next_post();
+		$post = $wp_query->next_post(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
 		// Check if page is front page.
 		if ( (int) get_option( 'page_on_front' ) === $post->ID ) {

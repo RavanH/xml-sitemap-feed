@@ -23,7 +23,7 @@ if ( have_posts() ) :
 	while ( have_posts() ) :
 		// the_post(); disabled to avoid expensive but useless setup_postdata(), just do:
 		// TODO : maybe make our own setup_postdata version?
-		$post = $wp_query->next_post();
+		$post = $wp_query->next_post(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
 		// Check if we are not dealing with an external URL :: Thanks to Francois Deschenes :).
 		if ( ! xmlsf_is_allowed_domain( get_permalink() ) ) {
@@ -42,8 +42,9 @@ if ( have_posts() ) :
 		$did_posts = true;
 
 		do_action( 'xmlsf_news_url' );
-		echo '<url><loc>' . esc_url( get_permalink() ) . '</loc><news:news>';
-		echo '<news:publication><news:name>';
+		echo '<url><loc>' . esc_url( get_permalink() ) . '</loc>';
+		// The news tags.
+		echo '<news:news><news:publication><news:name>';
 		if ( ! empty( $options['name'] ) ) {
 			echo esc_xml( apply_filters( 'xmlsf_news_publication_name', $options['name'] ) );
 		} elseif ( defined( 'XMLSF_GOOGLE_NEWS_NAME' ) ) {
@@ -61,6 +62,7 @@ if ( have_posts() ) :
 		do_action( 'xmlsf_news_tags_inner' );
 		echo '</news:news>';
 		do_action( 'xmlsf_news_tags_after' );
+
 		echo '</url>';
 		do_action( 'xmlsf_news_url_after' );
 		echo PHP_EOL;
