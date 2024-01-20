@@ -28,6 +28,8 @@ class XMLSF_Admin_Sitemap_News {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'xmlsf_news_add_settings', array( $this, 'add_settings' ) );
+
+		add_action( 'xmlsf_news_settings_before', array( $this, 'add_settings' ) );
 	}
 
 	/**
@@ -239,6 +241,17 @@ class XMLSF_Admin_Sitemap_News {
 			'xmlsf_news_tags',
 			array( 'XMLSF_Admin_Sitemap_News_Sanitize', 'news_tags_settings' )
 		);
+	}
+
+	/**
+	 * Advanced section intro
+	 *
+	 * @param string $active_tab Active tab.
+	 */
+	public function section_advanced_intro( $active_tab = '' ) {
+		if ( 'advanced' === $active_tab ) {
+			include XMLSF_DIR . '/views/admin/section-advanced-intro.php';
+		}
 	}
 
 	/**
