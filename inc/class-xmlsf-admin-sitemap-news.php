@@ -328,6 +328,9 @@ class XMLSF_Admin_Sitemap_News {
 				);
 		}
 
+		// Hook for additional/advanced help tab.
+		do_action( 'xmlsf_news_help_tabs', $screen, $active_tab );
+
 		ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-news-sidebar.php';
 		$content = ob_get_clean();

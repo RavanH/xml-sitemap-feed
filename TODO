@@ -5,6 +5,8 @@ TODO when on core server, the sitemap URL still shows as sitemap.xml on advanced
 TODO get debugging info back on NEWS sitemap
 TODO author sitemap lastmod === last publication date
 
+TODO update documentation with new hooks: index_pro/post, xmlsf_news_help_tabs
+
 TODO replace clearing meta data db calls with delete_metadata( ... $delete_all = true )
 TODO integrate sitemap updates via Webmaster tools API https://developers.google.com/webmaster-tools/v1/sitemaps/submit (PRO?)
 TODO test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active

@@ -106,6 +106,7 @@ define( 'XMLSF_VERSION', '5.4-beta14' );
  *                                Can be used to append alternative url or trigger another action in the background.
  * xmlsf_news_settings_before  -> Fired before the Google News Sitemap settings form
  * xmlsf_news_settings_after   -> Fired after the Google News Sitemap settings form
+ * xmlsf_news_help_tabs        -> Fired after the admin help tabs have been added.
  *
  * ---------------------
  *  AVAILABLE FUNCTIONS
