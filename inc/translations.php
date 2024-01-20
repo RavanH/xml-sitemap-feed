@@ -50,7 +50,7 @@ printf( /* Translators: Account (linked), Plugin name */
 	esc_html__( 'Google News Advanced', 'xml-sitemap-feed' )
 );
 
-sprintf( /* Translators: Expiration date */ __( 'Your license key has expired on %s.', 'xml-sitemap-feed' ), date_i18n( get_option( 'date_format' ), strtotime( $expires, current_time( 'timestamp' ) ) ) );
+sprintf( /* Translators: Expiration date */ __( 'Your license key has expired on %s.', 'xml-sitemap-feed' ), date_i18n( get_option( 'date_format' ), strtotime( $expires, time() + (int) ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) ) ) );
 __( 'Your license key has expired.', 'xml-sitemap-feed' );
 __( 'Your license key has been disabled.', 'xml-sitemap-feed' );
 __( 'Your license key has been disabled.', 'xml-sitemap-feed' );
