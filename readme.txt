@@ -304,8 +304,9 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 * Filter domains in taxonomy and author sitemaps
 * NEW: xmlsf_generator action hook
+* NEW: xmlsf_sitemap_index_pre and xmlsf_sitemap_index_post action hooks
 * NEW: xmlsf_author_post_types filter
-* Dropping Ping Services awaiting IndexNow support
+* Dropping all Ping Services
 * Exclude spammed or deleted authors on multisite
 * Updated help links
 * Update coding standards
