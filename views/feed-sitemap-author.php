@@ -27,10 +27,10 @@ $users = get_users(
 	)
 );
 foreach ( $users as $user ) {
-	$url = get_author_posts_url( $user->ID );
+	$url = apply_filters( 'xmlsf_entry_url', get_author_posts_url( $user->ID ), 'author', $user );
 
-	// Check if we are dealing with an external URL. This can happen with multi-language plugins where each language has its own domain.
-	if ( ! xmlsf_is_allowed_domain( $url ) ) {
+	// Use xmlsf_entry_url filter to return falsy value to exclude a specific URL.
+	if ( empty( $url ) ) {
 		continue;
 	}
 
@@ -39,14 +39,20 @@ foreach ( $users as $user ) {
 		continue;
 	}
 
+	do_action( 'xmlsf_url', 'author', $user );
+
 	echo '<url><loc>' . esc_xml( esc_url( $url ) ) . '</loc><priority>' . esc_xml( xmlsf_get_user_priority( $user ) ) . '</priority>';
 	$lastmod = xmlsf_get_user_modified( $user );
 	if ( $lastmod ) {
 		echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
 	}
-	do_action( 'xmlsf_tags_after', 'author' );
+
+	do_action( 'xmlsf_tags_after', 'author', $user );
+
 	echo '</url>';
-	do_action( 'xmlsf_url_after', 'author' );
+
+	do_action( 'xmlsf_url_after', 'author', $user );
+
 	echo PHP_EOL;
 }
 ?>

@@ -14,7 +14,7 @@ echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charse
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap><loc><?php echo esc_xml( xmlsf_sitemap_url( 'root' ) ); ?></loc><lastmod><?php echo esc_xml( get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ) ); ?></lastmod></sitemap>
 <?php
-do_action( 'xmlsf_sitemap_index_pre' );
+do_action( 'xmlsf_sitemap_index' );
 
 // Public post types.
 $post_types = xmlsf_get_post_types();
@@ -64,6 +64,6 @@ if ( is_array( $custom_sitemaps ) ) :
 	}
 endif;
 
-do_action( 'xmlsf_sitemap_index_post' );
+do_action( 'xmlsf_sitemap_index_after' );
 ?>
 </sitemapindex>

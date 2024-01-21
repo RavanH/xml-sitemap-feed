@@ -1,35 +1,35 @@
 ROADMAP
 
 = 5.4 =
-* add todos
+* rearrange sitemap settings tab fields
+* Rearrange sitemap help tabs (like news)
+* fix sitemap name when on core server
+* test meta cache clearing
+* test file deletion capability
+* remove metac cache clear commented code (if test successful)
+
+TODO author sitemap lastmod === last publication date
+TODO add news sitemap to index (with xmlsf_sitemap_index_pre hook)
+TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to verify results
+TODO make "hide empty" an option for taxonomy terms, see issue #40
+
 
 
 TODO LIST
 
-TODO add news sitemap to index (with xmlsf_sitemap_index_pre hook)
-TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to verify results
-TODO streamline help tab entries on XML Sitemap admin tabs (like Google News admin page)
-TODO when on core server, the sitemap URL still shows as sitemap.xml on advanced tab
-TODO get debugging info back on NEWS sitemap
-TODO author sitemap lastmod === last publication date
+* prepare compatibility routine for additional premium modules
+* add inline comment blocks for hooks
 
-TODO prepare compatibility routine for additional premium modules
-
-TODO update documentation with new hooks: index_pro/post, xmlsf_news_help_tabs
-
-TODO replace clearing meta data db calls with delete_metadata( ... $delete_all = true )
 TODO integrate sitemap updates via Webmaster tools API https://developers.google.com/webmaster-tools/v1/sitemaps/submit (PRO?)
 TODO test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 TODO fix WPML incompatibility https://wordpress.org/support/topic/multilingual-url-issue/
 TODO add option for priority support link in the sidebar help section and help tab
-TODO core sitemap stylesheets (per sitemap type)
+TODO core sitemap stylesheets per sitemap type (is that possible?)
 TODO allow CPT taxonomies selection in news sitemap (PRO?)
+TODO add BuddyPress groups as requested by Harry Riegel harry@whispert.de (PRO)
 TODO allow inclusion of taxonomies that belong to a post type that is not included
-TODO test User Role Editor auhtor issue reported by Harry Reigel harry@whispert.de
-TODO add filter for taxonomy terms
-TODO make "hide empty" an option for taxonomy terms, see issue #40
+
 TODO revisit xmlsf_output_compression (can we force gzip over brotli when .gz is used?)
-TODO make conflicting file removal respect DISALLOW_FILE_EDIT
 
 TODO start with namespacing and autoload
 // http://justintadlock.com/archives/2018/12/14/php-namespaces-for-wordpress-developers

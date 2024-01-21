@@ -18,19 +18,27 @@ $terms = get_terms( array( 'taxonomy' => get_query_var( 'taxonomy' ) ) );
 
 if ( is_array( $terms ) ) :
 	foreach ( $terms as $tax_term ) :
-		$url = get_term_link( $tax_term );
-		// Check if we are dealing with an external URL. This can happen with multi-language plugins where each language has its own domain.
-		if ( ! xmlsf_is_allowed_domain( $url ) ) {
+		$url = apply_filters( 'xmlsf_entry_url', get_term_link( $tax_term ), 'taxonomy', $tax_term );
+
+		// Use xmlsf_entry_url filter to return falsy value to exclude a specific URL.
+		if ( empty( $url ) ) {
 			continue;
 		}
-		echo '<url><loc>' . esc_url( $url ) . '</loc><priority>' . esc_xml( xmlsf_get_term_priority( $tax_term ) ) . '</priority>';
+
+		do_action( 'xmlsf_url', 'taxonomy', $tax_term );
+
+		echo '<url><loc>' . esc_xml( $url ) . '</loc><priority>' . esc_xml( xmlsf_get_term_priority( $tax_term ) ) . '</priority>';
 		$lastmod = xmlsf_get_term_modified( $tax_term );
 		if ( $lastmod ) {
 			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
 		}
-		do_action( 'xmlsf_tags_after', 'taxonomy' );
+
+		do_action( 'xmlsf_tags_after', 'taxonomy', $tax_term );
+
 		echo '</url>';
-		do_action( 'xmlsf_url_after', 'taxonomy' );
+
+		do_action( 'xmlsf_url_after', 'taxonomy', $tax_term );
+
 		echo PHP_EOL;
 	endforeach;
 endif;

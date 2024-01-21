@@ -171,24 +171,6 @@ function xmlsf_get_stylesheet_url( $sitemap = false ) {
 }
 
 /**
- * Filter sitemap post types
- *
- * @since 5.0
- *
- * @param array $post_types Post types.
- *
- * @return array
- */
-function xmlsf_filter_post_types( $post_types ) {
-	$post_types = (array) $post_types;
-
-	// Always exclude attachment and reply post types (bbPress).
-	unset( $post_types['attachment'], $post_types['reply'] );
-
-	return array_filter( $post_types );
-}
-
-/**
  * WPML compatibility hooked into xmlsf_add_settings and xmlsf_news_add_settings actions
  *
  * @return void

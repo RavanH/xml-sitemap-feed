@@ -7,7 +7,7 @@
 
 /**
  * Get post types.
- * Returns an array of taxonomy names to be included in the index.
+ * Returns an array of post types to be included in the index.
  *
  * @since 5.4
  *
@@ -15,9 +15,10 @@
  */
 function xmlsf_get_post_types() {
 	$post_types = (array) apply_filters( 'xmlsf_post_types', get_option( 'xmlsf_post_types', array() ) );
+	$disabled   = (array) xmlsf()->disabled_post_types();
 
 	foreach ( $post_types as $post_type => $settings ) {
-		if ( empty( $settings['active'] ) || ! post_type_exists( $post_type ) ) {
+		if ( empty( $settings['active'] ) || ! is_post_type_viewable( $post_type ) || in_array( $post_type, $disabled, true ) ) {
 			unset( $post_types[ $post_type ] );
 		}
 	}
@@ -130,6 +131,7 @@ function xmlsf_images_data( $post, $which ) {
 function xmlsf_public_taxonomies() {
 
 	$tax_array = array();
+	$disabled  = (array) xmlsf()->disabled_taxonomies();
 
 	foreach ( (array) get_option( 'xmlsf_post_types' ) as $post_type => $settings ) {
 
@@ -139,13 +141,34 @@ function xmlsf_public_taxonomies() {
 
 		// Check each tax public flag and term count and append name to array.
 		foreach ( get_object_taxonomies( $post_type, 'objects' ) as $taxonomy ) {
-			if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) ) {
+			if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, $disabled, true ) ) {
 				$tax_array[ $taxonomy->name ] = $taxonomy->label;
 			}
 		}
 	}
 
 	return $tax_array;
+}
+
+/**
+ * Get public post types.
+ * Returns an array of post types to be included on the settings page.
+ *
+ * @since 5.4
+ *
+ * @return array
+ */
+function xmlsf_public_post_types() {
+	$post_types = (array) apply_filters( 'xmlsf_post_types', get_post_types( array( 'public' => true ) ) );
+	$disabled   = (array) xmlsf()->disabled_post_types();
+
+	foreach ( $post_types as $post_type ) {
+		if ( ! is_post_type_viewable( $post_type ) || in_array( $post_type, $disabled, true ) ) {
+			unset( $post_types[ $post_type ] );
+		}
+	}
+
+	return $post_types;
 }
 
 /**
@@ -172,6 +195,38 @@ function xmlsf_sanitize_number( $number, $min = .1, $max = 1, $_float = true ) {
 	$number = min( max( $min, $number ), $max );
 
 	return $_float ? number_format( $number, 1 ) : $number;
+}
+
+/**
+ * Clear cache metadata
+ *
+ * @param string $type The metadata type to clear.
+ */
+function xmlsf_clear_metacache( $type = 'all' ) {
+	switch ( $type ) {
+		case 'images':
+			// Clear all images meta caches...
+			delete_metadata( 'post', 0, '_xmlsf_image_attached', '', true );
+			delete_metadata( 'post', 0, '_xmlsf_image_featured', '', true );
+			update_option( 'xmlsf_images_meta_primed', array() );
+			break;
+
+		case 'comments':
+			delete_metadata( 'post', 0, '_xmlsf_comment_date_gmt', '', true );
+			update_option( 'xmlsf_comments_meta_primed', array() );
+			break;
+
+		case 'terms':
+			delete_metadata( 'term', 0, 'term_modified', '', true );
+			break;
+
+		case 'all':
+		default:
+			$all_types = array( 'images', 'comments', 'terms' );
+			foreach ( $all_types as $_type ) {
+				xmlsf_clear_metacache( $_type );
+			}
+	}
 }
 
 /**

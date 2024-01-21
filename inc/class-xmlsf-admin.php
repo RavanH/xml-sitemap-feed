@@ -239,6 +239,14 @@ class XMLSF_Admin {
 	 * @param array $files Array of file names to delete.
 	 */
 	public function delete_static_files( $files ) {
+		if ( ! current_user_can( 'edit_files' ) ) {
+			add_settings_error(
+				'static_files',
+				'file_deletion_not_allowed',
+				__( 'Static file deletion not allowed.', 'xml-sitemap-feed' ) . ' ' .
+				__( 'This is due to insufficient user rights, or DISALLOW_FILE_EDIT might be set. Please contact your site administrator or remove manually via FTP or your hosting provider control panel.', 'xml-sitemap-feed' )
+			);
+		}
 		$allowed_files = array(
 			'wp-sitemap.xml',
 			'sitemap.xml',
@@ -319,7 +327,7 @@ class XMLSF_Admin {
 	 * Check for static sitemap files
 	 */
 	public function check_static_files() {
-		$home_path = trailingslashit( get_home_path() );
+		$home_path          = trailingslashit( get_home_path() );
 		self::$static_files = array();
 
 		// Add activated sitemaps.
@@ -442,11 +450,15 @@ class XMLSF_Admin {
 
 		if ( isset( $_POST['xmlsf-clear-term-meta'] ) ) {
 			// Remove terms metadata.
-			global $wpdb;
+			delete_metadata( 'term', 0, 'term_modified', '', true );
+
+			/*
+			//global $wpdb;
 			$wpdb->delete(
 				$wpdb->prefix . 'termmeta',
 				array( 'meta_key' => 'term_modified' )
 			);
+			*/
 			add_settings_error(
 				'clear_meta_notice',
 				'clear_meta_notice',
@@ -460,8 +472,12 @@ class XMLSF_Admin {
 			// with $delete_all set to true...
 
 			// Remove metadata.
+			xmlsf_clear_metacache( 'images' );
+			xmlsf_clear_metacache( 'comments' );
+
 			global $wpdb;
 
+			/*
 			// Images meta.
 			$wpdb->delete(
 				$wpdb->prefix . 'postmeta',
@@ -479,6 +495,7 @@ class XMLSF_Admin {
 				array( 'meta_key' => '_xmlsf_comment_date_gmt' )
 			);
 			update_option( 'xmlsf_comments_meta_primed', array() );
+			*/
 
 			add_settings_error(
 				'clear_meta_notice',

@@ -447,15 +447,15 @@ function xmlsf_get_term_priority( $term ) {
 
 	$options = get_option( 'xmlsf_taxonomy_settings' );
 
-	$priority = isset( $options['priority'] ) && is_numeric( $options['priority'] ) ? floatval( $options['priority'] ) : 0.5 ;
+	$priority = isset( $options['priority'] ) && is_numeric( $options['priority'] ) ? floatval( $options['priority'] ) : 0.5;
 
-	if ( is_numeric( $term) ) {
+	if ( is_numeric( $term ) ) {
 		$term = get_term( $term );
 	}
 
 	if ( ! empty( $options['dynamic_priority'] ) && $priority > 0.1 ) {
 		// set first and highest term post count as maximum.
-		if ( null == xmlsf()->taxonomy_termmaxposts ) {
+		if ( null === xmlsf()->taxonomy_termmaxposts ) {
 			xmlsf()->taxonomy_termmaxposts = $term->count;
 		}
 

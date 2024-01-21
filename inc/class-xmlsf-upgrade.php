@@ -151,13 +151,14 @@ class XMLSF_Upgrade {
 
 		if ( version_compare( '5.2', $db_version, '>' ) ) {
 			// Remove term meta term_modified_gmt.
-			$wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified_gmt' ) );
+			delete_metadata( 'term', 0, 'term_modified_gmt', '', true );
+			// $wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified_gmt' ) );
 		}
 
 		if ( version_compare( '5.3', $db_version, '>' ) ) {
-			// Clear comments meta.
-			$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
-			update_option( 'xmlsf_comments_meta_primed', array() );
+			// Remove comments meta _xmlsf_comment_date.
+			delete_metadata( 'post', 0, '_xmlsf_comment_date', '', true );
+			// $wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
 		}
 
 		if ( version_compare( '5.4', $db_version, '>' ) ) {

@@ -49,23 +49,12 @@ class XMLSF_Admin_Sitemap_Sanitize {
 	/**
 	 * Sanitize taxonomies
 	 *
-	 * Clears the term_modified data from the database when settings have changed.
-	 *
 	 * @param array $save Settings array.
 	 *
 	 * @return array
 	 */
 	public static function taxonomies( $save ) {
-		$old = get_option( 'xmlsf_taxonomies' );
-
-		if ( empty( $old ) ) {
-			$old = array();
-		}
-		$diff = array_diff( (array) $old, (array) $save );
-		if ( ! empty( $diff ) ) {
-			global $wpdb;
-			$wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified' ) );
-		}
+		// Nothing to do really...
 
 		return $save;
 	}
@@ -101,8 +90,9 @@ class XMLSF_Admin_Sitemap_Sanitize {
 		if ( empty( $sanitized['active'] ) ) {
 			$old = (array) get_option( 'xmlsf_taxonomy_settings', array() );
 			if ( ! empty( $old['active'] ) ) {
-				global $wpdb;
-				$wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified' ) );
+				xmlsf_clear_metacache( 'terms' );
+				// global $wpdb;
+				// $wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified' ) );.
 			}
 		}
 
@@ -184,15 +174,17 @@ class XMLSF_Admin_Sitemap_Sanitize {
 
 		// Clear images meta caches...
 		if ( $clear_images ) {
-			$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
-			$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
-			update_option( 'xmlsf_images_meta_primed', array() );
+			xmlsf_clear_metacache( 'images' );
+			// $wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
+			// $wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
+			// update_option( 'xmlsf_images_meta_primed', array() );
 		}
 
 		// Clear comments meta caches...
 		if ( $clear_comments ) {
-			$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_comment_date_gmt' ) );
-			update_option( 'xmlsf_comments_meta_primed', array() );
+			xmlsf_clear_metacache( 'comments' );
+			// $wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_comment_date_gmt' ) );
+			// update_option( 'xmlsf_comments_meta_primed', array() );
 		}
 
 		return $sanitized;

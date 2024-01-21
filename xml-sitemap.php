@@ -3,7 +3,7 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.4-beta30
+ * Version: 5.4-beta31
  * Text Domain: xml-sitemap-feed
  * Requires at least: 5.5
  * Requires PHP: 5.6
@@ -13,7 +13,7 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.4-beta14' );
+define( 'XMLSF_VERSION', '5.4-beta31' );
 
 /**
  * Copyright 2024 RavanH
@@ -35,85 +35,13 @@ define( 'XMLSF_VERSION', '5.4-beta14' );
  *  AVAILABLE HOOKS
  * --------------------
  *
- * FILTERS *
- *
- * xmlsf_defaults              -> Filters the default array values for different option groups.
- * xmlsf_request               -> Filters request when an xml sitemap request is found,
- *                                can be used for plugin compatibility.
- * xmlsf_news_request          -> Filters request when a news sitemap request is found
- *                                can be used for plugin compatibility.
- * xmlsf_allowed_domain        -> Filters the response when checking the url against allowed domains.
- *                                Passes variable $url; must return true or false.
- * xmlsf_index_url_args        -> Filters the index url arguments array
- * xmlsf_excluded              -> Filters the response when checking the post for exclusion flags in
- *                                XML Sitemap context. Passes the post exclusion flag and $post_id; must return true or false.
- * xmlsf_news_excluded         -> Filters the response when checking the post for exclusion flags in
- *                                Google News sitemap context. Passes variable $post_id; must exclusion flag, return true or false.
- * xmlsf_news_keywords         -> Filters the news keywords array
- * xmlsf_news_stock_tickers    -> Filters the news stock tickers array
- * xmlsf_disabled_taxonomies   -> Filters the taxonomies that should be unavailable for sitemaps
- *                                Passes an array of taxonomies to exclude; must return an array.
- * the_title_xmlsitemap        -> Filters the Image title and caption tags.
- * xmlsf_news_publication_name -> Filters the Google News publication name.
- * xmlsf_news_title            -> Filters the Google News post title.
- * xmlsf_root_data             -> Filters the root data urls (with priority and lastmod) array
- * xmlsf_custom_urls           -> Filters the custom urls array
- * xmlsf_custom_sitemaps       -> Filters the custom sitemaps array
- * xmlsf_news_language         -> Filters the post language tag used in the news sitemap.
- *                                Passes variable $post_id; must return a 2 or 3 letter
- *                                language ISO 639 code with the exception of zh-cn and zh-tw.
- * xmlsf_post_types            -> Filters the post types array for the XML sitemaps index.
- * xmlsf_post_priority         -> Filters a post priority value. Passes variables $priority and $post->ID.
- *                                Must return a float value between 0.1 and 1.0
- * xmlsf_term_priority         -> Filters a taxonomy term priority value. Passes variables $priority and $term->slug.
- *                                Must return a float value between 0.1 and 1.0
- * xmlsf_author_post_types     -> Filters the post type that is used to get author archive lastmod date. Passes variable array('post').
- *                                Must return an array of one or more (public) post type slugs.
- * xmlsf_news_post_types       -> Filters the post types array for the Google News sitemap settings page.
- * xmlsf_get_author_args       -> Filters the get_users() arguments before author sitemap creation.
- * xmlsf_skip_user             -> Allows excluding users from the author sitemap. Passes the $user object with ID, login, spam, deleted properties,
- *                                unless set otherwise via the fields argument through the xmlsf_get_author_args filter.
- *                                Expects a boolean value (true|false) in return. False by default.
- *
- * ACTIONS *
- *
- * xmlsf_generator             -> Fired before each sitemap's urlset tag.
- * xmlsf_urlset                -> Fired inside each sitemap's urlset tag. Can be used to
- *                                echo additional XML namespaces. Passes parameter home|post_type|taxonomy|custom
- *                                to allow identification of the current sitemap.
- * xmlsf_url                   -> Fired inside the XML Sitemap loop at the start of each sitemap url tag. Passes parameter
- *                                sitemap type (currently only 'post_type') to allow identification of the current sitemap.
- * xmlsf_sitemap_index_pre     -> Fired before any sitemap are added to the index.
- * xmlsf_sitemap_index_post    -> Fired after all sitemaps are added to the index.
- * xmlsf_image_tags_inner      -> Fired inside the XML Sitemap loop just before each closing </image:image> is generated.
- *                                Can be used to echo custom <image:image> tags or trigger another action in the background.
- * xmlsf_tags_after            -> Fired inside the XML Sitemap loop at the end of the tags, just before each
- *                                closing </url> is generated. Can be used to echo custom tags or trigger another
- *                                action in the background. Passes parameter home|post_type|taxonomy|custom
- *                                to allow identification of the current sitemap.
- * xmlsf_url_after             -> Fired inside the XML Sitemap loop after each url node. Can be used to append
- *                                alternative url or trigger another action in the background. Passes parameter
- *                                home|post_type|taxonomy|custom to allow identification of the current sitemap.
- * xmlsf_news_urlset           -> Fired inside the Google News Sitemap urlset tag. Can be used to
- *                                echo additional XML namespaces.
- * xmlsf_news_tags_inner       -> Fired inside the Google News Sitemap loop at the end of the news
- *                                tags, just before each closing </news:news> is generated. Can be used to
- *                                echo custom news:news tags or trigger another action in the background.
- * xmlsf_news_tags_after       -> Fired inside the Google News Sitemap loop at the end of the news
- *                                tags, just before each closing </url> is generated. Can be used to
- *                                echo custom news tags or trigger another action in the background.
- * xmlsf_news_url_after        -> Fired inside the Google News Sitemap loop after each news url node.
- *                                Can be used to append alternative url or trigger another action in the background.
- * xmlsf_news_settings_before  -> Fired before the Google News Sitemap settings form
- * xmlsf_news_settings_after   -> Fired after the Google News Sitemap settings form
- * xmlsf_news_help_tabs        -> Fired after the admin help tabs have been added.
+ * Documented on https://premium.status301.com/knowledge-base/xml-sitemap-google-news/action-and-filter-hooks/
  *
  * ---------------------
  *  AVAILABLE FUNCTIONS
  * ---------------------
  *
- *  is_sitemap() -> conditional, returns bolean, true if the request is for an xml sitemap
- *  is_news()    -> conditional, returns bolean, true if the request is for an xml news sitemap
+ * Conditional tags https://premium.status301.com/knowledge-base/xml-sitemap-google-news/conditional-tags/
  *
  *  Feel free to request, suggest or submit more :)
  */
@@ -172,9 +100,6 @@ function xmlsf_init() {
 
 	// Main functions.
 	require XMLSF_DIR . '/inc/functions.php';
-
-	// Post types filter.
-	add_filter( 'xmlsf_post_types', 'xmlsf_filter_post_types' );
 
 	// Include and instantiate main class.
 	xmlsf();
@@ -249,8 +174,11 @@ function xmlsf_activate() {
  * @return void
  */
 function xmlsf_deactivate() {
-	global $wpdb;
+	// Clear all cache metadata.
+	xmlsf_clear_metacache();
 
+	/*
+	// global $wpdb;
 	// Remove posts metadata.
 	$wpdb->delete( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->prefix . 'postmeta',
@@ -270,6 +198,7 @@ function xmlsf_deactivate() {
 		$wpdb->prefix . 'termmeta',
 		array( 'meta_key' => 'term_modified' ) // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 	);
+	*/
 
 	// Remove rules so they can be REGENERATED on the next page load (without this plugin active).
 	delete_option( 'rewrite_rules' );

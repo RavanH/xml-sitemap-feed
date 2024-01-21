@@ -30,6 +30,8 @@ function xmlsf_headers( $headers ) {
 /**
  * Is allowed domain
  *
+ * Check if we are not dealing with an external URL :: Thanks to Francois Deschenes :).
+ *
  * @param string $url URL.
  *
  * @return mixed|void
@@ -51,6 +53,7 @@ function xmlsf_is_allowed_domain( $url ) {
 
 	return apply_filters( 'xmlsf_allowed_domain', $return, $url );
 }
+add_filter( 'xmlsf_entry_url', 'xmlsf_is_allowed_domain' );
 
 /**
  * Load feed template

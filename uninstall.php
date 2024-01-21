@@ -52,8 +52,18 @@ if ( is_multisite() && defined( 'XMLSF_MULTISITE_UNINSTALL' ) && XMLSF_MULTISITE
  * @since 4.4
  */
 function xmlsf_uninstall() {
-	// Remove metadata.
-	global $wpdb;
+	// Remove cache metadata.
+	// Should already have been done on plugin deactivation unless we're unstalling on multisite...
+	include_once XMLSF_DIR . '/inc/functions-sitemap.php';
+	xmlsf_clear_metacache();
+
+	// Remove post meta data.
+	delete_metadata( 'post', 0, '_xmlsf_priority', '', true );
+	delete_metadata( 'post', 0, '_xmlsf_exclude', '', true );
+	delete_metadata( 'post', 0, '_xmlsf_news_exclude', '', true );
+
+	/*
+	//global $wpdb;
 	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
 	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
 	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_comment_date_gmt' ) );
@@ -61,6 +71,7 @@ function xmlsf_uninstall() {
 	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_exclude' ) );
 	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_news_exclude' ) );
 	$wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified' ) );
+	*/
 
 	// Remove plugin settings.
 	delete_option( 'xmlsf_version' );

@@ -19,7 +19,7 @@ class XMLSF_Admin_Sitemap {
 	/**
 	 * Holds the public taxonomies array
 	 *
-	 * @var array $public_taxonomies Public taxonomies.
+	 * @var array $public_taxonomies Public, filtered taxonomies.
 	 */
 	private $public_taxonomies;
 
@@ -329,14 +329,14 @@ class XMLSF_Admin_Sitemap {
 
 		/** POST TYPES */
 		add_settings_section( 'xml_sitemap_post_types_section', /*'<a name="xmlsf"></a>'.__( 'XML Sitemap', 'xml-sitemap-feed' )*/ '', '', 'xmlsf_post_types' );
-		$post_types = apply_filters( 'xmlsf_post_types', get_post_types( array( 'public' => true ) /*, 'objects'*/ ) );
+		$post_types = xmlsf_public_post_types();
 		if ( is_array( $post_types ) && ! empty( $post_types ) ) :
 			foreach ( $post_types as $post_type ) {
 				$obj = get_post_type_object( $post_type );
 				if ( ! is_object( $obj ) ) {
 					continue;
 				}
-				add_settings_field( 'xmlsf_post_type_' . $obj->name, $obj->label, array( $this, 'post_types_field' ), 'xmlsf_post_types', 'xml_sitemap_post_types_section', $post_type );
+				add_settings_field( 'xmlsf_post_type_' . $obj->name, $obj->label, array( $this, 'post_type_fields' ), 'xmlsf_post_types', 'xml_sitemap_post_types_section', $post_type );
 				// Note: (ab)using section name parameter to pass post type name.
 			}
 		endif;
@@ -500,14 +500,14 @@ class XMLSF_Admin_Sitemap {
 	 *
 	 * @param string $post_type Post type.
 	 */
-	public function post_types_field( $post_type ) {
+	public function post_type_fields( $post_type ) {
 		// post type slug passed as section name.
 		$obj     = get_post_type_object( $post_type );
 		$count   = wp_count_posts( $obj->name );
 		$options = (array) get_option( 'xmlsf_post_types', array() );
 
 		// The actual fields for data entry.
-		include XMLSF_DIR . '/views/admin/field-sitemap-post-types.php';
+		include XMLSF_DIR . '/views/admin/field-sitemap-post-type-settings.php';
 	}
 
 	/**

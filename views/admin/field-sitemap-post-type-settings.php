@@ -13,7 +13,7 @@
 
 	<p>
 		<label>
-			<input type="checkbox" name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][active ]" id="xmlsf_post_types_<?php echo esc_attr( $obj->name ); ?>" value="1"<?php checked( ! empty( $options[ $obj->name ]['active'] ), true ); ?> />
+			<input type="checkbox" name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][active]" id="xmlsf_post_types_<?php echo esc_attr( $obj->name ); ?>" value="1"<?php checked( ! empty( $options[ $obj->name ]['active'] ), true ); ?> />
 			<?php printf( /* translators: Post type name and post count */ esc_html__( 'Include %s', 'xml-sitemap-feed' ), esc_html( $obj->label ) ); ?> (<?php echo esc_html( $count->publish ); ?>)
 		</label>
 	</p>

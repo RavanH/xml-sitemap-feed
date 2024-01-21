@@ -78,13 +78,24 @@ class XMLSitemapFeed {
 	private $scheme;
 
 	/**
+	 * Excluded post types
+	 *
+	 * @var array
+	 */
+	private $disabled_post_types = array(
+		'attachment',
+		'reply', // bbPress.
+		'buddypress', // BuddyPress Directory internal post type.
+	);
+
+	/**
 	 * Excluded taxonomies
-	 * post format taxonomy is disabled.
 	 *
 	 * @var array
 	 */
 	private $disabled_taxonomies = array(
 		'product_shipping_class',
+		// 'post_format',
 	);
 
 	/**
@@ -243,5 +254,14 @@ class XMLSitemapFeed {
 	 */
 	public function disabled_taxonomies() {
 		return apply_filters( 'xmlsf_disabled_taxonomies', $this->disabled_taxonomies );
+	}
+
+	/**
+	 * Get disabled post types
+	 *
+	 * @return array
+	 */
+	public function disabled_post_types() {
+		return apply_filters( 'xmlsf_disabled_post_types', $this->disabled_post_types );
 	}
 }

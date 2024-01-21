@@ -41,7 +41,7 @@ class XMLSF_Sitemaps_URLs extends WP_Sitemaps_Provider {
 		$this->name        = 'urls';
 		$this->object_type = 'urls';
 
-		$urls = (array) apply_filters( 'xmlsf_custom_urls', (array) get_option( 'xmlsf_urls', array() ) );
+		$urls       = (array) apply_filters( 'xmlsf_custom_urls', (array) get_option( 'xmlsf_urls', array() ) );
 		$this->urls = array_filter( $urls );
 	}
 
@@ -79,7 +79,7 @@ class XMLSF_Sitemaps_URLs extends WP_Sitemaps_Provider {
 			return $url_list;
 		}
 
-		$length = $this->max_urls; // wp_sitemaps_get_max_urls( 'urls' ) ?
+		$length = $this->max_urls; // Or better us wp_sitemaps_get_max_urls( 'urls' )?
 		$offset = (int) $page_num > 1 ? ( (int) $page_num - 1 ) * $length : 0;
 
 		$urls = array_slice(

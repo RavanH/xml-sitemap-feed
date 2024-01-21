@@ -378,6 +378,13 @@ class XMLSF_Admin_Sitemap_News {
 			)
 		);
 
+		$disabled = (array) xmlsf()->disabled_post_types();
+		foreach ( $post_types as $post_type ) {
+			if ( ! is_post_type_viewable( $post_type ) || in_array( $post_type, $disabled, true ) ) {
+				unset( $post_types[ $post_type ] );
+			}
+		}
+
 		if ( ! is_array( $post_types ) || empty( $post_types ) ) {
 			// This should never happen.
 			echo '<p class="description warning">' . esc_html__( 'There appear to be no post types available.', 'xml-sitemap-feed' ) . '</p>';

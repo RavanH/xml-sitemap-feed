@@ -30,10 +30,14 @@ if ( have_posts() ) :
 		if ( (int) get_option( 'page_on_front' ) === $post->ID ) {
 			continue;
 		}
-		// Or if we are dealing with an external URL :: Thanks to Francois Deschenes :).
-		if ( ! xmlsf_is_allowed_domain( get_permalink() ) ) {
+
+		$url = apply_filters( 'xmlsf_entry_url', get_permalink(), 'post_type', $post );
+
+		// Use xmlsf_entry_url filter to return falsy value to exclude a specific URL.
+		if ( empty( $url ) ) {
 			continue;
 		}
+
 		// Or if post meta says "exclude me please".
 		$excluded = apply_filters( 'xmlsf_excluded', get_post_meta( $post->ID, '_xmlsf_exclude', true ), $post->ID );
 		if ( $excluded ) {
@@ -42,19 +46,23 @@ if ( have_posts() ) :
 
 		$did_posts = true;
 
-		do_action( 'xmlsf_url', 'post_type' );
-
-		$lastmod = xmlsf_get_post_modified( $post );
+		do_action( 'xmlsf_url', 'post_type', $post );
 
 		echo '<url>';
-		echo '<loc>' . esc_xml( esc_url( get_permalink() ) ) . '</loc>';
+		echo '<loc>' . esc_xml( esc_url( $url ) ) . '</loc>';
 		echo '<priority>' . esc_xml( xmlsf_get_post_priority( $post ) ) . '</priority>';
+
+		$lastmod = xmlsf_get_post_modified( $post );
 		if ( $lastmod ) {
 			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
 		}
+
 		do_action( 'xmlsf_tags_after', 'post_type', $post );
+
 		echo '</url>';
-		do_action( 'xmlsf_url_after', 'post_type' );
+
+		do_action( 'xmlsf_url_after', 'post_type', $post );
+
 		echo PHP_EOL;
 	endwhile;
 	$wp_query->in_the_loop = false;

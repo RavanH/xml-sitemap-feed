@@ -21,28 +21,26 @@ global $wp_query, $post;
 if ( have_posts() ) :
 	$wp_query->in_the_loop = true;
 	while ( have_posts() ) :
-		// the_post(); disabled to avoid expensive but useless setup_postdata(), just do:
-		// TODO : maybe make our own setup_postdata version?
+		// Not using the_post() to avoid expensive but useless setup_postdata().
 		$post = $wp_query->next_post(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$url  = apply_filters( 'xmlsf_news_entry_url', get_permalink(), $post );
 
-		// Check if we are not dealing with an external URL :: Thanks to Francois Deschenes :).
-		if ( ! xmlsf_is_allowed_domain( get_permalink() ) ) {
+		// Use xmlsf_entry_url filter to return falsy value to exclude a specific URL.
+		if ( empty( $url ) ) {
 			continue;
 		}
+
 		// Or if post meta says "exclude me please".
-		$excluded = apply_filters(
-			'xmlsf_news_excluded',
-			get_post_meta( $post->ID, '_xmlsf_news_exclude', true ),
-			$post->ID
-		);
-		if ( $excluded ) {
+		if ( apply_filters( 'xmlsf_news_excluded', get_post_meta( $post->ID, '_xmlsf_news_exclude', true ), $post->ID ) ) {
 			continue;
 		}
 
 		$did_posts = true;
 
-		do_action( 'xmlsf_news_url' );
-		echo '<url><loc>' . esc_url( get_permalink() ) . '</loc>';
+		do_action( 'xmlsf_news_url', $post );
+
+		echo '<url><loc>' . esc_xml( $url ) . '</loc>';
+
 		// The news tags.
 		echo '<news:news><news:publication><news:name>';
 		if ( ! empty( $options['name'] ) ) {
@@ -59,12 +57,17 @@ if ( have_posts() ) :
 		echo '<news:title>' . esc_xml( apply_filters( 'xmlsf_news_title', get_the_title() ) ) . '</news:title>';
 		echo '<news:keywords>' . esc_xml( implode( ', ', (array) apply_filters( 'xmlsf_news_keywords', array(), $post->ID ) ) ) . '</news:keywords>';
 		echo '<news:stock_tickers>' . esc_xml( implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ) ) . '</news:stock_tickers>';
-		do_action( 'xmlsf_news_tags_inner' );
+
+		do_action( 'xmlsf_news_tags_inner', $post );
+
 		echo '</news:news>';
-		do_action( 'xmlsf_news_tags_after' );
+
+		do_action( 'xmlsf_news_tags_after', $post );
 
 		echo '</url>';
-		do_action( 'xmlsf_news_url_after' );
+
+		do_action( 'xmlsf_news_url_after', $post );
+
 		echo PHP_EOL;
 	endwhile;
 	$wp_query->in_the_loop = false;
