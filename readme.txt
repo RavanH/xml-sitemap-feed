@@ -315,6 +315,10 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 * FIX: Nginx Helper purge urls
 * FIX: Conversion of false to array deprecated warning
 
+= 5.3.4 =
+* FIX: File not found error on invalid sitemap requests
+* FIX: Lastmod date older than post date on scheduled posts
+
 = 5.3.3 =
 * FIX: Undefined variable + Invalid argument supplied for foreach(), thanks @yankyaw09
 
