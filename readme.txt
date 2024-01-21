@@ -301,7 +301,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 == Changelog ==
 
 = 5.4 =
-
+* NEW: Switch between Plugin or WP core sitemap server for sitemap generation
 * Filter domains in taxonomy and author sitemaps
 * NEW: xmlsf_generator action hook
 * NEW: xmlsf_sitemap_index_pre and xmlsf_sitemap_index_post action hooks
@@ -312,8 +312,11 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 * Update coding standards
 * FIX: Don't use transients if not strictly needed
 * FIX: "Failed opening required" when no template
-* FIX: Nginx Helper purge urls
 * FIX: Conversion of false to array deprecated warning
+
+= 5.3.6 =
+* FIX: Work around get_users() fatal error in WP 6.3
+* FIX: Wrong Nginx helper purge urls (backport from 5.4-beta)
 
 = 5.3.5 =
 * FIX: Forced Status 200 response conflict with Etag/If-None-Match headers, thanks @revolutionnaire
