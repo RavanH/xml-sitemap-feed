@@ -166,7 +166,7 @@ No. In normal circumstances, your site will be indexed by the major search engin
 
 = Does this plugin ping search engines? =
 
-Google & Bing are no longer accepting sitemap pings. IndexNow is currently under development.
+Google & Bing are no longer accepting sitemap pings.
 
 = Do I need to change my robots.txt? =
 
@@ -306,7 +306,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 * NEW: xmlsf_generator action hook
 * NEW: xmlsf_sitemap_index_pre and xmlsf_sitemap_index_post action hooks
 * NEW: xmlsf_author_post_types filter
-* Dropping all Ping Services
+* Dropping all Ping Services (no longer supported)
 * Exclude spammed or deleted authors on multisite
 * Updated help links
 * Update coding standards

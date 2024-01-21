@@ -1,9 +1,19 @@
+ROADMAP
+
+= 5.4 =
+* add todos
+
+
+TODO LIST
+
 TODO add news sitemap to index (with xmlsf_sitemap_index_pre hook)
 TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to verify results
 TODO streamline help tab entries on XML Sitemap admin tabs (like Google News admin page)
 TODO when on core server, the sitemap URL still shows as sitemap.xml on advanced tab
 TODO get debugging info back on NEWS sitemap
 TODO author sitemap lastmod === last publication date
+
+TODO prepare compatibility routine for additional premium modules
 
 TODO update documentation with new hooks: index_pro/post, xmlsf_news_help_tabs
 
