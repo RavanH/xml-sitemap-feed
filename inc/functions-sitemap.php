@@ -151,27 +151,6 @@ function xmlsf_public_taxonomies() {
 }
 
 /**
- * Get public post types.
- * Returns an array of post types to be included on the settings page.
- *
- * @since 5.4
- *
- * @return array
- */
-function xmlsf_public_post_types() {
-	$post_types = (array) apply_filters( 'xmlsf_post_types', get_post_types( array( 'public' => true ) ) );
-	$disabled   = (array) xmlsf()->disabled_post_types();
-
-	foreach ( $post_types as $post_type ) {
-		if ( ! is_post_type_viewable( $post_type ) || in_array( $post_type, $disabled, true ) ) {
-			unset( $post_types[ $post_type ] );
-		}
-	}
-
-	return $post_types;
-}
-
-/**
  * Santize number value
  * Expects proper locale setting for calculations: setlocale( LC_NUMERIC, 'C' );
  *
