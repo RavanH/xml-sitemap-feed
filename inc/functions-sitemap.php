@@ -377,20 +377,3 @@ if ( ! function_exists( 'get_lastmodified' ) ) :
 		return apply_filters( 'get_lastmodified', $modified, $timezone );
 	}
 endif;
-
-if ( ! function_exists( 'esc_xml' ) ) :
-	/**
-	 * Quick and dirty XML escaping function.
-	 *
-	 * Keep for compatibility with WordPress 5.4 and below.
-	 *
-	 * @param string $text The input to be escaped.
-	 */
-	function esc_xml( $text ) {
-		$text = ent2ncr( $text );
-		$text = wp_strip_all_tags( $text );
-		$text = esc_html( $text );
-
-		return $text;
-	}
-endif;

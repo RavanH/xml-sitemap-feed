@@ -105,25 +105,10 @@ class XMLSF_Sitemap_News {
 		require_once XMLSF_DIR . '/inc/functions-public.php';
 		require_once XMLSF_DIR . '/inc/functions-public-sitemap-news.php';
 
-		// News name filter.
-		add_filter( 'xmlsf_news_publication_name', 'xmlsf_google_news_name' );
-
 		// Make sure we have the proper locale setting for calculations.
 		setlocale( LC_NUMERIC, 'C' );
 
-		// Generator comments.
-		add_action( 'xmlsf_generator', 'xmlsf_generator' );
-
-		// REPSONSE HEADERS filtering.
-		add_filter( 'wp_headers', 'xmlsf_headers' );
-
-		// Language filters.
-		add_filter( 'xmlsf_news_language', 'xmlsf_polylang_post_language_filter', 10, 2 );
-		add_filter( 'xmlsf_news_language', 'xmlsf_wpml_post_language_filter', 10, 3 );
-		add_filter( 'xmlsf_news_language', 'xmlsf_parse_language_string', 99 );
-
 		// Disable caching.
-		add_filter( 'nocache_headers', 'xmlsf_news_nocache_headers' );
 		defined( 'DONOTCACHEPAGE' ) || define( 'DONOTCACHEPAGE', true );
 		defined( 'DONOTCACHEDB' ) || define( 'DONOTCACHEDB', true );
 

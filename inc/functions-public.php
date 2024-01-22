@@ -27,6 +27,8 @@ function xmlsf_headers( $headers ) {
 	return array_merge( $headers, wp_get_nocache_headers() );
 }
 
+add_filter( 'wp_headers', 'xmlsf_headers' );
+
 /**
  * Is allowed domain
  *
@@ -34,25 +36,24 @@ function xmlsf_headers( $headers ) {
  *
  * @param string $url URL.
  *
- * @return mixed|void
+ * @return mixed Return false to exclude entry. Else return URL.
  */
 function xmlsf_is_allowed_domain( $url ) {
 
 	$domains = xmlsf()->get_allowed_domains();
-	$return  = false;
 	$host    = wp_parse_url( $url, PHP_URL_HOST );
 
 	if ( ! empty( $host ) ) {
 		foreach ( $domains as $domain ) {
 			if ( $host === $domain || strpos( $host, '.' . $domain ) !== false ) {
-				$return = true;
-				break;
+				return $url;
 			}
 		}
 	}
 
-	return apply_filters( 'xmlsf_allowed_domain', $return, $url );
+	return false;
 }
+
 add_filter( 'xmlsf_entry_url', 'xmlsf_is_allowed_domain' );
 
 /**
@@ -145,9 +146,26 @@ function xmlsf_generator() {
 	echo '<!-- generator-version="' . esc_xml( XMLSF_VERSION ) . '" -->' . PHP_EOL;
 }
 
+add_action( 'xmlsf_generator', 'xmlsf_generator' );
+
 /*****************
  * COMPATIBILITY *
  ****************/
+
+if ( ! function_exists( 'esc_xml' ) ) :
+	/**
+	 * Quick and dirty XML escaping function for WordPress pre-5.5 compatibility.
+	 *
+	 * @param string $text The input to be escaped.
+	 */
+	function esc_xml( $text ) {
+		$text = ent2ncr( $text );
+		$text = wp_strip_all_tags( $text );
+		$text = esc_html( $text );
+
+		return $text;
+	}
+endif;
 
 /**
  * Get translations
@@ -185,6 +203,7 @@ function xmlsf_get_translations( $post_id ) {
 
 	return $translation_ids;
 }
+
 add_filter( 'xmlsf_blogpages', 'xmlsf_get_translations' );
 add_filter( 'xmlsf_frontpages', 'xmlsf_get_translations' );
 
@@ -205,6 +224,7 @@ function xmlsf_polylang_request( $request ) {
 
 	return $request;
 }
+
 add_filter( 'xmlsf_request', 'xmlsf_polylang_request' );
 add_filter( 'xmlsf_news_request', 'xmlsf_polylang_request' );
 
@@ -237,6 +257,7 @@ function xmlsf_wpml_request( $request ) {
 
 	return $request;
 }
+
 add_filter( 'xmlsf_request', 'xmlsf_wpml_request' );
 add_filter( 'xmlsf_news_request', 'xmlsf_wpml_request' );
 
@@ -260,6 +281,7 @@ function xmlsf_wpml_language_switcher() {
 		$sitepress->switch_lang( $language );
 	}
 }
+
 add_action( 'xmlsf_url', 'xmlsf_wpml_language_switcher' );
 add_action( 'xmlsf_news_url', 'xmlsf_wpml_language_switcher' );
 
@@ -276,5 +298,6 @@ function xmlsf_bbpress_request( $request ) {
 
 	return $request;
 }
+
 add_filter( 'xmlsf_request', 'xmlsf_bbpress_request' );
 add_filter( 'xmlsf_news_request', 'xmlsf_bbpress_request' );

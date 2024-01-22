@@ -81,8 +81,8 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 			$xmlsf->request_filtered = true;
 		}
 
-		// Short-circuit if request is not a feed, news sitemap, does not start with 'sitemap'.
-		if ( empty( $request['feed'] ) || 'sitemap-news' === $request['feed'] || strpos( $request['feed'], 'sitemap' ) !== 0 ) {
+		// Short-circuit if request is not a feed, does not start with 'sitemap' or is a news sitemap.
+		if ( empty( $request['feed'] ) || strpos( $request['feed'], 'sitemap' ) !== 0 || 'sitemap-news' === $request['feed'] ) {
 			return $request;
 		}
 
@@ -100,9 +100,6 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 
 		// Include public functions.
 		require_once XMLSF_DIR . '/inc/functions-public.php';
-
-		// Generator comments.
-		add_action( 'xmlsf_generator', 'xmlsf_generator' );
 
 		/** COMPRESSION */
 
@@ -146,8 +143,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 		switch ( isset( $feed[1] ) ? $feed[1] : '' ) {
 
 			case 'posttype':
-				$settings = (array) get_option( 'xmlsf_post_types' );
-				if ( ! isset( $feed[2] ) || empty( $settings[ $feed[2] ] ) || ! is_array( $settings[ $feed[2] ] ) || empty( $settings[ $feed[2] ]['active'] ) ) {
+				if ( ! isset( $feed[2] ) || empty( $this->post_types[ $feed[2] ] ) || ! is_array( $this->post_types[ $feed[2] ] ) || empty( $this->post_types[ $feed[2] ]['active'] ) ) {
 					return $request;
 				}
 
@@ -236,9 +232,6 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 
 		// Prevent public errors breaking xml.
 		@ini_set( 'display_errors', 0 ); // phpcs:ignore WordPress.PHP.IniSet.display_errors_Disallowed
-
-		// REPSONSE HEADERS filtering.
-		add_filter( 'wp_headers', 'xmlsf_headers' );
 
 		// Remove filters to prevent stuff like cdn urls for xml stylesheet and images.
 		remove_all_filters( 'plugins_url' );
@@ -492,7 +485,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 			// Add public post types sitemaps.
 			$post_types = xmlsf_get_post_types();
 			foreach ( $post_types as $post_type => $settings ) :
-				$archive = isset( $settings['archive'] ) ? $settings['archive'] : '';
+				$archive      = isset( $settings['archive'] ) ? $settings['archive'] : '';
 				$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
 
 				foreach ( $archive_data as $url => $lastmod ) {
