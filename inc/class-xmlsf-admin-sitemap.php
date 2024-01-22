@@ -330,13 +330,10 @@ class XMLSF_Admin_Sitemap {
 		/** POST TYPES */
 		add_settings_section( 'xml_sitemap_post_types_section', /*'<a name="xmlsf"></a>'.__( 'XML Sitemap', 'xml-sitemap-feed' )*/ '', '', 'xmlsf_post_types' );
 		$post_types = (array) apply_filters( 'xmlsf_post_types', get_post_types( array( 'public' => true ) ) );
-		$disabled   = (array) xmlsf()->disabled_post_types();
 
-		foreach ( $post_types as $post_type ) {
-			if ( ! is_post_type_viewable( $post_type ) || in_array( $post_type, $disabled, true ) ) {
-				unset( $post_types[ $post_type ] );
-			}
-		}
+		// Make sure post types are allowed and publicly viewable.
+		$post_types = array_diff( $post_types, xmlsf()->disabled_post_types() );
+		$post_types = array_filter( $post_types, 'is_post_type_viewable' );
 
 		if ( is_array( $post_types ) && ! empty( $post_types ) ) :
 			foreach ( $post_types as $post_type ) {

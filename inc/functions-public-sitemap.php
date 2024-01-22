@@ -409,7 +409,7 @@ function xmlsf_get_post_priority( $post ) {
 	}
 
 	// Still here? Then get calculating...
-	$options  = get_option( 'xmlsf_post_types' );
+	$options  = (array) get_option( 'xmlsf_post_types', array() );
 	$priority = isset( $options[ $post->post_type ]['priority'] ) && is_numeric( $options[ $post->post_type ]['priority'] ) ? floatval( $options[ $post->post_type ]['priority'] ) : 0.5;
 
 	if ( ! empty( $options[ $post->post_type ]['dynamic_priority'] ) ) {

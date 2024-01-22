@@ -378,12 +378,9 @@ class XMLSF_Admin_Sitemap_News {
 			)
 		);
 
-		$disabled = (array) xmlsf()->disabled_post_types();
-		foreach ( $post_types as $post_type ) {
-			if ( ! is_post_type_viewable( $post_type ) || in_array( $post_type, $disabled, true ) ) {
-				unset( $post_types[ $post_type ] );
-			}
-		}
+		// Make sure post types are allowed and publicly viewable.
+		$post_types = array_diff( $post_types, xmlsf()->disabled_post_types() );
+		$post_types = array_filter( $post_types, 'is_post_type_viewable' );
 
 		if ( ! is_array( $post_types ) || empty( $post_types ) ) {
 			// This should never happen.

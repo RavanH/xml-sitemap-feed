@@ -118,16 +118,6 @@ function xmlsf_init() {
 			// Replace core sitemap.
 			remove_action( 'init', 'wp_sitemaps_get_server' );
 
-			// Sitemap title element filters.
-			if ( function_exists( 'esc_xml' ) ) {
-				// Since WP 5.5.
-				add_filter( 'the_title_xmlsitemap', 'esc_xml' );
-			} else {
-				add_filter( 'the_title_xmlsitemap', 'strip_tags' );
-				add_filter( 'the_title_xmlsitemap', 'ent2ncr', 8 );
-				add_filter( 'the_title_xmlsitemap', 'esc_html' );
-			}
-
 			require XMLSF_DIR . '/inc/class-xmlsf-sitemap-plugin.php';
 			$xmlsf_sitemap = new XMLSF_Sitemap_Plugin( $sitemaps['sitemap'] );
 		}
@@ -137,20 +127,6 @@ function xmlsf_init() {
 	}
 
 	if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-		// Common sitemap element filters.
-		if ( function_exists( 'esc_xml' ) ) {
-			// Since WP 5.5.
-			add_filter( 'xmlsf_news_publication_name', 'esc_xml' );
-			add_filter( 'xmlsf_news_title', 'esc_xml' );
-		} else {
-			add_filter( 'xmlsf_news_publication_name', 'strip_tags' );
-			add_filter( 'xmlsf_news_publication_name', 'ent2ncr', 8 );
-			add_filter( 'xmlsf_news_publication_name', 'esc_html' );
-			add_filter( 'xmlsf_news_title', 'strip_tags' );
-			add_filter( 'xmlsf_news_title', 'ent2ncr', 8 );
-			add_filter( 'xmlsf_news_title', 'esc_html' );
-		}
-
 		require XMLSF_DIR . '/inc/class-xmlsf-sitemap-news.php';
 		new XMLSF_Sitemap_News( $sitemaps['sitemap-news'] );
 	}

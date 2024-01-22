@@ -14,17 +14,16 @@
  * @return array
  */
 function xmlsf_get_post_types() {
-	$post_types = (array) apply_filters( 'xmlsf_post_types', get_option( 'xmlsf_post_types', array() ) );
-	$disabled   = (array) xmlsf()->disabled_post_types();
+	$post_types = (array) get_option( 'xmlsf_post_types', array() );
+	$available  = (array) apply_filters( 'xmlsf_post_types', get_post_types( array( 'public' => true ) ) );
 
-	foreach ( $post_types as $post_type => $settings ) {
-		if ( empty( $settings['active'] ) || ! is_post_type_viewable( $post_type ) || in_array( $post_type, $disabled, true ) ) {
-			unset( $post_types[ $post_type ] );
-		}
-	}
-	unset( $settings );
+	// Make sure post types are allowed and publicly viewable.
+	$available = array_diff( $available, xmlsf()->disabled_post_types() );
+	$available = array_filter( $available, 'is_post_type_viewable' );
 
-	return $post_types;
+	$post_types_settings = array_intersect_key( $post_types, array_flip( $available ) );
+
+	return $post_types_settings;
 }
 
 /**
@@ -110,9 +109,9 @@ function xmlsf_images_data( $post, $which ) {
 
 			$images_data[ $url ] = array(
 				'loc'     => $url,
-				'title'   => apply_filters( 'the_title_xmlsitemap', $attachment->post_title ),
-				'caption' => apply_filters( 'the_title_xmlsitemap', $attachment->post_excerpt ),
-				// 'caption' => apply_filters( 'the_title_xmlsitemap', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) ),
+				'title'   => $attachment->post_title,
+				'caption' => $attachment->post_excerpt,
+				// 'caption' => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
 			);
 		}
 	}
@@ -365,16 +364,33 @@ if ( ! function_exists( 'get_lastmodified' ) ) :
 	function get_lastmodified( $timezone = 'server', $post_type = 'any', $m = '', $w = '' ) {
 
 		// Get last post publication and modification dates.
-		$date = _get_post_time( $timezone, 'date', $post_type, 'last', $m, $w );
+		$date     = _get_post_time( $timezone, 'date', $post_type, 'last', $m, $w );
 		$modified = _get_post_time( $timezone, 'modified', $post_type, 'last', $m, $w );
 
 		// Make sure post date is not later than modified date. Can happen when scheduling publication of posts.
 		$date_time = strtotime( $date );
-		$mod_time = strtotime( $modified );
+		$mod_time  = strtotime( $modified );
 		if ( ! $mod_time || ( $date_time && $date_time > $mod_time ) ) {
 			$modified = $date;
 		}
 
 		return apply_filters( 'get_lastmodified', $modified, $timezone );
+	}
+endif;
+
+if ( ! function_exists( 'esc_xml' ) ) :
+	/**
+	 * Quick and dirty XML escaping function.
+	 *
+	 * Keep for compatibility with WordPress 5.4 and below.
+	 *
+	 * @param string $text The input to be escaped.
+	 */
+	function esc_xml( $text ) {
+		$text = ent2ncr( $text );
+		$text = wp_strip_all_tags( $text );
+		$text = esc_html( $text );
+
+		return $text;
 	}
 endif;
