@@ -43,6 +43,27 @@ class XMLSF_Sitemap_News {
 
 		// NGINX HELPER PURGE URLS.
 		add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
+
+		// Add nnes sitemap to the index.
+		add_filter( 'xmlsf_sitemap_index_after', array( $this, 'news_in_index' ) );
+	}
+
+	/**
+	 * Add Google News sitemap to the sitemap index
+	 */
+	public function news_in_index() {
+		$url        = xmlsf_sitemap_url( 'news' );
+		$options    = get_option( 'xmlsf_news_tags' );
+		$post_types = isset( $options['post_type'] ) && ! empty( $options['post_type'] ) ? (array) $options['post_type'] : array( 'post' );
+		foreach ( $post_types as $post_type ) {
+			$lastpostdate = get_date_from_gmt( get_lastpostdate( 'GMT', $post_type ), DATE_W3C );
+			$lastmod      = isset( $lastmod ) && $lastmod > $lastpostdate ? $lastmod : $lastpostdate; // Absolute last post date.
+		}
+		echo '<sitemap><loc>' . esc_xml( $url ) . '</loc>';
+		if ( isset( $lastmod ) ) {
+			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+		}
+		echo '</sitemap>' . PHP_EOL;
 	}
 
 	/**
@@ -83,6 +104,9 @@ class XMLSF_Sitemap_News {
 		// Include public functions.
 		require_once XMLSF_DIR . '/inc/functions-public.php';
 		require_once XMLSF_DIR . '/inc/functions-public-sitemap-news.php';
+
+		// News name filter.
+		add_filter( 'xmlsf_news_publication_name', 'xmlsf_google_news_name' );
 
 		// Make sure we have the proper locale setting for calculations.
 		setlocale( LC_NUMERIC, 'C' );
@@ -181,7 +205,7 @@ class XMLSF_Sitemap_News {
 		/** GENERAL MISC. PREPARATIONS */
 
 		// Prevent public errors breaking xml.
-		@ini_set( 'display_errors', 0 );
+		@ini_set( 'display_errors', 0 ); // phpcs:ignore WordPress.PHP.IniSet.display_errors_Disallowed
 
 		// Remove filters to prevent stuff like cdn urls for xml stylesheet and images.
 		remove_all_filters( 'plugins_url' );

@@ -86,22 +86,35 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 
 		// Additional URLs sitemap provider.
 		if ( get_option( 'xmlsf_urls' ) ) {
-			add_filter(
+			add_action(
 				'init',
 				function () {
-					require XMLSF_DIR . '/inc/class-xmlsf-sitemaps-urls.php';
-					wp_register_sitemap_provider( 'urls', new XMLSF_Sitemaps_URLs() );
+					require XMLSF_DIR . '/inc/class-xmlsf-sitemaps-provider-urls.php';
+					wp_register_sitemap_provider( 'urls', new XMLSF_Sitemaps_Provider_URLs() );
 				},
 				11
 			);
 		}
 		// External XML Sitemaps provider.
 		if ( get_option( 'xmlsf_custom_sitemaps' ) ) {
-			add_filter(
+			add_action(
 				'init',
 				function () {
-					require XMLSF_DIR . '/inc/class-xmlsf-sitemaps-custom.php';
-					wp_register_sitemap_provider( 'custom', new XMLSF_Sitemaps_Custom() );
+					require XMLSF_DIR . '/inc/class-xmlsf-sitemaps-provider-custom.php';
+					wp_register_sitemap_provider( 'custom', new XMLSF_Sitemaps_Provider_Custom() );
+				},
+				11
+			);
+		}
+
+		// Google News XML Sitemaps provider.
+		$xmlsf_sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
+		if ( ! empty( $xmlsf_sitemaps['sitemap-news'] ) ) {
+			add_action(
+				'init',
+				function () {
+					require XMLSF_DIR . '/inc/class-xmlsf-sitemaps-provider-news.php';
+					wp_register_sitemap_provider( 'news', new XMLSF_Sitemaps_Provider_News() );
 				},
 				11
 			);
@@ -275,6 +288,15 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 			case 'user':
 				// TODO make this xmlsf_author_post_types filter compatible.
 				$entry['lastmod'] = get_date_from_gmt( get_lastpostdate( 'GMT', 'post' ), DATE_W3C ); // Absolute last post date.
+				break;
+
+			case 'news':
+				$options    = get_option( 'xmlsf_news_tags' );
+				$post_types = isset( $options['post_type'] ) && ! empty( $options['post_type'] ) ? (array) $options['post_type'] : array( 'post' );
+				foreach ( $post_types as $post_type ) {
+					$lastpostdate     = get_date_from_gmt( get_lastpostdate( 'GMT', $post_type ), DATE_W3C );
+					$entry['lastmod'] = ! empty( $entry['lastmod'] ) && $entry['lastmod'] > $lastpostdate ? $entry['lastmod'] : $lastpostdate; // Absolute last post date.
+				}
 				break;
 
 			default:

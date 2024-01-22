@@ -1,6 +1,6 @@
 <?php
 /**
- * Sitemaps: WP_Sitemaps_URLs class
+ * Sitemaps: XMLSF_Sitemaps_Provider_URLs class
  *
  * Builds the sitemaps for the External Custom URLs.
  *
@@ -13,7 +13,8 @@
  *
  * @since 5.4
  */
-class XMLSF_Sitemaps_URLs extends WP_Sitemaps_Provider {
+class XMLSF_Sitemaps_Provider_URLs extends WP_Sitemaps_Provider {
+
 	/**
 	 * External Custom Sitemap URLs.
 	 *
@@ -39,7 +40,7 @@ class XMLSF_Sitemaps_URLs extends WP_Sitemaps_Provider {
 	 */
 	public function __construct() {
 		$this->name        = 'urls';
-		$this->object_type = 'urls';
+		$this->object_type = 'url';
 
 		$urls       = (array) apply_filters( 'xmlsf_custom_urls', (array) get_option( 'xmlsf_urls', array() ) );
 		$this->urls = array_filter( $urls );
