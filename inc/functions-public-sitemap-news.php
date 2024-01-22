@@ -67,9 +67,9 @@ function xmlsf_parse_language_string( $lang ) {
 
 add_filter( 'xmlsf_news_language', 'xmlsf_parse_language_string', 99 );
 
-/*****************
- * COMPATIBILITY *
- ****************/
+/**
+ * COMPATIBILITY
+ */
 
 /**
  * Post language filter for Polylang.
@@ -109,7 +109,7 @@ function xmlsf_wpml_post_language_filter( $locale, $post_id, $post_type = 'post'
 add_filter( 'xmlsf_news_language', 'xmlsf_wpml_post_language_filter', 10, 3 );
 
 /**
- * Google News Publisher filter.
+ * Google News Publisher filter for backward compat with XMLSF_GOOGLE_NEWS_NAME constant.
  *
  * @param string $name Google News Publisher name.
  *

@@ -148,9 +148,9 @@ function xmlsf_generator() {
 
 add_action( 'xmlsf_generator', 'xmlsf_generator' );
 
-/*****************
- * COMPATIBILITY *
- ****************/
+/**
+ * COMPATIBILITY
+ */
 
 if ( ! function_exists( 'esc_xml' ) ) :
 	/**
