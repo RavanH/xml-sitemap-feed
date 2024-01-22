@@ -39,17 +39,11 @@ if ( have_posts() ) :
 
 		do_action( 'xmlsf_news_url', $post );
 
-		echo '<url><loc>' . esc_xml( $url ) . '</loc>';
+		echo '<url><loc>' . esc_xml( esc_url( $url ) ) . '</loc>';
 
 		// The news tags.
 		echo '<news:news><news:publication><news:name>';
-		if ( ! empty( $options['name'] ) ) {
-			echo esc_xml( apply_filters( 'xmlsf_news_publication_name', $options['name'] ) );
-		} elseif ( defined( 'XMLSF_GOOGLE_NEWS_NAME' ) ) {
-			echo esc_xml( apply_filters( 'xmlsf_news_publication_name', XMLSF_GOOGLE_NEWS_NAME ) );
-		} else {
-			echo esc_xml( apply_filters( 'xmlsf_news_publication_name', get_bloginfo( 'name' ) ) );
-		}
+		echo esc_xml( apply_filters( 'xmlsf_news_publication_name', ( ! empty( $options['name'] ) ? $options['name'] : get_bloginfo( 'name' ) ) ) );
 		echo '</news:name>';
 		echo '<news:language>' . esc_xml( apply_filters( 'xmlsf_news_language', get_bloginfo( 'language' ), $post->ID, $post->post_type ) ) . '</news:language>';
 		echo '</news:publication>';
