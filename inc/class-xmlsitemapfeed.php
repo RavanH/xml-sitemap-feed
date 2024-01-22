@@ -85,7 +85,6 @@ class XMLSitemapFeed {
 	private $disabled_post_types = array(
 		'attachment',
 		'reply', // bbPress.
-		'buddypress', // BuddyPress Directory internal post type.
 	);
 
 	/**
@@ -262,6 +261,6 @@ class XMLSitemapFeed {
 	 * @return array
 	 */
 	public function disabled_post_types() {
-		return apply_filters( 'xmlsf_disabled_post_types', $this->disabled_post_types );
+		return (array) apply_filters( 'xmlsf_disabled_post_types', $this->disabled_post_types );
 	}
 }
