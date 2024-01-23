@@ -81,8 +81,7 @@ function xmlsf_init() {
 	// Upgrade/install, maybe...
 	$db_version = get_option( 'xmlsf_version', 0 );
 	if ( ! version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
-		require_once XMLSF_DIR . '/inc/class-xmlsf-upgrade.php';
-		new XMLSF_Upgrade( $db_version );
+		require_once XMLSF_DIR . '/upgrade.php';
 	}
 
 	if ( is_admin() ) {

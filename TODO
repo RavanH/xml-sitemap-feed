@@ -3,15 +3,15 @@ ROADMAP
 = 5.4 =
 * rearrange sitemap settings tab fields
 * Rearrange sitemap help tabs (like news)
-* test meta cache clearing
-* remove meta cache clear commented code (if test successful)
-* move upgrade to upgrade.php
 * fix advanced options failing
 * fix settings > reading options not showing correctly
-* test conflicting plugins/themes messages
-* do static files check:
+* add static files checks:
   - after plugin activation
   - on de/activation from settings reading
+
+* test meta cache clearing (remove meta cache clear commented code)
+* test conflicting plugins/themes messages
+* test upgrade.php
 
 TODO author sitemap lastmod === last publication date
 TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to verify results
