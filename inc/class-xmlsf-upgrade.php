@@ -189,6 +189,9 @@ class XMLSF_Upgrade {
 			// Delete old settings.
 			delete_option( 'xmlsf_ping' );
 			delete_option( 'xmlsf_permalinks_flushed' );
+
+			// Remove deprecated transient.
+			delete_transient( 'xmlsf_static_files' );
 		}
 
 		// Add missing new defaults.

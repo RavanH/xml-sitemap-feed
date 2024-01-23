@@ -8,13 +8,20 @@
 /**
  * XMLSF Admin Sitemap News CLASS
  */
-class XMLSF_Admin_Sitemap_News {
+class XMLSF_Admin_Sitemap_News extends XMLSF_Admin {
 	/**
 	 * Holds the values to be used in the fields callbacks.
 	 *
 	 * @var array $options Options array.
 	 */
 	private $options;
+
+	/**
+	 * Minimal compatible pro version
+	 *
+	 * @var float
+	 */
+	public static $compat_pro_min = '1.3.6';
 
 	/**
 	 * Start up.
@@ -27,9 +34,121 @@ class XMLSF_Admin_Sitemap_News {
 		// SETTINGS.
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
+		// Settings hooks.
 		add_action( 'xmlsf_news_add_settings', array( $this, 'add_settings' ) );
-
 		add_action( 'xmlsf_news_settings_before', array( $this, 'add_settings' ) );
+
+		// ACTIONS & CHECKS.
+		add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
+		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
+		add_action( 'admin_init', array( $this, 'check_news_advanced' ), 11 );
+
+		$this->conflicting_files[] = 'sitemap-news.xml';
+	}
+
+	/**
+	 * Clear settings
+	 */
+	public function clear_settings() {
+		// Update to defaults.
+		update_option( 'xmlsf_news_tags', xmlsf()->default_news_tags );
+	}
+
+	/**
+	 * Tools actions
+	 */
+	public function tools_actions() {
+		if ( ! isset( $_POST['_xmlsf_help_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
+			return;
+		}
+
+		if ( isset( $_POST['xmlsf-check-conflicts-news'] ) ) {
+			// Reset ignored warnings.
+			delete_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
+
+			$this->check_static_files();
+		}
+
+		if ( isset( $_POST['xmlsf-clear-settings-news'] ) ) {
+			$this->clear_settings();
+			add_settings_error(
+				'notice_clear_settings',
+				'notice_clear_settings',
+				__( 'Settings reset to the plugin defaults.', 'xml-sitemap-feed' ),
+				'updated'
+			);
+		}
+	}
+
+	/**
+	 * CHECKS
+	 */
+
+	/**
+	 * Google News Advanced incompatibility notice
+	 */
+	public function check_news_advanced() {
+		// Skip if no advanced plugin or dismissed.
+		if (
+			wp_doing_ajax() ||
+			! is_plugin_active( 'xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php' ) ||
+			in_array( 'xmlsf_advanced_news', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ) )
+		) {
+			return;
+		}
+
+		if ( ! $this->compatible_with_advanced() ) {
+			add_action(
+				'admin_notices',
+				function () {
+					include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced-news.php';
+				}
+			);
+		}
+	}
+
+	/**
+	 * Compare versions to known compatibility.
+	 */
+	public function compatible_with_advanced() {
+		// Check version.
+		defined( 'XMLSF_NEWS_ADV_VERSION' ) || define( 'XMLSF_NEWS_ADV_VERSION', false );
+
+		return false !== XMLSF_NEWS_ADV_VERSION && version_compare( self::$compat_pro_min, XMLSF_NEWS_ADV_VERSION, '<' );
+	}
+
+	/**
+	 * Check for conflicting themes and plugins
+	 */
+	public function check_conflicts() {
+		// Catch Box Pro feed redirect.
+		if ( function_exists( 'catchbox_is_feed_url_present' ) && catchbox_is_feed_url_present( null ) ) {
+			add_action(
+				'admin_notices',
+				function () {
+					include XMLSF_DIR . '/views/admin/notice-catchbox-feed-redirect.php';
+				}
+			);
+		}
+
+		// Ad Inserter XML setting incompatibility warning.
+		if ( is_plugin_active( 'ad-inserter/ad-inserter.php' ) ) {
+			$adsettings = get_option( 'ad_inserter' );
+			if ( is_array( $adsettings ) && ! empty( $adsettings ) ) {
+				foreach ( $adsettings as $ad => $settings ) {
+					// Check rss feed setting.
+					if ( ! empty( $settings['code'] ) && empty( $settings['disable_insertion'] ) && ! empty( $settings['enable_feed'] ) ) {
+						add_action(
+							'admin_notices',
+							function () {
+								include XMLSF_DIR . '/views/admin/notice-ad-insterter-feed.php';
+							}
+						);
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -130,6 +249,22 @@ class XMLSF_Admin_Sitemap_News {
 		// prepare sitemap link url.
 		$sitemaps    = (array) get_option( 'xmlsf_sitemaps', array() );
 		$sitemap_url = xmlsf_sitemap_url( 'news' );
+
+		// Sidebar actions.
+		add_action(
+			'xmlsf_admin_sidebar',
+			function () {
+				include XMLSF_DIR . '/views/admin/sidebar-news-links.php';
+			},
+			9
+		);
+		add_action(
+			'xmlsf_admin_sidebar',
+			function () {
+				include XMLSF_DIR . '/views/admin/help-tab-news-sidebar.php';
+			},
+			11
+		);
 
 		include XMLSF_DIR . '/views/admin/page-sitemap-news.php';
 	}

@@ -8,7 +8,7 @@
 /**
  * Admin Sitemap Class
  */
-class XMLSF_Admin_Sitemap {
+class XMLSF_Admin_Sitemap extends XMLSF_Admin {
 	/**
 	 * Holds the values to be used in the fields callbacks
 	 *
@@ -27,14 +27,138 @@ class XMLSF_Admin_Sitemap {
 	 * Start up
 	 */
 	public function __construct() {
+		// SETTINGS.
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
-		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_metadata' ) );
 
+		// ACTIONS & CHECKS.
+		add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
+		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
+		add_action( 'update_option_xmlsf_general_settings', array( $this, 'update_general_settings' ), 10, 2 );
+
 		// Placeholders for advanced options.
 		add_action( 'xmlsf_posttype_archive_field_options', array( $this, 'advanced_archive_field_options' ) );
+
+		// When core sitemap server is used.
+		$settings = (array) get_option( 'xmlsf_general_settings', array() );
+		if ( ! empty( $settings['server'] ) && 'core' === $settings['server'] ) {
+			$this->conflicting_files[] = 'wp-sitemap.xml';
+		} else {
+			$this->conflicting_files[] = 'sitemap.xml';
+		}
+	}
+
+	/**
+	 * Update actions
+	 *
+	 * @param mixed $old   Old option value.
+	 * @param mixed $value Saved option value.
+	 */
+	public function update_general_settings( $old, $value ) {
+		if ( ! is_array( $old ) || empty( $old['server'] ) || $old['server'] !== $value['server'] ) {
+			if ( 'core' === $value['server'] ) {
+				$this->conflicting_files = array( 'wp-sitemap.xml' );
+			} else {
+				$this->conflicting_files = array( 'sitemap.xml' );
+			}
+			$this->check_static_files( true );
+		}
+	}
+
+	/**
+	 * Clear settings
+	 */
+	public function clear_settings() {
+		$defaults = xmlsf()->defaults();
+
+		unset( $defaults['sitemaps'] );
+
+		foreach ( $defaults as $option => $settings ) {
+			update_option( 'xmlsf_' . $option, $settings );
+		}
+	}
+
+	/**
+	 * Tools actions
+	 */
+	public function tools_actions() {
+		if ( ! isset( $_POST['_xmlsf_help_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
+			return;
+		}
+
+		if ( isset( $_POST['xmlsf-check-conflicts-sitemap'] ) ) {
+			// Reset ignored warnings.
+			delete_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
+
+			$this->check_static_files();
+		}
+
+		if ( isset( $_POST['xmlsf-clear-settings-sitemap'] ) ) {
+			$this->clear_settings();
+			add_settings_error(
+				'notice_clear_settings',
+				'notice_clear_settings',
+				__( 'Settings reset to the plugin defaults.', 'xml-sitemap-feed' ),
+				'updated'
+			);
+		}
+
+		if ( isset( $_POST['xmlsf-clear-term-meta'] ) ) {
+			// Remove terms metadata.
+			xmlsf_clear_metacache( 'terms' );
+
+			/*
+			//global $wpdb;
+			$wpdb->delete(
+				$wpdb->prefix . 'termmeta',
+				array( 'meta_key' => 'term_modified' )
+			);
+			*/
+
+			add_settings_error(
+				'clear_meta_notice',
+				'clear_meta_notice',
+				__( 'Sitemap term meta cache has been cleared.', 'xml-sitemap-feed' ),
+				'success'
+			);
+		}
+
+		if ( isset( $_POST['xmlsf-clear-post-meta'] ) ) {
+			// Remove metadata.
+			xmlsf_clear_metacache( 'images' );
+			xmlsf_clear_metacache( 'comments' );
+
+			global $wpdb;
+
+			/*
+			// Images meta.
+			$wpdb->delete(
+				$wpdb->prefix . 'postmeta',
+				array( 'meta_key' => '_xmlsf_image_attached' )
+			);
+			$wpdb->delete(
+				$wpdb->prefix . 'postmeta',
+				array( 'meta_key' => '_xmlsf_image_featured' )
+			);
+			update_option( 'xmlsf_images_meta_primed', array() );
+
+			// Comments meta.
+			$wpdb->delete(
+				$wpdb->prefix . 'postmeta',
+				array( 'meta_key' => '_xmlsf_comment_date_gmt' )
+			);
+			update_option( 'xmlsf_comments_meta_primed', array() );
+			*/
+
+			add_settings_error(
+				'clear_meta_notice',
+				'clear_meta_notice',
+				__( 'Sitemap post meta caches have been cleared.', 'xml-sitemap-feed' ),
+				'updated'
+			);
+		}
 	}
 
 	/**
@@ -68,7 +192,7 @@ class XMLSF_Admin_Sitemap {
 			}
 
 			// check wpseo sitemap option.
-			if ( ! in_array( 'wpseo_sitemap', XMLSF_Admin::$dismissed, true ) ) {
+			if ( ! in_array( 'wpseo_sitemap', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 				$wpseo = get_option( 'wpseo' );
 				if ( ! empty( $wpseo['enable_xml_sitemap'] ) ) {
 					add_action(
@@ -104,7 +228,7 @@ class XMLSF_Admin_Sitemap {
 			}
 
 			// check seopress sitemap option.
-			if ( ! in_array( 'seopress_sitemap', XMLSF_Admin::$dismissed, true ) ) {
+			if ( ! in_array( 'seopress_sitemap', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 				$seopress_xml_sitemap = get_option( 'seopress_xml_sitemap_option_name' );
 				if ( ! empty( $seopress_toggle['toggle-xml-sitemap'] ) && ! empty( $seopress_xml_sitemap['seopress_xml_sitemap_general_enable'] ) ) {
 					add_action(
@@ -138,7 +262,7 @@ class XMLSF_Admin_Sitemap {
 			}
 
 			// check rank math sitemap option.
-			if ( ! in_array( 'rankmath_sitemap', XMLSF_Admin::$dismissed, true ) ) {
+			if ( ! in_array( 'rankmath_sitemap', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 				$rankmath_modules = (array) get_option( 'rank_math_modules' );
 				if ( in_array( 'sitemap', $rankmath_modules, true ) ) {
 					add_action(
@@ -154,7 +278,7 @@ class XMLSF_Admin_Sitemap {
 		// All in One SEO Pack conflict notices.
 		if ( is_plugin_active( 'all-in-one-seo-pack/all_in_one_seo_pack.php' ) ) {
 			// check aioseop sitemap module.
-			if ( ! in_array( 'aioseop_sitemap', XMLSF_Admin::$dismissed, true ) ) {
+			if ( ! in_array( 'aioseop_sitemap', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 				$aioseop_options = (array) get_option( 'aioseop_options' );
 
 				if ( isset( $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) && 'on' === $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) {
@@ -174,7 +298,7 @@ class XMLSF_Admin_Sitemap {
 		//
 		if ( is_plugin_active( 'autodescription/autodescription.php' ) ) {
 			// check sfw sitemap module.
-			if ( ! in_array( 'seoframework_sitemap', XMLSF_Admin::$dismissed, true ) ) {
+			if ( ! in_array( 'seoframework_sitemap', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 				$sfw_options = (array) get_option( 'autodescription-site-settings' );
 
 				if ( ! empty( $sfw_options['sitemaps_output'] ) ) {
@@ -372,6 +496,22 @@ class XMLSF_Admin_Sitemap {
 		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
 		$sitemap_url = xmlsf_sitemap_url();
+
+		// Sidebar actions.
+		add_action(
+			'xmlsf_admin_sidebar',
+			function () {
+				include XMLSF_DIR . '/views/admin/sidebar-links.php';
+			},
+			9
+		);
+		add_action(
+			'xmlsf_admin_sidebar',
+			function () {
+				include XMLSF_DIR . '/views/admin/help-tab-sidebar.php';
+			},
+			11
+		);
 
 		include XMLSF_DIR . '/views/admin/page-sitemap.php';
 	}

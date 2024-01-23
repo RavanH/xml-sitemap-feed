@@ -3,31 +3,33 @@ ROADMAP
 = 5.4 =
 * rearrange sitemap settings tab fields
 * Rearrange sitemap help tabs (like news)
-* fix sitemap name when on core server
 * test meta cache clearing
-* test file deletion capability
-* remove metac cache clear commented code (if test successful)
+* remove meta cache clear commented code (if test successful)
+* move upgrade to upgrade.php
+* fix advanced options failing
+* fix settings > reading options not showing correctly
+* test conflicting plugins/themes messages
+* do static files check:
+  - after plugin activation
+  - on de/activation from settings reading
 
 TODO author sitemap lastmod === last publication date
-TODO add news sitemap to index (with xmlsf_sitemap_index_pre hook)
 TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to verify results
 TODO make "hide empty" an option for taxonomy terms, see issue #40
 
-
+Verify and remove unused:
+*
 
 TODO LIST
 
 * prepare compatibility routine for additional premium modules
 * add inline comment blocks for hooks
 
-TODO integrate sitemap updates via Webmaster tools API https://developers.google.com/webmaster-tools/v1/sitemaps/submit (PRO?)
 TODO test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 TODO fix WPML incompatibility https://wordpress.org/support/topic/multilingual-url-issue/
-TODO add option for priority support link in the sidebar help section and help tab
 TODO core sitemap stylesheets per sitemap type (is that possible?)
 TODO allow CPT taxonomies selection in news sitemap (PRO?)
-TODO add BuddyPress groups as requested by Harry Riegel harry@whispert.de (PRO)
-TODO allow inclusion of taxonomies that belong to a post type that is not included
+TODO allow inclusion of taxonomies that belong to a post type that is not included (what??)
 
 TODO revisit xmlsf_output_compression (can we force gzip over brotli when .gz is used?)
 

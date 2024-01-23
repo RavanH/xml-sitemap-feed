@@ -37,9 +37,10 @@ class XMLSF_Admin_Sitemap_Sanitize {
 			$sanitized['limit'] = xmlsf_sanitize_number( $save['limit'], 1, 50000, false );
 		}
 
-		// When sitemap server has been changed, ask for rewrite rules to be REGENERATED.
+		// When sitemap server has been changed...
 		$old = (array) get_option( 'xmlsf_general_settings' );
 		if ( empty( $old['server'] ) || $old['server'] !== $sanitized['server'] ) {
+			// Force rewrite rules to be REGENERATED.
 			delete_option( 'rewrite_rules' );
 		}
 

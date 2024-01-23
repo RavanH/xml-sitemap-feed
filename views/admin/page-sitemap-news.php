@@ -43,7 +43,7 @@
 	<div class="sidebar">
 
 		<?php
-		if ( defined( 'XMLSF_NEWS_ADV_VERSION' ) && version_compare( XMLSF_NEWS_ADV_VERSION, XMLSF_Admin::$compat_pro_min, '<' ) ) {
+		if ( ! $this->compatible_with_advanced() ) {
 			$class = 'update-nag';
 			include XMLSF_DIR . '/views/admin/section-advanced-compat-message.php';
 		}
@@ -67,21 +67,14 @@
 				<input type="submit" name="xmlsf-flush-rewrite-rules" class="button button-small" value="<?php esc_html_e( 'Flush rewrite rules', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
-				<input type="submit" name="xmlsf-check-conflicts" class="button button-small" value="<?php esc_html_e( 'Check for conflicts', 'xml-sitemap-feed' ); ?>" />
+				<input type="submit" name="xmlsf-check-conflicts-news" class="button button-small" value="<?php esc_html_e( 'Check for conflicts', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
-				<input type="hidden" name="xmlsf-clear-settings" value="sitemap-news" />
-				<input type="submit" name="xmlsf-clear-settings-submit" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm( '<?php echo esc_js( __( 'This will revert your sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); ?>' )" />
+				<input type="submit" name="xmlsf-clear-settings-news" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm( '<?php echo esc_js( __( 'This will revert your sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); ?>' )" />
 			</p>
 		</form>
 
-		<?php include XMLSF_DIR . '/views/admin/sidebar-news-links.php'; ?>
-
-		<?php include XMLSF_DIR . '/views/admin/sidebar-help.php'; ?>
-
-		<?php include XMLSF_DIR . '/views/admin/help-tab-news-sidebar.php'; ?>
-
-		<?php include XMLSF_DIR . '/views/admin/sidebar-contribute.php'; ?>
+		<?php do_action( 'xmlsf_admin_sidebar', 'news' ); ?>
 
 	</div>
 

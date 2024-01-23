@@ -90,6 +90,9 @@ function xmlsf_uninstall() {
 	delete_option( 'xmlsf_images_meta_primed' );
 	delete_option( 'xmlsf_comments_meta_primed' );
 
+	// Remove old transient.
+	delete_transient( 'xmlsf_static_files' );
+
 	// Flush rules.
 	flush_rewrite_rules();
 }
