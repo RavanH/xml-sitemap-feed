@@ -6,47 +6,6 @@
  */
 
 /**
- * Ping Search Engine
- *
- * @since 5.1
- *
- * @param string $se       Search engine name.
- * @param string $sitemap  Sitemap name.
- * @param int    $interval Interval in seconds.
- *
- * @return int|null Ping response code, or 999 when skipped or null when search engine is unknown.
- */
-function xmlsf_ping( $se, $sitemap, $interval ) {
-	$se_urls = array(
-		'google' => 'https://www.google.com/ping',
-	);
-
-	if ( ! array_key_exists( $se, $se_urls ) ) {
-		return '';
-	}
-
-	$url = add_query_arg( 'sitemap', rawurlencode( xmlsf_sitemap_url() ), $se_urls[ $se ] );
-
-	// Check if we did not ping already within the interval.
-	if ( false === get_transient( 'xmlsf_ping_' . $se . '_' . $sitemap ) ) {
-		// Ping !
-		$response = wp_remote_request( $url );
-		$code     = wp_remote_retrieve_response_code( $response );
-		if ( 200 === $code ) {
-			set_transient( 'xmlsf_ping_' . $se . '_' . $sitemap, '', $interval );
-		}
-	} else {
-		// Skip !
-		$response = '';
-		$code     = 999;
-	}
-
-	do_action( 'xmlsf_ping', $se, $sitemap, $url, $code, $response );
-
-	return $code;
-}
-
-/**
  * Get the public XML sitemap url.
  *
  * @since 5.4
@@ -194,22 +153,12 @@ add_action( 'xmlsf_news_add_settings', 'xmlsf_wpml_remove_home_url_filter' );
  * @return bool
  */
 function xmlsf_uses_core_server() {
-	// SimpeXML not available.
-	if ( ! class_exists( 'SimpleXMLElement' ) ) {
-		return false;
-	}
-
 	// Sitemap disabled.
-	$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
-	if ( empty( $sitemaps['sitemap'] ) ) {
+	if ( ! xmlsf_sitemaps_enabled( 'sitemap' ) ) {
 		return false;
 	}
 
 	// Check settings.
-	$settings = (array) get_option( 'xmlsf_general_settings', array() );
-	if ( ! empty( $settings['server'] ) && 'core' === $settings['server'] ) {
-		return true;
-	} else {
-		return false;
-	}
+	$settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
+	return ! empty( $settings['server'] ) && 'core' === $settings['server'];
 }

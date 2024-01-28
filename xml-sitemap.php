@@ -3,7 +3,7 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.4-beta31
+ * Version: 5.4-beta35
  * Text Domain: xml-sitemap-feed
  * Requires at least: 5.5
  * Requires PHP: 5.6
@@ -13,7 +13,7 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.4-beta31' );
+define( 'XMLSF_VERSION', '5.4-beta33' );
 
 /**
  * Copyright 2024 RavanH
@@ -84,50 +84,50 @@ function xmlsf_init() {
 		require_once XMLSF_DIR . '/upgrade.php';
 	}
 
-	if ( is_admin() ) {
-		require XMLSF_DIR . '/inc/class-xmlsf-admin.php';
-		new XMLSF_Admin();
-	}
-
-	$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
-
 	// If nothing enabled, just disable core sitemap and bail.
-	if ( empty( $sitemaps ) ) {
-		add_filter( 'wp_sitemaps_enabled', '__return_false' );
-		return;
-	}
+	if ( xmlsf_sitemaps_enabled() ) {
+		// Shared functions.
+		require_once XMLSF_DIR . '/inc/functions.php';
 
-	// Main functions.
-	require XMLSF_DIR . '/inc/functions.php';
+		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
-	// Include and instantiate main class.
-	xmlsf();
+		// XML Sitemap.
+		if ( ! empty( $sitemaps['sitemap'] ) ) {
+			global $xmlsf_sitemap;
 
-	if ( ! empty( $sitemaps['sitemap'] ) ) {
-		global $xmlsf_sitemap;
+			require XMLSF_DIR . '/inc/class-xmlsf-sitemap.php';
+			require XMLSF_DIR . '/inc/functions-sitemap.php';
 
-		require XMLSF_DIR . '/inc/class-xmlsf-sitemap.php';
-		require XMLSF_DIR . '/inc/functions-sitemap.php';
+			if ( xmlsf_uses_core_server() ) {
+				// Extend core sitemap.
+				require XMLSF_DIR . '/inc/class-xmlsf-sitemap-core.php';
+				$xmlsf_sitemap = new XMLSF_Sitemap_Core( 'wp-sitemap.xml' );
+			} else {
+				// Replace core sitemap.
+				remove_action( 'init', 'wp_sitemaps_get_server' );
 
-		if ( xmlsf_uses_core_server() ) {
-			// Extend core sitemap.
-			require XMLSF_DIR . '/inc/class-xmlsf-sitemap-core.php';
-			$xmlsf_sitemap = new XMLSF_Sitemap_Core( 'wp-sitemap.xml' );
+				require XMLSF_DIR . '/inc/class-xmlsf-sitemap-plugin.php';
+				$xmlsf_sitemap = new XMLSF_Sitemap_Plugin( $sitemaps['sitemap'] );
+			}
 		} else {
-			// Replace core sitemap.
-			remove_action( 'init', 'wp_sitemaps_get_server' );
-
-			require XMLSF_DIR . '/inc/class-xmlsf-sitemap-plugin.php';
-			$xmlsf_sitemap = new XMLSF_Sitemap_Plugin( $sitemaps['sitemap'] );
+			// Disable core sitemap.
+			add_filter( 'wp_sitemaps_enabled', '__return_false' );
 		}
+
+		// Google News sitemap.
+		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
+			require XMLSF_DIR . '/inc/class-xmlsf-sitemap-news.php';
+			new XMLSF_Sitemap_News( $sitemaps['sitemap-news'] );
+		}
+
+		// Include and instantiate main class.
+		xmlsf();
 	} else {
-		// Disable core sitemap.
 		add_filter( 'wp_sitemaps_enabled', '__return_false' );
 	}
 
-	if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-		require XMLSF_DIR . '/inc/class-xmlsf-sitemap-news.php';
-		new XMLSF_Sitemap_News( $sitemaps['sitemap-news'] );
+	if ( is_admin() ) {
+		xmlsf_admin();
 	}
 }
 
@@ -140,6 +140,7 @@ function xmlsf_init() {
 function xmlsf_activate() {
 	// Remove rules so they will be REGENERATED either on the next page load (with old plugin settings) or on install/upgrade.
 	delete_option( 'rewrite_rules' );
+	// Nope.
 }
 
 /**
@@ -185,20 +186,42 @@ function xmlsf_deactivate() {
  * @since 5.0
  *
  * @global XMLSitemapFeed $xmlsf
- * @return XMLSitemapFeed object
+ * @return XMLSitemapFeed object by reference
  */
-function xmlsf() {
+function &xmlsf() {
 	global $xmlsf;
 
 	if ( ! isset( $xmlsf ) ) {
 		if ( ! class_exists( 'XMLSitemapFeed' ) ) {
-			require XMLSF_DIR . '/inc/class-xmlsitemapfeed.php';
+			require_once XMLSF_DIR . '/inc/class-xmlsitemapfeed.php';
 		}
 
 		$xmlsf = new XMLSitemapFeed();
 	}
 
 	return $xmlsf;
+}
+
+/**
+ * Get instantiated sitemap admin class
+ *
+ * @since 5.4
+ *
+ * @global XMLSF_Admin $xmlsf_admin
+ * @return XMLSF_Admin object by reference
+ */
+function &xmlsf_admin() {
+	global $xmlsf_admin;
+
+	if ( ! isset( $xmlsf_admin ) ) {
+		if ( ! class_exists( 'XMLSF_Admin' ) ) {
+			require XMLSF_DIR . '/inc/class-xmlsf-admin.php';
+		}
+
+		$xmlsf_admin = new XMLSF_Admin();
+	}
+
+	return $xmlsf_admin;
 }
 
 /**
@@ -215,19 +238,65 @@ function xmlsf_robots_txt( $output ) {
 	$output       .= $robots_custom ? $robots_custom . PHP_EOL : '';
 
 	// SITEMAPS.
-	$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
 	$output .= PHP_EOL . '# XML Sitemap & Google News version ' . XMLSF_VERSION . ' - https://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
 	if ( '1' !== get_option( 'blog_public' ) ) {
 		$output .= '# XML Sitemaps are disabled because of this site\'s privacy settings.' . PHP_EOL;
-	} elseif ( ! is_array( $sitemaps ) || empty( $sitemaps ) ) {
-		$output .= '# No XML Sitemaps are enabled on this site.' . PHP_EOL;
+	} elseif ( ! xmlsf_sitemaps_enabled() ) {
+		$output .= '# No XML Sitemaps are enabled.' . PHP_EOL;
 	} else {
-		$output .= ! empty( $sitemaps['sitemap'] ) && ! xmlsf_uses_core_server() ? 'Sitemap: ' . xmlsf_sitemap_url() . PHP_EOL : PHP_EOL;
-		$output .= ! empty( $sitemaps['sitemap-news'] ) ? 'Sitemap: ' . xmlsf_sitemap_url( 'news' ) . PHP_EOL : '';
+		xmlsf_sitemaps_enabled( 'sitemap' ) && $output .= 'Sitemap: ' . xmlsf_sitemap_url() . PHP_EOL;
+		xmlsf_sitemaps_enabled( 'news' ) && $output    .= 'Sitemap: ' . xmlsf_sitemap_url( 'news' ) . PHP_EOL;
 	}
 
 	return $output;
+}
+
+/**
+ * Are any sitemaps enabled?
+ *
+ * @since 5.4
+ *
+ * @param string $which Which sitemap to check for. Default any sitemap.
+ *
+ * @return false|array
+ */
+function xmlsf_sitemaps_enabled( $which = 'any' ) {
+	static $enabled;
+
+	if ( null === $enabled ) {
+		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
+
+		switch ( true ) {
+			default:
+			case '1' !== get_option( 'blog_public' ):
+				$enabled = array();
+				break;
+
+			case isset( $sitemaps['sitemap'] ) && isset( $sitemaps['sitemap-news'] ):
+				$enabled = array( 'sitemap', 'news' );
+				break;
+
+			case isset( $sitemaps['sitemap'] ):
+				$enabled = array( 'sitemap' );
+				break;
+
+			case isset( $sitemaps['sitemap-news'] ):
+				$enabled = array( 'news' );
+				break;
+		}
+	}
+
+	if ( 'sitemap' === $which ) {
+		// Looking for regular sitemap.
+		return apply_filters( 'xmlsf_sitemaps_enabled', in_array( 'sitemap', $enabled, true ), 'sitemap' );
+	}
+	if ( 'news' === $which ) {
+		// Looking for news sitemap.
+		return apply_filters( 'xmlsf_sitemaps_enabled', in_array( 'news', $enabled, true ), 'news' );
+	}
+	// Looking for any sitemap.
+	return apply_filters( 'xmlsf_sitemaps_enabled', ! empty( $enabled ), $which );
 }
 
 /**

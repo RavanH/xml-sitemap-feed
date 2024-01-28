@@ -10,32 +10,17 @@
  */
 class XMLSF_Admin {
 	/**
-	 * Sitemaps settings
-	 *
-	 * @var array
-	 */
-	private $settings = array();
-
-	/**
-	 * Potentially conflicting files
-	 *
-	 * @var array
-	 */
-	protected $conflicting_files = array();
-
-	/**
 	 * CONSTRUCTOR
 	 */
 	public function __construct() {
 
-		$this->settings = (array) get_option( 'xmlsf_sitemaps', array() );
-
-		if ( isset( $this->settings['sitemap'] ) ) {
+		if ( xmlsf_sitemaps_enabled( 'sitemap' ) ) {
 			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap-sanitize.php';
 			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap.php';
+			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap-fields.php';
 		}
 
-		if ( isset( $this->settings['sitemap-news'] ) ) {
+		if ( xmlsf_sitemaps_enabled( 'news' ) ) {
 			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap-news-sanitize.php';
 			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap-news.php';
 		}
@@ -67,7 +52,6 @@ class XMLSF_Admin {
 	 * Register settings and add settings fields
 	 */
 	public function register_settings() {
-		global $wp_rewrite;
 
 		// Sitemaps.
 		register_setting(
@@ -82,42 +66,24 @@ class XMLSF_Admin {
 			'reading'
 		);
 
-		// Custom domains, only when any sitemap is active.
-		if ( isset( $this->settings['sitemap'] ) || isset( $this->settings['sitemap-news'] ) ) {
-			register_setting(
-				'reading',
-				'xmlsf_domains',
-				array( 'XMLSF_Admin_Sanitize', 'domains_settings' )
-			);
-			add_settings_field(
-				'xmlsf_domains',
-				__( 'Allowed domains', 'xml-sitemap-feed' ),
-				array( $this, 'domains_settings_field' ),
-				'reading'
-			);
-		}
-
 		// Help tab.
 		add_action(
 			'load-options-reading.php',
 			array( $this, 'xml_sitemaps_help' )
 		);
 
-		// Robots rules, only when permalinks are set.
-		$rules = get_option( 'rewrite_rules' );
-		if ( $wp_rewrite->using_permalinks() && isset( $rules['robots\.txt$'] ) ) {
-			register_setting(
-				'reading',
-				'xmlsf_robots',
-				'sanitize_textarea_field'
-			);
-			add_settings_field(
-				'xmlsf_robots',
-				__( 'Additional robots.txt rules', 'xml-sitemap-feed' ),
-				array( $this, 'robots_settings_field' ),
-				'reading'
-			);
-		}
+		// Robots rules.
+		register_setting(
+			'reading',
+			'xmlsf_robots',
+			'sanitize_textarea_field'
+		);
+		add_settings_field(
+			'xmlsf_robots',
+			__( 'Additional robots.txt rules', 'xml-sitemap-feed' ),
+			array( $this, 'robots_settings_field' ),
+			'reading'
+		);
 	}
 
 	/**
@@ -143,20 +109,6 @@ class XMLSF_Admin {
 		);
 
 		ob_start();
-		include XMLSF_DIR . '/views/admin/help-tab-allowed-domains.php';
-		include XMLSF_DIR . '/views/admin/help-tab-support.php';
-		$content = ob_get_clean();
-
-		get_current_screen()->add_help_tab(
-			array(
-				'id'       => 'allowed-domains',
-				'title'    => __( 'Allowed domains', 'xml-sitemap-feed' ),
-				'content'  => $content,
-				'priority' => 11,
-			)
-		);
-
-		ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-robots.php';
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
 		$content = ob_get_clean();
@@ -176,6 +128,7 @@ class XMLSF_Admin {
 	 */
 	public function sitemaps_settings_field() {
 		if ( get_option( 'blog_public' ) ) {
+			$sitemaps = (array) get_option( 'xmlsf_sitemaps', xmlsf()->defaults( 'sitemaps' ) );
 			// The actual fields for data entry.
 			include XMLSF_DIR . '/views/admin/field-sitemaps.php';
 		} else {
@@ -184,23 +137,15 @@ class XMLSF_Admin {
 	}
 
 	/**
-	 * Domain settings field
-	 */
-	public function domains_settings_field() {
-		$domains = get_option( 'xmlsf_domains' );
-
-		if ( ! is_array( $domains ) ) {
-			$domains = array();
-		}
-
-		// The actual fields for data entry.
-		include XMLSF_DIR . '/views/admin/field-sitemap-domains.php';
-	}
-
-	/**
 	 * ROBOTS
 	 */
 	public function robots_settings_field() {
+		global $wp_rewrite;
+
+		$rules  = (array) get_option( 'rewrite_rules' );
+		$found  = $this->check_static_files( 'robots.txt', 0 );
+		$static = ! empty( $found ) && in_array( 'robots.txt', $found, true );
+
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-robots.php';
 	}
@@ -222,16 +167,20 @@ class XMLSF_Admin {
 	/**
 	 * Check for static sitemap files
 	 *
-	 * @param bool $found_only Whether to give feedback when no files are found.
+	 * @param mixed $files     Filename or array of filenames.
+	 * @param bool  $verbosity Verbosity level: 0|false (no messages), 1|true (warnings only) or 2 (warnings or success).
+	 *
+	 * @return array Found static files.
 	 */
-	public function check_static_files( $found_only = false ) {
+	public function check_static_files( $files, $verbosity = 2 ) {
 
 		$home_path = trailingslashit( get_home_path() );
+		$found     = array();
 
-		foreach ( (array) $this->conflicting_files as $pretty ) {
+		foreach ( (array) $files as $pretty ) {
 			if ( ! empty( $pretty ) && file_exists( $home_path . $pretty ) ) {
-				$found = true;
-				add_settings_error(
+				$found[] = $pretty;
+				$verbosity && add_settings_error(
 					'static_files_notice',
 					'static_files',
 					sprintf( /* translators: %1$s file name, %2$s is XML Sitemap (linked to options-reading.php) */
@@ -245,12 +194,14 @@ class XMLSF_Admin {
 		}
 
 		// Tell me all is OK.
-		isset( $found ) || $found_only || add_settings_error(
+		$verbosity > 1 && empty( $found ) && add_settings_error(
 			'static_files_notice',
 			'static_files',
 			__( 'No conflicting static files found.', 'xml-sitemap-feed' ),
 			'success'
 		);
+
+		return $found;
 	}
 
 	/**

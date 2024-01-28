@@ -48,36 +48,4 @@ class XMLSF_Admin_Sanitize {
 
 		return $sanitized;
 	}
-
-	/**
-	 * Sanitize domain settings
-	 *
-	 * @param array $save Settings array.
-	 *
-	 * @return array
-	 */
-	public static function domains_settings( $save ) {
-		$default = wp_parse_url( home_url(), PHP_URL_HOST );
-
-		// Clean up input.
-		if ( is_array( $save ) ) {
-			$save = array_filter( $save );
-			$save = reset( $save );
-		}
-		$input = $save ? explode( PHP_EOL, wp_strip_all_tags( $save ) ) : array();
-
-		// Build sanitized output.
-		$sanitized = array();
-		foreach ( $input as $line ) {
-			$line   = trim( $line );
-			$domain = wp_parse_url( trim( filter_var( $line, FILTER_SANITIZE_URL ) ), PHP_URL_HOST );
-
-			// Filter out empties and default domain.
-			if ( ! empty( $domain ) && $domain !== $default && strpos( $domain, '.' . $default ) === false ) {
-				$sanitized[] = $domain;
-			}
-		}
-
-		return ( ! empty( $sanitized ) ) ? $sanitized : '';
-	}
 }

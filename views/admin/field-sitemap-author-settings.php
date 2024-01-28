@@ -12,12 +12,6 @@
 	</legend>
 	<p>
 		<label>
-			<input type="checkbox" name="xmlsf_author_settings[active]" id="xmlsf_author_active" value="1"<?php checked( ! empty( $author_settings['active'] ), true ); ?> />
-			<?php esc_html_e( 'Include authors', 'xml-sitemap-feed' ); ?> (<?php echo count( get_users( $users_args ) ); ?>)
-		</label>
-	</p>
-	<p>
-		<label>
 			<?php esc_html_e( 'Priority', 'xml-sitemap-feed' ); ?>
 			<input type="number" step="0.1" min="0.1" max="0.9" name="xmlsf_author_settings[priority]" id="xmlsf_author_priority" value="<?php echo ( isset( $author_settings['priority'] ) ? esc_attr( $author_settings['priority'] ) : '' ); ?>" class="small-text" />
 		</label>

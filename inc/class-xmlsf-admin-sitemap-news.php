@@ -8,7 +8,7 @@
 /**
  * XMLSF Admin Sitemap News CLASS
  */
-class XMLSF_Admin_Sitemap_News extends XMLSF_Admin {
+class XMLSF_Admin_Sitemap_News {
 	/**
 	 * Holds the values to be used in the fields callbacks.
 	 *
@@ -42,8 +42,6 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin {
 		add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
 		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
 		add_action( 'admin_init', array( $this, 'check_news_advanced' ), 11 );
-
-		$this->conflicting_files[] = 'sitemap-news.xml';
 	}
 
 	/**
@@ -66,7 +64,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin {
 			// Reset ignored warnings.
 			delete_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
 
-			$this->check_static_files();
+			xmlsf_admin()->check_static_files( 'sitemap-news.xml' );
 		}
 
 		if ( isset( $_POST['xmlsf-clear-settings-news'] ) ) {
@@ -247,7 +245,6 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin {
 		do_action( 'xmlsf_news_add_settings', $active_tab );
 
 		// prepare sitemap link url.
-		$sitemaps    = (array) get_option( 'xmlsf_sitemaps', array() );
 		$sitemap_url = xmlsf_sitemap_url( 'news' );
 
 		// Sidebar actions.
@@ -337,7 +334,7 @@ class XMLSF_Admin_Sitemap_News extends XMLSF_Admin {
 			);
 			add_settings_field(
 				'xmlsf_news_post_type',
-				__( 'Post type', 'xml-sitemap-feed' ),
+				__( 'Post types', 'xml-sitemap-feed' ),
 				array( $this, 'post_type_field' ),
 				'xmlsf_news_general',
 				'news_sitemap_general_section'

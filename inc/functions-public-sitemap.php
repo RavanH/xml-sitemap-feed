@@ -211,19 +211,6 @@ function xmlsf_image_schema( $type ) {
 }
 add_action( 'xmlsf_urlset', 'xmlsf_image_schema' );
 
-
-/**
- * Do authors
- *
- * @return bool
- */
-function xmlsf_do_authors() {
-
-	$settings = get_option( 'xmlsf_author_settings', xmlsf()->defaults( 'author_settings' ) );
-
-	return is_array( $settings ) && ! empty( $settings['active'] );
-}
-
 /**
  * Get front pages
  *

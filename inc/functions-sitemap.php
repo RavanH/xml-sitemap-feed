@@ -35,27 +35,28 @@ function xmlsf_get_post_types() {
  * @return array
  */
 function xmlsf_get_taxonomies() {
-	$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
+	$settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
+
+	if ( ! empty( $settings['disabled'] ) && in_array( 'taxonomies', (array) $settings['disabled'], true ) ) {
+		return array();
+	}
 
 	$tax_array = array();
 
-	if ( ! empty( $taxonomy_settings['active'] ) ) {
+	$taxonomies = get_option( 'xmlsf_taxonomies' );
 
-		$taxonomies = get_option( 'xmlsf_taxonomies' );
-
-		if ( is_array( $taxonomies ) ) {
-			foreach ( $taxonomies as $taxonomy ) {
-				$count = wp_count_terms( $taxonomy );
-				if ( ! is_wp_error( $count ) && $count > 0 ) {
-					$tax_array[] = $taxonomy;
-				}
+	if ( is_array( $taxonomies ) ) {
+		foreach ( $taxonomies as $taxonomy ) {
+			$count = wp_count_terms( $taxonomy );
+			if ( ! is_wp_error( $count ) && $count > 0 ) {
+				$tax_array[] = $taxonomy;
 			}
-		} else {
-			foreach ( xmlsf_public_taxonomies() as $name => $label ) {
-				$count = wp_count_terms( $name );
-				if ( ! is_wp_error( $count ) && $count > 0 ) {
-					$tax_array[] = $name;
-				}
+		}
+	} else {
+		foreach ( xmlsf_public_taxonomies() as $name => $label ) {
+			$count = wp_count_terms( $name );
+			if ( ! is_wp_error( $count ) && $count > 0 ) {
+				$tax_array[] = $name;
 			}
 		}
 	}

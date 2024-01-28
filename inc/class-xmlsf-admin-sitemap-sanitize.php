@@ -18,31 +18,31 @@ class XMLSF_Admin_Sitemap_Sanitize {
 	 * @return array
 	 */
 	public static function general_settings( $save ) {
-		setlocale( LC_NUMERIC, 'C' );
-
-		$sanitized       = xmlsf()->defaults( 'general_settings' );
-		$save            = (array) $save;
-		$allowed_servers = array(
-			'core',
-			'plugin',
-		);
+		$defaults = xmlsf()->defaults( 'general_settings' );
+		$save     = (array) $save;
+		$old      = (array) get_option( 'xmlsf_general_settings' );
 
 		// Sanitize server setting.
-		if ( ! empty( $save['server'] ) && in_array( $save['server'], $allowed_servers, true ) ) {
-			$sanitized['server'] = $save['server'];
-		}
+		$sanitized['server'] = isset( $save['server'] ) && in_array( $save['server'], array( 'core', 'plugin' ), true ) ? $save['server'] : $defaults['server'];
 
-		// Sanitize limit.
-		if ( ! empty( $save['limit'] ) && is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = xmlsf_sanitize_number( $save['limit'], 1, 50000, false );
-		}
+		// Sanitize includes.
+		$sanitized['disabled'] = isset( $save['disabled'] ) && is_array( $save['disabled'] ) ? $save['disabled'] : array();
 
 		// When sitemap server has been changed...
-		$old = (array) get_option( 'xmlsf_general_settings' );
 		if ( empty( $old['server'] ) || $old['server'] !== $sanitized['server'] ) {
 			// Force rewrite rules to be REGENERATED.
 			delete_option( 'rewrite_rules' );
+			// TODO test update_option hook with flush rewrite rules? Or find another method...
 		}
+
+		// When taxonomies have been disabled...
+		if ( in_array( 'taxonomies', $sanitized['disabled'], true ) && ! in_array( 'taxonomies', $old['disabled'], true ) ) {
+			xmlsf_clear_metacache( 'terms' );
+			// global $wpdb;
+			// $wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified' ) );.
+		}
+
+		// TODO Clear user meta cache if deactivating...
 
 		return $sanitized;
 	}
@@ -74,7 +74,6 @@ class XMLSF_Admin_Sitemap_Sanitize {
 		$sanitized = xmlsf()->defaults( 'taxonomy_settings' );
 		$save      = (array) $save;
 
-		$sanitized['active']           = ! empty( $save['active'] ) ? '1' : '';
 		$sanitized['dynamic_priority'] = ! empty( $save['dynamic_priority'] ) ? '1' : '';
 
 		// Sanitize priority.
@@ -85,16 +84,6 @@ class XMLSF_Admin_Sitemap_Sanitize {
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && is_numeric( $save['limit'] ) ) {
 			$sanitized['limit'] = xmlsf_sanitize_number( $save['limit'], 1, 50000, false );
-		}
-
-		// Clear term meta cache if deactivating...
-		if ( empty( $sanitized['active'] ) ) {
-			$old = (array) get_option( 'xmlsf_taxonomy_settings', array() );
-			if ( ! empty( $old['active'] ) ) {
-				xmlsf_clear_metacache( 'terms' );
-				// global $wpdb;
-				// $wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified' ) );.
-			}
 		}
 
 		return $sanitized;
@@ -114,7 +103,6 @@ class XMLSF_Admin_Sitemap_Sanitize {
 		$sanitized = xmlsf()->defaults( 'taxonomy_settings' );
 		$save      = (array) $save;
 
-		$sanitized['active']           = ! empty( $save['active'] ) ? '1' : '';
 		$sanitized['dynamic_priority'] = ! empty( $save['dynamic_priority'] ) ? '1' : '';
 
 		// Sanitize priority.
@@ -126,8 +114,6 @@ class XMLSF_Admin_Sitemap_Sanitize {
 		if ( ! empty( $save['limit'] ) && is_numeric( $save['limit'] ) ) {
 			$sanitized['limit'] = xmlsf_sanitize_number( $save['limit'], 1, 50000, false );
 		}
-
-		// TODO Clear user meta cache if deactivating...
 
 		return $sanitized;
 	}
@@ -148,6 +134,11 @@ class XMLSF_Admin_Sitemap_Sanitize {
 		$old            = (array) get_option( 'xmlsf_post_types', array() );
 		$clear_images   = false;
 		$clear_comments = false;
+
+		// Sanitize limit.
+		if ( ! empty( $save['limit'] ) && is_numeric( $save['limit'] ) ) {
+			$sanitized['limit'] = xmlsf_sanitize_number( $save['limit'], 1, 50000, false );
+		}
 
 		foreach ( $sanitized as $post_type => $settings ) {
 			$sanitized[ $post_type ]['priority'] = is_numeric( $settings['priority'] ) ? xmlsf_sanitize_number( str_replace( ',', '.', $settings['priority'] ), .1, .9 ) : '0.5';
@@ -251,5 +242,66 @@ class XMLSF_Admin_Sitemap_Sanitize {
 		}
 
 		return ! empty( $sanitized ) ? $sanitized : '';
+	}
+
+	/**
+	 * Sanitize domain settings
+	 *
+	 * @param array $save Settings array.
+	 *
+	 * @return array
+	 */
+	public static function domains_settings( $save ) {
+		$default = wp_parse_url( home_url(), PHP_URL_HOST );
+		$save    = sanitize_textarea_field( $save );
+		$input   = $save ? explode( PHP_EOL, wp_strip_all_tags( $save ) ) : array();
+
+		// Build sanitized output.
+		$sanitized = array();
+		foreach ( $input as $line ) {
+			$line = trim( $line );
+
+			// Skip if empty line.
+			if ( empty( $line ) ) {
+				continue;
+			}
+
+			// Prevent parse_url misdiagnosing a domain without protocol as a path.
+			$domain = strpos( $line, '://' ) === false && substr( $line, 0, 1 ) !== '/' ? '//' . $line : $line;
+
+			// Parse url.
+			$domain = wp_parse_url( filter_var( $domain, FILTER_SANITIZE_URL ), PHP_URL_HOST );
+
+			// Empty result. Skip.
+			if ( empty( $domain ) ) {
+				$line = strlen( $line ) > 13 ? substr( $line, 0, 10 ) . '&hellip;' : $line;
+				add_settings_error(
+					'invalid_domain_notice',
+					'invalid_domain',
+					sprintf( /* translators: %s the first 13 characters of an entry. */
+						esc_html__( 'The line "%s" did not appear to contain a valid domain.', 'xml-sitemap-feed' ),
+						esc_html( $line )
+					),
+					'warning'
+				);
+				continue;
+			}
+			// Default (sub-)domain.
+			if ( $domain === $default || strpos( $domain, '.' . $default ) !== false ) {
+				add_settings_error(
+					'invalid_domain_notice',
+					'invalid_domain',
+					sprintf( /* translators: %s the first 13 characters of an entry. */
+						esc_html__( 'The domain "%s" is already an allowed domain.', 'xml-sitemap-feed' ),
+						esc_html( $line )
+					),
+					'warning'
+				);
+				continue;
+			}
+			$sanitized[] = $domain;
+		}
+
+		return ( ! empty( $sanitized ) ) ? $sanitized : '';
 	}
 }

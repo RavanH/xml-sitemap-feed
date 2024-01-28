@@ -157,14 +157,18 @@ class XMLSitemapFeed {
 			$this->defaults = array(
 				'sitemaps'          => $sitemaps,
 				'general_settings'  => array(
-					'server' => class_exists( 'SimpleXMLElement' ) ? 'core' : 'plugin',
-					'limit'  => 2000,
+					'server'  => class_exists( 'SimpleXMLElement' ) ? 'core' : 'plugin',
+					'include' => array(
+						'post_types',
+						'authors',
+					),
+					'limit'   => 2000,
 				),
 				'post_types'        => array(
 					'post' => array(
 						'active'           => '1',
 						'archive'          => 'yearly',
-						'priority'         => '0.7',
+						'priority'         => .7,
 						'dynamic_priority' => '',
 						'tags'             => array(
 							'image' => 'featured',
@@ -173,7 +177,7 @@ class XMLSitemapFeed {
 					),
 					'page' => array(
 						'active'           => '1',
-						'priority'         => '0.5',
+						'priority'         => .5,
 						'dynamic_priority' => '',
 						'tags'             => array(
 							'image' => 'attached',
@@ -183,15 +187,14 @@ class XMLSitemapFeed {
 				),
 				'taxonomies'        => '',
 				'taxonomy_settings' => array(
-					'active'           => '',
-					'priority'         => '0.3',
+					'priority'         => .3,
 					'dynamic_priority' => '',
+					'include_empty'    => '',
 					'limit'            => 2000,
 				),
 				'authors'           => '',
 				'author_settings'   => array(
-					'active'   => '1',
-					'priority' => '0.3',
+					'priority' => .3,
 					'limit'    => 2000,
 				),
 				'robots'            => '',

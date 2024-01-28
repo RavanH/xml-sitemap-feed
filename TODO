@@ -1,10 +1,13 @@
 ROADMAP
 
 = 5.4 =
+* add disable post types
+* make disable option work
+* replace deleting rewrite rules, it's bad
+* remove allowed domains check from news sitemap
 * rearrange sitemap settings tab fields
 * Rearrange sitemap help tabs (like news)
 * fix advanced options failing
-* fix settings > reading options not showing correctly
 * add static files checks:
   - after plugin activation
   - on de/activation from settings reading

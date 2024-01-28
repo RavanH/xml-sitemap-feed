@@ -7,7 +7,7 @@
 
 ?>
 <fieldset>
-	<legend class="screen-reader-text"><?php esc_html_e( 'Post type', 'xml-sitemap-feed' ); ?></legend>
+	<legend class="screen-reader-text"><?php esc_html_e( 'Post types', 'xml-sitemap-feed' ); ?></legend>
 <?php
 foreach ( $post_types as $_post_type ) :
 	$obj = get_post_type_object( $_post_type );

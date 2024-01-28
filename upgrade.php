@@ -175,24 +175,33 @@ function xmlsf_upgrade( $db_version ) {
 		delete_transient( 'xmlsf_check_static_files' );
 		delete_transient( 'xmlsf_prefetch_post_meta_failed' );
 
+		$author_settings = (array) get_option( 'xmlsf_author_settings', array() );
+		$tax_settings    = (array) get_option( 'xmlsf_taxonomy_settings', array() );
 		// Do not switch to core sitemap when upgrading.
+		$general_settings = array(
+			'server'   => 'plugin',
+			'disabled' => array(),
+		);
+		// Set include array.
+		if ( empty( $tax_settings['active'] ) ) {
+			$general_settings['disabled'][] = 'taxonomies';
+		}
+		if ( empty( $author_settings['active'] ) ) {
+			$general_settings['disabled'][] = 'authors';
+		}
+		// Add general settings option.
 		add_option(
 			'xmlsf_general_settings',
-			array(
-				'server' => 'plugin',
-				'limit'  => '2000',
-			)
+			$general_settings
 		);
 		// Update taxonomy terms limit.
-		$settings          = (array) get_option( 'xmlsf_taxonomy_settings', array() );
-		$settings['limit'] = isset( $settings['term_limit'] ) ? $settings['term_limit'] : '3000';
-		unset( $settings['term_limit'] );
-		update_option( 'xmlsf_taxonomy_settings', $settings );
+		$tax_settings['limit'] = isset( $tax_settings['term_limit'] ) ? $tax_settings['term_limit'] : '3000';
+		unset( $tax_settings['term_limit'] );
+		update_option( 'xmlsf_taxonomy_settings', $tax_settings );
 		// Update users limit.
-		$settings          = (array) get_option( 'xmlsf_author_settings', array() );
-		$settings['limit'] = isset( $settings['term_limit'] ) ? $settings['term_limit'] : '1000';
+		$author_settings['limit'] = isset( $author_settings['term_limit'] ) ? $author_settings['term_limit'] : '1000';
 		unset( $settings['term_limit'] );
-		update_option( 'xmlsf_author_settings', $settings );
+		update_option( 'xmlsf_author_settings', $author_settings );
 
 		// Delete old settings.
 		delete_option( 'xmlsf_ping' );

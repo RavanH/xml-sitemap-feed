@@ -8,19 +8,8 @@
 ?>
 <fieldset id="xmlsf_taxonomy_settings">
 	<legend class="screen-reader-text">
-		<?php echo esc_html( translate( 'General' ) ); ?>
+		<?php echo esc_html( translate( 'General Settings' ) ); ?>
 	</legend>
-	<p>
-		<label>
-			<input type="checkbox" name="xmlsf_taxonomy_settings[active]" id="xmlsf_taxonomy_active" value="1"<?php checked( ! empty( $taxonomy_settings['active'] ), true ); ?> />
-			<?php esc_html_e( 'Include taxonomies', 'xml-sitemap-feed' ); ?> (<?php echo count( $this->public_taxonomies() ); ?>)
-		</label>
-		<?php if ( ! $this->public_taxonomies() ) { ?>
-			<p class="description warning" style="color: red;">
-				<?php esc_html_e( 'No taxonomies available for the currently included post types.', 'xml-sitemap-feed' ); ?>
-			</p>
-		<?php } ?>
-	</p>
 	<p>
 		<label>
 			<?php esc_html_e( 'Priority', 'xml-sitemap-feed' ); ?>
@@ -31,6 +20,12 @@
 		<label>
 			<input type="checkbox" name="xmlsf_taxonomy_settings[dynamic_priority]" id="xmlsf_taxonomy_dynamic_priority" value="1"<?php echo checked( ! empty( $taxonomy_settings['dynamic_priority'] ), true, false ); ?> />
 			<?php esc_html_e( 'Automatic Priority calculation.', 'xml-sitemap-feed' ); ?>
+		</label>
+	</p>
+	<p>
+		<label>
+			<input type="checkbox" name="xmlsf_taxonomy_settings[include_empty]" id="xmlsf_taxonomy_include_empty" value="1"<?php checked( ! empty( $taxonomy_settings['include_empty'] ), true ); ?> />
+			<?php esc_html_e( 'Include empty taxonomy terms.', 'xml-sitemap-feed' ); ?>
 		</label>
 	</p>
 	<p>

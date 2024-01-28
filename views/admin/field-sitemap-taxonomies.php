@@ -13,14 +13,14 @@
 	<p>
 		<?php esc_html_e( 'Limit to these taxonomies:', 'xml-sitemap-feed' ); ?>
 	</p>
-		<?php if ( ! empty( $this->public_taxonomies() ) ) { ?>
+		<?php if ( ! empty( $public_tax ) ) { ?>
 	<ul class="cat-checklist">
 			<?php
-			foreach ( $this->public_taxonomies() as $name => $label ) {
+			foreach ( $public_tax as $name => $label ) {
 				?>
 		<li>
 			<label>
-				<input type="checkbox" name="xmlsf_taxonomies[]" id="xmlsf_taxonomies_'<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $name ); ?>" <?php checked( in_array( $name, (array) $taxonomies, true ) ); ?>/>
+				<input type="checkbox" name="xmlsf_taxonomies[]" id="xmlsf_taxonomies_<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $name ); ?>" <?php checked( in_array( $name, (array) $taxonomies, true ) ); ?>/>
 				<?php echo esc_html( $label ); ?> (<?php echo esc_html( wp_count_terms( $name ) ); ?>)
 			</label>
 		</li>

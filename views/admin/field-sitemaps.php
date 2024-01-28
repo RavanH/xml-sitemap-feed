@@ -11,11 +11,11 @@
 		<?php esc_html_e( 'Enable XML sitemaps', 'xml-sitemap-feed' ); ?>
 	</legend>
 	<label>
-		<input type="checkbox" name="xmlsf_sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="sitemap.xml"<?php echo checked( isset( $this->sitemaps['sitemap'] ), true, false ); ?> />
+		<input type="checkbox" name="xmlsf_sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="sitemap.xml"<?php checked( xmlsf_sitemaps_enabled( 'sitemap' ) ); ?><?php disabled( ! apply_filters( 'xmlsf_sitemaps_enabled', true, 'sitemap' ) ); ?> />
 		<?php esc_html_e( 'XML Sitemap Index', 'xml-sitemap-feed' ); ?>
 	</label>
 
-	<?php if ( isset( $this->sitemaps['sitemap'] ) ) { ?>
+	<?php if ( xmlsf_sitemaps_enabled( 'sitemap' ) ) { ?>
 	<span class="description">
 		&nbsp;&ndash;&nbsp;
 		<a href="<?php echo esc_attr( admin_url( 'options-general.php' ) ); ?>?page=xmlsf" id="xmlsf_link"><?php echo esc_html( translate( 'Settings' ) ); ?></a> |
@@ -26,14 +26,14 @@
 	<br>
 
 	<label>
-		<input type="checkbox" name="xmlsf_sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="sitemap-news.xml"<?php echo checked( isset( $this->sitemaps['sitemap-news'] ), true, false ); ?> />
+		<input type="checkbox" name="xmlsf_sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="sitemap-news.xml"<?php checked( xmlsf_sitemaps_enabled( 'news' ) ); ?><?php disabled( ! apply_filters( 'xmlsf_sitemaps_enabled', true, 'news' ) ); ?> />
 		<?php esc_html_e( 'Google News Sitemap', 'xml-sitemap-feed' ); ?>
 	</label>
 
 	<?php
-	if ( isset( $this->sitemaps['sitemap-news'] ) ) {
+	if ( xmlsf_sitemaps_enabled( 'news' ) ) {
 		global $wp_rewrite;
-		$news_url = trailingslashit( get_bloginfo( 'url' ) ) . ( $wp_rewrite->using_permalinks() ? $this->sitemaps['sitemap-news'] : '?feed=sitemap-news' );
+		$news_url = trailingslashit( get_bloginfo( 'url' ) ) . ( $wp_rewrite->using_permalinks() ? $this->settings['sitemap-news'] : '?feed=sitemap-news' );
 		?>
 	<span class="description">
 		&nbsp;&ndash;&nbsp;

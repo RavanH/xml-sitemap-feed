@@ -16,6 +16,8 @@ echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charse
 <?php
 do_action( 'xmlsf_sitemap_index' );
 
+$general_settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
+
 // Public post types.
 $post_types = xmlsf_get_post_types();
 foreach ( $post_types as $the_post_type => $settings ) :
@@ -32,19 +34,21 @@ foreach ( $post_types as $the_post_type => $settings ) :
 endforeach;
 
 // Public taxonomies.
-$taxonomies = xmlsf_get_taxonomies();
-foreach ( $taxonomies as $the_taxonomy ) :
-	$url     = xmlsf_sitemap_url( 'taxonomy', array( 'type' => $the_taxonomy ) );
-	$lastmod = xmlsf_get_taxonomy_modified( $the_taxonomy );
-	echo '<sitemap><loc>' . esc_xml( $url ) . '</loc>';
-	if ( $lastmod ) {
-		echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
-	}
-	echo '</sitemap>' . PHP_EOL;
-endforeach;
+if ( empty( $general_settings['disabled'] ) || ! in_array( 'taxonomies', (array) $general_settings['disabled'], true ) ) {
+	$taxonomies = xmlsf_get_taxonomies();
+	foreach ( $taxonomies as $the_taxonomy ) :
+		$url     = xmlsf_sitemap_url( 'taxonomy', array( 'type' => $the_taxonomy ) );
+		$lastmod = xmlsf_get_taxonomy_modified( $the_taxonomy );
+		echo '<sitemap><loc>' . esc_xml( $url ) . '</loc>';
+		if ( $lastmod ) {
+			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+		}
+		echo '</sitemap>' . PHP_EOL;
+	endforeach;
+}
 
 // Authors.
-if ( xmlsf_do_authors() ) {
+if ( empty( $general_settings['disabled'] ) || ! in_array( 'authors', (array) $general_settings['disabled'], true ) ) {
 	echo '<sitemap><loc>' . esc_xml( xmlsf_sitemap_url( 'author' ) ) . '</loc><lastmod>' . esc_xml( get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ) ) . '</lastmod></sitemap>' . PHP_EOL;
 }
 

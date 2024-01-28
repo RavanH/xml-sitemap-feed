@@ -108,8 +108,7 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 		}
 
 		// Google News XML Sitemaps provider.
-		$xmlsf_sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
-		if ( ! empty( $xmlsf_sitemaps['sitemap-news'] ) ) {
+		if ( xmlsf_sitemaps_enabled( 'news' ) ) {
 			add_action(
 				'init',
 				function () {
@@ -435,18 +434,18 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	public function max_urls( $max_urls, $object_type ) {
 		switch ( $object_type ) {
 			case 'user':
-				$settings = (array) get_option( 'xmlsf_author_settings' );
+				$settings = (array) get_option( 'xmlsf_author_settings', xmlsf()->defaults( 'author_settings' ) );
 				$max_urls = ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
 				break;
 
 			case 'term':
-				$settings = (array) get_option( 'xmlsf_taxonomy_settings' );
+				$settings = (array) get_option( 'xmlsf_taxonomy_settings', xmlsf()->defaults( 'taxonomy_settings' ) );
 				$max_urls = ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
 				break;
 
 			case 'post':
 			default:
-				$settings = (array) get_option( 'xmlsf_general_settings' );
+				$settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
 				$max_urls = ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
 		}
 
@@ -464,16 +463,17 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 * @return false|obj Provider or false if disabled.
 	 */
 	public function add_provider( $provider, $name ) {
+		$settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
+		if ( empty( $settings['disabled'] ) ) {
+			return $provider;
+		}
 		// Verify author sitemap settings.
 		if ( 'users' === $name ) {
-			$settings = (array) get_option( 'xmlsf_author_settings' );
-			return empty( $settings['active'] ) ? false : $provider;
+			return ! empty( $settings['disabled'] ) && in_array( 'authors', (array) $settings['disabled'], true ) ? false : $provider;
 		}
 		// Verify taxonomy sitemaps settings.
 		if ( 'taxonomies' === $name ) {
-			$settings   = (array) get_option( 'xmlsf_taxonomy_settings' );
-			$taxonomies = xmlsf_public_taxonomies();
-			return empty( $settings['active'] ) || empty( $taxonomies ) ? false : $provider;
+			return ! empty( $settings['disabled'] ) && in_array( 'taxonomies', (array) $settings['disabled'], true ) ? false : $provider;
 		}
 
 		return $provider;

@@ -86,16 +86,16 @@ abstract class XMLSF_Sitemap {
 	 * @param WP_Post $post       Post object.
 	 */
 	public function update_term_modified_meta( $new_status, $old_status, $post ) {
-		$taxonomy_settings = get_option( 'xmlsf_taxonomy_settings' );
+		$settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
 
 		// Bail when...
 		if (
 			// no status transition or not moving in or out of 'publish' status.
 			$old_status === $new_status || ( 'publish' !== $new_status && 'publish' !== $old_status ) ||
-			// inactive post type.
-			! array_key_exists( $post->post_type, $this->post_types ) || empty( $this->post_types[ $post->post_type ]['active'] ) ||
 			// no taxonomies activated.
-			! is_array( $taxonomy_settings ) || empty( $taxonomy_settings['active'] )
+			in_array( 'taxonomies', $settings['disabled'] ) ||
+			// inactive post type.
+			! array_key_exists( $post->post_type, $this->post_types ) || empty( $this->post_types[ $post->post_type ]['active'] )
 		) {
 			return;
 		}
