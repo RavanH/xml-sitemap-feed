@@ -264,6 +264,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 			$args['number'] = $defaults['limit'];
 		}
 
+		$args['hide_empty']      = empty( $options['include_empty'] );
 		$args['order']           = 'DESC';
 		$args['orderby']         = 'count';
 		$args['pad_counts']      = true;

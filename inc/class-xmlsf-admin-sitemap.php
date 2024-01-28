@@ -442,7 +442,7 @@ class XMLSF_Admin_Sitemap {
 		);
 		add_settings_field(
 			'include',
-			translate( 'Disable' ),
+			translate( 'Deactivate' ),
 			array( 'XMLSF_Admin_Sitemap_Fields', 'include_fields' ),
 			'xmlsf_general',
 			'general'
@@ -712,7 +712,7 @@ class XMLSF_Admin_Sitemap {
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-general-disable',
-						'title'   => translate( 'Disable' ),
+						'title'   => translate( 'Deactivate' ),
 						'content' => $content,
 					)
 				);

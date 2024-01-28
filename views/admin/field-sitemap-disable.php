@@ -8,7 +8,7 @@
 ?>
 <fieldset id="xmlsf_sitemap_general_settings_disable">
 	<legend class="screen-reader-text">
-		<?php echo esc_html( translate( 'Disable' ) ); ?>
+		<?php echo esc_html( translate( 'Deactivate' ) ); ?>
 	</legend>
 
 	<p>

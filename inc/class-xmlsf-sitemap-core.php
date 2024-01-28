@@ -224,14 +224,8 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 				case 'taxonomies':
 					// Try to raise memory limit, context added for filters.
 					wp_raise_memory_limit( 'wp-sitemap-taxonomies-' . $subtype );
-					// Make sure the term query returns term objects, not just ids. See bugreport: https://core.trac.wordpress.org/ticket/55239.
-					add_filter(
-						'wp_sitemaps_taxonomies_query_args',
-						function ( $args ) {
-							$args['fields'] = 'all';
-							return $args;
-						}
-					);
+					// Add a filter for the tax query arguments. This allows the user to include empty terms.
+					add_filter( 'wp_sitemaps_taxonomies_query_args', array( $this, 'taxonomies_query_args' ) );
 					break;
 
 				case 'users':
@@ -277,16 +271,25 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 		// Add lastmod.
 		switch ( $type ) {
 			case 'post':
-				$entry['lastmod'] = get_date_from_gmt( get_lastpostmodified( 'GMT', $subtype ), DATE_W3C );
+				$lastmod = get_date_from_gmt( get_lastpostmodified( 'GMT', $subtype ), DATE_W3C );
+				if ( $lastmod ) {
+					$entry['lastmod'] = $lastmod;
+				}
 				break;
 
 			case 'term':
-				$entry['lastmod'] = xmlsf_get_taxonomy_modified( $subtype );
+				$lastmod = xmlsf_get_taxonomy_modified( $subtype );
+				if ( $lastmod ) {
+					$entry['lastmod'] = $lastmod;
+				}
 				break;
 
 			case 'user':
 				// TODO make this xmlsf_author_post_types filter compatible.
-				$entry['lastmod'] = get_date_from_gmt( get_lastpostdate( 'GMT', 'post' ), DATE_W3C ); // Absolute last post date.
+				$lastmod = get_date_from_gmt( get_lastpostdate( 'GMT', 'post' ), DATE_W3C ); // Absolute last post date.
+				if ( $lastmod ) {
+					$entry['lastmod'] = $lastmod;
+				}
 				break;
 
 			case 'news':
@@ -318,11 +321,15 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 */
 	public function users_entry( $entry, $user_object ) {
 		// Add priority.
-		$entry['priority'] = xmlsf_get_user_priority( $user_object );
-
+		$priority = xmlsf_get_user_priority( $user_object );
+		if ( $priority ) {
+			$entry['priority'] = $priority;
+		}
 		// Add lastmod.
-		$entry['lastmod'] = xmlsf_get_user_modified( $user_object );
-
+		$lastmod = xmlsf_get_user_modified( $user_object );
+		if ( $lastmod ) {
+			$entry['lastmod'] = $lastmod;
+		}
 		return $entry;
 	}
 
@@ -346,10 +353,16 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 		}
 
 		// Add priority.
-		$entry['priority'] = xmlsf_get_term_priority( $term_object );
+		$priority = xmlsf_get_term_priority( $term_object );
+		if ( $priority ) {
+			$entry['priority'] = $priority;
+		}
 
 		// Add lastmod.
-		$entry['lastmod'] = xmlsf_get_term_modified( $term_object );
+		$lastmod = xmlsf_get_term_modified( $term_object );
+		if ( $lastmod ) {
+			$entry['lastmod'] = $lastmod;
+		}
 
 		return $entry;
 	}
@@ -377,6 +390,24 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 				return in_array( $tax->name, $only, true );
 			}
 		);
+	}
+
+	/**
+	 * Filter tax query arguments.
+	 * Hooked into wp_sitemaps_taxonomies_query_args filter.
+	 *
+	 * @since 5.4
+	 *
+	 * @param array $args Query arguments.
+	 *
+	 * @return array
+	 */
+	public function taxonomies_query_args( $args ) {
+		$settings = (array) get_option( 'xmlsf_taxonomy_settings', xmlsf()->defaults( 'taxonomy_settings' ) );
+
+		$args['hide_empty'] = empty( $settings['include_empty'] );
+
+		return $args;
 	}
 
 	/**

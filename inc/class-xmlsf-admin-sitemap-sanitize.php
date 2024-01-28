@@ -70,20 +70,16 @@ class XMLSF_Admin_Sitemap_Sanitize {
 	 * @return array
 	 */
 	public static function taxonomy_settings( $save ) {
-		setlocale( LC_NUMERIC, 'C' );
-		$sanitized = xmlsf()->defaults( 'taxonomy_settings' );
-		$save      = (array) $save;
-
-		$sanitized['dynamic_priority'] = ! empty( $save['dynamic_priority'] ) ? '1' : '';
+		$sanitized = (array) $save;
 
 		// Sanitize priority.
-		if ( ! empty( $save['priority'] ) && is_numeric( $save['priority'] ) ) {
-			$sanitized['priority'] = xmlsf_sanitize_number( $save['priority'], .1, .9 );
+		if ( ! empty( $sanitized['priority'] ) && is_numeric( $sanitized['priority'] ) ) {
+			$sanitized['priority'] = xmlsf_sanitize_number( $sanitized['priority'], .1, .9 );
 		}
 
 		// Sanitize limit.
-		if ( ! empty( $save['limit'] ) && is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = xmlsf_sanitize_number( $save['limit'], 1, 50000, false );
+		if ( ! empty( $sanitized['limit'] ) && is_numeric( $sanitized['limit'] ) ) {
+			$sanitized['limit'] = xmlsf_sanitize_number( $sanitized['limit'], 1, 50000, false );
 		}
 
 		return $sanitized;
