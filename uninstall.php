@@ -62,17 +62,6 @@ function xmlsf_uninstall() {
 	delete_metadata( 'post', 0, '_xmlsf_exclude', '', true );
 	delete_metadata( 'post', 0, '_xmlsf_news_exclude', '', true );
 
-	/*
-	//global $wpdb;
-	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
-	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
-	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_comment_date_gmt' ) );
-	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_priority' ) );
-	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_exclude' ) );
-	$wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_news_exclude' ) );
-	$wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified' ) );
-	*/
-
 	// Remove plugin settings.
 	delete_option( 'xmlsf_version' );
 	delete_option( 'xmlsf_sitemaps' );
@@ -94,5 +83,5 @@ function xmlsf_uninstall() {
 	delete_transient( 'xmlsf_static_files' );
 
 	// Flush rules.
-	flush_rewrite_rules();
+	flush_rewrite_rules( false );
 }

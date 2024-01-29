@@ -98,14 +98,6 @@ class XMLSF_Admin_Sitemap {
 			// Remove terms metadata.
 			xmlsf_clear_metacache( 'terms' );
 
-			/*
-			//global $wpdb;
-			$wpdb->delete(
-				$wpdb->prefix . 'termmeta',
-				array( 'meta_key' => 'term_modified' )
-			);
-			*/
-
 			add_settings_error(
 				'clear_meta_notice',
 				'clear_meta_notice',
@@ -118,28 +110,6 @@ class XMLSF_Admin_Sitemap {
 			// Remove metadata.
 			xmlsf_clear_metacache( 'images' );
 			xmlsf_clear_metacache( 'comments' );
-
-			global $wpdb;
-
-			/*
-			// Images meta.
-			$wpdb->delete(
-				$wpdb->prefix . 'postmeta',
-				array( 'meta_key' => '_xmlsf_image_attached' )
-			);
-			$wpdb->delete(
-				$wpdb->prefix . 'postmeta',
-				array( 'meta_key' => '_xmlsf_image_featured' )
-			);
-			update_option( 'xmlsf_images_meta_primed', array() );
-
-			// Comments meta.
-			$wpdb->delete(
-				$wpdb->prefix . 'postmeta',
-				array( 'meta_key' => '_xmlsf_comment_date_gmt' )
-			);
-			update_option( 'xmlsf_comments_meta_primed', array() );
-			*/
 
 			add_settings_error(
 				'clear_meta_notice',
