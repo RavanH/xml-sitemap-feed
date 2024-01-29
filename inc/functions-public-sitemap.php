@@ -152,12 +152,13 @@ function xmlsf_get_user_modified( $user ) {
  * @uses WP_Post $post
  * @return void
  */
-function xmlsf_image_tag( $type ) {
-	if ( 'post_type' !== $type ) {
+function xmlsf_image_tag( $type, $post = null ) {
+	if ( 'post_type' !== $type || null === $post ) {
 		return;
 	}
-	global $post;
+
 	$post_types = (array) get_option( 'xmlsf_post_types' );
+
 	if (
 		isset( $post_types[ $post->post_type ] ) &&
 		is_array( $post_types[ $post->post_type ] ) &&
@@ -184,7 +185,7 @@ function xmlsf_image_tag( $type ) {
 		}
 	}
 }
-add_action( 'xmlsf_tags_after', 'xmlsf_image_tag' );
+add_action( 'xmlsf_tags_after', 'xmlsf_image_tag', 10, 2 );
 
 /**
  * Image schema
