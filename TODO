@@ -1,9 +1,8 @@
 ROADMAP
 
 = 5.4 =
+
 * add disable post types
-* make disable option work
-* replace deleting rewrite rules, it's bad
 * remove allowed domains check from news sitemap
 * rearrange sitemap settings tab fields
 * Rearrange sitemap help tabs (like news)
@@ -12,13 +11,11 @@ ROADMAP
   - after plugin activation
   - on de/activation from settings reading
 
-* test meta cache clearing (remove meta cache clear commented code)
 * test conflicting plugins/themes messages
-* test upgrade.php
+* test without WP_DEBUG
 
 TODO author sitemap lastmod === last publication date
 TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to verify results
-TODO make "hide empty" an option for taxonomy terms, see issue #40
 
 Verify and remove unused:
 *
@@ -27,6 +24,7 @@ TODO LIST
 
 * prepare compatibility routine for additional premium modules
 * add inline comment blocks for hooks
+* dynamic stylesheets
 
 TODO test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 TODO fix WPML incompatibility https://wordpress.org/support/topic/multilingual-url-issue/
