@@ -9,9 +9,6 @@
 
 defined( 'WPINC' ) || die;
 
-// Make sure rules are REGENERATED on next pageload.
-delete_option( 'rewrite_rules' );
-
 if ( $db_version ) {
 	xmlsf_upgrade( $db_version );
 } else {
@@ -19,6 +16,8 @@ if ( $db_version ) {
 }
 
 update_option( 'xmlsf_version', XMLSF_VERSION );
+
+set_transient( 'xmlsf_flush_rewrite_rules', true );
 
 /**
  * Update from defaults.
@@ -150,30 +149,18 @@ function xmlsf_upgrade( $db_version ) {
 		add_option( 'xmlsf_robots', $robots, '', false );
 	}
 
-	if ( version_compare( '5.1', $db_version, '>' ) ) {
+	if ( version_compare( '5.4', $db_version, '>' ) ) {
 		// Delete old transients.
 		delete_transient( 'xmlsf_ping_google_sitemap_news' );
 		delete_transient( 'xmlsf_ping_google_sitemap' );
 		delete_transient( 'xmlsf_ping_bing_sitemap' );
-	}
-
-	if ( version_compare( '5.2', $db_version, '>' ) ) {
-		// Remove term meta term_modified_gmt.
-		delete_metadata( 'term', 0, 'term_modified_gmt', '', true );
-		// $wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified_gmt' ) );
-	}
-
-	if ( version_compare( '5.3', $db_version, '>' ) ) {
-		// Remove comments meta _xmlsf_comment_date.
-		delete_metadata( 'post', 0, '_xmlsf_comment_date', '', true );
-		// $wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_comment_date' ) );
-	}
-
-	if ( version_compare( '5.4', $db_version, '>' ) ) {
-		// Delete old transients.
 		delete_transient( 'xmlsf_flush_rewrite_rules' );
 		delete_transient( 'xmlsf_check_static_files' );
 		delete_transient( 'xmlsf_prefetch_post_meta_failed' );
+		// Remove term meta term_modified_gmt.
+		delete_metadata( 'term', 0, 'term_modified_gmt', '', true );
+		// Remove comments meta _xmlsf_comment_date.
+		delete_metadata( 'post', 0, '_xmlsf_comment_date', '', true );
 
 		$author_settings = (array) get_option( 'xmlsf_author_settings', array() );
 		$tax_settings    = (array) get_option( 'xmlsf_taxonomy_settings', array() );
@@ -200,7 +187,7 @@ function xmlsf_upgrade( $db_version ) {
 		update_option( 'xmlsf_taxonomy_settings', $tax_settings );
 		// Update users limit.
 		$author_settings['limit'] = isset( $author_settings['term_limit'] ) ? $author_settings['term_limit'] : '1000';
-		unset( $settings['term_limit'] );
+		unset( $author_settings['term_limit'] );
 		update_option( 'xmlsf_author_settings', $author_settings );
 
 		// Delete old settings.

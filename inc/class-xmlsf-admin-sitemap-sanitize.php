@@ -30,16 +30,13 @@ class XMLSF_Admin_Sitemap_Sanitize {
 
 		// When sitemap server has been changed...
 		if ( empty( $old['server'] ) || $old['server'] !== $sanitized['server'] ) {
-			// Force rewrite rules to be REGENERATED.
-			delete_option( 'rewrite_rules' );
-			// TODO test update_option hook with flush rewrite rules? Or find another method...
+			// Flush rewrite rules on next init.
+			set_transient( 'xmlsf_flush_rewrite_rules', true );
 		}
 
 		// When taxonomies have been disabled...
 		if ( in_array( 'taxonomies', $sanitized['disabled'], true ) && ! in_array( 'taxonomies', $old['disabled'], true ) ) {
 			xmlsf_clear_metacache( 'terms' );
-			// global $wpdb;
-			// $wpdb->delete( $wpdb->prefix . 'termmeta', array( 'meta_key' => 'term_modified' ) );.
 		}
 
 		// TODO Clear user meta cache if deactivating...
@@ -163,16 +160,11 @@ class XMLSF_Admin_Sitemap_Sanitize {
 		// Clear images meta caches...
 		if ( $clear_images ) {
 			xmlsf_clear_metacache( 'images' );
-			// $wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_attached' ) );
-			// $wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_image_featured' ) );
-			// update_option( 'xmlsf_images_meta_primed', array() );
 		}
 
 		// Clear comments meta caches...
 		if ( $clear_comments ) {
 			xmlsf_clear_metacache( 'comments' );
-			// $wpdb->delete( $wpdb->prefix . 'postmeta', array( 'meta_key' => '_xmlsf_comment_date_gmt' ) );
-			// update_option( 'xmlsf_comments_meta_primed', array() );
 		}
 
 		return $sanitized;

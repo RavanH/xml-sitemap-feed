@@ -27,7 +27,7 @@ class XMLSF_Admin_Sanitize {
 
 		if ( $old !== $save ) {
 			// When sitemaps are added or removed, make rewrite rules REGENERATE on next page load.
-			delete_option( 'rewrite_rules' );
+			set_transient( 'xmlsf_flush_rewrite_rules', true );
 
 			// Switched on news sitemap.
 			if ( ! empty( $save['sitemap-news'] ) && empty( $old['sitemap-news'] ) ) {

@@ -267,7 +267,7 @@ class XMLSF_Admin {
 
 		if ( isset( $_POST['xmlsf-flush-rewrite-rules'] ) ) {
 			// Flush rewrite rules.
-			flush_rewrite_rules();
+			flush_rewrite_rules( false );
 			add_settings_error(
 				'flush_admin_notice',
 				'flush_admin_notice',

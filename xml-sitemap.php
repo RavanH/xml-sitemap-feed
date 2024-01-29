@@ -3,7 +3,7 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.4-beta35
+ * Version: 5.4-beta39
  * Text Domain: xml-sitemap-feed
  * Requires at least: 5.5
  * Requires PHP: 5.6
@@ -13,7 +13,7 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.4-beta33' );
+define( 'XMLSF_VERSION', '5.4-beta39' );
 
 /**
  * Copyright 2024 RavanH
@@ -129,6 +129,15 @@ function xmlsf_init() {
 	if ( is_admin() ) {
 		xmlsf_admin();
 	}
+
+	// Flush rewrite rules?
+	if ( get_transient( 'xmlsf_flush_rewrite_rules' ) ) {
+		flush_rewrite_rules( false );
+		set_transient( 'xmlsf_flush_rewrite_rules', false );
+	} elseif ( false === get_transient( 'xmlsf_flush_rewrite_rules' ) ) {
+		// If no transient set, then set an empty one. This saves DB queries.
+		set_transient( 'xmlsf_flush_rewrite_rules', false );
+	}
 }
 
 /**
@@ -138,9 +147,8 @@ function xmlsf_init() {
  * @return void
  */
 function xmlsf_activate() {
-	// Remove rules so they will be REGENERATED either on the next page load (with old plugin settings) or on install/upgrade.
-	delete_option( 'rewrite_rules' );
-	// Nope.
+	// Flush rewrite rules on next init.
+	set_transient( 'xmlsf_flush_rewrite_rules', true );
 }
 
 /**
@@ -153,31 +161,11 @@ function xmlsf_deactivate() {
 	// Clear all cache metadata.
 	xmlsf_clear_metacache();
 
-	/*
-	// global $wpdb;
-	// Remove posts metadata.
-	$wpdb->delete( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->prefix . 'postmeta',
-		array( 'meta_key' => '_xmlsf_image_attached' ) // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-	);
-	$wpdb->delete( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->prefix . 'postmeta',
-		array( 'meta_key' => '_xmlsf_image_featured' ) // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-	);
-	$wpdb->delete( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->prefix . 'postmeta',
-		array( 'meta_key' => '_xmlsf_comment_date_gmt' ) // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-	);
-
-	// Remove terms metadata.
-	$wpdb->delete( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->prefix . 'termmeta',
-		array( 'meta_key' => 'term_modified' ) // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-	);
-	*/
-
-	// Remove rules so they can be REGENERATED on the next page load (without this plugin active).
-	delete_option( 'rewrite_rules' );
+	// Remove relevant hooks, then flush.
+	remove_filter( 'rewrite_rules_array', array( 'XMLSF_Sitemap_News', 'rewrite_rules' ), 99, 1 );
+	remove_filter( 'rewrite_rules_array', array( 'XMLSF_Sitemap_Plugin', 'rewrite_rules' ), 99, 1 );
+	remove_filter( 'wp_sitemaps_enabled', '__return_false' );
+	flush_rewrite_rules( false );
 }
 
 /**
