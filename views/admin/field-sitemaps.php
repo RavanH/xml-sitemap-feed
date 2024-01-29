@@ -32,13 +32,11 @@
 
 	<?php
 	if ( xmlsf_sitemaps_enabled( 'news' ) ) {
-		global $wp_rewrite;
-		$news_url = trailingslashit( get_bloginfo( 'url' ) ) . ( $wp_rewrite->using_permalinks() ? $this->settings['sitemap-news'] : '?feed=sitemap-news' );
 		?>
 	<span class="description">
 		&nbsp;&ndash;&nbsp;
-		<a href="<?php echo esc_attr( admin_url( 'options-general.php' ) ); ?>?page=xmlsf_news" id="xmlsf_news_link"><?php echo esc_html( translate( 'Settings' ) ); ?></a> |
-		<a href="<?php echo esc_attr( $news_url ); ?>" target="_blank"><?php echo esc_html( translate( 'View' ) ); ?></a>
+		<a href="<?php echo esc_url( admin_url( 'options-general.php' ) ); ?>?page=xmlsf_news" id="xmlsf_news_link"><?php echo esc_html( translate( 'Settings' ) ); ?></a> |
+		<a href="<?php echo esc_url( xmlsf_sitemap_url( 'news' ) ); ?>" target="_blank"><?php echo esc_html( translate( 'View' ) ); ?></a>
 	</span>
 	<?php } ?>
 
