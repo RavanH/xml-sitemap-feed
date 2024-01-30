@@ -2,15 +2,17 @@ ROADMAP
 
 = 5.4 =
 
+* move post types limit to post types admin page and settings
 * add disable post types
-* remove allowed domains check from news sitemap
-* rearrange sitemap settings tab fields
-* Rearrange sitemap help tabs (like news)
+* Add to sitemap help tabs:
+	- authors
+	- post types
+	- advanced
 * fix advanced options failing
 * add static files checks:
   - after plugin activation
   - on de/activation from settings reading
-
+* fix rewrite rules after deactivation
 * test conflicting plugins/themes messages
 * test without WP_DEBUG
 

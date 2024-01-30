@@ -14,9 +14,8 @@ class XMLSF_Admin_Sitemap_Fields {
 	 * Server field
 	 */
 	public static function server_field() {
-		$settings    = (array) get_option( 'xmlsf_general_settings' );
-		$defaults    = xmlsf()->defaults( 'general_settings' );
-		$server      = ! empty( $settings['server'] ) ? $settings['server'] : $defaults['server'];
+		$server      = get_option( 'xmlsf_server' );
+		$server      = ! in_array( $server, array( 'core', 'plugin' ) ) ? xmlsf()->defaults( 'server' ) : $server;
 		$nosimplexml = ! class_exists( 'SimpleXMLElement' );
 
 		// The actual fields for data entry.
@@ -26,7 +25,7 @@ class XMLSF_Admin_Sitemap_Fields {
 	/**
 	 * Include fields
 	 */
-	public static function include_fields() {
+	public static function disable_fields() {
 		/**
 		 * Filters the post types present in the author archive. Must return an array of one or multiple post types.
 		 * Allows to add or change post type when theme author archive page shows custom post types.
@@ -39,8 +38,7 @@ class XMLSF_Admin_Sitemap_Fields {
 		 */
 		$post_type_array = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
 
-		$settings   = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
-		$disabled   = ! empty( $settings['disabled'] ) ? (array) $settings['disabled'] : array();
+		$disabled   = (array) get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
 		$public_tax = xmlsf_public_taxonomies();
 		$users_args = array(
 			'fields'              => 'ID',
@@ -134,16 +132,6 @@ class XMLSF_Admin_Sitemap_Fields {
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-name.php';
-	}
-
-	/**
-	 * Domain settings field
-	 */
-	public static function domains_settings_field() {
-		$domains = (array) get_option( 'xmlsf_domains', array() );
-
-		// The actual fields for data entry.
-		include XMLSF_DIR . '/views/admin/field-sitemap-domains.php';
 	}
 
 	/**

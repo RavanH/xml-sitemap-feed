@@ -165,22 +165,17 @@ function xmlsf_upgrade( $db_version ) {
 		$author_settings = (array) get_option( 'xmlsf_author_settings', array() );
 		$tax_settings    = (array) get_option( 'xmlsf_taxonomy_settings', array() );
 		// Do not switch to core sitemap when upgrading.
-		$general_settings = array(
-			'server'   => 'plugin',
-			'disabled' => array(),
-		);
+		add_option( 'xmlsf_server', 'plugin' );
 		// Set include array.
+		$disabled = array();
 		if ( empty( $tax_settings['active'] ) ) {
-			$general_settings['disabled'][] = 'taxonomies';
+			$disabled[] = 'taxonomies';
 		}
 		if ( empty( $author_settings['active'] ) ) {
-			$general_settings['disabled'][] = 'authors';
+			$disabled[] = 'users';
 		}
 		// Add general settings option.
-		add_option(
-			'xmlsf_general_settings',
-			$general_settings
-		);
+		add_option( 'xmlsf_disabled_providers', ! empty( $disabled ) ? $disabled : '' );
 		// Update taxonomy terms limit.
 		$tax_settings['limit'] = isset( $tax_settings['term_limit'] ) ? $tax_settings['term_limit'] : '3000';
 		unset( $tax_settings['term_limit'] );
@@ -193,6 +188,7 @@ function xmlsf_upgrade( $db_version ) {
 		// Delete old settings.
 		delete_option( 'xmlsf_ping' );
 		delete_option( 'xmlsf_permalinks_flushed' );
+		delete_option( 'xmlsf_domains' );
 
 		// Remove deprecated transient.
 		delete_transient( 'xmlsf_static_files' );

@@ -64,13 +64,6 @@ class XMLSitemapFeed {
 	public $is_news = false;
 
 	/**
-	 * Allowed domain names
-	 *
-	 * @var null|array $domains
-	 */
-	private $domains = null;
-
-	/**
 	 * Site public scheme
 	 *
 	 * @var string $domain
@@ -155,17 +148,11 @@ class XMLSitemapFeed {
 			);
 
 			$this->defaults = array(
-				'sitemaps'          => $sitemaps,
-				'general_settings'  => array(
-					'server'  => class_exists( 'SimpleXMLElement' ) ? 'core' : 'plugin',
-					'include' => array(
-						'post_types',
-						'authors',
-					),
-					'limit'   => 2000,
-				),
-				'post_types'        => array(
-					'post' => array(
+				'sitemaps'           => $sitemaps,
+				'server'             => class_exists( 'SimpleXMLElement' ) ? 'core' : 'plugin',
+				'disabled_providers' => array(),
+				'post_types'         => array(
+					'post'  => array(
 						'active'           => '1',
 						'archive'          => 'yearly',
 						'priority'         => .7,
@@ -175,7 +162,7 @@ class XMLSitemapFeed {
 							/*'video' => ''*/
 						),
 					),
-					'page' => array(
+					'page'  => array(
 						'active'           => '1',
 						'priority'         => .5,
 						'dynamic_priority' => '',
@@ -184,23 +171,23 @@ class XMLSitemapFeed {
 							/*'video' => ''*/
 						),
 					),
+					'limit' => 2000,
 				),
-				'taxonomies'        => '',
-				'taxonomy_settings' => array(
+				'taxonomies'         => '',
+				'taxonomy_settings'  => array(
 					'priority'         => .3,
 					'dynamic_priority' => '',
 					'include_empty'    => '',
 					'limit'            => 2000,
 				),
-				'authors'           => '',
-				'author_settings'   => array(
+				'authors'            => '',
+				'author_settings'    => array(
 					'priority' => .3,
 					'limit'    => 2000,
 				),
-				'robots'            => '',
-				'urls'              => '',
-				'custom_sitemaps'   => '',
-				'domains'           => '',
+				'robots'             => '',
+				'urls'               => '',
+				'custom_sitemaps'    => '',
 			);
 
 		endif;
@@ -212,26 +199,6 @@ class XMLSitemapFeed {
 		}
 
 		return apply_filters( 'xmlsf_defaults', $return, $key );
-	}
-
-	/**
-	 * Get domain
-	 *
-	 * @return array
-	 */
-	public function get_allowed_domains() {
-		// Allowed domain.
-		if ( null === $this->domains ) {
-			$host          = wp_parse_url( home_url(), PHP_URL_HOST );
-			$this->domains = ( ! empty( $host ) ) ? (array) $host : array();
-			$domains       = get_option( 'xmlsf_domains' );
-
-			if ( ! empty( $domains ) ) {
-				$this->domains = array_merge( $this->domains, (array) $domains );
-			}
-		}
-
-		return $this->domains;
 	}
 
 	/**

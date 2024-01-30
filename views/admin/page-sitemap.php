@@ -21,12 +21,12 @@
 		<a class="nav-tab<?php echo 'general' === $active_tab ? ' nav-tab-active' : '" href="?page=xmlsf&tab=general'; ?>"><?php echo esc_html( translate( 'General' ) ); ?></a>
 		<a class="nav-tab<?php echo 'post_types' === $active_tab ? ' nav-tab-active' : '" href="?page=xmlsf&tab=post_types'; ?>"><?php esc_attr_e( 'Post types', 'xml-sitemap-feed' ); ?></a>
 		<?php
-		if ( empty( $settings['disabled'] ) || ! in_array( 'taxonomies', (array) $settings['disabled'], true ) ) {
+		if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) ) {
 			?>
 		<a class="nav-tab<?php echo 'taxonomies' === $active_tab ? ' nav-tab-active' : '" href="?page=xmlsf&tab=taxonomies'; ?>"><?php esc_attr_e( 'Taxonomies', 'xml-sitemap-feed' ); ?></a>
 			<?php
 		}
-		if ( empty( $settings['disabled'] ) || ! in_array( 'authors', (array) $settings['disabled'], true ) ) {
+		if ( empty( $disabled ) || ! in_array( 'users', (array) $disabled, true ) ) {
 			?>
 		<a class="nav-tab<?php echo 'authors' === $active_tab ? ' nav-tab-active' : '" href="?page=xmlsf&tab=authors'; ?>"><?php esc_attr_e( 'Authors', 'xml-sitemap-feed' ); ?></a>
 			<?php

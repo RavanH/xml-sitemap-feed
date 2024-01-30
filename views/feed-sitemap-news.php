@@ -25,7 +25,7 @@ if ( have_posts() ) :
 		$post = $wp_query->next_post(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$url  = apply_filters( 'xmlsf_news_entry_url', get_permalink(), $post );
 
-		// Use xmlsf_entry_url filter to return falsy value to exclude a specific URL.
+		// Use xmlsf_news_entry_url filter to return falsy value to exclude a specific URL.
 		if ( empty( $url ) ) {
 			continue;
 		}

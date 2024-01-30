@@ -35,9 +35,9 @@ function xmlsf_get_post_types() {
  * @return array
  */
 function xmlsf_get_taxonomies() {
-	$settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
+	$disabled = get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
 
-	if ( ! empty( $settings['disabled'] ) && in_array( 'taxonomies', (array) $settings['disabled'], true ) ) {
+	if ( ! empty( $disabled ) && in_array( 'taxonomies', (array) $disabled, true ) ) {
 		return array();
 	}
 

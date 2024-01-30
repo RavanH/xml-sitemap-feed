@@ -65,7 +65,8 @@ function xmlsf_uninstall() {
 	// Remove plugin settings.
 	delete_option( 'xmlsf_version' );
 	delete_option( 'xmlsf_sitemaps' );
-	delete_option( 'xmlsf_general_settings' );
+	delete_option( 'xmlsf_server' );
+	delete_option( 'xmlsf_disabled_providers' );
 	delete_option( 'xmlsf_post_types' );
 	delete_option( 'xmlsf_taxonomies' );
 	delete_option( 'xmlsf_taxonomy_settings' );

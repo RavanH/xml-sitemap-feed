@@ -494,17 +494,11 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 * @return false|obj Provider or false if disabled.
 	 */
 	public function add_provider( $provider, $name ) {
-		$settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
-		if ( empty( $settings['disabled'] ) ) {
-			return $provider;
-		}
-		// Verify author sitemap settings.
-		if ( 'users' === $name ) {
-			return ! empty( $settings['disabled'] ) && in_array( 'authors', (array) $settings['disabled'], true ) ? false : $provider;
-		}
-		// Verify taxonomy sitemaps settings.
-		if ( 'taxonomies' === $name ) {
-			return ! empty( $settings['disabled'] ) && in_array( 'taxonomies', (array) $settings['disabled'], true ) ? false : $provider;
+		$disabled = get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
+
+		// Match disabled settings.
+		if ( ! empty( $disabled ) && in_array( $name, (array) $disabled, true ) ) {
+			return false;
 		}
 
 		return $provider;

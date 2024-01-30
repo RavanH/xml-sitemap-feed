@@ -16,25 +16,27 @@ echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charse
 <?php
 do_action( 'xmlsf_sitemap_index' );
 
-$general_settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
+$disabled = get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
 
 // Public post types.
-$post_types = xmlsf_get_post_types();
-foreach ( $post_types as $the_post_type => $settings ) :
-	$archive      = isset( $settings['archive'] ) ? $settings['archive'] : '';
-	$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $the_post_type, $archive );
+if ( empty( $disabled ) || ! in_array( 'post_ypes', (array) $disabled, true ) ) {
+	$post_types = xmlsf_get_post_types();
+	foreach ( $post_types as $the_post_type => $settings ) :
+		$archive      = isset( $settings['archive'] ) ? $settings['archive'] : '';
+		$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $the_post_type, $archive );
 
-	foreach ( $archive_data as $url => $lastmod ) {
-		echo '<sitemap><loc>' . esc_url( $url ) . '</loc>';
-		if ( $lastmod ) {
-			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+		foreach ( $archive_data as $url => $lastmod ) {
+			echo '<sitemap><loc>' . esc_url( $url ) . '</loc>';
+			if ( $lastmod ) {
+				echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+			}
+			echo '</sitemap>' . PHP_EOL;
 		}
-		echo '</sitemap>' . PHP_EOL;
-	}
-endforeach;
+	endforeach;
+}
 
 // Public taxonomies.
-if ( empty( $general_settings['disabled'] ) || ! in_array( 'taxonomies', (array) $general_settings['disabled'], true ) ) {
+if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) ) {
 	$taxonomies = xmlsf_get_taxonomies();
 	foreach ( $taxonomies as $the_taxonomy ) :
 		$url     = xmlsf_sitemap_url( 'taxonomy', array( 'type' => $the_taxonomy ) );
@@ -48,7 +50,7 @@ if ( empty( $general_settings['disabled'] ) || ! in_array( 'taxonomies', (array)
 }
 
 // Authors.
-if ( empty( $general_settings['disabled'] ) || ! in_array( 'authors', (array) $general_settings['disabled'], true ) ) {
+if ( empty( $disabled ) || ! in_array( 'users', (array) $disabled, true ) ) {
 	echo '<sitemap><loc>' . esc_xml( xmlsf_sitemap_url( 'author' ) ) . '</loc><lastmod>' . esc_xml( get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ) ) . '</lastmod></sitemap>' . PHP_EOL;
 }
 

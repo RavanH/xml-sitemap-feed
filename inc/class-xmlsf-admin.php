@@ -17,6 +17,7 @@ class XMLSF_Admin {
 		if ( xmlsf_sitemaps_enabled( 'sitemap' ) ) {
 			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap-sanitize.php';
 			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap.php';
+			new XMLSF_Admin_Sitemap();
 			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap-fields.php';
 		}
 

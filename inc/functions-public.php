@@ -30,33 +30,6 @@ function xmlsf_headers( $headers ) {
 add_filter( 'wp_headers', 'xmlsf_headers' );
 
 /**
- * Is allowed domain
- *
- * Check if we are not dealing with an external URL :: Thanks to Francois Deschenes :).
- *
- * @param string $url URL.
- *
- * @return mixed Return false to exclude entry. Else return URL.
- */
-function xmlsf_is_allowed_domain( $url ) {
-
-	$domains = xmlsf()->get_allowed_domains();
-	$host    = wp_parse_url( $url, PHP_URL_HOST );
-
-	if ( ! empty( $host ) ) {
-		foreach ( $domains as $domain ) {
-			if ( $host === $domain || strpos( $host, '.' . $domain ) !== false ) {
-				return $url;
-			}
-		}
-	}
-
-	return false;
-}
-
-add_filter( 'xmlsf_entry_url', 'xmlsf_is_allowed_domain' );
-
-/**
  * Load feed template
  *
  * Hooked into do_feed_{sitemap...}. First checks for a child/parent theme template file, then falls back to plugin template

@@ -139,7 +139,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 		$request = apply_filters( 'xmlsf_request', $request );
 
 		$feed     = explode( '-', $request['feed'], 3 );
-		$settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
+		$disabled = get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
 
 		switch ( isset( $feed[1] ) ? $feed[1] : '' ) {
 
@@ -187,7 +187,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 				break;
 
 			case 'taxonomy':
-				if ( ! isset( $feed[2] ) || in_array( 'taxonomies', (array) $settings['disabled'] ) ) {
+				if ( ! isset( $feed[2] ) || ( ! empty( $disabled ) && in_array( 'taxonomies', (array) $disabled ) ) ) {
 					return $request;
 				}
 
@@ -205,7 +205,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 				break;
 
 			case 'author':
-				if ( in_array( 'authors', (array) $settings['disabled'] ) ) {
+				if ( ! empty( $disabled ) && in_array( 'users', (array) $disabled, true ) ) {
 					return $request;
 				}
 

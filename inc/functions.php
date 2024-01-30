@@ -159,6 +159,6 @@ function xmlsf_uses_core_server() {
 	}
 
 	// Check settings.
-	$settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
-	return ! empty( $settings['server'] ) && 'core' === $settings['server'];
+	$server = get_option( 'xmlsf_server', xmlsf()->defaults( 'server' ) );
+	return ! empty( $server ) && 'core' === $server;
 }

@@ -11,37 +11,29 @@
 class XMLSF_Admin_Sitemap_Sanitize {
 
 	/**
-	 * Sanitize general settings
+	 * Sanitize server setting
 	 *
-	 * @param array $save Settings array.
+	 * @param string $save Setting.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	public static function general_settings( $save ) {
-		$defaults = xmlsf()->defaults( 'general_settings' );
-		$save     = (array) $save;
-		$old      = (array) get_option( 'xmlsf_general_settings' );
-
-		// Sanitize server setting.
-		$sanitized['server'] = isset( $save['server'] ) && in_array( $save['server'], array( 'core', 'plugin' ), true ) ? $save['server'] : $defaults['server'];
-
-		// Sanitize includes.
-		$sanitized['disabled'] = isset( $save['disabled'] ) && is_array( $save['disabled'] ) ? $save['disabled'] : array();
-
-		// When sitemap server has been changed...
-		if ( empty( $old['server'] ) || $old['server'] !== $sanitized['server'] ) {
-			// Flush rewrite rules on next init.
-			set_transient( 'xmlsf_flush_rewrite_rules', true );
-		}
-
-		// When taxonomies have been disabled...
-		if ( in_array( 'taxonomies', $sanitized['disabled'], true ) && ! in_array( 'taxonomies', $old['disabled'], true ) ) {
-			xmlsf_clear_metacache( 'terms' );
-		}
-
-		// TODO Clear user meta cache if deactivating...
+	public static function server( $save ) {
+		$sanitized = empty( $save ) || ! in_array( $save, array( 'core', 'plugin' ), true ) ? xmlsf()->defaults( 'server' ) : $save;
 
 		return $sanitized;
+	}
+
+	/**
+	 * Sanitize server setting
+	 *
+	 * @param mixed $save Settings array or empty value.
+	 *
+	 * @return mixed
+	 */
+	public static function disabled( $save ) {
+		// Nothing to do really...
+
+		return $save;
 	}
 
 	/**
@@ -124,10 +116,6 @@ class XMLSF_Admin_Sitemap_Sanitize {
 		setlocale( LC_NUMERIC, 'C' );
 		$sanitized = is_array( $save ) ? $save : array();
 
-		$old            = (array) get_option( 'xmlsf_post_types', array() );
-		$clear_images   = false;
-		$clear_comments = false;
-
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && is_numeric( $save['limit'] ) ) {
 			$sanitized['limit'] = xmlsf_sanitize_number( $save['limit'], 1, 50000, false );
@@ -135,36 +123,6 @@ class XMLSF_Admin_Sitemap_Sanitize {
 
 		foreach ( $sanitized as $post_type => $settings ) {
 			$sanitized[ $post_type ]['priority'] = is_numeric( $settings['priority'] ) ? xmlsf_sanitize_number( str_replace( ',', '.', $settings['priority'] ), .1, .9 ) : '0.5';
-
-			// Poll for changes that warrant clearing meta data.
-			if ( isset( $old[ $post_type ] ) && is_array( $old[ $post_type ] ) ) {
-
-				if ( empty( $settings['active'] ) ) {
-					if ( ! empty( $old[ $post_type ]['active'] ) ) {
-						$clear_images   = true;
-						$clear_comments = true;
-					}
-				} else {
-					if ( isset( $old[ $post_type ]['tags'] ) && is_array( $old[ $post_type ]['tags'] ) && isset( $old[ $post_type ]['tags']['image'] ) && $old[ $post_type ]['tags']['image'] !== $settings['tags']['image'] ) {
-						$clear_images = true;
-					}
-					if ( ! empty( $old[ $post_type ]['update_lastmod_on_comments'] ) && empty( $settings['update_lastmod_on_comments'] ) ) {
-						$clear_comments = true;
-					}
-				}
-			}
-		}
-
-		global $wpdb;
-
-		// Clear images meta caches...
-		if ( $clear_images ) {
-			xmlsf_clear_metacache( 'images' );
-		}
-
-		// Clear comments meta caches...
-		if ( $clear_comments ) {
-			xmlsf_clear_metacache( 'comments' );
 		}
 
 		return $sanitized;
@@ -230,66 +188,5 @@ class XMLSF_Admin_Sitemap_Sanitize {
 		}
 
 		return ! empty( $sanitized ) ? $sanitized : '';
-	}
-
-	/**
-	 * Sanitize domain settings
-	 *
-	 * @param array $save Settings array.
-	 *
-	 * @return array
-	 */
-	public static function domains_settings( $save ) {
-		$default = wp_parse_url( home_url(), PHP_URL_HOST );
-		$save    = sanitize_textarea_field( $save );
-		$input   = $save ? explode( PHP_EOL, wp_strip_all_tags( $save ) ) : array();
-
-		// Build sanitized output.
-		$sanitized = array();
-		foreach ( $input as $line ) {
-			$line = trim( $line );
-
-			// Skip if empty line.
-			if ( empty( $line ) ) {
-				continue;
-			}
-
-			// Prevent parse_url misdiagnosing a domain without protocol as a path.
-			$domain = strpos( $line, '://' ) === false && substr( $line, 0, 1 ) !== '/' ? '//' . $line : $line;
-
-			// Parse url.
-			$domain = wp_parse_url( filter_var( $domain, FILTER_SANITIZE_URL ), PHP_URL_HOST );
-
-			// Empty result. Skip.
-			if ( empty( $domain ) ) {
-				$line = strlen( $line ) > 13 ? substr( $line, 0, 10 ) . '&hellip;' : $line;
-				add_settings_error(
-					'invalid_domain_notice',
-					'invalid_domain',
-					sprintf( /* translators: %s the first 13 characters of an entry. */
-						esc_html__( 'The line "%s" did not appear to contain a valid domain.', 'xml-sitemap-feed' ),
-						esc_html( $line )
-					),
-					'warning'
-				);
-				continue;
-			}
-			// Default (sub-)domain.
-			if ( $domain === $default || strpos( $domain, '.' . $default ) !== false ) {
-				add_settings_error(
-					'invalid_domain_notice',
-					'invalid_domain',
-					sprintf( /* translators: %s the first 13 characters of an entry. */
-						esc_html__( 'The domain "%s" is already an allowed domain.', 'xml-sitemap-feed' ),
-						esc_html( $line )
-					),
-					'warning'
-				);
-				continue;
-			}
-			$sanitized[] = $domain;
-		}
-
-		return ( ! empty( $sanitized ) ) ? $sanitized : '';
 	}
 }

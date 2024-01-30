@@ -444,10 +444,10 @@ function xmlsf_get_term_priority( $term ) {
 	if ( ! empty( $options['dynamic_priority'] ) && $priority > 0.1 ) {
 		// set first and highest term post count as maximum.
 		if ( null === xmlsf()->taxonomy_termmaxposts ) {
-			xmlsf()->taxonomy_termmaxposts = $term->count;
+			xmlsf()->taxonomy_termmaxposts = $term->count + 1;
 		}
 
-		$priority -= ( xmlsf()->taxonomy_termmaxposts - $term->count ) * ( $priority - 0.1 ) / xmlsf()->taxonomy_termmaxposts;
+		$priority -= ( xmlsf()->taxonomy_termmaxposts - $term->count ) * ( $priority - 0.1 ) / (int) xmlsf()->taxonomy_termmaxposts;
 	}
 
 	$priority = apply_filters( 'xmlsf_term_priority', $priority, $term->slug );

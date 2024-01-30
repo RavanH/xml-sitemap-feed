@@ -6,19 +6,19 @@
  */
 
 ?>
-<fieldset id="xmlsf_sitemap_general_settings_server">
+<fieldset id="xmlsf_sitemap_server">
 	<legend class="screen-reader-text">
 		<?php echo esc_html( translate( 'Server' ) ); ?>
 	</legend>
 
 	<p>
 		<label>
-			<input type="radio" name="xmlsf_general_settings[server]" value="core"<?php disabled( $nosimplexml, true ); ?><?php checked( 'core' === $server && ! $nosimplexml, true ); ?> />
+			<input type="radio" name="xmlsf_server" value="core"<?php disabled( $nosimplexml, true ); ?><?php checked( 'core' === $server && ! $nosimplexml, true ); ?> />
 			<?php echo esc_html( translate( 'WordPress' ) ); ?>
 		</label>
 		<br>
 		<label>
-			<input type="radio" name="xmlsf_general_settings[server]" value="plugin"<?php checked( 'core' !== $server || $nosimplexml, true ); ?> />
+			<input type="radio" name="xmlsf_server" value="plugin"<?php checked( 'plugin' === $server || $nosimplexml, true ); ?> />
 			<?php echo esc_html( translate( 'Plugin' ) ); ?>
 		</label>
 	</p>
