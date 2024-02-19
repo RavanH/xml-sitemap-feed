@@ -11,7 +11,7 @@
 		<?php esc_html_e( 'Enable XML sitemaps', 'xml-sitemap-feed' ); ?>
 	</legend>
 	<label>
-		<input type="checkbox" name="xmlsf_sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="sitemap.xml"<?php checked( xmlsf_sitemaps_enabled( 'sitemap' ) ); ?><?php disabled( ! apply_filters( 'xmlsf_sitemaps_enabled', true, 'sitemap' ) ); ?> />
+		<input type="checkbox" name="xmlsf_sitemaps[sitemap]" id="xmlsf_sitemaps_index" value="1"<?php checked( xmlsf_sitemaps_enabled( 'sitemap' ) ); ?><?php disabled( ! apply_filters( 'xmlsf_sitemaps_enabled', true, 'sitemap' ) ); ?> />
 		<?php esc_html_e( 'XML Sitemap Index', 'xml-sitemap-feed' ); ?>
 	</label>
 
@@ -26,7 +26,7 @@
 	<br>
 
 	<label>
-		<input type="checkbox" name="xmlsf_sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="sitemap-news.xml"<?php checked( xmlsf_sitemaps_enabled( 'news' ) ); ?><?php disabled( ! apply_filters( 'xmlsf_sitemaps_enabled', true, 'news' ) ); ?> />
+		<input type="checkbox" name="xmlsf_sitemaps[sitemap-news]" id="xmlsf_sitemaps_news" value="1"<?php checked( xmlsf_sitemaps_enabled( 'news' ) ); ?><?php disabled( ! apply_filters( 'xmlsf_sitemaps_enabled', true, 'news' ) ); ?> />
 		<?php esc_html_e( 'Google News Sitemap', 'xml-sitemap-feed' ); ?>
 	</label>
 

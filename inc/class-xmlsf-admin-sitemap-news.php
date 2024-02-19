@@ -21,7 +21,7 @@ class XMLSF_Admin_Sitemap_News {
 	 *
 	 * @var float
 	 */
-	public static $compat_pro_min = '1.3.6';
+	public static $compat_pro_min = '1.3.5';
 
 	/**
 	 * Start up.
@@ -36,7 +36,6 @@ class XMLSF_Admin_Sitemap_News {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		// Settings hooks.
 		add_action( 'xmlsf_news_add_settings', array( $this, 'add_settings' ) );
-		add_action( 'xmlsf_news_settings_before', array( $this, 'add_settings' ) );
 
 		// ACTIONS & CHECKS.
 		add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
@@ -110,9 +109,9 @@ class XMLSF_Admin_Sitemap_News {
 	 */
 	public function compatible_with_advanced() {
 		// Check version.
-		defined( 'XMLSF_NEWS_ADV_VERSION' ) || define( 'XMLSF_NEWS_ADV_VERSION', false );
+		defined( 'XMLSF_NEWS_ADV_VERSION' ) || define( 'XMLSF_NEWS_ADV_VERSION', self::$compat_pro_min );
 
-		return false !== XMLSF_NEWS_ADV_VERSION && version_compare( self::$compat_pro_min, XMLSF_NEWS_ADV_VERSION, '<' );
+		return version_compare( self::$compat_pro_min, XMLSF_NEWS_ADV_VERSION, '<=' );
 	}
 
 	/**

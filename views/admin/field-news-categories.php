@@ -13,7 +13,7 @@
 	<p>
 		<?php esc_html_e( 'Limit to posts in these post categories:', 'xml-sitemap-feed' ); ?>
 	</p>
-	<style>ul.children{padding-left:1em}</style>
+	<style>ul.cat-checklist{height:auto;max-height:48em}ul.children{padding-left:1em}</style>
 	<ul class="cat-checklist">
 		<?php echo $cat_list; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</ul>

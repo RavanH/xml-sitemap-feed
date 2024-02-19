@@ -2,27 +2,20 @@ ROADMAP
 
 = 5.4 =
 
-* move post types limit to post types admin page and settings
-* add disable post types
-* Add to sitemap help tabs:
-	- authors
-	- post types
-	- advanced
-* fix advanced options failing
-* add static files checks:
-  - after plugin activation
-  - on de/activation from settings reading
-* fix rewrite rules after deactivation
+* clear user meta cache button
+
 * test conflicting plugins/themes messages
 * test without WP_DEBUG
-
-TODO author sitemap lastmod === last publication date
-TODO add help link to https://news.google.com/search?q=site:site.dom+when:2d to verify results
+* test without permalink structure
 
 Verify and remove unused:
 *
 
 TODO LIST
+
+* author sitemap lastmod (in index) = last publication date >>> latest user modified meta...
+
+* Automatic priority calculation for authors?
 
 * prepare compatibility routine for additional premium modules
 * add inline comment blocks for hooks

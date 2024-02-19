@@ -98,23 +98,28 @@ function xmlsf_get_user_modified( $user ) {
 	}
 
 	if ( null === $lastmod ) {
+		$post_types = get_post_types( array( 'public' => true ) );
+		// We're not supporting sitemaps for author pages for attachments and pages.
+		unset( $post_types['attachment'] );
+		unset( $post_types['page'] );
+
 		/**
-		 * Filters the post types present in the author archive. Must return an array of one or multiple post types.
+		 * Filters the has_published_posts query argument in the author archive. Must return a boolean or an array of one or multiple post types.
 		 * Allows to add or change post type when theme author archive page shows custom post types.
 		 *
-		 * @since 0.1
+		 * @since 5.4
 		 *
 		 * @param array Array with post type slugs. Default array( 'post' ).
 		 *
-		 * @return array
+		 * @return mixed
 		 */
-		$post_type_array = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
+		$post_types = apply_filters( 'xmlsf_author_has_published_posts', $post_types );
 
 		// Get lastmod from last publication date.
 		$posts   = get_posts(
 			array(
 				'author'                 => $user->ID,
-				'post_type'              => $post_type_array,
+				'post_type'              => $post_types,
 				'post_status'            => 'publish',
 				'posts_per_page'         => 1,
 				'numberposts'            => 1,

@@ -13,10 +13,11 @@
 	<p>
 		<?php esc_html_e( 'Limit to these taxonomies:', 'xml-sitemap-feed' ); ?>
 	</p>
-		<?php if ( ! empty( $public_tax ) ) { ?>
+	<style>ul.cat-checklist{height:auto;max-height:48em}ul.children{padding-left:1em}</style>
 	<ul class="cat-checklist">
 			<?php
-			foreach ( $public_tax as $name => $label ) {
+			foreach ( $public_tax as $name ) {
+				$label = get_taxonomy( $name )->label;
 				?>
 		<li>
 			<label>
@@ -26,9 +27,4 @@
 		</li>
 		<?php } ?>
 	</ul>
-	<?php } else { ?>
-	<p class="description warning" style="color: red;">
-			<?php esc_html_e( 'No taxonomies available for the currently included post types.', 'xml-sitemap-feed' ); ?>
-	</p>
-	<?php } ?>
 </fieldset>

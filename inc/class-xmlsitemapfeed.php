@@ -188,6 +188,7 @@ class XMLSitemapFeed {
 				'robots'             => '',
 				'urls'               => '',
 				'custom_sitemaps'    => '',
+				'news_tags'          => $this->default_news_tags,
 			);
 
 		endif;

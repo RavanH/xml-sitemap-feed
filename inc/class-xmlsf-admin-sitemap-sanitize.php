@@ -75,6 +75,19 @@ class XMLSF_Admin_Sitemap_Sanitize {
 	}
 
 	/**
+	 * Sanitize authors
+	 *
+	 * @param array $save Settings array.
+	 *
+	 * @return array
+	 */
+	public static function authors( $save ) {
+		// Nothing to do really...
+
+		return $save;
+	}
+
+	/**
 	 * Sanitize author settings
 	 *
 	 * Clears the term_modified data from the database when settings have changed.

@@ -37,17 +37,48 @@ class XMLSF_Admin {
 		add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
 		add_action( 'admin_init', array( $this, 'notices_actions' ), 9 );
 		add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
+		add_action( 'update_option_xmlsf_sitemaps', array( $this, 'update_sitemaps' ), 10, 2 );
 
 		// Shared Admin pages sidebar actions.
 		add_action( 'xmlsf_admin_sidebar', array( $this, 'admin_sidebar_help' ) );
 		add_action( 'xmlsf_admin_sidebar', array( $this, 'admin_sidebar_contribute' ), 20 );
-
-		require XMLSF_DIR . '/inc/class-xmlsf-admin-sanitize.php';
 	}
 
 	/**
 	 * SETTINGS
 	 */
+
+	/**
+	 * Update actions for Sitemaps
+	 *
+	 * @param mixed $old   Old option value.
+	 * @param mixed $value Saved option value.
+	 */
+	public function update_sitemaps( $old, $value ) {
+		global $xmlsf_sitemap;
+		$old   = (array) $old;
+		$value = (array) $value;
+
+		if ( $old !== $value ) {
+			$files = array();
+
+			// Switched on sitemap.
+			if ( ! empty( $value['sitemap'] ) && empty( $old['sitemap'] ) ) {
+				$files[] = is_object( $xmlsf_sitemap ) ? $xmlsf_sitemap->index() : apply_filters( 'xmlsf_sitemap_filename', 'sitemap.xml' );
+			}
+
+			// Switched on news sitemap.
+			if ( ! empty( $value['sitemap-news'] ) && empty( $old['sitemap-news'] ) ) {
+				$files[] = apply_filters( 'xmlsf_sitemap_news_filename', 'sitemap-news.xml' );
+			}
+
+			// Check static files.
+			empty( $files ) || xmlsf_admin()->check_static_files( $files, 1 );
+
+			// Flush rewrite rules on next init.
+			set_transient( 'xmlsf_flush_rewrite_rules', true );
+		}
+	}
 
 	/**
 	 * Register settings and add settings fields
@@ -57,8 +88,7 @@ class XMLSF_Admin {
 		// Sitemaps.
 		register_setting(
 			'reading',
-			'xmlsf_sitemaps',
-			array( 'XMLSF_Admin_Sanitize', 'sitemaps_settings' )
+			'xmlsf_sitemaps'
 		);
 		add_settings_field(
 			'xmlsf_sitemaps',
@@ -174,7 +204,6 @@ class XMLSF_Admin {
 	 * @return array Found static files.
 	 */
 	public function check_static_files( $files, $verbosity = 2 ) {
-
 		$home_path = trailingslashit( get_home_path() );
 		$found     = array();
 
@@ -194,7 +223,7 @@ class XMLSF_Admin {
 			}
 		}
 
-		// Tell me all is OK.
+		// Tell me if all is OK.
 		$verbosity > 1 && empty( $found ) && add_settings_error(
 			'static_files_notice',
 			'static_files',
@@ -261,7 +290,7 @@ class XMLSF_Admin {
 			return;
 		}
 
-		// TODO
+		// TODO clear global settings.
 		if ( isset( $_POST['xmlsf-clear-settings-general'] ) ) {
 			$this->clear_settings();
 		}

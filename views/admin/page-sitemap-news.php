@@ -43,7 +43,7 @@
 
 		<?php
 		if ( ! $this->compatible_with_advanced() ) {
-			$class = 'update-nag';
+			$class = 'notice notice-error notice-alt';
 			include XMLSF_DIR . '/views/admin/section-advanced-compat-message.php';
 		}
 		?>

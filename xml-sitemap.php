@@ -3,7 +3,7 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.4-beta41
+ * Version: 5.4-beta47
  * Text Domain: xml-sitemap-feed
  * Requires at least: 5.5
  * Requires PHP: 5.6
@@ -13,7 +13,7 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.4-beta41' );
+define( 'XMLSF_VERSION', '5.4-beta47' );
 
 /**
  * Copyright 2024 RavanH
@@ -101,13 +101,13 @@ function xmlsf_init() {
 			if ( xmlsf_uses_core_server() ) {
 				// Extend core sitemap.
 				require XMLSF_DIR . '/inc/class-xmlsf-sitemap-core.php';
-				$xmlsf_sitemap = new XMLSF_Sitemap_Core( 'wp-sitemap.xml' );
+				$xmlsf_sitemap = new XMLSF_Sitemap_Core();
 			} else {
 				// Replace core sitemap.
 				remove_action( 'init', 'wp_sitemaps_get_server' );
 
 				require XMLSF_DIR . '/inc/class-xmlsf-sitemap-plugin.php';
-				$xmlsf_sitemap = new XMLSF_Sitemap_Plugin( $sitemaps['sitemap'] );
+				$xmlsf_sitemap = new XMLSF_Sitemap_Plugin();
 			}
 		} else {
 			// Disable core sitemap.
@@ -116,8 +116,9 @@ function xmlsf_init() {
 
 		// Google News sitemap.
 		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
+			global $xmlsf_sitemap_news;
 			require XMLSF_DIR . '/inc/class-xmlsf-sitemap-news.php';
-			new XMLSF_Sitemap_News( $sitemaps['sitemap-news'] );
+			$xmlsf_sitemap_news = new XMLSF_Sitemap_News();
 		}
 
 		// Include and instantiate main class.
@@ -162,11 +163,13 @@ function xmlsf_deactivate() {
 	xmlsf_clear_metacache();
 
 	// Remove relevant hooks, then flush.
-	remove_filter( 'rewrite_rules_array', array( 'XMLSF_Sitemap_News', 'rewrite_rules' ), 99, 1 );
-	remove_filter( 'rewrite_rules_array', array( 'XMLSF_Sitemap_Plugin', 'rewrite_rules' ), 99, 1 );
-	remove_filter( 'wp_sitemaps_enabled', '__return_false' );
+	global $xmlsf_sitemap, $xmlsf_sitemap_news;
+	remove_filter( 'rewrite_rules_array', array( $xmlsf_sitemap, 'rewrite_rules' ), 99 );
+	remove_filter( 'rewrite_rules_array', array( $xmlsf_sitemap_news, 'rewrite_rules' ), 99 );
+	// Re-add the default server rules, if needed.
+	wp_sitemaps_get_server();
+
 	flush_rewrite_rules( false );
-	// TODO fix this...
 }
 
 /**

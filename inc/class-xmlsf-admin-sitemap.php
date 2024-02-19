@@ -46,15 +46,15 @@ class XMLSF_Admin_Sitemap {
 	public function update_server( $old, $value ) {
 
 		if ( $old !== $value ) {
-			if ( 'core' === $value ) {
-				xmlsf_admin()->check_static_files( 'wp-sitemap.xml', 1 );
-			} else {
-				xmlsf_admin()->check_static_files( 'sitemap.xml', 1 );
-			}
+			global $xmlsf_sitemap;
+
+			// Check static file.
+			$filename = is_object( $xmlsf_sitemap ) ? $xmlsf_sitemap->index() : apply_filters( 'xmlsf_sitemap_filename', ( 'core' === $value ) ? 'wp-sitemap.xml' : 'sitemap.xml' );
+			xmlsf_admin()->check_static_files( $filename, 1 );
+
 			// Flush rewrite rules on next init.
 			set_transient( 'xmlsf_flush_rewrite_rules', true );
 		}
-
 	}
 
 	/**
@@ -145,10 +145,9 @@ class XMLSF_Admin_Sitemap {
 			delete_user_meta( get_current_user_id(), 'xmlsf_dismissed' );
 
 			// When core sitemap server is used.
-			if ( xmlsf_uses_core_server() ) {
-				xmlsf_admin()->check_static_files( 'wp-sitemap.xml' );
-			} else {
-				xmlsf_admin()->check_static_files( 'sitemap.xml' );
+			global $xmlsf_sitemap;
+			if ( is_object( $xmlsf_sitemap ) ) {
+				xmlsf_admin()->check_static_files( $xmlsf_sitemap->index() );
 			}
 		}
 
@@ -170,6 +169,18 @@ class XMLSF_Admin_Sitemap {
 				'clear_meta_notice',
 				'clear_meta_notice',
 				__( 'Sitemap term meta cache has been cleared.', 'xml-sitemap-feed' ),
+				'success'
+			);
+		}
+
+		if ( isset( $_POST['xmlsf-clear-user-meta'] ) ) {
+			// Remove terms metadata.
+			xmlsf_clear_metacache( 'users' );
+
+			add_settings_error(
+				'clear_meta_notice',
+				'clear_meta_notice',
+				__( 'Sitemap author meta cache has been cleared.', 'xml-sitemap-feed' ),
 				'success'
 			);
 		}
@@ -466,7 +477,7 @@ class XMLSF_Admin_Sitemap {
 		// Sections.
 		add_settings_section(
 			'general', // Section ID.
-			translate( 'General Settings' ), // Title.
+			'', // Title.
 			'', // Intro callback.
 			'xmlsf_general' // Page slug.
 		);
@@ -496,7 +507,7 @@ class XMLSF_Admin_Sitemap {
 
 		xmlsf_uses_core_server() && add_settings_field(
 			'xmlsf_sitemap_post_types_limit',
-			translate( 'General Settings' ),
+			translate( 'General' ),
 			array( 'XMLSF_Admin_Sitemap_Fields', 'post_types_general_fields' ),
 			'xmlsf_post_types',
 			'xml_sitemap_post_types_section'
@@ -534,7 +545,7 @@ class XMLSF_Admin_Sitemap {
 		);
 		add_settings_field(
 			'xmlsf_taxonomy_settings',
-			translate( 'General Settings' ),
+			translate( 'General' ),
 			array( 'XMLSF_Admin_Sitemap_Fields', 'taxonomy_settings_field' ),
 			'xmlsf_taxonomies',
 			'xml_sitemap_taxonomies_section'
@@ -556,8 +567,15 @@ class XMLSF_Admin_Sitemap {
 		);
 		add_settings_field(
 			'xmlsf_author_settings',
-			translate( 'General Settings' ),
+			translate( 'General' ),
 			array( 'XMLSF_Admin_Sitemap_Fields', 'author_settings_field' ),
+			'xmlsf_authors',
+			'xml_sitemap_authors_section'
+		);
+		add_settings_field(
+			'xmlsf_authors',
+			__( 'Authors', 'xml-sitemap-feed' ),
+			array( 'XMLSF_Admin_Sitemap_Fields', 'authors_field' ),
 			'xmlsf_authors',
 			'xml_sitemap_authors_section'
 		);
@@ -613,13 +631,6 @@ class XMLSF_Admin_Sitemap {
 			},
 			9
 		);
-		add_action(
-			'xmlsf_admin_sidebar',
-			function () {
-				include XMLSF_DIR . '/views/admin/help-tab-sidebar.php';
-			},
-			11
-		);
 
 		$disabled = get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
 
@@ -668,6 +679,11 @@ class XMLSF_Admin_Sitemap {
 			'xmlsf_author_settings',
 			array( 'XMLSF_Admin_Sitemap_Sanitize', 'author_settings' )
 		);
+		register_setting(
+			'xmlsf_authors',
+			'xmlsf_authors',
+			array( 'XMLSF_Admin_Sitemap_Sanitize', 'authors' )
+		);
 		// custom urls.
 		register_setting(
 			'xmlsf_advanced',
@@ -711,7 +727,7 @@ class XMLSF_Admin_Sitemap {
 				// Server.
 				$content  = '<p>' . esc_html__( 'Select your XML Sitemap generator here.', 'xml-sitemap-feed' ) . '</p>';
 				$content .= '<p><strong>' . esc_html( translate( 'WordPress' ) ) . '</strong></p>';
-				$content .= '<p>' . esc_html__( 'The default sitemap server is light-weight, effective and compatible with most installations. But it is also limited. The XML Sitemaps & Google News plugin adds some essential features and options to the default sitemap generator.', 'xml-sitemap-feed' ) . '</p>';
+				$content .= '<p>' . esc_html__( 'The default sitemap server is light-weight, effective and compatible with most installations. But it is also limited. The XML Sitemaps & Google News plugin adds some essential features and options to the default sitemap generator but if these are not enough, try the plugin sitemap server.', 'xml-sitemap-feed' ) . '</p>';
 				$content .= '<p><strong>' . esc_html( translate( 'Plugin' ) ) . '</strong></p>';
 				$content .= '<p>' . esc_html__( 'The plugin sitemap server generates the sitemap in a different way, allowing some additional features and configuration options. However, it is not guaranteed to be compatible with your specific WordPress installation.', 'xml-sitemap-feed' ) . '</p>';
 				$screen->add_help_tab(
@@ -723,11 +739,6 @@ class XMLSF_Admin_Sitemap {
 				);
 				// Disable.
 				$content  = '<p>' . esc_html__( 'By default, all public content types, taxonomy archives and author archives are included in the XML Sitemap index. If you wish to exclude any content or archive types, you can disable them here.', 'xml-sitemap-feed' ) . '</p>';
-				$content .= '<p>' . sprintf( /* translators: %1$s Post types, %2$s Post types linked to the respective tab */
-					esc_html__( 'Select %1$s here to exclude all post, pages (except the front page) and custom post types from the sitemap index. To exclude only a particular post type, please go to the %2$s tab.', 'xml-sitemap-feed' ),
-					'<strong>' . esc_html__( 'Post types', 'xml-sitemap-feed' ) . '</strong>',
-					'<a href="?page=xmlsf&tab=post_types">' . esc_html__( 'Post types', 'xml-sitemap-feed' ) . '</a>'
-				) . '</p>';
 				$content .= '<p>' . sprintf( /* translators: %1$s Taxonomies, %2$s Taxonomies linked to the respective tab */
 					esc_html__( 'Select %1$s here to exclude then all taxonomy archives from the sitemap index. To exclude only a particular taxonomy, please go to the %2$s tab.', 'xml-sitemap-feed' ),
 					'<strong>' . esc_html__( 'Taxonomies', 'xml-sitemap-feed' ) . '</strong>',
@@ -748,6 +759,19 @@ class XMLSF_Admin_Sitemap {
 				break;
 
 			case 'post_types':
+				if ( xmlsf_uses_core_server() ) {
+					ob_start();
+					include XMLSF_DIR . '/views/admin/help-tab-post-types-general.php';
+					$content = ob_get_clean();
+					// General Settings.
+					$screen->add_help_tab(
+						array(
+							'id'      => 'sitemap-settings-post-type-general',
+							'title'   => translate( 'General' ),
+							'content' => $content,
+						)
+					);
+				}
 				ob_start();
 				include XMLSF_DIR . '/views/admin/help-tab-post-types.php';
 				$content = ob_get_clean();
@@ -755,11 +779,10 @@ class XMLSF_Admin_Sitemap {
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-settings-post-types',
-						'title'   => translate( 'General Settings' ),
+						'title'   => __( 'Post types', 'xml-sitemap-feed' ),
 						'content' => $content,
 					)
 				);
-				// Limits.
 				break;
 
 			case 'taxonomies':
@@ -770,7 +793,7 @@ class XMLSF_Admin_Sitemap {
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-settings-taxonomies-general',
-						'title'   => translate( 'General Settings' ),
+						'title'   => translate( 'General' ),
 						'content' => $content,
 					)
 				);
@@ -790,7 +813,16 @@ class XMLSF_Admin_Sitemap {
 				ob_start();
 				include XMLSF_DIR . '/views/admin/help-tab-authors.php';
 				$content = ob_get_clean();
-				// Add help tab.
+				$screen->add_help_tab(
+					array(
+						'id'      => 'sitemap-settings-authors-general',
+						'title'   => translate( 'General' ),
+						'content' => $content,
+					)
+				);
+				// Authors.
+				$content  = '<p><strong>' . esc_html__( 'Limit to these authors:', 'xml-sitemap-feed' ) . '</strong></p>';
+				$content .= '<p>' . esc_html__( 'Select the authors to include in the author sitemap. Select none to automatically include all authors.', 'xml-sitemap-feed' ) . '</p>';
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-settings-authors',

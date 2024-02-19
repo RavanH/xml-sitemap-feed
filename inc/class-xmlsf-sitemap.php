@@ -14,7 +14,7 @@ abstract class XMLSF_Sitemap {
 	 *
 	 * @var string
 	 */
-	protected $sitemap;
+	protected $index;
 
 	/**
 	 * Post types included in sitemap index
@@ -46,6 +46,13 @@ abstract class XMLSF_Sitemap {
 		}
 
 		return $rewrite_rules;
+	}
+
+	/**
+	 * Get sitemap index file name.
+	 */
+	public function index() {
+		return apply_filters( 'xmlsf_sitemap_filename', $this->index );
 	}
 
 	/**

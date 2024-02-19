@@ -11,12 +11,13 @@
 class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	/**
 	 * CONSTRUCTOR
-	 * Runs on init
 	 *
-	 * @param string $sitemap Sitemap name.
+	 * Runs on init
 	 */
-	public function __construct( $sitemap ) {
-		$this->sitemap = $sitemap ? $sitemap : 'wp-sitemap.xml';
+	public function __construct() {
+		global $wp_rewrite;
+
+		$this->index = $wp_rewrite->using_permalinks() ? 'wp-sitemap.xml' : '?sitemap=index';
 
 		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
 
@@ -68,6 +69,9 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 
 		// Maybe exclude taxonomies.
 		add_filter( 'wp_sitemaps_taxonomies', array( $this, 'taxonomies' ) );
+
+		// Filter user query arguments.
+		add_filter( 'wp_sitemaps_users_query_args', array( $this, 'users_query_args' ) );
 
 		/**
 		 * Add sitemaps.
@@ -224,8 +228,6 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 				case 'taxonomies':
 					// Try to raise memory limit, context added for filters.
 					wp_raise_memory_limit( 'wp-sitemap-taxonomies-' . $subtype );
-					// Add a filter for the tax query arguments. This allows the user to include empty terms.
-					add_filter( 'wp_sitemaps_taxonomies_query_args', array( $this, 'taxonomies_query_args' ) );
 					break;
 
 				case 'users':
@@ -247,6 +249,37 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 		}
 
 		return $request;
+	}
+
+	/**
+	 * Filter users query arguments.
+	 * Hooked into wp_sitemaps_users_query_args filter.
+	 *
+	 * @since 5.4
+	 *
+	 * @param array $args Query arguments.
+	 *
+	 * @return array
+	 */
+	public function users_query_args( $args ) {
+		/**
+		 * Filters the has_published_posts query argument in the author archive. Must return a boolean or an array of one or multiple post types.
+		 * Allows to add or change post type when theme author archive page shows custom post types.
+		 *
+		 * @since 5.4
+		 *
+		 * @param array Array with post type slugs. Default array( 'post' ).
+		 *
+		 * @return mixed
+		 */
+		$args['has_published_posts'] = apply_filters( 'xmlsf_author_has_published_posts', $args['has_published_posts'] );
+
+		$include = get_option( 'xmlsf_authors' );
+		if ( ! empty( $include ) ) {
+			$args['include'] = (array) $include;
+		}
+
+		return $args;
 	}
 
 	/**
@@ -285,7 +318,7 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 				break;
 
 			case 'user':
-				// TODO make this xmlsf_author_post_types filter compatible.
+				// TODO make this xmlsf_author_has_published_posts filter compatible.
 				$lastmod = get_date_from_gmt( get_lastpostdate( 'GMT', 'post' ), DATE_W3C ); // Absolute last post date.
 				if ( $lastmod ) {
 					$entry['lastmod'] = $lastmod;
@@ -393,24 +426,6 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	}
 
 	/**
-	 * Filter tax query arguments.
-	 * Hooked into wp_sitemaps_taxonomies_query_args filter.
-	 *
-	 * @since 5.4
-	 *
-	 * @param array $args Query arguments.
-	 *
-	 * @return array
-	 */
-	public function taxonomies_query_args( $args ) {
-		$settings = (array) get_option( 'xmlsf_taxonomy_settings', xmlsf()->defaults( 'taxonomy_settings' ) );
-
-		$args['hide_empty'] = empty( $settings['include_empty'] );
-
-		return $args;
-	}
-
-	/**
 	 * Add priority and lastmod to posts entries.
 	 * Hooked into wp_sitemaps_posts_entry filter.
 	 *
@@ -465,20 +480,25 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	public function max_urls( $max_urls, $object_type ) {
 		switch ( $object_type ) {
 			case 'user':
-				$settings = (array) get_option( 'xmlsf_author_settings', xmlsf()->defaults( 'author_settings' ) );
-				$max_urls = ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
+				$settings = (array) get_option( 'xmlsf_author_settings' );
+				$defaults = xmlsf()->defaults( 'author_settings' );
+				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 				break;
 
 			case 'term':
-				$settings = (array) get_option( 'xmlsf_taxonomy_settings', xmlsf()->defaults( 'taxonomy_settings' ) );
-				$max_urls = ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
+				$settings = (array) get_option( 'xmlsf_taxonomy_settings' );
+				$defaults = xmlsf()->defaults( 'taxonomy_settings' );
+				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 				break;
 
 			case 'post':
 			default:
-				$settings = (array) get_option( 'xmlsf_general_settings', xmlsf()->defaults( 'general_settings' ) );
-				$max_urls = ! empty( $settings['limit'] ) && is_numeric( $settings['limit'] ) ? absint( $settings['limit'] ) : $max_urls;
+				$settings = (array) get_option( 'xmlsf_post_types' );
+				$defaults = xmlsf()->defaults( 'post_types' );
+				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 		}
+
+		$max_urls = is_numeric( $limit ) ? absint( $limit ) : $max_urls;
 
 		return $max_urls;
 	}

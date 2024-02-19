@@ -199,9 +199,13 @@ function xmlsf_clear_metacache( $type = 'all' ) {
 			delete_metadata( 'term', 0, 'term_modified', '', true );
 			break;
 
+		case 'users':
+			delete_metadata( 'user', 0, 'user_modified', '', true );
+			break;
+
 		case 'all':
 		default:
-			$all_types = array( 'images', 'comments', 'terms' );
+			$all_types = array( 'images', 'comments', 'terms', 'users' );
 			foreach ( $all_types as $_type ) {
 				xmlsf_clear_metacache( $_type );
 			}

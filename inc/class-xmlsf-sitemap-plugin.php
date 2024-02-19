@@ -23,12 +23,13 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 
 	/**
 	 * CONSTRUCTOR
-	 * Runs on init
 	 *
-	 * @param string $sitemap Sitemap name.
+	 * Runs on init
 	 */
-	public function __construct( $sitemap = 'sitemap.xml' ) {
-		$this->sitemap = $sitemap;
+	public function __construct() {
+		global $wp_rewrite;
+
+		$this->index = $wp_rewrite->using_permalinks() ? 'sitemap.xml' : '?feed=sitemap';
 
 		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
 
@@ -264,7 +265,6 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 			$args['number'] = $defaults['limit'];
 		}
 
-		$args['hide_empty']      = empty( $options['include_empty'] );
 		$args['order']           = 'DESC';
 		$args['orderby']         = 'count';
 		$args['pad_counts']      = true;
@@ -284,26 +284,36 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 	 * @return array
 	 */
 	public function set_authors_args( $args ) {
+		$post_types = get_post_types( array( 'public' => true ) );
+		// We're not supporting sitemaps for author pages for attachments and pages.
+		unset( $post_types['attachment'] );
+		unset( $post_types['page'] );
+
 		/**
-		 * Filters the post types present in the author archive. Must return an array of one or multiple post types.
+		 * Filters the has_published_posts query argument in the author archive. Must return a boolean or an array of one or multiple post types.
 		 * Allows to add or change post type when theme author archive page shows custom post types.
 		 *
-		 * @since 0.1
+		 * @since 5.4
 		 *
 		 * @param array Array with post type slugs. Default array('post').
 		 *
-		 * @return array
+		 * @return mixed
 		 */
-		$post_type_array = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
+		$post_types = apply_filters( 'xmlsf_author_has_published_posts', $post_types );
 
 		$author_settings = get_option( 'xmlsf_author_settings' );
 		$defaults        = xmlsf()->defaults( 'author_settings' );
 
-		$args['has_published_posts'] = $post_type_array;
+		$args['has_published_posts'] = $post_types;
 		$args['number']              = ! empty( $author_settings['limit'] ) && is_numeric( $author_settings['limit'] ) ? intval( $author_settings['limit'] ) : $defaults['limit'];
 
 		if ( $args['number'] < 1 || $args['number'] > 50000 ) {
 			$args['number'] = $defaults['limit'];
+		}
+
+		$include = get_option( 'xmlsf_authors' );
+		if ( ! empty( $include ) ) {
+			$args['include'] = (array) $include;
 		}
 
 		return $args;
@@ -343,7 +353,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 	 */
 	public function redirect() {
 		if ( ! empty( $_SERVER['REQUEST_URI'] ) && substr( wp_unslash( $_SERVER['REQUEST_URI'] ), 0, 15 ) === '/wp-sitemap.xml' ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			wp_safe_redirect( home_url( $this->sitemap ), 301, 'XML Sitemap & Google News for WordPress' );
+			wp_safe_redirect( home_url( $this->index ), 301, 'XML Sitemap & Google News for WordPress' );
 			exit();
 		}
 	}

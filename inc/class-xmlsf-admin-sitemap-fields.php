@@ -23,26 +23,31 @@ class XMLSF_Admin_Sitemap_Fields {
 	}
 
 	/**
-	 * Include fields
+	 * Deactivate fields
 	 */
 	public static function disable_fields() {
+		$post_types = get_post_types( array( 'public' => true ) );
+		// We're not supporting sitemaps for author pages for attachments and pages.
+		unset( $post_types['attachment'] );
+		unset( $post_types['page'] );
+
 		/**
-		 * Filters the post types present in the author archive. Must return an array of one or multiple post types.
+		 * Filters the has_published_posts query argument in the author archive. Must return a boolean or an array of one or multiple post types.
 		 * Allows to add or change post type when theme author archive page shows custom post types.
 		 *
-		 * @since 0.1
+		 * @since 5.4
 		 *
 		 * @param array Array with post type slugs. Default array( 'post' ).
 		 *
-		 * @return array
+		 * @return mixed
 		 */
-		$post_type_array = apply_filters( 'xmlsf_author_post_types', array( 'post' ) );
+		$post_types = apply_filters( 'xmlsf_author_has_published_posts', $post_types );
 
 		$disabled   = (array) get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
-		$public_tax = xmlsf_public_taxonomies();
+		$public_tax = get_taxonomies( array( 'public' => true ) );
 		$users_args = array(
 			'fields'              => 'ID',
-			'has_published_posts' => $post_type_array,
+			'has_published_posts' => $post_types,
 		);
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-disable.php';
@@ -52,8 +57,8 @@ class XMLSF_Admin_Sitemap_Fields {
 	 * Limit field
 	 */
 	public static function post_types_general_fields() {
-		$settings = (array) get_option( 'xmlsf_general_settings' );
-		$defaults = xmlsf()->defaults( 'general_settings' );
+		$settings = (array) get_option( 'xmlsf_post_types' );
+		$defaults = xmlsf()->defaults( 'post_types' );
 		$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 
 		// The actual fields for data entry.
@@ -90,7 +95,7 @@ class XMLSF_Admin_Sitemap_Fields {
 	 */
 	public static function taxonomies_field() {
 		$taxonomies = (array) get_option( 'xmlsf_taxonomies', array() );
-		$public_tax = (array) xmlsf_public_taxonomies();
+		$public_tax = (array) get_taxonomies( array( 'public' => true ) );
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-taxonomies.php';
@@ -110,6 +115,26 @@ class XMLSF_Admin_Sitemap_Fields {
 	 * Authors field
 	 */
 	public static function authors_field() {
+		$post_types = get_post_types( array( 'public' => true ) );
+		// We're not supporting sitemaps for author pages for attachments and pages.
+		unset( $post_types['attachment'] );
+		unset( $post_types['page'] );
+
+		/**
+		 * Filters the has_published_posts query argument in the author archive. Must return a boolean or an array of one or multiple post types.
+		 * Allows to add or change post type when theme author archive page shows custom post types.
+		 *
+		 * @since 5.4
+		 *
+		 * @param array Array with post type slugs. Default array( 'post' ).
+		 *
+		 * @return mixed
+		 */
+		$post_types = apply_filters( 'xmlsf_author_has_published_posts', $post_types );
+
+		$authors = (array) get_option( 'xmlsf_authors', array() );
+		$users   = (array) get_users( array( 'has_published_posts' => $post_types ) );
+
 		include XMLSF_DIR . '/views/admin/field-sitemap-authors.php';
 	}
 
@@ -121,14 +146,9 @@ class XMLSF_Admin_Sitemap_Fields {
 	 * Sitemap name field
 	 */
 	public static function xmlsf_sitemap_name_field() {
-		global $wp_rewrite;
+		global $wp_rewrite, $xmlsf_sitemap;
 		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
-
-		if ( xmlsf_uses_core_server() ) {
-			$name = $wp_rewrite->using_permalinks() ? 'wp-sitemap.xml' : '?sitemap=index';
-		} else {
-			$name = $wp_rewrite->using_permalinks() ? 'sitemap.xml' : '?feed=sitemap';
-		}
+		$name     = is_object( $xmlsf_sitemap ) ? $xmlsf_sitemap->index() : apply_filters( 'xmlsf_sitemap_filename', 'sitemap.xml' );
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-name.php';

@@ -1,16 +1,11 @@
 <?php
 /**
- * Help tab: Authors
+ * Help tab: Authors General Settings
  *
  * @package XML Sitemap & Google News
  */
 
 ?>
-<p>
-	<strong><?php esc_html_e( 'Include authors', 'xml-sitemap-feed' ); ?></strong>
-	<br />
-	<?php esc_html_e( 'Activate this to include an author sitemap in the sitemap index. Only users of level Contributor and higher, with at least one published post, are included in the author sitemap.', 'xml-sitemap-feed' ); ?>
-</p>
 <p>
 	<strong><?php esc_html_e( 'Priority', 'xml-sitemap-feed' ); ?></strong>
 	<br />

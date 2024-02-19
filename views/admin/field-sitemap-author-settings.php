@@ -18,22 +18,15 @@
 	</p>
 	<p>
 		<label>
+			<input type="checkbox" name="xmlsf_author_settings[include_empty]" id="xmlsf_author_include_empty" value="1"<?php checked( ! empty( $author_settings['include_empty'] ), true ); ?><?php disabled( apply_filters( 'xmlsf_advanced_enabled', false ), false ); ?> />
+			<?php esc_html_e( 'Include empty author archives.', 'xml-sitemap-feed' ); ?>
+			<?php apply_filters( 'xmlsf_advanced_enabled', false ) || printf( /* Translators: XML Sitemap Advanced */ esc_html__( 'Available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">' . esc_html__( 'XML Sitemap Advanced', 'xml-sitemap-feed' ) . '</a>' ); ?>
+		</label>
+	</p>
+	<p>
+		<label>
 			<?php esc_html_e( 'Maximum authors per sitemap', 'xml-sitemap-feed' ); ?>
 			<input type="number" step="100" min="0" max="50000" name="xmlsf_author_settings[limit]" id="xmlsf_author_limit" value="<?php echo ( isset( $author_settings['limit'] ) ? esc_attr( $author_settings['limit'] ) : '' ); ?>" class="medium-text" />
 		</label>
-	</p>
-	<p class="description">
-		<?php
-		echo wp_kses_post(
-			apply_filters(
-				'xmlsf_author_settings_description',
-				sprintf(
-					/* Translators: XML Sitemap Advanced */
-					esc_html__( 'More options available in %s.', 'xml-sitemap-feed' ),
-					'<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">' . esc_html__( 'XML Sitemap Advanced', 'xml-sitemap-feed' ) . '</a>'
-				)
-			)
-		);
-		?>
 	</p>
 </fieldset>

@@ -302,11 +302,10 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 = 5.4 =
 * NEW: Switch between Plugin or WP core sitemap server for sitemap generation
-* NEW: optionally include empty taxonomy term archives
 * Filter domains in taxonomy and author sitemaps
 * NEW: xmlsf_generator action hook
 * NEW: xmlsf_sitemap_index_pre and xmlsf_sitemap_index_post action hooks
-* NEW: xmlsf_author_post_types filter
+* NEW: xmlsf_author_has_published_posts filter
 * Dropping all Ping Services (no longer supported)
 * Dropping allowed domains filtering
 * Exclude spammed or deleted authors on multisite
