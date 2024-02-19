@@ -254,13 +254,6 @@ class XMLSF_Admin_Sitemap_News {
 			},
 			9
 		);
-		add_action(
-			'xmlsf_admin_sidebar',
-			function () {
-				include XMLSF_DIR . '/views/admin/help-tab-news-sidebar.php';
-			},
-			11
-		);
 
 		include XMLSF_DIR . '/views/admin/page-sitemap-news.php';
 	}
