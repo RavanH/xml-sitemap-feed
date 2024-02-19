@@ -269,7 +269,7 @@ abstract class XMLSF_Sitemap {
 			is_array( $this->post_types[ $post_type ]['tags'] ) &&
 			! empty( $this->post_types[ $post_type ]['tags']['image'] )
 		) {
-			$primed = (array) get_option( 'xmlsf_images_meta_primed', array() );
+			$primed = (array) get_transient( 'xmlsf_images_meta_primed' );
 
 			if (
 				! isset( $primed[ $post_type ] ) ||
@@ -289,13 +289,13 @@ abstract class XMLSF_Sitemap {
 				$primed[ $post_type ][] = $m;
 
 				// Update.
-				update_option( 'xmlsf_images_meta_primed', $primed );
+				set_transient( 'xmlsf_images_meta_primed', $primed );
 			}
 		}
 
 		// If update_lastmod_on_comments active then prefetch comments.
 		if ( ! empty( $this->post_types[ $post_type ]['update_lastmod_on_comments'] ) ) {
-			$primed = (array) get_option( 'xmlsf_comments_meta_primed', array() );
+			$primed = (array) get_transient( 'xmlsf_comments_meta_primed' );
 
 			if (
 				! isset( $primed[ $post_type ] ) ||
@@ -315,7 +315,7 @@ abstract class XMLSF_Sitemap {
 				$primed[ $post_type ][] = $m;
 
 				// Update.
-				update_option( 'xmlsf_comments_meta_primed', $primed );
+				set_transient( 'xmlsf_comments_meta_primed', $primed );
 			}
 		}
 	}

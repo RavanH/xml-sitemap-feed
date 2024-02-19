@@ -190,10 +190,14 @@ class XMLSF_Admin_Sitemap {
 			xmlsf_clear_metacache( 'images' );
 			xmlsf_clear_metacache( 'comments' );
 
+			// Re-prime caches. TODO make this async.
+			global $xmlsf_sitemap;
+			$xmlsf_sitemap->prefetch_posts_meta();
+
 			add_settings_error(
 				'clear_meta_notice',
 				'clear_meta_notice',
-				__( 'Sitemap post meta caches have been cleared.', 'xml-sitemap-feed' ),
+				__( 'Sitemap post meta caches have been cleared and re-primed.', 'xml-sitemap-feed' ),
 				'updated'
 			);
 		}

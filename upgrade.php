@@ -190,6 +190,10 @@ function xmlsf_upgrade( $db_version ) {
 		delete_option( 'xmlsf_ping' );
 		delete_option( 'xmlsf_permalinks_flushed' );
 		delete_option( 'xmlsf_domains' );
+		set_transient( 'xmlsf_images_meta_primed', get_option( 'xmlsf_images_meta_primed' ) );
+		set_transient( 'xmlsf_comments_meta_primed', get_option( 'xmlsf_comments_meta_primed' ) );
+		delete_option( 'xmlsf_images_meta_primed' );
+		delete_option( 'xmlsf_comments_meta_primed' );
 
 		// Remove deprecated transient.
 		delete_transient( 'xmlsf_static_files' );

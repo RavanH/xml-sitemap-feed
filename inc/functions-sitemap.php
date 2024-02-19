@@ -187,12 +187,12 @@ function xmlsf_clear_metacache( $type = 'all' ) {
 			// Clear all images meta caches...
 			delete_metadata( 'post', 0, '_xmlsf_image_attached', '', true );
 			delete_metadata( 'post', 0, '_xmlsf_image_featured', '', true );
-			update_option( 'xmlsf_images_meta_primed', array() );
+			set_transient( 'xmlsf_images_meta_primed', array() );
 			break;
 
 		case 'comments':
 			delete_metadata( 'post', 0, '_xmlsf_comment_date_gmt', '', true );
-			update_option( 'xmlsf_comments_meta_primed', array() );
+			set_transient( 'xmlsf_comments_meta_primed', array() );
 			break;
 
 		case 'terms':

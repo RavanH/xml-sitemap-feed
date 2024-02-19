@@ -5,7 +5,7 @@ Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Googl
 Requires at least: 4.4
 Requires PHP: 5.6
 Tested up to: 6.3
-Stable tag: 5.3.6
+Stable tag: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -296,7 +296,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 == Upgrade Notice ==
 
 = 5.4 =
-
+Switch between plugin and WP core sitemap. New filter/action hooks. Ping service no longer supported.
 
 == Changelog ==
 
