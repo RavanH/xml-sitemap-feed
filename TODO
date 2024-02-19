@@ -1,22 +1,10 @@
 ROADMAP
 
-= 5.4 =
+= 5.5 =
 
-* clear user meta cache button
-
-* test conflicting plugins/themes messages
-* test without WP_DEBUG
-* test without permalink structure
-
-Verify and remove unused:
-*
-
-TODO LIST
-
+* re-test conflicting plugins/themes messages
 * author sitemap lastmod (in index) = last publication date >>> latest user modified meta...
-
-* Automatic priority calculation for authors?
-
+* Automatic priority calculation for authors
 * prepare compatibility routine for additional premium modules
 * add inline comment blocks for hooks
 * dynamic stylesheets
@@ -25,7 +13,6 @@ TODO test/fix outdated lastmod dates for post type sitemaps when Redis Cache is 
 TODO fix WPML incompatibility https://wordpress.org/support/topic/multilingual-url-issue/
 TODO core sitemap stylesheets per sitemap type (is that possible?)
 TODO allow CPT taxonomies selection in news sitemap (PRO?)
-TODO allow inclusion of taxonomies that belong to a post type that is not included (what??)
 
 TODO revisit xmlsf_output_compression (can we force gzip over brotli when .gz is used?)
 

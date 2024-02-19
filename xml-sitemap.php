@@ -132,12 +132,9 @@ function xmlsf_init() {
 	}
 
 	// Flush rewrite rules?
-	if ( get_transient( 'xmlsf_flush_rewrite_rules' ) ) {
+	global $wp_rewrite;
+	if ( $wp_rewrite->using_permalinks() && ! get_option( 'rewrite_rules' ) ) {
 		flush_rewrite_rules( false );
-		set_transient( 'xmlsf_flush_rewrite_rules', false );
-	} elseif ( false === get_transient( 'xmlsf_flush_rewrite_rules' ) ) {
-		// If no transient set, then set an empty one. This saves DB queries.
-		set_transient( 'xmlsf_flush_rewrite_rules', false );
 	}
 }
 
@@ -149,7 +146,7 @@ function xmlsf_init() {
  */
 function xmlsf_activate() {
 	// Flush rewrite rules on next init.
-	set_transient( 'xmlsf_flush_rewrite_rules', true );
+	delete_option( 'rewrite_rules' );
 }
 
 /**
@@ -237,8 +234,8 @@ function xmlsf_robots_txt( $output ) {
 	} elseif ( ! xmlsf_sitemaps_enabled() ) {
 		$output .= '# No XML Sitemaps are enabled.' . PHP_EOL;
 	} else {
-		xmlsf_sitemaps_enabled( 'sitemap' ) && $output .= 'Sitemap: ' . xmlsf_sitemap_url() . PHP_EOL;
-		xmlsf_sitemaps_enabled( 'news' ) && $output    .= 'Sitemap: ' . xmlsf_sitemap_url( 'news' ) . PHP_EOL;
+		xmlsf_uses_core_server() || xmlsf_sitemaps_enabled( 'sitemap' ) && $output .= 'Sitemap: ' . xmlsf_sitemap_url() . PHP_EOL;
+		xmlsf_sitemaps_enabled( 'news' ) && $output .= 'Sitemap: ' . xmlsf_sitemap_url( 'news' );
 	}
 
 	return $output;

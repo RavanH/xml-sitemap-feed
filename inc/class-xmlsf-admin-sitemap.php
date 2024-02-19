@@ -53,7 +53,7 @@ class XMLSF_Admin_Sitemap {
 			xmlsf_admin()->check_static_files( $filename, 1 );
 
 			// Flush rewrite rules on next init.
-			set_transient( 'xmlsf_flush_rewrite_rules', true );
+			delete_option( 'rewrite_rules' );
 		}
 	}
 
