@@ -5,32 +5,39 @@
  * @package XML Sitemap Feed plugin for WordPress
  */
 
-if ( ! defined( 'WPINC' ) ) die;
+defined( 'WPINC' ) || die;
 
-// do xml tag via echo or SVN parser is going to freak out
-echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
+// Do xml tag via echo or SVN parser is going to freak out.
+echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charset' ) ) ) . '"?>
 '; ?>
 <?php xmlsf_xml_stylesheet( 'custom' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action('xmlsf_urlset', 'custom'); ?>>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action( 'xmlsf_urlset', 'custom' ); ?>>
 <?php
 
-// get our custom urls array
-$urls = apply_filters( 'xmlsf_custom_urls', get_option('xmlsf_urls') );
-if ( is_array($urls) ) :
+// Get our custom urls array.
+$custom_urls = apply_filters( 'xmlsf_custom_urls', get_option( 'xmlsf_urls' ) );
+if ( is_array( $custom_urls ) ) :
 	// and loop away!
-	foreach ( $urls as $url ) {
-		if (empty($url[0])) continue;
-	?>
-	<url>
-		<loc><?php echo esc_url( $url[0] ); ?></loc>
-		<priority><?php echo ( isset($url[1]) && is_numeric($url[1]) ) ? htmlspecialchars( $url[1], ENT_COMPAT, get_bloginfo('charset') ) : '0.5'; ?></priority>
-<?php 	do_action( 'xmlsf_tags_after', 'custom' ); ?>
- 	</url>
-<?php
-		do_action( 'xmlsf_url_after', 'custom' );
-	};
+	foreach ( $custom_urls as $data ) {
+		if ( empty( $data[0] ) ) {
+			continue;
+		}
 
+		do_action( 'xmlsf_url', 'custom', $data );
+
+		echo '<url><loc>' . esc_url( $data[0] ) . '</loc><priority>';
+		echo ( isset( $data[1] ) && is_numeric( $data[1] ) ) ? esc_xml( $data[1] ) : '0.5';
+		echo '</priority>';
+
+		do_action( 'xmlsf_tags_after', 'custom', $data );
+
+		echo '</url>';
+
+		do_action( 'xmlsf_url_after', 'custom', $data );
+
+		echo PHP_EOL;
+	}
 endif;
-?></urlset>
-<?php xmlsf_usage(); ?>
+?>
+</urlset>

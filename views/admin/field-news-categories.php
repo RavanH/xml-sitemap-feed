@@ -1,12 +1,20 @@
+<?php
+/**
+ * Categories fields
+ *
+ * @package XML Sitemap & Google News
+ */
+
+?>
 <fieldset>
 	<legend class="screen-reader-text">
-		<?php echo translate( 'Categories' ); ?>
+		<?php esc_html_e( 'Categories' ); ?>
 	</legend>
 	<p>
-		<?php _e( 'Limit to posts in these post categories:', 'xml-sitemap-feed' ); ?>
+		<?php esc_html_e( 'Limit to posts in these post categories:', 'xml-sitemap-feed' ); ?>
 	</p>
-	<style type"text/css">ul.children{padding-left:1em}</style>
+	<style>ul.cat-checklist{height:auto;max-height:48em}ul.children{padding-left:1em}</style>
 	<ul class="cat-checklist">
-		<?php echo $cat_list; ?>
+		<?php echo $cat_list; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</ul>
 </fieldset>

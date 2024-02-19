@@ -1,4 +1,0 @@
-<!-- Queries executed: <?php echo htmlentities( $num, ENT_COMPAT, get_bloginfo('charset') ); ?> | Peak memory usage: <?php echo $mem ? htmlentities( $mem, ENT_COMPAT, get_bloginfo('charset') ) : 'Not availabe.'; ?> | Memory limit: <?php echo htmlspecialchars( $limit, ENT_COMPAT, get_bloginfo('charset') ); ?> -->
-<!-- Query errors: <?php echo !empty($errors) ? htmlentities( $errors, ENT_COMPAT, get_bloginfo('charset') ) : 'None encountered.'; ?> -->
-<!-- Queries: <?php echo !empty($saved) ? htmlentities( $saved, ENT_COMPAT, get_bloginfo('charset') ) : 'Set SAVEQUERIES to show saved database queries here.'; ?> -->
-<!-- Average system load during the last minute: <?php $load = function_exists('sys_getloadavg') ? sys_getloadavg() : false; echo $load ? htmlentities( $load[0], ENT_COMPAT, get_bloginfo('charset') ) : 'Not available.'; ?> -->

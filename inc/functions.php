@@ -1,56 +1,21 @@
 <?php
-
 /**
- * Ping Search Engine
+ * Global Functions
  *
- * @since 5.1
- *
- * @param $se google
- * @param $sitemap sitemap
- * @param $interval seconds
- *
- * @return int|null ping response code, or 999 when skipped or null when search engine is unknown
+ * @package XML Sitemap & Google News
  */
-function xmlsf_ping( $se, $sitemap, $interval ) {
-	$se_urls = array(
-		'google' => 'https://www.google.com/ping'
-	);
-
-	if ( ! array_key_exists( $se, $se_urls ) ) {
-		return '';
-	}
-
-	$url = add_query_arg( 'sitemap', urlencode( xmlsf_sitemap_url() ), $se_urls[$se] );
-
-	// check if we did not ping already within the interval
-	if ( false === get_transient( 'xmlsf_ping_'.$se.'_'.$sitemap ) ) {
-		// Ping !
-		$response = wp_remote_request( $url );
-		$code = wp_remote_retrieve_response_code( $response );
-		if ( 200 === $code ) {
-			set_transient( 'xmlsf_ping_'.$se.'_'.$sitemap, '', $interval );
-		}
-	} else {
-		// Skip !
-		$response = '';
-		$code = 999;
-	}
-
-	do_action( 'xmlsf_ping', $se, $sitemap, $url, $code, $response );
-
-	return $code;
-}
 
 /**
  * Get the public XML sitemap url.
  *
  * @since 5.4
- * @param string $sitemap
- * @param array $args arguments:
- *                    $type - post_type or taxonomy, default false
- *                    $m    - YYYY, YYYYMM, YYYYMMDD
- *                    $w    - week of the year ($m must be YYYY format)
- *                    $gz   - bool for GZ extension (triggers compression verification)
+ *
+ * @param string $sitemap Sitemap name.
+ * @param array  $args    Arguments array:
+ *                        $type - post_type or taxonomy, default false
+ *                        $m    - YYYY, YYYYMM, YYYYMMDD
+ *                        $w    - week of the year ($m must be YYYY format)
+ *                        $gz   - bool for GZ extension (triggers compression verification).
  *
  * @return string|false The sitemap URL or false if the sitemap doesn't exist.
  */
@@ -72,23 +37,33 @@ function xmlsf_sitemap_url( $sitemap = 'index', $args = array() ) {
 	}
 
 	// Get our arguments.
-	$args = apply_filters( 'xmlsf_index_url_args', wp_parse_args( $args, array( 'type' => false, 'm' => false, 'w' => false, 'gz' => false) ) );
-	extract( $args );
+	$args = apply_filters(
+		'xmlsf_index_url_args',
+		wp_parse_args(
+			$args,
+			array(
+				'type' => false,
+				'm'    => false,
+				'w'    => false,
+				'gz'   => false,
+			)
+		)
+	);
 
 	// Construct file name.
 	if ( $wp_rewrite->using_permalinks() ) {
-		$name = 'sitemap-'.$sitemap;
-		$name .= $type ? '-'.$type : '';
-		$name .= $m ? '.'.$m : '';
-		$name .= $w ? '.'.$w : '';
+		$name  = 'sitemap-' . $sitemap;
+		$name .= $args['type'] ? '-' . $args['type'] : '';
+		$name .= $args['m'] ? '.' . $args['m'] : '';
+		$name .= $args['w'] ? '.' . $args['w'] : '';
 		$name .= '.xml';
-		$name .= $gz ? '.gz' : '';
+		$name .= $args['gz'] ? '.gz' : '';
 	} else {
-		$name = '?feed=sitemap-'.$sitemap;
-		$name .= $gz ? '.gz' : '';
-		$name .= $type ? '-'.$type : '';
-		$name .= $m ? '&m='.$m : '';
-		$name .= $w ? '&w='.$w : '';
+		$name  = '?feed=sitemap-' . $sitemap;
+		$name .= $args['gz'] ? '.gz' : '';
+		$name .= $args['type'] ? '-' . $args['type'] : '';
+		$name .= $args['m'] ? '&m=' . $args['m'] : '';
+		$name .= $args['w'] ? '&w=' . $args['w'] : '';
 	}
 
 	return esc_url( trailingslashit( home_url() ) . $name );
@@ -97,14 +72,14 @@ function xmlsf_sitemap_url( $sitemap = 'index', $args = array() ) {
 /**
  * Print XML Stylesheet
  *
- * @param string|false $sitemap
+ * @param string|false $sitemap Optional sitemap name.
  */
 function xmlsf_xml_stylesheet( $sitemap = false ) {
 
 	$url = xmlsf_get_stylesheet_url( $sitemap );
 
 	if ( $url ) {
-		echo '<?xml-stylesheet type="text/xsl" href="' . wp_make_link_relative( $url ) . '?ver=' . XMLSF_VERSION . '"?>' . PHP_EOL;
+		echo '<?xml-stylesheet type="text/xsl" href="' . esc_url( wp_make_link_relative( $url ) ) . '?ver=' . esc_xml( XMLSF_VERSION ) . '"?>' . PHP_EOL;
 	}
 }
 
@@ -113,7 +88,8 @@ function xmlsf_xml_stylesheet( $sitemap = false ) {
  *
  * @since 5.4
  *
- * @param string|false $sitemap
+ * @param string|false $sitemap Optional sitemap name.
+ *
  * @return string|false
  */
 function xmlsf_get_stylesheet_url( $sitemap = false ) {
@@ -137,7 +113,7 @@ function xmlsf_get_stylesheet_url( $sitemap = false ) {
 	 * assets/sitemap-[custom_sitemap_name].xsl
 	 */
 
-	$file = $sitemap ? 'assets/sitemap-'.$sitemap.'.xsl' : 'assets/sitemap.xsl';
+	$file = $sitemap ? 'assets/sitemap-' . $sitemap . '.xsl' : 'assets/sitemap.xsl';
 
 	// Find theme stylesheet file.
 	if ( file_exists( get_stylesheet_directory() . '/' . $file ) ) {
@@ -154,51 +130,35 @@ function xmlsf_get_stylesheet_url( $sitemap = false ) {
 }
 
 /**
- * Error messages for ping
- */
-function xmlsf_debug_ping( $se, $sitemap, $ping_url, $response_code, $response = '' ) {
-	if ( defined('WP_DEBUG') && WP_DEBUG == true ) {
-		if ( $response_code == 999 ) {
-			error_log( 'Ping '. $se .' skipped.' );
-		} else {
-			error_log( 'Pinged '. $ping_url .' with response code: ' . $response_code );
-		}
-
-		if ( ! empty( $response ) ) {
-			error_log( 'Response: ' . print_r( $response, true ) );
-		}
-	}
-}
-
-/**
- * Filter sitemap post types
- *
- * @since 5.0
- * @param $post_types array
- * @return array
- */
-function xmlsf_filter_post_types( $post_types ) {
-	$post_types = (array) $post_types;
-
-	// Always exclude attachment and reply post types (bbPress)
-	unset( $post_types['attachment'], $post_types['reply'] );
-
-	return array_filter( $post_types );
-}
-
-/**
  * WPML compatibility hooked into xmlsf_add_settings and xmlsf_news_add_settings actions
- *
- * @param void
  *
  * @return void
  */
 function xmlsf_wpml_remove_home_url_filter() {
-	// remove WPML home url filter
+	// Remove WPML home url filter.
 	global $wpml_url_filters;
-	if ( is_object($wpml_url_filters) ) {
+	if ( is_object( $wpml_url_filters ) ) {
 		remove_filter( 'home_url', array( $wpml_url_filters, 'home_url_filter' ), - 10 );
 	}
 }
 add_action( 'xmlsf_add_settings', 'xmlsf_wpml_remove_home_url_filter' );
 add_action( 'xmlsf_news_add_settings', 'xmlsf_wpml_remove_home_url_filter' );
+
+/**
+ * Are we using the WP core server?
+ * Returns whether the WordPress core sitemap server name used or not.
+ *
+ * @since 5.4
+ *
+ * @return bool
+ */
+function xmlsf_uses_core_server() {
+	// Sitemap disabled.
+	if ( ! xmlsf_sitemaps_enabled( 'sitemap' ) ) {
+		return false;
+	}
+
+	// Check settings.
+	$server = get_option( 'xmlsf_server', xmlsf()->defaults( 'server' ) );
+	return ! empty( $server ) && 'core' === $server;
+}

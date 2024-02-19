@@ -1,6 +1,6 @@
 <?php
 /**
- * Sitemaps: WP_Sitemaps_Custom class
+ * Sitemaps: XMLSF_Sitemaps_Provider_Custom class
  *
  * Builds the sitemaps for the External Suctom Sitemaps.
  *
@@ -13,7 +13,7 @@
  *
  * @since 5.4
  */
-class XMLSF_Sitemaps_Custom extends WP_Sitemaps_Provider {
+class XMLSF_Sitemaps_Provider_Custom extends WP_Sitemaps_Provider {
 
 	/**
 	 * External Custom Sitemap URLs.
@@ -23,17 +23,17 @@ class XMLSF_Sitemaps_Custom extends WP_Sitemaps_Provider {
 	 * @var array
 	 */
 	private $urls = array();
-	
+
 	/**
 	 * WP_Sitemaps_Posts constructor.
 	 *
 	 * @since 5.4
 	 */
 	public function __construct() {
-		$this->name =        'custom';
-		$this->object_type = 'custom';
+		$this->name        = 'custom';
+		$this->object_type = 'url';
 
-		$urls = (array) apply_filters( 'xmlsf_custom_sitemaps', (array) get_option( 'xmlsf_custom_sitemaps', array() ) );
+		$urls       = (array) apply_filters( 'xmlsf_custom_sitemaps', (array) get_option( 'xmlsf_custom_sitemaps', array() ) );
 		$this->urls = array_filter( $urls, 'wp_http_validate_url' );
 	}
 
@@ -79,7 +79,7 @@ class XMLSF_Sitemaps_Custom extends WP_Sitemaps_Provider {
 
 		$pages = $this->get_max_num_pages();
 
-		for ( $page = 1; $page <= $pages; $page ++ ) {
+		for ( $page = 1; $page <= $pages; $page++ ) {
 			$sitemap_entry = array(
 				'loc' => $this->get_sitemap_url( '', $page ),
 			);
@@ -116,7 +116,6 @@ class XMLSF_Sitemaps_Custom extends WP_Sitemaps_Provider {
 	 */
 	public function get_sitemap_url( $name, $page ) {
 		$pos = (int) $page - 1;
-		return $this->urls[$pos];
+		return $this->urls[ $pos ];
 	}
-
 }

@@ -5,36 +5,42 @@
  * @package XML Sitemap Feed plugin for WordPress
  */
 
-if ( ! defined( 'WPINC' ) ) die;
+defined( 'WPINC' ) || die;
 
-// do xml prolog via echo or plugin repository SVN parser is going to freak out
-echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>
+// Do xml prolog via echo or plugin repository SVN parser is going to freak out.
+echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charset' ) ) ) . '"?>
 '; ?>
 <?php xmlsf_xml_stylesheet( 'taxonomy' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action( 'xmlsf_urlset', 'taxonomy' ); ?>>
 <?php
-$terms = get_terms( array('taxonomy'=>get_query_var('taxonomy')) );
+$terms = get_terms( array( 'taxonomy' => get_query_var( 'taxonomy' ) ) );
 
-if ( is_array($terms) ) :
-    foreach ( $terms as $term ) :
-		$url = get_term_link( $term );
-		// Check if we are dealing with an external URL. This can happen with multi-language plugins where each language has its own domain.
-		if ( ! xmlsf_is_allowed_domain( $url ) ) continue;
-		?>
-	<url>
-		<loc><?php echo esc_url( $url ); ?></loc>
-	 	<priority><?php echo htmlspecialchars( xmlsf_get_term_priority( $term ), ENT_COMPAT, get_bloginfo('charset') ); ?></priority>
-<?php if ( $lastmod = xmlsf_get_term_modified( $term ) ) { ?>
-		<lastmod><?php echo htmlspecialchars( $lastmod, ENT_COMPAT, get_bloginfo('charset') ); ?></lastmod>
-<?php }
- 		do_action( 'xmlsf_tags_after', 'taxonomy' );
-?>
-	</url>
-<?php
-		do_action( 'xmlsf_url_after', 'taxonomy' );
+if ( is_array( $terms ) ) :
+	foreach ( $terms as $tax_term ) :
+		$url = apply_filters( 'xmlsf_entry_url', get_term_link( $tax_term ), 'taxonomy', $tax_term );
+
+		// Use xmlsf_entry_url filter to return falsy value to exclude a specific URL.
+		if ( empty( $url ) ) {
+			continue;
+		}
+
+		do_action( 'xmlsf_url', 'taxonomy', $tax_term );
+
+		echo '<url><loc>' . esc_xml( $url ) . '</loc><priority>' . esc_xml( xmlsf_get_term_priority( $tax_term ) ) . '</priority>';
+		$lastmod = xmlsf_get_term_modified( $tax_term );
+		if ( $lastmod ) {
+			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+		}
+
+		do_action( 'xmlsf_tags_after', 'taxonomy', $tax_term );
+
+		echo '</url>';
+
+		do_action( 'xmlsf_url_after', 'taxonomy', $tax_term );
+
+		echo PHP_EOL;
 	endforeach;
 endif;
-
-?></urlset>
-<?php xmlsf_usage(); ?>
+?>
+</urlset>
