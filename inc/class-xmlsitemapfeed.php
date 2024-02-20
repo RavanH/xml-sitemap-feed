@@ -149,7 +149,7 @@ class XMLSitemapFeed {
 
 			$this->defaults = array(
 				'sitemaps'           => $sitemaps,
-				'server'             => class_exists( 'SimpleXMLElement' ) ? 'core' : 'plugin',
+				'server'             => class_exists( 'SimpleXMLElement' ) && function_exists( 'get_sitemap_url' ) ? 'core' : 'plugin',
 				'disabled_providers' => array(),
 				'post_types'         => array(
 					'post'  => array(

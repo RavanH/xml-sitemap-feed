@@ -146,7 +146,7 @@ add_action( 'xmlsf_news_add_settings', 'xmlsf_wpml_remove_home_url_filter' );
 
 /**
  * Are we using the WP core server?
- * Returns whether the WordPress core sitemap server name used or not.
+ * Returns whether the WordPress core sitemap server is used or not.
  *
  * @since 5.4
  *
@@ -154,7 +154,7 @@ add_action( 'xmlsf_news_add_settings', 'xmlsf_wpml_remove_home_url_filter' );
  */
 function xmlsf_uses_core_server() {
 	// Sitemap disabled.
-	if ( ! xmlsf_sitemaps_enabled( 'sitemap' ) ) {
+	if ( ! xmlsf_sitemaps_enabled( 'sitemap' ) || ! function_exists( 'get_sitemap_url' ) ) {
 		return false;
 	}
 
