@@ -24,7 +24,7 @@
 		?>
 	<p>
 		<label><?php esc_html_e( 'Split by', 'xml-sitemap-feed' ); ?>
-			<select name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][archive ]" id="xmlsf_post_types_'<?php echo esc_attr( $obj->name ); ?>_archive">
+			<select name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][archive]" id="xmlsf_post_types_'<?php echo esc_attr( $obj->name ); ?>_archive">
 				<option value="">
 					<?php esc_html_e( 'None' ); ?>
 				</option>
