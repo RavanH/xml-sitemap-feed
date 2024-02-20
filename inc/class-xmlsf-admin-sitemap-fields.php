@@ -14,9 +14,10 @@ class XMLSF_Admin_Sitemap_Fields {
 	 * Server field
 	 */
 	public static function server_field() {
-		$server      = get_option( 'xmlsf_server' );
-		$server      = ! in_array( $server, array( 'core', 'plugin' ) ) ? xmlsf()->defaults( 'server' ) : $server;
-		$nosimplexml = ! class_exists( 'SimpleXMLElement' );
+		$server       = get_option( 'xmlsf_server' );
+		$server       = ! in_array( $server, array( 'core', 'plugin' ) ) ? xmlsf()->defaults( 'server' ) : $server;
+		$nosimplexml  = ! class_exists( 'SimpleXMLElement' );
+		$nocoreserver = ! function_exists( 'get_sitemap_url' );
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-server.php';

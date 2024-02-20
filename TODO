@@ -1,7 +1,7 @@
 ROADMAP
 
 = 5.5 =
-* drop all WP pre-5.5 compatibility routines
+* drop all WP pre-5.5 and ClassicPress compatibility routines?
 * make prime meta caches async
 * re-test conflicting plugins/themes messages
 * author sitemap lastmod (in index) = last publication date >>> latest user modified meta...
