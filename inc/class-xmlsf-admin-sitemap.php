@@ -318,26 +318,33 @@ class XMLSF_Admin_Sitemap {
 		}
 
 		// All in One SEO Pack conflict notices.
-		if ( is_plugin_active( 'all-in-one-seo-pack/all_in_one_seo_pack.php' ) ) {
+		if ( is_plugin_active( 'all-in-one-seo-pack/all_in_one_seo_pack.php' ) && ! in_array( 'aioseop_sitemap', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 			// check aioseop sitemap module.
-			if ( ! in_array( 'aioseop_sitemap', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
-				$aioseop_options = (array) get_option( 'aioseop_options' );
+			$aioseop_options = (array) get_option( 'aioseop_options' );
 
-				if ( isset( $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) && 'on' === $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) {
-					// sitemap module on.
-					add_action(
-						'admin_notices',
-						function () {
-							include XMLSF_DIR . '/views/admin/notice-aioseop-sitemap.php';
-						}
-					);
-				}
+			if ( isset( $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) && 'on' === $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) {
+				// sitemap module on.
+				add_action(
+					'admin_notices',
+					function () {
+						include XMLSF_DIR . '/views/admin/notice-aioseop-sitemap.php';
+					}
+				);
 			}
+		}
+
+		// XML Sitemap Generator for Google conflict notices.
+		if ( is_plugin_active( 'google-sitemap-generator/sitemap.php' ) && ! in_array( 'gsgenerator_sitemap', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
+			add_action(
+				'admin_notices',
+				function () {
+					include XMLSF_DIR . '/views/admin/notice-google-sitemap-generator.php';
+				}
+			);
 		}
 
 		// SEO Framework conflict notices
 		// autodescription-site-settings[sitemaps_output].
-		//
 		if ( is_plugin_active( 'autodescription/autodescription.php' ) ) {
 			// check sfw sitemap module.
 			if ( ! in_array( 'seoframework_sitemap', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
