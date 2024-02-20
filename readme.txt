@@ -5,7 +5,7 @@ Tags: sitemap, xml sitemap, news sitemap, sitemap.xml, robots.txt, Google, Googl
 Requires at least: 4.4
 Requires PHP: 5.6
 Tested up to: 6.3
-Stable tag: 5.4
+Stable tag: 5.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -295,12 +295,18 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.4 =
-Switch between plugin and WP core sitemap. New filter/action hooks. Ping service no longer supported.
+= 5.4.1 =
+Switch between plugin and WP core sitemap. New filter/action hooks. Ping service no longer supported. Bugfixes.
 
 == Changelog ==
 
+= 5.4.1 =
+20240220
+* FIX: Undefined contact on uninstall
+* FIX: admin compatibility message
+
 = 5.4 =
+20240219
 * NEW: Switch between Plugin or WP core sitemap server for sitemap generation
 * NEW: xmlsf_generator action hook
 * NEW: xmlsf_sitemap_index_pre and xmlsf_sitemap_index_post action hooks
@@ -315,17 +321,21 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 * FIX: Conversion of false to array deprecated warning
 
 = 5.3.6 =
+20230810
 * FIX: Work around get_users() fatal error in WP 6.3
 * FIX: Wrong Nginx helper purge urls (backport from 5.4-beta)
 
 = 5.3.5 =
+20230629
 * FIX: Forced Status 200 response conflict with Etag/If-None-Match headers, thanks @revolutionnaire
 
 = 5.3.4 =
+20230530
 * FIX: File not found error on invalid sitemap requests
 * FIX: Lastmod date older than post date on scheduled posts
 
 = 5.3.3 =
+20230528
 * FIX: Undefined variable + Invalid argument supplied for foreach(), thanks @yankyaw09
 
 = 5.3.2 =
@@ -359,16 +369,19 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 * FIX: Cache-Control header no-cache
 
 = 5.2.7 =
+20191111
 * NEW: Ad Inserter compatibility check
 * NEW: xmlsf_urlset and xmlsf_news_urlset action hooks, thanks to Stanislav Khromov (@khromov)
 * Exclude hierarchical post types from news sitemap
 
 = 5.2.6 =
+20191009
 * NEW: xmlsf_tags_after, xmlsf_url_after and xmlsf_news_url_after action hooks
 * Make stylesheet paths relative to prevent exclusion when using different language domains
 * FIX: Taxonomy selection not available to new installs
 
 = 5.2.4 =
+20190917
 * NEW Rank Math incompatibility admin warnings
 * FIX undefined index
 * FIX invalid form control
@@ -385,6 +398,7 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 * FIX Call to undefined function xmlsf_cache_get_archives()
 
 = 5.2 =
+20190429
 * Image query optimization and meta caching
 * Last comment date meta caching
 * Lastmod and publication dates in local time
@@ -410,6 +424,7 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 * FIX news sitemap only ping
 
 = 5.1 =
+20190313
 * SEOPress and Catch Box incompatibility admin messages
 * FIX bbPress incompatibility
 * FIX failing last modified date for taxonomy sitemaps
@@ -424,6 +439,7 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 * NEW Tools: Ping search engines and Flush rewrite rules
 
 = 5.0.7 =
+20181025
 * Allowed domains back to Settings > Reading
 * FIX static files check on activation
 * NEW Admin warning on conflicting plugin settings
@@ -437,6 +453,7 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 * FIX PHP 5.4 compatibility issues
 
 = 5.0 =
+20180908
 * Complete code restructure and cleanup: MVC and JIT inclusion
 * Fewer DB queries, much smaller memory footprint on normal queries
 * NEW Admin interface with dedicated options pages and help tabs
@@ -474,6 +491,7 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 * FIX: plugin_basename propagation
 
 = 4.9 =
+20180507
 * Code cleanup
 * NEW: FactCheck genre
 * Changefreq tag dropped
@@ -487,6 +505,7 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 * restore pre PHP 5.4 compatibility (popular request)
 
 = 4.8 =
+20180316
 * NEW: Conditional functions is_sitemap() and is_news()
 * code cleanup and annotation
 * new google ping URL
@@ -498,6 +517,7 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 * FIX Open_BaseDir issue on IIS server
 
 = 4.7.5 =
+20161207
 * FIX: On cache_flush purge also the respective time_key cache entry,
 props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-in-outdated-last-modified-values-on-index-sitemap/
 * FIX: Variable variable php 7 compat
@@ -513,6 +533,7 @@ props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-i
 * FIX: PHP 5.3 compatibility
 
 = 4.7 =
+20160506
 * WPML compatibility
 * FIX: News Sitemap chinese language tag
 * FIX: flush rules on plugin re-activation
@@ -527,6 +548,7 @@ props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-i
 * BUGFIX: broken Polylang compatibility reported by @zesseb
 
 = 4.6.1 =
+20160407
 * Code cleanup
 * POT file update
 * Dutch translation update
