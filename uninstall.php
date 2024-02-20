@@ -54,7 +54,7 @@ if ( is_multisite() && defined( 'XMLSF_MULTISITE_UNINSTALL' ) && XMLSF_MULTISITE
 function xmlsf_uninstall() {
 	// Remove cache metadata.
 	// Should already have been done on plugin deactivation unless we're unstalling on multisite...
-	include_once XMLSF_DIR . '/inc/functions-sitemap.php';
+	include_once __DIR__ . '/inc/functions-sitemap.php';
 	xmlsf_clear_metacache();
 
 	// Remove post meta data.
