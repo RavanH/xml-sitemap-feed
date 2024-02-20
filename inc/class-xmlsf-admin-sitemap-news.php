@@ -109,7 +109,7 @@ class XMLSF_Admin_Sitemap_News {
 	 */
 	public function compatible_with_advanced() {
 		// Check version.
-		defined( 'XMLSF_NEWS_ADV_VERSION' ) || define( 'XMLSF_NEWS_ADV_VERSION', self::$compat_pro_min );
+		defined( 'XMLSF_NEWS_ADV_VERSION' ) || define( 'XMLSF_NEWS_ADV_VERSION', '0.1' );
 
 		return version_compare( self::$compat_pro_min, XMLSF_NEWS_ADV_VERSION, '<=' );
 	}
