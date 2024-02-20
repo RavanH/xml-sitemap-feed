@@ -164,7 +164,7 @@ function xmlsf_deactivate() {
 	remove_filter( 'rewrite_rules_array', array( $xmlsf_sitemap, 'rewrite_rules' ), 99 );
 	remove_filter( 'rewrite_rules_array', array( $xmlsf_sitemap_news, 'rewrite_rules' ), 99 );
 	// Re-add the default server rules, if needed.
-	wp_sitemaps_get_server();
+	function_exists( 'wp_sitemaps_get_server' ) && wp_sitemaps_get_server();
 
 	flush_rewrite_rules( false );
 }
