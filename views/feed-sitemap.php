@@ -19,21 +19,19 @@ do_action( 'xmlsf_sitemap_index' );
 $disabled = get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
 
 // Public post types.
-if ( empty( $disabled ) || ! in_array( 'post_ypes', (array) $disabled, true ) ) {
-	$post_types = xmlsf_get_post_types();
-	foreach ( $post_types as $the_post_type => $settings ) :
-		$archive      = isset( $settings['archive'] ) ? $settings['archive'] : '';
-		$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $the_post_type, $archive );
+$post_types = xmlsf_get_post_types();
+foreach ( $post_types as $the_post_type => $settings ) :
+	$archive      = isset( $settings['archive'] ) ? $settings['archive'] : '';
+	$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $the_post_type, $archive );
 
-		foreach ( $archive_data as $url => $lastmod ) {
-			echo '<sitemap><loc>' . esc_url( $url ) . '</loc>';
-			if ( $lastmod ) {
-				echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
-			}
-			echo '</sitemap>' . PHP_EOL;
+	foreach ( $archive_data as $url => $lastmod ) {
+		echo '<sitemap><loc>' . esc_url( $url ) . '</loc>';
+		if ( $lastmod ) {
+			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
 		}
-	endforeach;
-}
+		echo '</sitemap>' . PHP_EOL;
+	}
+endforeach;
 
 // Public taxonomies.
 if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) ) {
