@@ -35,8 +35,7 @@ class XMLSF_Sitemap_News {
 	public function __construct( $sitemap = 'sitemap-news.xml' ) {
 		$this->sitemap = $sitemap;
 
-		// Rewrite rules filter.
-		add_filter( 'rewrite_rules_array', array( $this, 'rewrite_rules' ), 99, 1 );
+		$this->register_rewrites();
 
 		// MAIN REQUEST filter.
 		add_filter( 'request', array( $this, 'filter_request' ), 0 );
@@ -46,6 +45,20 @@ class XMLSF_Sitemap_News {
 
 		// Add nnes sitemap to the index.
 		add_filter( 'xmlsf_sitemap_index_after', array( $this, 'news_in_index' ) );
+	}
+
+	/**
+	 * Registers sitemap rewrite tags and routing rules.
+	 *
+	 * @since 5.4.5
+	 */
+	public function register_rewrites() {
+		// Register news sitemap provider route.
+		add_rewrite_rule(
+			'^sitemap-news\.xml(\.gz)?$',
+			'index.php?feed=sitemap-news$matches[1]',
+			'top'
+		);
 	}
 
 	/**
@@ -95,8 +108,8 @@ class XMLSF_Sitemap_News {
 		$xmlsf->is_sitemap = true;
 		$xmlsf->is_news    = true;
 
-		// Set rewrite trailingslash to false.
-		$wp_rewrite->use_trailing_slashes = false;
+		// Don't go redirecting anything now..
+		remove_action( 'template_redirect', 'redirect_canonical' );
 
 		// Save a few db queries.
 		add_filter( 'split_the_query', '__return_false' );

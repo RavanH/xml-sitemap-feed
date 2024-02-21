@@ -24,31 +24,6 @@ abstract class XMLSF_Sitemap {
 	protected $post_types = array();
 
 	/**
-	 * Rewrite rules
-	 *
-	 * @var array
-	 */
-	public $rewrite_rules = array();
-
-	/**
-	 * Add sitemap rewrite rules
-	 * Hooked into rewrite_rules_array filter
-	 *
-	 * @param array $rewrite_rules Rewrite rules.
-	 *
-	 * @return array $rewrite_rules
-	 */
-	public function rewrite_rules( $rewrite_rules ) {
-		global $wp_rewrite;
-
-		foreach ( $this->rewrite_rules as $rewrite_rule ) {
-			$rewrite_rules = array_merge( array( $rewrite_rule['regex'] => $wp_rewrite->index . $rewrite_rule['query'] ), $rewrite_rules );
-		}
-
-		return $rewrite_rules;
-	}
-
-	/**
 	 * Get sitemap index file name.
 	 */
 	public function index() {

@@ -10,18 +10,6 @@
  */
 class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 	/**
-	 * Rewrite rules
-	 *
-	 * @var array
-	 */
-	public $rewrite_rules = array(
-		array(
-			'regex' => 'sitemap(?:_index)?(-[a-z0-9\-_]+)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml(\.gz)?$',
-			'query' => '?feed=sitemap$matches[1]$matches[4]&m=$matches[2]&w=$matches[3]',
-		),
-	);
-
-	/**
 	 * CONSTRUCTOR
 	 *
 	 * Runs on init
@@ -33,8 +21,7 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 
 		$this->post_types = (array) get_option( 'xmlsf_post_types', array() );
 
-		// Rewrite rules filter.
-		add_filter( 'rewrite_rules_array', array( $this, 'rewrite_rules' ), 99, 1 );
+		$this->register_rewrites();
 
 		// Redirect wp-sitemap requests.
 		add_action( 'template_redirect', array( $this, 'redirect' ), 0 );
@@ -66,6 +53,43 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 	}
 
 	/**
+	 * Registers sitemap rewrite tags and routing rules.
+	 *
+	 * @since 5.4.5
+	 */
+	public function register_rewrites() {
+		// Register index route.
+		add_rewrite_rule( '^sitemap(?:_index)?\.xml$', 'index.php?feed=sitemap', 'top' );
+
+		// Register routes for providers.
+		add_rewrite_rule(
+			'^sitemap-root\.xml(\.gz)?$',
+			'index.php?feed=sitemap-root$matches[1]',
+			'top'
+		);
+		add_rewrite_rule(
+			'^sitemap-posttype-([a-z0-9\-_]+?)(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml(\.gz)?$',
+			'index.php?feed=sitemap-posttype-$matches[1]$matches[4]&m=$matches[2]&w=$matches[3]',
+			'top'
+		);
+		add_rewrite_rule(
+			'^sitemap-author\.xml(\.gz)?$',
+			'index.php?feed=sitemap-author$matches[1]',
+			'top'
+		);
+		add_rewrite_rule(
+			'^sitemap-custom\.xml(\.gz)?$',
+			'index.php?feed=sitemap-custom$matches[1]',
+			'top'
+		);
+		add_rewrite_rule(
+			'^sitemap-taxonomy-([a-z0-9\-_]+?)\.xml(\.gz)?$',
+			'index.php?feed=sitemap-taxonomy-$matches[1]$matches[4]',
+			'top'
+		);
+	}
+
+	/**
 	 * Filter request
 	 *
 	 * @param array $request Original request.
@@ -93,8 +117,8 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 		// Set the sitemap conditional flag.
 		$xmlsf->is_sitemap = true;
 
-		// Set rewrite trailingslash to false.
-		$wp_rewrite->use_trailing_slashes = false;
+		// Don't go redirecting anything now..
+		remove_action( 'template_redirect', 'redirect_canonical' );
 
 		// Save a few db queries.
 		add_filter( 'split_the_query', '__return_false' );
@@ -499,14 +523,20 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 				$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
 
 				foreach ( $archive_data as $url => $lastmod ) {
-					$urls[] = wp_parse_url( $url, PHP_URL_PATH );
+					$path = wp_parse_url( $url, PHP_URL_PATH );
+					if ( $path ) {
+						$urls[] = $path;
+					}
 				}
 			endforeach;
 
 			// Add public post taxonomies sitemaps.
 			$taxonomies = xmlsf_get_taxonomies();
 			foreach ( $taxonomies as $taxonomy ) {
-				$urls[] = wp_parse_url( xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
+				$path = wp_parse_url( xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
+				if ( $path ) {
+					$urls[] = $path;
+				}
 			}
 		}
 
