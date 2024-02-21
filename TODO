@@ -1,8 +1,9 @@
 ROADMAP
 
 = 5.5 =
+* move away from feed templates, adopt ?sitemap=... approach from core
 * drop all WP pre-5.5 and ClassicPress compatibility routines?
-* make prime meta caches async
+* make prime meta caches (async crawler?)
 * re-test conflicting plugins/themes messages
 * author sitemap lastmod (in index) = last publication date >>> latest user modified meta...
 * Automatic priority calculation for authors
