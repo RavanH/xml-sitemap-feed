@@ -14,14 +14,21 @@
  * @return array
  */
 function xmlsf_get_post_types() {
-	$post_types = (array) get_option( 'xmlsf_post_types', array() );
-	$available  = (array) apply_filters( 'xmlsf_post_types', get_post_types( array( 'public' => true ) ) );
+	$active_post_types = array();
+	$post_types        = (array) get_option( 'xmlsf_post_types', array() );
+	// Get active post types.
+	foreach ( $post_types as $post_type => $settings ) {
+		if ( ! empty( $settings['active'] ) ) {
+			$active_post_types[ $post_type ] = $settings;
+		}
+	}
 
+	$available = (array) apply_filters( 'xmlsf_post_types', get_post_types( array( 'public' => true ) ) );
 	// Make sure post types are allowed and publicly viewable.
 	$available = array_diff( $available, xmlsf()->disabled_post_types() );
 	$available = array_filter( $available, 'is_post_type_viewable' );
 
-	$post_types_settings = array_intersect_key( $post_types, array_flip( $available ) );
+	$post_types_settings = array_intersect_key( $active_post_types, array_flip( $available ) );
 
 	return $post_types_settings;
 }
