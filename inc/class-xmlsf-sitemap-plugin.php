@@ -499,14 +499,20 @@ class XMLSF_Sitemap_Plugin extends XMLSF_Sitemap {
 				$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
 
 				foreach ( $archive_data as $url => $lastmod ) {
-					$urls[] = wp_parse_url( $url, PHP_URL_PATH );
+					$path = wp_parse_url( $url, PHP_URL_PATH );
+					if ( $path ) {
+						$urls[] = $path;
+					}
 				}
 			endforeach;
 
 			// Add public post taxonomies sitemaps.
 			$taxonomies = xmlsf_get_taxonomies();
 			foreach ( $taxonomies as $taxonomy ) {
-				$urls[] = wp_parse_url( xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
+				$path = wp_parse_url( xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
+				if ( $path ) {
+					$urls[] = $path;
+				}
 			}
 		}
 
