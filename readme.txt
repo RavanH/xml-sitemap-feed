@@ -303,6 +303,7 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 = 5.4.4 =
 20240221
 * FIX: split by month
+* FIX: disabled post types in index
 * ClassicPress and WP pre-5.5 compatibility
 * FIX: Undefined contact on uninstall
 * FIX: admin compatibility message
