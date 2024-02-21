@@ -3,7 +3,7 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.4.5-alpha1
+ * Version: 5.4.5
  * Text Domain: xml-sitemap-feed
  * Requires at least: 4.4
  * Requires PHP: 5.6
@@ -13,7 +13,7 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.4.4' );
+define( 'XMLSF_VERSION', '5.4.5' );
 
 /**
  * Copyright 2024 RavanH
@@ -133,9 +133,7 @@ function xmlsf_init() {
 
 	// Flush rewrite rules?
 	global $wp_rewrite;
-	if ( $wp_rewrite->using_permalinks() && ! get_option( 'rewrite_rules' ) ) {
-		flush_rewrite_rules( false );
-	}
+	$wp_rewrite->wp_rewrite_rules();
 }
 
 /**
@@ -157,15 +155,17 @@ function xmlsf_activate() {
  */
 function xmlsf_deactivate() {
 	// Clear all cache metadata.
+	if ( ! function_exists( 'xmlsf_clear_metacache' ) ) {
+		// Needed for wp-cli.
+		include_once XMLSF_DIR . '/inc/functions-sitemap.php';
+	}
 	xmlsf_clear_metacache();
 
-	// Remove relevant hooks, then flush.
-	global $xmlsf_sitemap, $xmlsf_sitemap_news;
-	remove_filter( 'rewrite_rules_array', array( $xmlsf_sitemap, 'rewrite_rules' ), 99 );
-	remove_filter( 'rewrite_rules_array', array( $xmlsf_sitemap_news, 'rewrite_rules' ), 99 );
-	// Re-add the default server rules, if needed.
+	// Remove old rules.
+	// TODO but how? remove_rewrite_rule() does not exist yet :/
+	// Re-add core rules.
 	function_exists( 'wp_sitemaps_get_server' ) && wp_sitemaps_get_server();
-
+	// Then flush.
 	flush_rewrite_rules( false );
 }
 
