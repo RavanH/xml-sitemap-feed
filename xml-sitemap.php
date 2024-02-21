@@ -3,7 +3,7 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.4.4
+ * Version: 5.4.5-alpha1
  * Text Domain: xml-sitemap-feed
  * Requires at least: 4.4
  * Requires PHP: 5.6
@@ -84,14 +84,21 @@ function xmlsf_init() {
 		require_once XMLSF_DIR . '/upgrade.php';
 	}
 
-	// If nothing enabled, just disable core sitemap and bail.
+	// If sitemaps enabled, do our thing. Otherwise disable core.
 	if ( xmlsf_sitemaps_enabled() ) {
 		// Shared functions.
 		require_once XMLSF_DIR . '/inc/functions.php';
 
 		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
-		// XML Sitemap.
+		// Google News sitemap?
+		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
+			global $xmlsf_sitemap_news;
+			require XMLSF_DIR . '/inc/class-xmlsf-sitemap-news.php';
+			$xmlsf_sitemap_news = new XMLSF_Sitemap_News();
+		}
+
+		// XML Sitemap?
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
 			global $xmlsf_sitemap;
 
@@ -112,13 +119,6 @@ function xmlsf_init() {
 		} else {
 			// Disable core sitemap.
 			add_filter( 'wp_sitemaps_enabled', '__return_false' );
-		}
-
-		// Google News sitemap.
-		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-			global $xmlsf_sitemap_news;
-			require XMLSF_DIR . '/inc/class-xmlsf-sitemap-news.php';
-			$xmlsf_sitemap_news = new XMLSF_Sitemap_News();
 		}
 
 		// Include and instantiate main class.
