@@ -3,6 +3,8 @@ ROADMAP
 = 5.5 =
 * autoload
 * revise readme
+* add missing google news help tab sections: post types, Hierarchical post types
+* remove help tab section: content labels
 * Move automatic priority calc + update lastmod on comments to General section
 * switch to Exclude... instead of Include...
 * move away from feed templates, adopt ?sitemap=... approach from core
