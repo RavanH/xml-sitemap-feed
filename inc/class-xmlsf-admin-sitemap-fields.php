@@ -50,6 +50,7 @@ class XMLSF_Admin_Sitemap_Fields {
 			'fields'              => 'ID',
 			'has_published_posts' => $post_types,
 		);
+
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-disable.php';
 	}

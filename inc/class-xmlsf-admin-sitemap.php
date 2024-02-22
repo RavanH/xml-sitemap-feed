@@ -498,7 +498,7 @@ class XMLSF_Admin_Sitemap {
 		);
 		add_settings_field(
 			'disabled_providers',
-			translate( 'Deactivate' ),
+			translate( 'Exclude:' ),
 			array( 'XMLSF_Admin_Sitemap_Fields', 'disable_fields' ),
 			'xmlsf_general',
 			'general'
@@ -759,7 +759,7 @@ class XMLSF_Admin_Sitemap {
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-general-disable',
-						'title'   => translate( 'Deactivate' ),
+						'title'   => translate( 'Exclude:' ),
 						'content' => $content,
 					)
 				);

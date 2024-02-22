@@ -8,7 +8,7 @@
 ?>
 <fieldset id="xmlsf_disabled_providers">
 	<legend class="screen-reader-text">
-		<?php echo esc_html( translate( 'Deactivate' ) ); ?>
+		<?php echo esc_html( translate( 'Exclude:' ) ); ?>
 	</legend>
 
 	<p>
