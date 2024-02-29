@@ -29,29 +29,3 @@ CONSIDER
 * drop all WP pre-5.5 and ClassicPress compatibility routines?
 * remove all .gz stuff (output compression already on most hosting)
 * core sitemap stylesheets per sitemap type (is that possible?)
-
-TODO start with namespacing and autoload
-// http://justintadlock.com/archives/2018/12/14/php-namespaces-for-wordpress-developers
-/*
-spl_autoload_register( function( $class ) {
-
-	$namespace = 'XMLSF\\';
-
-	// Bail if the class is not in our namespace.
-	if ( 0 !== strpos( $class, $namespace ) ) {
-		return;
-	}
-
-	// Build the filename.
-	$class = str_replace( $namespace, '', $class );
-	$class = strtolower( $class );
-	$class = str_replace( '_', '-', $class );
-	$file = realpath( __DIR__ ) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'class-' . $class . '.php';
-
-	// If the file exists for the class name, load it.
-	if ( file_exists( $file ) ) {
-		include( $file );
-	}
-} );
-*/
-

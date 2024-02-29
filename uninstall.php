@@ -9,7 +9,7 @@
  * XMLSF_MULTISITE_UNINSTALL
  *
  * Set this constant in wp-config.php if you want to allow looping over each site
- * in the network to run XMLSitemapFeed_Uninstall->uninstall() defined in uninstall.php
+ * in the network to run xmlsf_uninstall() defined in uninstall.php
  *
  * There is NO batch-processing so it does not scale on large networks!
  * The constant is ignored on networks over 10k sites.

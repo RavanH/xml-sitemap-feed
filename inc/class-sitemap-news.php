@@ -5,10 +5,12 @@
  * @package XML Sitemap & Google News
  */
 
+namespace XMLSF;
+
 /**
  * XMLSF Sitemap News CLASS
  */
-class XMLSF_Sitemap_News {
+class Sitemap_News {
 	/**
 	 * Sitemap index name
 	 *
@@ -38,13 +40,13 @@ class XMLSF_Sitemap_News {
 		$this->register_rewrites();
 
 		// MAIN REQUEST filter.
-		add_filter( 'request', array( $this, 'filter_request' ), 0 );
+		\add_filter( 'request', array( $this, 'filter_request' ), 0 );
 
 		// NGINX HELPER PURGE URLS.
-		add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
+		\add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
 
 		// Add nnes sitemap to the index.
-		add_filter( 'xmlsf_sitemap_index_after', array( $this, 'news_in_index' ) );
+		\add_filter( 'xmlsf_sitemap_index_after', array( $this, 'news_in_index' ) );
 	}
 
 	/**
@@ -54,7 +56,7 @@ class XMLSF_Sitemap_News {
 	 */
 	public function register_rewrites() {
 		// Register news sitemap provider route.
-		add_rewrite_rule(
+		\add_rewrite_rule(
 			'^sitemap-news\.xml(\.gz)?$',
 			'index.php?feed=sitemap-news$matches[1]',
 			'top'
@@ -65,16 +67,16 @@ class XMLSF_Sitemap_News {
 	 * Add Google News sitemap to the sitemap index
 	 */
 	public function news_in_index() {
-		$url        = xmlsf_sitemap_url( 'news' );
-		$options    = get_option( 'xmlsf_news_tags' );
+		$url        = \xmlsf_sitemap_url( 'news' );
+		$options    = \get_option( 'xmlsf_news_tags' );
 		$post_types = isset( $options['post_type'] ) && ! empty( $options['post_type'] ) ? (array) $options['post_type'] : array( 'post' );
 		foreach ( $post_types as $post_type ) {
-			$lastpostdate = get_date_from_gmt( get_lastpostdate( 'GMT', $post_type ), DATE_W3C );
+			$lastpostdate = \get_date_from_gmt( \get_lastpostdate( 'GMT', $post_type ), DATE_W3C );
 			$lastmod      = isset( $lastmod ) && $lastmod > $lastpostdate ? $lastmod : $lastpostdate; // Absolute last post date.
 		}
-		echo '<sitemap><loc>' . esc_xml( $url ) . '</loc>';
+		echo '<sitemap><loc>' . \esc_xml( $url ) . '</loc>';
 		if ( isset( $lastmod ) ) {
-			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+			echo '<lastmod>' . \esc_xml( $lastmod ) . '</lastmod>';
 		}
 		echo '</sitemap>' . PHP_EOL;
 	}
@@ -98,7 +100,7 @@ class XMLSF_Sitemap_News {
 		}
 
 		// Short-circuit if request is not a feed or it does not start with 'sitemap-news'.
-		if ( empty( $request['feed'] ) || strpos( $request['feed'], 'sitemap-news' ) !== 0 ) {
+		if ( empty( $request['feed'] ) || \strpos( $request['feed'], 'sitemap-news' ) !== 0 ) {
 			return $request;
 		}
 
@@ -109,34 +111,30 @@ class XMLSF_Sitemap_News {
 		$xmlsf->is_news    = true;
 
 		// Don't go redirecting anything now..
-		remove_action( 'template_redirect', 'redirect_canonical' );
+		\remove_action( 'template_redirect', 'redirect_canonical' );
 
 		// Save a few db queries.
-		add_filter( 'split_the_query', '__return_false' );
-
-		// Include public functions.
-		require_once XMLSF_DIR . '/inc/functions-public.php';
-		require_once XMLSF_DIR . '/inc/functions-public-sitemap-news.php';
+		\add_filter( 'split_the_query', '__return_false' );
 
 		// Make sure we have the proper locale setting for calculations.
-		setlocale( LC_NUMERIC, 'C' );
+		\setlocale( LC_NUMERIC, 'C' );
 
 		// Disable caching.
-		defined( 'DONOTCACHEPAGE' ) || define( 'DONOTCACHEPAGE', true );
-		defined( 'DONOTCACHEDB' ) || define( 'DONOTCACHEDB', true );
+		\defined( 'DONOTCACHEPAGE' ) || \define( 'DONOTCACHEPAGE', true );
+		\defined( 'DONOTCACHEDB' ) || \define( 'DONOTCACHEDB', true );
 
 		/** COMPRESSION */
 
 		// Check for gz request.
-		if ( substr( $request['feed'], -3 ) === '.gz' ) {
+		if ( \substr( $request['feed'], -3 ) === '.gz' ) {
 			// Pop that .gz.
-			$request['feed'] = substr( $request['feed'], 0, -3 );
+			$request['feed'] = \substr( $request['feed'], 0, -3 );
 			// Verify/apply compression settings.
-			xmlsf_output_compression();
+			\xmlsf_output_compression();
 		}
 
 		/** PREPARE TO LOAD TEMPLATE */
-		add_action(
+		\add_action(
 			'do_feed_' . $request['feed'],
 			'xmlsf_load_template',
 			10,
@@ -148,7 +146,7 @@ class XMLSF_Sitemap_News {
 		$request['no_found_rows'] = true; // found rows calc is slow and only needed for pagination.
 
 		/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
-		$request = apply_filters( 'xmlsf_news_request', $request );
+		$request = \apply_filters( 'xmlsf_news_request', $request );
 
 		/**
 		 * Developers
@@ -165,34 +163,34 @@ class XMLSF_Sitemap_News {
 		$request['cache_results'] = false;
 
 		// Post type(s).
-		$options              = (array) get_option( 'xmlsf_news_tags' );
+		$options              = (array) \get_option( 'xmlsf_news_tags' );
 		$post_types           = ! empty( $options['post_type'] ) ? $options['post_type'] : array( 'post' );
-		$post_types           = apply_filters( 'xmlsf_news_post_types', $post_types );
+		$post_types           = \apply_filters( 'xmlsf_news_post_types', $post_types );
 		$request['post_type'] = $post_types;
 
 		// Categories.
-		if ( is_array( $options ) && isset( $options['categories'] ) && is_array( $options['categories'] ) ) {
-			$request['cat'] = implode( ',', $options['categories'] );
+		if ( \is_array( $options ) && isset( $options['categories'] ) && \is_array( $options['categories'] ) ) {
+			$request['cat'] = \implode( ',', $options['categories'] );
 		}
 
 		// Set up query filters.
 		$live = false;
 		foreach ( $post_types as $post_type ) {
-			if ( strtotime( get_lastpostdate( 'gmt', $post_type ) ) > strtotime( gmdate( 'Y-m-d H:i:s', strtotime( '-48 hours' ) ) ) ) {
+			if ( \strtotime( \get_lastpostdate( 'gmt', $post_type ) ) > \strtotime( \gmdate( 'Y-m-d H:i:s', \strtotime( '-48 hours' ) ) ) ) {
 				$live = true;
 				break;
 			}
 		}
 		if ( $live ) {
-			add_filter(
+			\add_filter(
 				'post_limits',
 				function () {
 					return 'LIMIT 0, 1000';
 				}
 			);
-			add_filter( 'posts_where', 'xmlsf_news_filter_where', 10, 1 );
+			\add_filter( 'posts_where', 'xmlsf_news_filter_where', 10, 1 );
 		} else {
-			add_filter(
+			\add_filter(
 				'post_limits',
 				function () {
 					return 'LIMIT 0, 1';
@@ -203,16 +201,16 @@ class XMLSF_Sitemap_News {
 		/** GENERAL MISC. PREPARATIONS */
 
 		// Prevent public errors breaking xml.
-		@ini_set( 'display_errors', 0 ); // phpcs:ignore WordPress.PHP.IniSet.display_errors_Disallowed
+		@\ini_set( 'display_errors', 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.PHP.IniSet.display_errors_Disallowed
 
 		// Remove filters to prevent stuff like cdn urls for xml stylesheet and images.
-		remove_all_filters( 'plugins_url' );
-		remove_all_filters( 'wp_get_attachment_url' );
-		remove_all_filters( 'image_downsize' );
+		\remove_all_filters( 'plugins_url' );
+		\remove_all_filters( 'wp_get_attachment_url' );
+		\remove_all_filters( 'image_downsize' );
 
 		// Remove actions that we do not need.
-		remove_all_actions( 'widgets_init' );
-		remove_all_actions( 'wp_footer' );
+		\remove_all_actions( 'widgets_init' );
+		\remove_all_actions( 'wp_footer' );
 
 		return $request;
 	}
@@ -229,7 +227,7 @@ class XMLSF_Sitemap_News {
 	public function rewrite_rules( $rewrite_rules ) {
 		global $wp_rewrite;
 
-		$rewrite_rules = array_merge( array( $this->rewrite_rules['regex'] => $wp_rewrite->index . $this->rewrite_rules['query'] ), $rewrite_rules );
+		$rewrite_rules = \array_merge( array( $this->rewrite_rules['regex'] => $wp_rewrite->index . $this->rewrite_rules['query'] ), $rewrite_rules );
 
 		return $rewrite_rules;
 	}

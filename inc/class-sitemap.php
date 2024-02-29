@@ -5,10 +5,12 @@
  * @package XML Sitemap & Google News
  */
 
+namespace XMLSF;
+
 /**
  * XMLSF Sitemap CLASS
  */
-abstract class XMLSF_Sitemap {
+abstract class Sitemap {
 	/**
 	 * Sitemap index name
 	 *
@@ -27,7 +29,7 @@ abstract class XMLSF_Sitemap {
 	 * Get sitemap index file name.
 	 */
 	public function index() {
-		return apply_filters( 'xmlsf_sitemap_filename', $this->index );
+		return \apply_filters( 'xmlsf_sitemap_filename', $this->index );
 	}
 
 	/**
@@ -38,26 +40,26 @@ abstract class XMLSF_Sitemap {
 	 */
 	public function clean_post_cache( $post_ID, $post ) {
 		// are we moving the post in or out of published status?
-		wp_cache_delete( 'xmlsf_get_archives', 'general' );
+		\wp_cache_delete( 'xmlsf_get_archives', 'general' );
 
 		// TODO get year / month here to delete specific keys too !!!!
-		$m = get_date_from_gmt( $post->post_date_gmt, 'Ym' );
-		$y = substr( $m, 0, 4 );
+		$m = \get_date_from_gmt( $post->post_date_gmt, 'Ym' );
+		$y = \substr( $m, 0, 4 );
 
 		// clear possible last post modified cache keys.
-		wp_cache_delete( 'lastpostmodified:gmt', 'timeinfo' ); // should be handled by WP core?
-		wp_cache_delete( 'lastpostmodified' . $y . ':gmt', 'timeinfo' );
-		wp_cache_delete( 'lastpostmodified' . $m . ':gmt', 'timeinfo' );
-		wp_cache_delete( 'lastpostmodified' . $y . ':gmt:' . $post->post_type, 'timeinfo' );
-		wp_cache_delete( 'lastpostmodified' . $m . ':gmt:' . $post->post_type, 'timeinfo' );
+		\wp_cache_delete( 'lastpostmodified:gmt', 'timeinfo' ); // should be handled by WP core?
+		\wp_cache_delete( 'lastpostmodified' . $y . ':gmt', 'timeinfo' );
+		\wp_cache_delete( 'lastpostmodified' . $m . ':gmt', 'timeinfo' );
+		\wp_cache_delete( 'lastpostmodified' . $y . ':gmt:' . $post->post_type, 'timeinfo' );
+		\wp_cache_delete( 'lastpostmodified' . $m . ':gmt:' . $post->post_type, 'timeinfo' );
 
 		// clear possible last post date cache keys.
-		wp_cache_delete( 'lastpostdate:gmt', 'timeinfo' );
-		wp_cache_delete( 'lastpostdate:gmt:' . $post->post_type, 'timeinfo' );
+		\wp_cache_delete( 'lastpostdate:gmt', 'timeinfo' );
+		\wp_cache_delete( 'lastpostdate:gmt:' . $post->post_type, 'timeinfo' );
 
 		// clear possible fist post date cache keys.
-		wp_cache_delete( 'firstpostdate:gmt', 'timeinfo' );
-		wp_cache_delete( 'firstpostdate:gmt:' . $post->post_type, 'timeinfo' );
+		\wp_cache_delete( 'firstpostdate:gmt', 'timeinfo' );
+		\wp_cache_delete( 'firstpostdate:gmt:' . $post->post_type, 'timeinfo' );
 	}
 
 	/**
@@ -73,30 +75,30 @@ abstract class XMLSF_Sitemap {
 			// no status transition or not moving in or out of 'publish' status.
 			$old_status === $new_status || ( 'publish' !== $new_status && 'publish' !== $old_status ) ||
 			// inactive post type.
-			! array_key_exists( $post->post_type, $this->post_types ) || empty( $this->post_types[ $post->post_type ]['active'] ) ||
+			! \array_key_exists( $post->post_type, $this->post_types ) || empty( $this->post_types[ $post->post_type ]['active'] ) ||
 			// no taxonomies activated.
-			in_array( 'taxonomies', (array) get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) ), true )
+			\in_array( 'taxonomies', (array) \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) ), true )
 		) {
 			return;
 		}
 
-		$taxonomies = get_option( 'xmlsf_taxonomies' );
+		$taxonomies = \get_option( 'xmlsf_taxonomies' );
 		if ( empty( $taxonomies ) ) {
-			$taxonomies = xmlsf_public_taxonomies();
+			$taxonomies = \xmlsf_public_taxonomies();
 		}
 
 		$term_ids = array();
 		foreach ( (array) $taxonomies as $slug => $name ) {
-			$terms = wp_get_post_terms( $post->ID, $slug, array( 'fields' => 'ids' ) );
+			$terms = \wp_get_post_terms( $post->ID, $slug, array( 'fields' => 'ids' ) );
 			if ( ! is_wp_error( $terms ) ) {
-				$term_ids = array_merge( $term_ids, $terms );
+				$term_ids = \array_merge( $term_ids, $terms );
 			}
 		}
 
-		$time = gmdate( 'Y-m-d H:i:s' );
+		$time = \gmdate( 'Y-m-d H:i:s' );
 
 		foreach ( $term_ids as $id ) {
-			update_term_meta( $id, 'term_modified', $time );
+			\update_term_meta( $id, 'term_modified', $time );
 		}
 	}
 
@@ -117,10 +119,10 @@ abstract class XMLSF_Sitemap {
 
 		// TODO: maybe only for activated users.
 
-		$time    = gmdate( 'Y-m-d H:i:s' );
-		$user_id = get_post_field( 'post_author', $post );
+		$time    = \gmdate( 'Y-m-d H:i:s' );
+		$user_id = \get_post_field( 'post_author', $post );
 
-		update_user_meta( $user_id, 'user_modified', $time );
+		\update_user_meta( $user_id, 'user_modified', $time );
 	}
 
 	/**
@@ -138,7 +140,7 @@ abstract class XMLSF_Sitemap {
 			// not publishing or updating.
 			'publish' !== $new_status ||
 			// inactive post type.
-			! array_key_exists( $post->post_type, $this->post_types ) || empty( $this->post_types[ $post->post_type ]['active'] ) ||
+			! \array_key_exists( $post->post_type, $this->post_types ) || empty( $this->post_types[ $post->post_type ]['active'] ) ||
 			// no image tags active.
 			empty( $this->post_types[ $post->post_type ]['tags']['image'] )
 		) {
@@ -148,7 +150,7 @@ abstract class XMLSF_Sitemap {
 		$which = $this->post_types[ $post->post_type ]['tags']['image'];
 
 		// delete old image meta data.
-		delete_post_meta( $post->ID, '_xmlsf_image_' . $which );
+		\delete_post_meta( $post->ID, '_xmlsf_image_' . $which );
 
 		$this->_add_images_meta( $post, $which );
 	}
@@ -168,21 +170,21 @@ abstract class XMLSF_Sitemap {
 			return;
 		}
 
-		$post_type = get_post_type( $comment->comment_post_ID );
+		$post_type = \get_post_type( $comment->comment_post_ID );
 
 		// Bail when...
 		if (
 			// inactive post type.
-			! array_key_exists( $post_type, $this->post_types )
+			! \array_key_exists( $post_type, $this->post_types )
 			// comments date irrelevant.
 			|| empty( $this->post_types[ $post_type ]['update_lastmod_on_comments'] )
 		) {
 			return;
 		}
 
-		$time = gmdate( 'Y-m-d H:i:s' );
+		$time = \gmdate( 'Y-m-d H:i:s' );
 
-		update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date_gmt', $time );
+		\update_post_meta( $comment->comment_post_ID, '_xmlsf_comment_date_gmt', $time );
 	}
 
 	/**
@@ -200,12 +202,12 @@ abstract class XMLSF_Sitemap {
 			return;
 		}
 
-		$post_type = get_post_type( $commentdata['comment_post_ID'] );
+		$post_type = \get_post_type( $commentdata['comment_post_ID'] );
 
 		// Bail when...
 		if (
 			// inactive post type.
-			! array_key_exists( $post_type, $this->post_types )
+			! \array_key_exists( $post_type, $this->post_types )
 			// comments date irrelevant.
 			|| empty( $this->post_types[ $post_type ]['update_lastmod_on_comments'] )
 		) {
@@ -213,7 +215,7 @@ abstract class XMLSF_Sitemap {
 		}
 
 		// Update comment meta data.
-		update_post_meta( $commentdata['comment_post_ID'], '_xmlsf_comment_date_gmt', $commentdata['comment_date_gmt'] );
+		\update_post_meta( $commentdata['comment_post_ID'], '_xmlsf_comment_date_gmt', $commentdata['comment_date_gmt'] );
 	}
 
 	/**
@@ -228,7 +230,7 @@ abstract class XMLSF_Sitemap {
 		$post_type = $wp_query->get( 'post_type' );
 
 		// Bail if unexpected post type.
-		if ( empty( $post_type ) || ! is_string( $post_type ) || ! isset( $this->post_types[ $post_type ] ) ) {
+		if ( empty( $post_type ) || ! \is_string( $post_type ) || ! isset( $this->post_types[ $post_type ] ) ) {
 			return;
 		}
 
@@ -244,15 +246,15 @@ abstract class XMLSF_Sitemap {
 			is_array( $this->post_types[ $post_type ]['tags'] ) &&
 			! empty( $this->post_types[ $post_type ]['tags']['image'] )
 		) {
-			$primed = (array) get_transient( 'xmlsf_images_meta_primed' );
+			$primed = (array) \get_transient( 'xmlsf_images_meta_primed' );
 
 			if (
 				! isset( $primed[ $post_type ] ) ||
-				! is_array( $primed[ $post_type ] ) ||
+				! \is_array( $primed[ $post_type ] ) ||
 				(
-					! in_array( $m, $primed[ $post_type ], true ) &&
-					! in_array( $y, $primed[ $post_type ], true ) &&
-					! in_array( 'all', $primed[ $post_type ], true )
+					! \in_array( $m, $primed[ $post_type ], true ) &&
+					! \in_array( $y, $primed[ $post_type ], true ) &&
+					! \in_array( 'all', $primed[ $post_type ], true )
 				)
 			) {
 				// Prime images meta data.
@@ -264,21 +266,21 @@ abstract class XMLSF_Sitemap {
 				$primed[ $post_type ][] = $m;
 
 				// Update.
-				set_transient( 'xmlsf_images_meta_primed', $primed );
+				\set_transient( 'xmlsf_images_meta_primed', $primed );
 			}
 		}
 
 		// If update_lastmod_on_comments active then prefetch comments.
 		if ( ! empty( $this->post_types[ $post_type ]['update_lastmod_on_comments'] ) ) {
-			$primed = (array) get_transient( 'xmlsf_comments_meta_primed' );
+			$primed = (array) \get_transient( 'xmlsf_comments_meta_primed' );
 
 			if (
 				! isset( $primed[ $post_type ] ) ||
-				! is_array( $primed[ $post_type ] ) ||
+				! \is_array( $primed[ $post_type ] ) ||
 				(
-					! in_array( $m, $primed[ $post_type ], true ) &&
-					! in_array( $y, $primed[ $post_type ], true ) &&
-					! in_array( 'all', $primed[ $post_type ], true )
+					! \in_array( $m, $primed[ $post_type ], true ) &&
+					! \in_array( $y, $primed[ $post_type ], true ) &&
+					! \in_array( 'all', $primed[ $post_type ], true )
 				)
 			) {
 				// Prime comment meta data.
@@ -290,7 +292,7 @@ abstract class XMLSF_Sitemap {
 				$primed[ $post_type ][] = $m;
 
 				// Update.
-				set_transient( 'xmlsf_comments_meta_primed', $primed );
+				\set_transient( 'xmlsf_comments_meta_primed', $primed );
 			}
 		}
 	}
@@ -302,17 +304,17 @@ abstract class XMLSF_Sitemap {
 	 * @param WP_Post $post  Post object.
 	 * @param string  $which Which.
 	 */
-	protected function _add_images_meta( $post, $which ) {
-		if ( ! is_object( $post ) || ! isset( $post->ID ) ) {
+	protected function _add_images_meta( $post, $which ) { // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+		if ( ! \is_object( $post ) || ! isset( $post->ID ) ) {
 			return;
 		}
 
-		$stored = (array) get_post_meta( $post->ID, '_xmlsf_image_' . $which );
+		$stored = (array) \get_post_meta( $post->ID, '_xmlsf_image_' . $which );
 
 		// Populate images and add as meta data.
-		foreach ( xmlsf_images_data( $post, $which ) as $data ) {
-			if ( ! in_array( $data, $stored, true ) ) {
-				add_post_meta( $post->ID, '_xmlsf_image_' . $which, $data );
+		foreach ( \xmlsf_images_data( $post, $which ) as $data ) {
+			if ( ! \in_array( $data, $stored, true ) ) {
+				\add_post_meta( $post->ID, '_xmlsf_image_' . $which, $data );
 			}
 		}
 	}
@@ -323,13 +325,13 @@ abstract class XMLSF_Sitemap {
 	 * @since 5.2
 	 * @param array $post Post object.
 	 */
-	protected function _add_comment_meta( $post ) {
-		if ( ! is_object( $post ) || ! isset( $post->ID ) ) {
+	protected function _add_comment_meta( $post ) { // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+		if ( ! \is_object( $post ) || ! isset( $post->ID ) ) {
 			return;
 		}
 
 		// Get latest post comment.
-		$comments = get_comments(
+		$comments = \get_comments(
 			array(
 				'status'  => 'approve',
 				'number'  => 1,
@@ -338,7 +340,7 @@ abstract class XMLSF_Sitemap {
 		);
 
 		if ( isset( $comments[0]->comment_date_gmt ) ) {
-			update_post_meta( $post->ID, '_xmlsf_comment_date_gmt', $comments[0]->comment_date_gmt );
+			\update_post_meta( $post->ID, '_xmlsf_comment_date_gmt', $comments[0]->comment_date_gmt );
 		}
 	}
 }

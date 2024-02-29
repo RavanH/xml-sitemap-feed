@@ -3,7 +3,7 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.4.5
+ * Version: 5.5-alpha1
  * Text Domain: xml-sitemap-feed
  * Requires at least: 4.4
  * Requires PHP: 5.6
@@ -13,7 +13,7 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.4.5' );
+define( 'XMLSF_VERSION', '5.5-alpha1' );
 
 /**
  * Copyright 2024 RavanH
@@ -52,12 +52,8 @@ define( 'XMLSF_DIR', __DIR__ );
 
 define( 'XMLSF_BASENAME', plugin_basename( __FILE__ ) );
 
-// Main plugin init.
-add_action( 'init', 'xmlsf_init', 9 );
-
-register_activation_hook( __FILE__, 'xmlsf_activate' );
-
-register_deactivation_hook( __FILE__, 'xmlsf_deactivate' );
+// Pluggable functions.
+require_once XMLSF_DIR . '/inc/functions-pluggable.php';
 
 /**
  * Plugin initialization
@@ -93,28 +89,25 @@ function xmlsf_init() {
 
 		// Google News sitemap?
 		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
+			require XMLSF_DIR . '/inc/functions-sitemap-news.php';
+
 			global $xmlsf_sitemap_news;
-			require XMLSF_DIR . '/inc/class-xmlsf-sitemap-news.php';
-			$xmlsf_sitemap_news = new XMLSF_Sitemap_News();
+			$xmlsf_sitemap_news = new XMLSF\Sitemap_News();
 		}
 
 		// XML Sitemap?
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
-			global $xmlsf_sitemap;
-
-			require XMLSF_DIR . '/inc/class-xmlsf-sitemap.php';
 			require XMLSF_DIR . '/inc/functions-sitemap.php';
 
+			global $xmlsf_sitemap;
 			if ( xmlsf_uses_core_server() ) {
 				// Extend core sitemap.
-				require XMLSF_DIR . '/inc/class-xmlsf-sitemap-core.php';
-				$xmlsf_sitemap = new XMLSF_Sitemap_Core();
+				$xmlsf_sitemap = new XMLSF\Sitemap_Core();
 			} else {
 				// Replace core sitemap.
 				remove_action( 'init', 'wp_sitemaps_get_server' );
 
-				require XMLSF_DIR . '/inc/class-xmlsf-sitemap-plugin.php';
-				$xmlsf_sitemap = new XMLSF_Sitemap_Plugin();
+				$xmlsf_sitemap = new XMLSF\Sitemap_Plugin();
 			}
 		} else {
 			// Disable core sitemap.
@@ -133,8 +126,10 @@ function xmlsf_init() {
 
 	// Flush rewrite rules?
 	global $wp_rewrite;
-	$wp_rewrite->wp_rewrite_rules();
+	$wp_rewrite->wp_rewrite_rules(); // Recreates rewrite rules only when needed.
 }
+
+add_action( 'init', 'xmlsf_init', 9 );
 
 /**
  * Plugin activation
@@ -146,6 +141,8 @@ function xmlsf_activate() {
 	// Flush rewrite rules on next init.
 	delete_option( 'rewrite_rules' );
 }
+
+register_activation_hook( __FILE__, 'xmlsf_activate' );
 
 /**
  * Plugin de-activation
@@ -169,6 +166,8 @@ function xmlsf_deactivate() {
 	flush_rewrite_rules( false );
 }
 
+register_deactivation_hook( __FILE__, 'xmlsf_deactivate' );
+
 /**
  * Get instantiated sitemap class
  *
@@ -181,11 +180,7 @@ function &xmlsf() {
 	global $xmlsf;
 
 	if ( ! isset( $xmlsf ) ) {
-		if ( ! class_exists( 'XMLSitemapFeed' ) ) {
-			require_once XMLSF_DIR . '/inc/class-xmlsitemapfeed.php';
-		}
-
-		$xmlsf = new XMLSitemapFeed();
+		$xmlsf = new XMLSF\XMLSitemapFeed();
 	}
 
 	return $xmlsf;
@@ -196,18 +191,14 @@ function &xmlsf() {
  *
  * @since 5.4
  *
- * @global XMLSF_Admin $xmlsf_admin
- * @return XMLSF_Admin object by reference
+ * @global XMLSF\Admin $xmlsf_admin
+ * @return XMLSF\Admin object by reference
  */
 function &xmlsf_admin() {
 	global $xmlsf_admin;
 
 	if ( ! isset( $xmlsf_admin ) ) {
-		if ( ! class_exists( 'XMLSF_Admin' ) ) {
-			require XMLSF_DIR . '/inc/class-xmlsf-admin.php';
-		}
-
-		$xmlsf_admin = new XMLSF_Admin();
+		$xmlsf_admin = new XMLSF\Admin();
 	}
 
 	return $xmlsf_admin;
@@ -289,47 +280,29 @@ function xmlsf_sitemaps_enabled( $which = 'any' ) {
 }
 
 /**
- * CONDITIONAL TAGS
+ * Register XMLSF autoloader
+ * http://justintadlock.com/archives/2018/12/14/php-namespaces-for-wordpress-developers
+ *
+ * @since 5.5
+ *
+ * @param string $class_name Namespaced class name.
  */
+function xmlsf_autoloader( $class_name ) {
+	// Bail if the class is not in our namespace.
+	if ( 0 !== strpos( $class_name, 'XMLSF\\' ) ) {
+		return;
+	}
 
-if ( ! function_exists( 'is_sitemap' ) ) {
-	/**
-	 * Is the query for a sitemap?
-	 *
-	 * @since 4.8
-	 * @return bool
-	 */
-	function is_sitemap() {
-		if ( function_exists( 'wp_sitemaps_loaded' ) ) {
-			global $wp_query;
-			if ( ! isset( $wp_query ) ) {
-				_doing_it_wrong( __FUNCTION__, esc_html__( 'Conditional query tags do not work before the query is run. Before then, they always return false.' ), '3.1.0' );
-				return false;
-			}
-			return property_exists( $wp_query, 'is_sitemap' ) ? $wp_query->is_sitemap : false;
-		}
-		global $xmlsf;
-		if ( ! is_object( $xmlsf ) || false === $xmlsf->request_filtered ) {
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
-			return false;
-		}
-		return $xmlsf->is_sitemap;
+	// Build the filename.
+	$class_name = str_replace( 'XMLSF\\', '', $class_name );
+	$class_name = strtolower( $class_name );
+	$class_name = str_replace( '_', '-', $class_name );
+	$file       = realpath( __DIR__ ) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'class-' . $class_name . '.php';
+
+	// If the file exists for the class name, load it.
+	if ( file_exists( $file ) ) {
+		include $file;
 	}
 }
 
-if ( ! function_exists( 'is_news' ) ) {
-	/**
-	 * Is the query for a news sitemap?
-	 *
-	 * @since 4.8
-	 * @return bool
-	 */
-	function is_news() {
-		global $xmlsf;
-		if ( ! is_object( $xmlsf ) || false === $xmlsf->request_filtered_news ) {
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
-			return false;
-		}
-		return $xmlsf->is_news;
-	}
-}
+spl_autoload_register( 'xmlsf_autoloader' );

@@ -1,6 +1,6 @@
 <?php
 /**
- * Sitemaps: XMLSF_Sitemaps_Provider_News class
+ * Sitemaps: Sitemaps_Provider_News class
  *
  * Builds the sitemaps for the External Suctom Sitemaps.
  *
@@ -8,12 +8,14 @@
  * @since 5.4
  */
 
+namespace XMLSF;
+
 /**
  * Posts XML sitemap provider.
  *
  * @since 5.4
  */
-class XMLSF_Sitemaps_Provider_News extends WP_Sitemaps_Provider {
+class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 
 	/**
 	 * External Custom Sitemap URLs.
@@ -33,8 +35,8 @@ class XMLSF_Sitemaps_Provider_News extends WP_Sitemaps_Provider {
 		$this->name        = 'news';
 		$this->object_type = 'news';
 
-		$urls       = (array) xmlsf_sitemap_url( 'news' );
-		$this->urls = array_filter( $urls, 'wp_http_validate_url' );
+		$urls       = (array) \xmlsf_sitemap_url( 'news' );
+		$this->urls = \array_filter( $urls, 'wp_http_validate_url' );
 	}
 
 	/**
@@ -62,7 +64,7 @@ class XMLSF_Sitemaps_Provider_News extends WP_Sitemaps_Provider {
 	 * @return int Total number of pages.
 	 */
 	public function get_max_num_pages( $object_subtype = '' ) {
-		return count( $this->urls );
+		return \count( $this->urls );
 	}
 
 	/**
@@ -95,7 +97,7 @@ class XMLSF_Sitemaps_Provider_News extends WP_Sitemaps_Provider {
 			 *                               Empty string if the object type does not support subtypes.
 			 * @param int    $page           Page number of results.
 			 */
-			$sitemap_entry = apply_filters( 'wp_sitemaps_index_entry', $sitemap_entry, $this->object_type, '', $page );
+			$sitemap_entry = \apply_filters( 'wp_sitemaps_index_entry', $sitemap_entry, $this->object_type, '', $page );
 
 			$sitemaps[] = $sitemap_entry;
 		}

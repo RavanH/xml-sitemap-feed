@@ -5,6 +5,8 @@
  * @package XML Sitemap & Google News
  */
 
+namespace XMLSF;
+
 /**
  * XMLSitemapFeed CLASS
  */
@@ -143,13 +145,13 @@ class XMLSitemapFeed {
 		if ( empty( $this->defaults ) ) :
 
 			// sitemaps.
-			$sitemaps = ( '1' !== get_option( 'blog_public' ) ) ? array() : array(
+			$sitemaps = ( '1' !== \get_option( 'blog_public' ) ) ? array() : array(
 				'sitemap' => 'sitemap.xml',
 			);
 
 			$this->defaults = array(
 				'sitemaps'           => $sitemaps,
-				'server'             => class_exists( 'SimpleXMLElement' ) && function_exists( 'get_sitemap_url' ) ? 'core' : 'plugin',
+				'server'             => \class_exists( 'SimpleXMLElement' ) && function_exists( 'get_sitemap_url' ) ? 'core' : 'plugin',
 				'disabled_providers' => array(),
 				'post_types'         => array(
 					'post'  => array(
@@ -199,7 +201,7 @@ class XMLSitemapFeed {
 			$return = $this->defaults;
 		}
 
-		return apply_filters( 'xmlsf_defaults', $return, $key );
+		return \apply_filters( 'xmlsf_defaults', $return, $key );
 	}
 
 	/**
@@ -210,7 +212,7 @@ class XMLSitemapFeed {
 	public function scheme() {
 		// Scheme to use.
 		if ( empty( $this->scheme ) ) {
-			$scheme       = wp_parse_url( home_url(), PHP_URL_SCHEME );
+			$scheme       = \wp_parse_url( home_url(), PHP_URL_SCHEME );
 			$this->scheme = $scheme ? $scheme : 'http';
 		}
 
@@ -223,7 +225,7 @@ class XMLSitemapFeed {
 	 * @return array
 	 */
 	public function disabled_taxonomies() {
-		return apply_filters( 'xmlsf_disabled_taxonomies', $this->disabled_taxonomies );
+		return \apply_filters( 'xmlsf_disabled_taxonomies', $this->disabled_taxonomies );
 	}
 
 	/**
@@ -232,6 +234,6 @@ class XMLSitemapFeed {
 	 * @return array
 	 */
 	public function disabled_post_types() {
-		return (array) apply_filters( 'xmlsf_disabled_post_types', $this->disabled_post_types );
+		return (array) \apply_filters( 'xmlsf_disabled_post_types', $this->disabled_post_types );
 	}
 }
