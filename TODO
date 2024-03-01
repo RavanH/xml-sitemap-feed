@@ -1,7 +1,11 @@
 ROADMAP
 
 = 5.5 =
-* autoload
+* fix Attempt to read property “post_type” on null https://wordpress.org/support/topic/php-warning-attempt-to-read-property-post_type-on-null-3/
+* fix Polylang Pro showing homepages everywhere https://wordpress.org/support/topic/polylang-broken-since-last-update/
+* fix Polylang issue icw core server
+* fix non-public post types visible icw plugin server
+* subnamespacing?
 * revise readme
 * add missing google news help tab sections: post types, Hierarchical post types
 * remove help tab section: content labels

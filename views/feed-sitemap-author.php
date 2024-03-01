@@ -10,7 +10,7 @@ defined( 'WPINC' ) || die;
 // do xml tag via echo or SVN parser is going to freak out.
 echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charset' ) ) ) . '"?>
 '; ?>
-<?php xmlsf_xml_stylesheet( 'author' ); ?>
+<?php XMLSF\xml_stylesheet( 'author' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action( 'xmlsf_urlset', 'home' ); ?>>
 <?php
@@ -41,8 +41,8 @@ foreach ( $users as $user ) {
 
 	do_action( 'xmlsf_url', 'author', $user );
 
-	echo '<url><loc>' . esc_xml( esc_url( $url ) ) . '</loc><priority>' . esc_xml( xmlsf_get_user_priority( $user ) ) . '</priority>';
-	$lastmod = xmlsf_get_user_modified( $user );
+	echo '<url><loc>' . esc_xml( esc_url( $url ) ) . '</loc><priority>' . esc_xml( XMLSF\get_user_priority( $user ) ) . '</priority>';
+	$lastmod = XMLSF\get_user_modified( $user );
 	if ( $lastmod ) {
 		echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
 	}

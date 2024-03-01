@@ -67,7 +67,7 @@ class Sitemap_News {
 	 * Add Google News sitemap to the sitemap index
 	 */
 	public function news_in_index() {
-		$url        = \xmlsf_sitemap_url( 'news' );
+		$url        = namespace\sitemap_url( 'news' );
 		$options    = \get_option( 'xmlsf_news_tags' );
 		$post_types = isset( $options['post_type'] ) && ! empty( $options['post_type'] ) ? (array) $options['post_type'] : array( 'post' );
 		foreach ( $post_types as $post_type ) {
@@ -130,13 +130,13 @@ class Sitemap_News {
 			// Pop that .gz.
 			$request['feed'] = \substr( $request['feed'], 0, -3 );
 			// Verify/apply compression settings.
-			\xmlsf_output_compression();
+			namespace\output_compression();
 		}
 
 		/** PREPARE TO LOAD TEMPLATE */
 		\add_action(
 			'do_feed_' . $request['feed'],
-			'xmlsf_load_template',
+			'XMLSF\load_template',
 			10,
 			2
 		);
@@ -154,9 +154,9 @@ class Sitemap_News {
 		 * Add your actions that should run when a news sitemap request is found with: add_filter( 'xmlsf_news_request', 'your_filter_function' );
 		 *
 		 * Filters hooked here already:
-		 * xmlsf_polylang_request - Polylang compatibility
-		 * xmlsf_wpml_request - WPML compatibility
-		 * xmlsf_bbpress_request - bbPress compatibility
+		 * XMLSF\polylang_request - Polylang compatibility
+		 * XMLSF\wpml_request - WPML compatibility
+		 * XMLSF\bbpress_request - bbPress compatibility
 		 */
 
 		// No caching.
@@ -188,7 +188,7 @@ class Sitemap_News {
 					return 'LIMIT 0, 1000';
 				}
 			);
-			\add_filter( 'posts_where', 'xmlsf_news_filter_where', 10, 1 );
+			\add_filter( 'posts_where', 'XMLSF\news_filter_where', 10, 1 );
 		} else {
 			\add_filter(
 				'post_limits',

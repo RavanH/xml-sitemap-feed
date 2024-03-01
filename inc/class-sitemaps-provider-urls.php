@@ -103,7 +103,7 @@ class Sitemaps_Provider_URLs extends \WP_Sitemaps_Provider {
 			);
 
 			if ( isset( $url[1] ) && \is_numeric( $url[1] ) ) {
-				$sitemap_entry['priority'] = \xmlsf_sanitize_number( $url[1] );
+				$sitemap_entry['priority'] = namespace\sanitize_number( $url[1] );
 			}
 
 			/**

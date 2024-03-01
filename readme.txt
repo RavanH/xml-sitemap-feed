@@ -300,6 +300,10 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 
 == Changelog ==
 
+= 5.5 =
+* Namespacing & autoloading
+* FIX: Polylang news sitemap category selection
+
 = 5.4.5 =
 20240221
 * FIX: wp-cli disable plugin incompatibility

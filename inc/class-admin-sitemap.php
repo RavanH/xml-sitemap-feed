@@ -73,7 +73,7 @@ class Admin_Sitemap {
 
 		// When taxonomies have been disabled...
 		if ( \in_array( 'taxonomies', (array) $value, true ) && ! \in_array( 'taxonomies', (array) $old, true ) ) {
-			\xmlsf_clear_metacache( 'terms' );
+			namespace\clear_metacache( 'terms' );
 		}
 
 		// TODO Clear user meta cache if deactivating...
@@ -112,12 +112,12 @@ class Admin_Sitemap {
 
 		// Clear images meta caches...
 		if ( $clear_images ) {
-			\xmlsf_clear_metacache( 'images' );
+			namespace\clear_metacache( 'images' );
 		}
 
 		// Clear comments meta caches...
 		if ( $clear_comments ) {
-			\xmlsf_clear_metacache( 'comments' );
+			namespace\clear_metacache( 'comments' );
 		}
 	}
 
@@ -165,7 +165,7 @@ class Admin_Sitemap {
 
 		if ( isset( $_POST['xmlsf-clear-term-meta'] ) ) {
 			// Remove terms metadata.
-			\xmlsf_clear_metacache( 'terms' );
+			namespace\clear_metacache( 'terms' );
 
 			\add_settings_error(
 				'clear_meta_notice',
@@ -177,7 +177,7 @@ class Admin_Sitemap {
 
 		if ( isset( $_POST['xmlsf-clear-user-meta'] ) ) {
 			// Remove terms metadata.
-			\xmlsf_clear_metacache( 'users' );
+			namespace\clear_metacache( 'users' );
 
 			\add_settings_error(
 				'clear_meta_notice',
@@ -189,8 +189,8 @@ class Admin_Sitemap {
 
 		if ( isset( $_POST['xmlsf-clear-post-meta'] ) ) {
 			// Remove metadata.
-			\xmlsf_clear_metacache( 'images' );
-			\xmlsf_clear_metacache( 'comments' );
+			namespace\clear_metacache( 'images' );
+			namespace\clear_metacache( 'comments' );
 
 			\add_settings_error(
 				'clear_meta_notice',
@@ -404,7 +404,7 @@ class Admin_Sitemap {
 		$disabled = false;
 
 		// value prechecks to prevent "invalid form control not focusable" when meta box is hidden.
-		$priority = \is_numeric( $priority ) ? \xmlsf_sanitize_number( $priority ) : '';
+		$priority = \is_numeric( $priority ) ? namespace\sanitize_number( $priority ) : '';
 
 		// disable options and (visibly) set excluded to true for private posts.
 		if ( 'private' === $post->post_status ) {
@@ -449,7 +449,7 @@ class Admin_Sitemap {
 		if ( empty( $_POST['xmlsf_priority'] ) || ! \is_numeric( $_POST['xmlsf_priority'] ) ) {
 			\delete_post_meta( $post_id, '_xmlsf_priority' );
 		} else {
-			\update_post_meta( $post_id, '_xmlsf_priority', \xmlsf_sanitize_number( \sanitize_key( $_POST['xmlsf_priority'] ) ) );
+			\update_post_meta( $post_id, '_xmlsf_priority', namespace\sanitize_number( \sanitize_key( $_POST['xmlsf_priority'] ) ) );
 		}
 
 		// _xmlsf_exclude
@@ -514,7 +514,7 @@ class Admin_Sitemap {
 			'xmlsf_post_types'
 		);
 
-		\xmlsf_uses_core_server() && \add_settings_field(
+		namespace\uses_core_server() && \add_settings_field(
 			'xmlsf_sitemap_post_types_limit',
 			\translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
 			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'post_types_general_fields' ),
@@ -630,7 +630,7 @@ class Admin_Sitemap {
 		\do_action( 'xmlsf_add_settings', $active_tab );
 
 		// prepare sitemap link url.
-		$sitemap_url = \xmlsf_sitemap_url();
+		$sitemap_url = namespace\sitemap_url();
 
 		// Sidebar actions.
 		\add_action(
@@ -768,7 +768,7 @@ class Admin_Sitemap {
 				break;
 
 			case 'post_types':
-				if ( xmlsf_uses_core_server() ) {
+				if ( namespace\uses_core_server() ) {
 					\ob_start();
 					include XMLSF_DIR . '/views/admin/help-tab-post-types-general.php';
 					$content = \ob_get_clean();

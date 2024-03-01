@@ -19,7 +19,7 @@
 	</p>
 
 	<?php
-	if ( empty( $obj->hierarchical ) && ! xmlsf_uses_core_server() ) {
+	if ( empty( $obj->hierarchical ) && ! XMLSF\uses_core_server() ) {
 		$archive = isset( $options[ $obj->name ]['archive'] ) ? $options[ $obj->name ]['archive'] : 'yearly';
 		?>
 	<p>
@@ -68,7 +68,7 @@
 	</p>
 
 	<?php
-	if ( ! xmlsf_uses_core_server() ) {
+	if ( ! XMLSF\uses_core_server() ) {
 		?>
 	<p>
 		<label>

@@ -132,7 +132,7 @@ class Sitemap_Plugin extends Sitemap {
 			// Pop that .gz.
 			$request['feed'] = \substr( $request['feed'], 0, -3 );
 			// Verify/apply compression settings.
-			\xmlsf_output_compression();
+			namespace\output_compression();
 		}
 
 		/** MODIFY REQUEST PARAMETERS */
@@ -153,9 +153,9 @@ class Sitemap_Plugin extends Sitemap {
 		 * Use add_filter( 'xmlsf_request', 'your_filter_function' );
 		 *
 		 * Filters hooked here already:
-		 * xmlsf_polylang_request - Polylang compatibility
-		 * xmlsf_wpml_request - WPML compatibility
-		 * xmlsf_bbpress_request - bbPress compatibility
+		 * XMLSF\polylang_request - Polylang compatibility
+		 * XMLSF\wpml_request - WPML compatibility
+		 * XMLSF\bbpress_request - bbPress compatibility
 		 */
 		$request = \apply_filters( 'xmlsf_request', $request );
 
@@ -243,7 +243,7 @@ class Sitemap_Plugin extends Sitemap {
 		/** PREPARE TO LOAD TEMPLATE */
 		\add_action(
 			'do_feed_' . $request['feed'],
-			'xmlsf_load_template',
+			'XMLSF\load_template',
 			10,
 			2
 		);
@@ -411,7 +411,7 @@ class Sitemap_Plugin extends Sitemap {
 			$arcresults = $this->cache_get_archives( $query );
 
 			foreach ( (array) $arcresults as $arcresult ) {
-				$url            = \xmlsf_sitemap_url(
+				$url            = namespace\sitemap_url(
 					'posttype',
 					array(
 						'type' => $post_type,
@@ -428,7 +428,7 @@ class Sitemap_Plugin extends Sitemap {
 			$arcresults = $this->cache_get_archives( $query );
 
 			foreach ( (array) $arcresults as $arcresult ) {
-				$url            = \xmlsf_sitemap_url(
+				$url            = namespace\sitemap_url(
 					'posttype',
 					array(
 						'type' => $post_type,
@@ -444,7 +444,7 @@ class Sitemap_Plugin extends Sitemap {
 			$arcresults = $this->cache_get_archives( $query );
 
 			foreach ( (array) $arcresults as $arcresult ) {
-				$url            = \xmlsf_sitemap_url(
+				$url            = namespace\sitemap_url(
 					'posttype',
 					array(
 						'type' => $post_type,
@@ -460,7 +460,7 @@ class Sitemap_Plugin extends Sitemap {
 			$arcresults = $this->cache_get_archives( $query );
 
 			if ( is_object( $arcresults[0] ) && $arcresults[0]->posts > 0 ) {
-				$url            = \xmlsf_sitemap_url( 'posttype', array( 'type' => $post_type ) );
+				$url            = namespace\sitemap_url( 'posttype', array( 'type' => $post_type ) );
 				$return[ $url ] = \get_date_from_gmt( \get_lastmodified( 'GMT', $post_type ), DATE_W3C );
 			}
 
@@ -512,7 +512,7 @@ class Sitemap_Plugin extends Sitemap {
 			$urls[] = '/sitemap-custom.xml';
 
 			// Add public post types sitemaps.
-			$post_types = \xmlsf_get_post_types();
+			$post_types = namespace\get_post_types();
 			foreach ( $post_types as $post_type => $settings ) :
 				$archive      = isset( $settings['archive'] ) ? $settings['archive'] : '';
 				$archive_data = \apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
@@ -526,9 +526,9 @@ class Sitemap_Plugin extends Sitemap {
 			endforeach;
 
 			// Add public post taxonomies sitemaps.
-			$taxonomies = \xmlsf_get_taxonomies();
+			$taxonomies = namespace\get_taxonomies();
 			foreach ( $taxonomies as $taxonomy ) {
-				$path = \wp_parse_url( \xmlsf_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
+				$path = \wp_parse_url( namespace\sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
 				if ( $path ) {
 					$urls[] = $path;
 				}

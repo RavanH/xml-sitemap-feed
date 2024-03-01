@@ -35,7 +35,7 @@ class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 		$this->name        = 'news';
 		$this->object_type = 'news';
 
-		$urls       = (array) \xmlsf_sitemap_url( 'news' );
+		$urls       = (array) namespace\sitemap_url( 'news' );
 		$this->urls = \array_filter( $urls, 'wp_http_validate_url' );
 	}
 

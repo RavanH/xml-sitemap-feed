@@ -5,6 +5,8 @@
  * @package XML Sitemap & Google News
  */
 
+namespace XMLSF;
+
 /**
  * Response headers filter
  * Does not check if we are really in a sitemap feed.
@@ -13,14 +15,14 @@
  *
  * @return array
  */
-function xmlsf_news_nocache_headers( $headers ) {
+function news_nocache_headers( $headers ) {
 	// Prevent proxy caches serving a cached news sitemap.
 	$headers['Cache-Control'] .= ', no-store';
 
 	return $headers;
 }
 
-add_filter( 'nocache_headers', 'xmlsf_news_nocache_headers' );
+add_filter( 'nocache_headers', __NAMESPACE__ . '\news_nocache_headers' );
 
 /**
  * Filter news WHERE
@@ -30,8 +32,8 @@ add_filter( 'nocache_headers', 'xmlsf_news_nocache_headers' );
  *
  * @return string
  */
-function xmlsf_news_filter_where( $where = '' ) {
-	return $where . ' AND post_date_gmt > \'' . gmdate( 'Y-m-d H:i:s', strtotime( '-48 hours' ) ) . '\'';
+function news_filter_where( $where = '' ) {
+	return $where . ' AND post_date_gmt > \'' . \gmdate( 'Y-m-d H:i:s', \strtotime( '-48 hours' ) ) . '\'';
 }
 
 /**
@@ -41,31 +43,31 @@ function xmlsf_news_filter_where( $where = '' ) {
  *
  * @return string
  */
-function xmlsf_parse_language_string( $lang ) {
+function parse_language_string( $lang ) {
 	// Lower case, no tags.
-	$lang = convert_chars( strtolower( wp_strip_all_tags( $lang ) ) );
+	$lang = \convert_chars( \strtolower( \wp_strip_all_tags( $lang ) ) );
 
 	// Convert underscores.
-	$lang = str_replace( '_', '-', $lang );
+	$lang = \str_replace( '_', '-', $lang );
 
 	// No hyphens except...
-	if ( strpos( $lang, '-' ) ) :
-		if ( 0 === strpos( $lang, 'zh' ) ) {
-			$lang = strpos( $lang, 'hk' ) || strpos( $lang, 'tw' ) || strpos( $lang, 'hant' ) ? 'zh-tw' : 'zh-cn';
+	if ( \strpos( $lang, '-' ) ) :
+		if ( 0 === \strpos( $lang, 'zh' ) ) {
+			$lang = \strpos( $lang, 'hk' ) || \strpos( $lang, 'tw' ) || \strpos( $lang, 'hant' ) ? 'zh-tw' : 'zh-cn';
 		} else {
 			// Explode on hyphen and use only first part.
-			$expl = explode( '-', $lang );
+			$expl = \explode( '-', $lang );
 			$lang = $expl[0];
 		}
 	endif;
 
 	// Make sure it's max 3 letters.
-	$lang = substr( $lang, 0, 2 );
+	$lang = \substr( $lang, 0, 2 );
 
 	return $lang;
 }
 
-add_filter( 'xmlsf_news_language', 'xmlsf_parse_language_string', 99 );
+add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\parse_language_string', 99 );
 
 /**
  * COMPATIBILITY
@@ -79,11 +81,11 @@ add_filter( 'xmlsf_news_language', 'xmlsf_parse_language_string', 99 );
  *
  * @return string
  */
-function xmlsf_polylang_post_language_filter( $locale, $post_id ) {
-	return function_exists( 'pll_get_post_language' ) ? pll_get_post_language( $post_id, 'locale' ) : $locale;
+function polylang_post_language_filter( $locale, $post_id ) {
+	return \function_exists( 'pll_get_post_language' ) ? \pll_get_post_language( $post_id, 'locale' ) : $locale;
 }
 
-add_filter( 'xmlsf_news_language', 'xmlsf_polylang_post_language_filter', 10, 2 );
+add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\polylang_post_language_filter', 10, 2 );
 
 /**
  * Post language filter for WPML.
@@ -94,9 +96,10 @@ add_filter( 'xmlsf_news_language', 'xmlsf_polylang_post_language_filter', 10, 2 
  *
  * @return string
  */
-function xmlsf_wpml_post_language_filter( $locale, $post_id, $post_type = 'post' ) {
+function wpml_post_language_filter( $locale, $post_id, $post_type = 'post' ) {
 	global $sitepress;
-	return $sitepress ? apply_filters(
+
+	return $sitepress ? \apply_filters(
 		'wpml_element_language_code',
 		$locale,
 		array(
@@ -106,7 +109,7 @@ function xmlsf_wpml_post_language_filter( $locale, $post_id, $post_type = 'post'
 	) : $locale;
 }
 
-add_filter( 'xmlsf_news_language', 'xmlsf_wpml_post_language_filter', 10, 3 );
+add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\wpml_post_language_filter', 10, 3 );
 
 /**
  * Google News Publisher filter for backward compat with XMLSF_GOOGLE_NEWS_NAME constant.
@@ -115,10 +118,10 @@ add_filter( 'xmlsf_news_language', 'xmlsf_wpml_post_language_filter', 10, 3 );
  *
  * @return string
  */
-function xmlsf_google_news_name( $name ) {
-	defined( 'XMLSF_GOOGLE_NEWS_NAME' ) || define( 'XMLSF_GOOGLE_NEWS_NAME', false );
+function google_news_name( $name ) {
+	\defined( 'XMLSF_GOOGLE_NEWS_NAME' ) || \define( 'XMLSF_GOOGLE_NEWS_NAME', false );
 
 	return XMLSF_GOOGLE_NEWS_NAME ? XMLSF_GOOGLE_NEWS_NAME : $name;
 }
 
-add_filter( 'xmlsf_news_publication_name', 'xmlsf_google_news_name' );
+add_filter( 'xmlsf_news_publication_name', __NAMESPACE__ . '\google_news_name' );

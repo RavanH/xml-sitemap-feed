@@ -16,11 +16,11 @@ class Admin {
 	 */
 	public function __construct() {
 
-		if ( \xmlsf_sitemaps_enabled( 'sitemap' ) ) {
+		if ( namespace\sitemaps_enabled( 'sitemap' ) ) {
 			new Admin_Sitemap();
 		}
 
-		if ( \xmlsf_sitemaps_enabled( 'news' ) ) {
+		if ( namespace\sitemaps_enabled( 'news' ) ) {
 			new Admin_Sitemap_News();
 		}
 

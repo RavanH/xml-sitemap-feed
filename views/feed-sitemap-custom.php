@@ -10,7 +10,7 @@ defined( 'WPINC' ) || die;
 // Do xml tag via echo or SVN parser is going to freak out.
 echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charset' ) ) ) . '"?>
 '; ?>
-<?php xmlsf_xml_stylesheet( 'custom' ); ?>
+<?php XMLSF\xml_stylesheet( 'custom' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action( 'xmlsf_urlset', 'custom' ); ?>>
 <?php

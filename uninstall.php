@@ -55,7 +55,7 @@ function xmlsf_uninstall() {
 	// Remove cache metadata.
 	// Should already have been done on plugin deactivation unless we're unstalling on multisite...
 	include_once __DIR__ . '/inc/functions-sitemap.php';
-	xmlsf_clear_metacache();
+	XMLSF\clear_metacache();
 
 	// Remove post meta data.
 	delete_metadata( 'post', 0, '_xmlsf_priority', '', true );

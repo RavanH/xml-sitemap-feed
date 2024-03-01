@@ -37,6 +37,7 @@ function xmlsf_debug_output_compression() {
 	$gz = in_array( 'ob_gzhandler', ob_list_handlers(), true ) ? 'ENABLED' : 'DISABLED';
 	error_log( 'GZhandler output buffer compression ' . $gz );
 }
+
 add_action( 'xmlsf_output_compression', 'xmlsf_debug_output_compression' );
 
 

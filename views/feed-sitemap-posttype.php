@@ -13,7 +13,7 @@ $xmlsf_sitemap->prefetch_posts_meta();
 // Do xml tag via echo or SVN parser is going to freak out.
 echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charset' ) ) ) . '"?>
 '; ?>
-<?php xmlsf_xml_stylesheet( 'posttype' ); ?>
+<?php XMLSF\xml_stylesheet( 'posttype' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action( 'xmlsf_urlset', 'post_type' ); ?>>
 <?php
@@ -50,9 +50,9 @@ if ( have_posts() ) :
 
 		echo '<url>';
 		echo '<loc>' . esc_xml( esc_url( $url ) ) . '</loc>';
-		echo '<priority>' . esc_xml( xmlsf_get_post_priority( $post ) ) . '</priority>';
+		echo '<priority>' . esc_xml( XMLSF\get_post_priority( $post ) ) . '</priority>';
 
-		$lastmod = xmlsf_get_post_modified( $post );
+		$lastmod = XMLSF\get_post_modified( $post );
 		if ( $lastmod ) {
 			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
 		}

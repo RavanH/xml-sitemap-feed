@@ -84,7 +84,7 @@ abstract class Sitemap {
 
 		$taxonomies = \get_option( 'xmlsf_taxonomies' );
 		if ( empty( $taxonomies ) ) {
-			$taxonomies = \xmlsf_public_taxonomies();
+			$taxonomies = namespace\public_taxonomies();
 		}
 
 		$term_ids = array();
@@ -312,7 +312,7 @@ abstract class Sitemap {
 		$stored = (array) \get_post_meta( $post->ID, '_xmlsf_image_' . $which );
 
 		// Populate images and add as meta data.
-		foreach ( \xmlsf_images_data( $post, $which ) as $data ) {
+		foreach ( namespace\images_data( $post, $which ) as $data ) {
 			if ( ! \in_array( $data, $stored, true ) ) {
 				\add_post_meta( $post->ID, '_xmlsf_image_' . $which, $data );
 			}

@@ -55,6 +55,9 @@ define( 'XMLSF_BASENAME', plugin_basename( __FILE__ ) );
 // Pluggable functions.
 require_once XMLSF_DIR . '/inc/functions-pluggable.php';
 
+// Shared functions.
+require_once XMLSF_DIR . '/inc/functions.php';
+
 /**
  * Plugin initialization
  *
@@ -66,7 +69,7 @@ function xmlsf_init() {
 	WP_DEBUG && require_once XMLSF_DIR . '/inc/functions-debugging.php';
 
 	// Add robots.txt filter.
-	add_filter( 'robots_txt', 'xmlsf_robots_txt', 0 );
+	add_filter( 'robots_txt', 'XMLSF\robots_txt', 0 );
 
 	// If XML Sitemaps Manager is installed, remove its init and admin_init hooks.
 	if ( function_exists( 'xmlsm_init' ) ) {
@@ -81,10 +84,7 @@ function xmlsf_init() {
 	}
 
 	// If sitemaps enabled, do our thing. Otherwise disable core.
-	if ( xmlsf_sitemaps_enabled() ) {
-		// Shared functions.
-		require_once XMLSF_DIR . '/inc/functions.php';
-
+	if ( XMLSF\sitemaps_enabled() ) {
 		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
 
 		// Google News sitemap?
@@ -100,7 +100,7 @@ function xmlsf_init() {
 			require XMLSF_DIR . '/inc/functions-sitemap.php';
 
 			global $xmlsf_sitemap;
-			if ( xmlsf_uses_core_server() ) {
+			if ( XMLSF\uses_core_server() ) {
 				// Extend core sitemap.
 				$xmlsf_sitemap = new XMLSF\Sitemap_Core();
 			} else {
@@ -152,11 +152,11 @@ register_activation_hook( __FILE__, 'xmlsf_activate' );
  */
 function xmlsf_deactivate() {
 	// Clear all cache metadata.
-	if ( ! function_exists( 'xmlsf_clear_metacache' ) ) {
+	if ( ! function_exists( 'XMLSF\clear_metacache' ) ) {
 		// Needed for wp-cli.
 		include_once XMLSF_DIR . '/inc/functions-sitemap.php';
 	}
-	xmlsf_clear_metacache();
+	XMLSF\clear_metacache();
 
 	// Remove old rules.
 	// TODO but how? remove_rewrite_rule() does not exist yet :/
@@ -202,81 +202,6 @@ function &xmlsf_admin() {
 	}
 
 	return $xmlsf_admin;
-}
-
-/**
- * Filter robots.txt rules
- *
- * @param string $output Default robots.txt content.
- *
- * @return string
- */
-function xmlsf_robots_txt( $output ) {
-
-	// CUSTOM ROBOTS.
-	$robots_custom = get_option( 'xmlsf_robots' );
-	$output       .= $robots_custom ? $robots_custom . PHP_EOL : '';
-
-	// SITEMAPS.
-
-	$output .= PHP_EOL . '# XML Sitemap & Google News version ' . XMLSF_VERSION . ' - https://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
-	if ( '1' !== get_option( 'blog_public' ) ) {
-		$output .= '# XML Sitemaps are disabled because of this site\'s privacy settings.' . PHP_EOL;
-	} elseif ( ! xmlsf_sitemaps_enabled() ) {
-		$output .= '# No XML Sitemaps are enabled.' . PHP_EOL;
-	} else {
-		xmlsf_uses_core_server() || xmlsf_sitemaps_enabled( 'sitemap' ) && $output .= 'Sitemap: ' . xmlsf_sitemap_url() . PHP_EOL;
-		xmlsf_sitemaps_enabled( 'news' ) && $output .= 'Sitemap: ' . xmlsf_sitemap_url( 'news' );
-	}
-
-	return $output;
-}
-
-/**
- * Are any sitemaps enabled?
- *
- * @since 5.4
- *
- * @param string $which Which sitemap to check for. Default any sitemap.
- *
- * @return false|array
- */
-function xmlsf_sitemaps_enabled( $which = 'any' ) {
-	static $enabled;
-
-	if ( null === $enabled ) {
-		$sitemaps = (array) get_option( 'xmlsf_sitemaps', array() );
-
-		switch ( true ) {
-			default:
-			case '1' !== get_option( 'blog_public' ):
-				$enabled = array();
-				break;
-
-			case isset( $sitemaps['sitemap'] ) && isset( $sitemaps['sitemap-news'] ):
-				$enabled = array( 'sitemap', 'news' );
-				break;
-
-			case isset( $sitemaps['sitemap'] ):
-				$enabled = array( 'sitemap' );
-				break;
-
-			case isset( $sitemaps['sitemap-news'] ):
-				$enabled = array( 'news' );
-				break;
-		}
-	}
-
-	if ( 'sitemap' === $which ) {
-		// Looking for regular sitemap.
-		return apply_filters( 'xmlsf_sitemaps_enabled', in_array( 'sitemap', $enabled, true ), 'sitemap' );
-	}
-	if ( 'news' === $which ) {
-		// Looking for news sitemap.
-		return apply_filters( 'xmlsf_sitemaps_enabled', in_array( 'news', $enabled, true ), 'news' );
-	}
-	// Looking for any sitemap.
-	return apply_filters( 'xmlsf_sitemaps_enabled', ! empty( $enabled ), $which );
 }
 
 /**

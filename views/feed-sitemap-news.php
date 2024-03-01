@@ -12,7 +12,7 @@ $options = get_option( 'xmlsf_news_tags' );
 // Do xml tag via echo or SVN parser is going to freak out.
 echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charset' ) ) ) . '"?>
 '; ?>
-<?php xmlsf_xml_stylesheet( 'news' ); ?>
+<?php XMLSF\xml_stylesheet( 'news' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" <?php do_action( 'xmlsf_urlset', 'news' ); ?>>
 <?php

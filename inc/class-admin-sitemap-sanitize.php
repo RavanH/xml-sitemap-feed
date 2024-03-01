@@ -65,12 +65,12 @@ class Admin_Sitemap_Sanitize {
 
 		// Sanitize priority.
 		if ( ! empty( $sanitized['priority'] ) && \is_numeric( $sanitized['priority'] ) ) {
-			$sanitized['priority'] = \xmlsf_sanitize_number( $sanitized['priority'], .1, .9 );
+			$sanitized['priority'] = namespace\sanitize_number( $sanitized['priority'], .1, .9 );
 		}
 
 		// Sanitize limit.
 		if ( ! empty( $sanitized['limit'] ) && \is_numeric( $sanitized['limit'] ) ) {
-			$sanitized['limit'] = \xmlsf_sanitize_number( $sanitized['limit'], 1, 50000, false );
+			$sanitized['limit'] = namespace\sanitize_number( $sanitized['limit'], 1, 50000, false );
 		}
 
 		return $sanitized;
@@ -107,12 +107,12 @@ class Admin_Sitemap_Sanitize {
 
 		// Sanitize priority.
 		if ( ! empty( $save['priority'] ) && \is_numeric( $save['priority'] ) ) {
-			$sanitized['priority'] = \xmlsf_sanitize_number( $save['priority'], .1, .9 );
+			$sanitized['priority'] = namespace\sanitize_number( $save['priority'], .1, .9 );
 		}
 
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = \xmlsf_sanitize_number( $save['limit'], 1, 50000, false );
+			$sanitized['limit'] = namespace\sanitize_number( $save['limit'], 1, 50000, false );
 		}
 
 		return $sanitized;
@@ -133,11 +133,11 @@ class Admin_Sitemap_Sanitize {
 
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = \xmlsf_sanitize_number( $save['limit'], 1, 50000, false );
+			$sanitized['limit'] = namespace\sanitize_number( $save['limit'], 1, 50000, false );
 		}
 
 		foreach ( $sanitized as $post_type => $settings ) {
-			$sanitized[ $post_type ]['priority'] = \is_numeric( $settings['priority'] ) ? \xmlsf_sanitize_number( \str_replace( ',', '.', $settings['priority'] ), .1, .9 ) : '0.5';
+			$sanitized[ $post_type ]['priority'] = \is_numeric( $settings['priority'] ) ? namespace\sanitize_number( \str_replace( ',', '.', $settings['priority'] ), .1, .9 ) : '0.5';
 		}
 
 		return $sanitized;
@@ -197,7 +197,7 @@ class Admin_Sitemap_Sanitize {
 			$url = \filter_var( \esc_url( \trim( $arr[0] ) ), FILTER_VALIDATE_URL );
 
 			if ( ! empty( $url ) ) {
-				$priority    = isset( $arr[1] ) ? \xmlsf_sanitize_number( \str_replace( ',', '.', $arr[1] ) ) : '0.5';
+				$priority    = isset( $arr[1] ) ? namespace\sanitize_number( \str_replace( ',', '.', $arr[1] ) ) : '0.5';
 				$sanitized[] = array( $url, $priority );
 			}
 		}

@@ -112,7 +112,7 @@ class Sitemap_Core extends Sitemap {
 		}
 
 		// Google News XML Sitemaps provider.
-		if ( \xmlsf_sitemaps_enabled( 'news' ) ) {
+		if ( namespace\sitemaps_enabled( 'news' ) ) {
 			\add_action(
 				'init',
 				function () {
@@ -302,7 +302,7 @@ class Sitemap_Core extends Sitemap {
 				break;
 
 			case 'term':
-				$lastmod = \xmlsf_get_taxonomy_modified( $subtype );
+				$lastmod = namespace\get_taxonomy_modified( $subtype );
 				if ( $lastmod ) {
 					$entry['lastmod'] = $lastmod;
 				}
@@ -345,12 +345,12 @@ class Sitemap_Core extends Sitemap {
 	 */
 	public function users_entry( $entry, $user_object ) {
 		// Add priority.
-		$priority = \xmlsf_get_user_priority( $user_object );
+		$priority = namespace\get_user_priority( $user_object );
 		if ( $priority ) {
 			$entry['priority'] = $priority;
 		}
 		// Add lastmod.
-		$lastmod = \xmlsf_get_user_modified( $user_object );
+		$lastmod = namespace\get_user_modified( $user_object );
 		if ( $lastmod ) {
 			$entry['lastmod'] = $lastmod;
 		}
@@ -377,13 +377,13 @@ class Sitemap_Core extends Sitemap {
 		}
 
 		// Add priority.
-		$priority = \xmlsf_get_term_priority( $term_object );
+		$priority = namespace\get_term_priority( $term_object );
 		if ( $priority ) {
 			$entry['priority'] = $priority;
 		}
 
 		// Add lastmod.
-		$lastmod = \xmlsf_get_term_modified( $term_object );
+		$lastmod = namespace\get_term_modified( $term_object );
 		if ( $lastmod ) {
 			$entry['lastmod'] = $lastmod;
 		}
@@ -430,10 +430,10 @@ class Sitemap_Core extends Sitemap {
 	 */
 	public function posts_entry( $entry, $post_object, $post_type ) {
 		// Add priority.
-		$entry['priority'] = \xmlsf_get_post_priority( $post_object );
+		$entry['priority'] = namespace\get_post_priority( $post_object );
 
 		// Add lastmod.
-		$entry['lastmod'] = \xmlsf_get_post_modified( $post_object );
+		$entry['lastmod'] = namespace\get_post_modified( $post_object );
 
 		return $entry;
 	}
@@ -554,7 +554,7 @@ class Sitemap_Core extends Sitemap {
 			),
 		);
 
-		// Update meta cache in one query instead of many, coming from get_post_meta() in xmlsf_get_post_priority().
+		// Update meta cache in one query instead of many, coming from get_post_meta() in XMLSF\get_post_priority().
 		$args['update_post_meta_cache'] = true;
 
 		return $args;
@@ -572,7 +572,7 @@ class Sitemap_Core extends Sitemap {
 	public function stylesheet_url( $url ) {
 		// TODO make this optional: get_option( 'xmlsf_core_sitemap_stylesheet' )
 		// TODO make these match sitemap type.
-		$url = \xmlsf_get_stylesheet_url( 'root' );
+		$url = namespace\get_stylesheet_url( 'root' );
 
 		return $url;
 	}
@@ -588,7 +588,7 @@ class Sitemap_Core extends Sitemap {
 	 */
 	public function stylesheet_index_url( $url ) {
 		// TODO make this optional: get_option( 'xmlsf_core_sitemap_stylesheet' ).
-		$url = \xmlsf_get_stylesheet_url();
+		$url = namespace\get_stylesheet_url();
 
 		return $url;
 	}

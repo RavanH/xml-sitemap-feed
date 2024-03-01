@@ -6,6 +6,25 @@
  */
 
 /**
+ * COMPATIBILITY
+ */
+
+if ( ! function_exists( 'esc_xml' ) ) :
+	/**
+	 * Quick and dirty XML escaping function for WordPress pre-5.5 compatibility.
+	 *
+	 * @param string $text The input to be escaped.
+	 */
+	function esc_xml( $text ) {
+		$text = ent2ncr( $text );
+		$text = wp_strip_all_tags( $text );
+		$text = esc_html( $text );
+
+		return $text;
+	}
+endif;
+
+/**
  * MISSING WORDPRESS FUNCTIONS
  */
 
