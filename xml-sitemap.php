@@ -69,7 +69,7 @@ function xmlsf_init() {
 	WP_DEBUG && require_once XMLSF_DIR . '/inc/functions-debugging.php';
 
 	// Add robots.txt filter.
-	add_filter( 'robots_txt', 'XMLSF\robots_txt', 0 );
+	add_filter( 'robots_txt', 'XMLSF\robots_txt' );
 
 	// If XML Sitemaps Manager is installed, remove its init and admin_init hooks.
 	if ( function_exists( 'xmlsm_init' ) ) {
