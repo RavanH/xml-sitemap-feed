@@ -28,8 +28,8 @@ function robots_txt( $output ) {
 	} elseif ( ! namespace\sitemaps_enabled() ) {
 		$output .= '# No XML Sitemaps are enabled.' . PHP_EOL;
 	} else {
-		namespace\uses_core_server() || namespace\sitemaps_enabled( 'sitemap' ) && $output .= 'Sitemap: ' . namespace\sitemap_url() . PHP_EOL;
-		namespace\sitemaps_enabled( 'news' ) && $output .= 'Sitemap: ' . namespace\sitemap_url( 'news' );
+		namespace\sitemaps_enabled( 'sitemap' ) && $output .= 'Sitemap: ' . namespace\sitemap_url() . PHP_EOL;
+		namespace\sitemaps_enabled( 'news' ) && $output .= 'Sitemap: ' . namespace\sitemap_url( 'news' ) . PHP_EOL;
 	}
 
 	return $output;
@@ -181,44 +181,21 @@ function wpml_remove_home_url_filter() {
  *
  * @param string $which Which sitemap to check for. Default any sitemap.
  *
- * @return false|array
+ * @return bool
  */
 function sitemaps_enabled( $which = 'any' ) {
-	static $enabled;
+	$sitemaps = (array) \get_option( 'xmlsf_sitemaps', array() );
 
-	if ( null === $enabled ) {
-		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', array() );
-
-		switch ( true ) {
-			default:
-			case '1' !== \get_option( 'blog_public' ):
-				$enabled = array();
-				break;
-
-			case isset( $sitemaps['sitemap'] ) && isset( $sitemaps['sitemap-news'] ):
-				$enabled = array( 'sitemap', 'news' );
-				break;
-
-			case isset( $sitemaps['sitemap'] ):
-				$enabled = array( 'sitemap' );
-				break;
-
-			case isset( $sitemaps['sitemap-news'] ):
-				$enabled = array( 'news' );
-				break;
-		}
+	if ( '1' !== \get_option( 'blog_public' ) || empty( $sitemaps ) ) {
+		$return = false;
+	} elseif ( 'any' === $which ) {
+		$return = true;
+	} else {
+		$key = 'news' === $which ? 'sitemap-news' : $which;
+		$return = array_key_exists( $key, $sitemaps );
 	}
 
-	if ( 'sitemap' === $which ) {
-		// Looking for regular sitemap.
-		return \apply_filters( 'xmlsf_sitemaps_enabled', in_array( 'sitemap', $enabled, true ), 'sitemap' );
-	}
-	if ( 'news' === $which ) {
-		// Looking for news sitemap.
-		return \apply_filters( 'xmlsf_sitemaps_enabled', in_array( 'news', $enabled, true ), 'news' );
-	}
-	// Looking for any sitemap.
-	return \apply_filters( 'xmlsf_sitemaps_enabled', ! empty( $enabled ), $which );
+	return \apply_filters( 'xmlsf_sitemaps_enabled', $return, $which );
 }
 
 /**
