@@ -216,7 +216,7 @@ class Admin_Sitemap {
 		if ( \is_plugin_active( 'wordpress-seo/wp-seo.php' ) ) {
 			// check date archive redirection.
 			$wpseo_titles = \get_option( 'wpseo_titles' );
-			if ( ! empty( $wpseo_titles['disable-date'] ) ) {
+			if ( ! empty( $wpseo_titles['disable-date'] ) && ! namespace\uses_core_server() ) {
 				// check if Split by option is set anywhere.
 				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
@@ -252,7 +252,7 @@ class Admin_Sitemap {
 			$seopress_toggle = \get_option( 'seopress_toggle' );
 
 			$seopress_titles = \get_option( 'seopress_titles_option_name' );
-			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) ) {
+			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) && ! namespace\uses_core_server() ) {
 				// check if Split by option is set anywhere.
 				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
@@ -286,7 +286,7 @@ class Admin_Sitemap {
 
 			// check date archive redirection.
 			$rankmath_titles = \get_option( 'rank-math-options-titles' );
-			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] ) {
+			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] && ! namespace\uses_core_server() ) {
 				// check if Split by option is set anywhere.
 				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
