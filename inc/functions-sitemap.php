@@ -416,17 +416,20 @@ add_action( 'xmlsf_tags_after', __NAMESPACE__ . '\image_tag', 10, 2 );
  * @return void
  */
 function image_schema( $type ) {
-	if ( 'post_type' !== $type ) {
+	global $wp_query;
+
+	if ( 'post_type' !== $type || empty( $wp_query->query_vars['post_type'] ) ) {
 		return;
 	}
-	global $post;
+
 	$post_types = (array) \get_option( 'xmlsf_post_types' );
+
 	if (
-		isset( $post_types[ $post->post_type ] ) &&
-		\is_array( $post_types[ $post->post_type ] ) &&
-		isset( $post_types[ $post->post_type ]['tags'] ) &&
-		\is_array( $post_types[ $post->post_type ]['tags'] ) &&
-		! empty( $post_types[ $post->post_type ]['tags']['image'] )
+		isset( $post_types[ $wp_query->query_vars['post_type'] ] ) &&
+		\is_array( $post_types[ $wp_query->query_vars['post_type'] ] ) &&
+		isset( $post_types[ $wp_query->query_vars['post_type'] ]['tags'] ) &&
+		\is_array( $post_types[ $wp_query->query_vars['post_type'] ]['tags'] ) &&
+		! empty( $post_types[ $wp_query->query_vars['post_type'] ]['tags']['image'] )
 	) {
 		echo 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"';
 	}

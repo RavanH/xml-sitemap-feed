@@ -303,6 +303,7 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 = 5.5 =
 * Namespacing & autoloading
 * FIX: Polylang news sitemap category selection
+* FIX: Attempt to read property post_type on null
 
 = 5.4.5 =
 20240221
