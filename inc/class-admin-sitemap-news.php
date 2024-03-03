@@ -41,8 +41,8 @@ class Admin_Sitemap_News {
 
 		// ACTIONS & CHECKS.
 		\add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
-		\add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
-		\add_action( 'admin_init', array( $this, 'check_news_advanced' ), 11 );
+		\add_action( 'admin_notices', array( $this, 'check_conflicts' ), 0 );
+		\add_action( 'admin_notices', array( $this, 'check_news_advanced' ), 0 );
 	}
 
 	/**

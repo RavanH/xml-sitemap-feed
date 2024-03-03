@@ -191,7 +191,7 @@ function sitemaps_enabled( $which = 'any' ) {
 	} elseif ( 'any' === $which ) {
 		$return = true;
 	} else {
-		$key = 'news' === $which ? 'sitemap-news' : $which;
+		$key    = 'news' === $which ? 'sitemap-news' : $which;
 		$return = array_key_exists( $key, $sitemaps );
 	}
 

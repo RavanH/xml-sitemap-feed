@@ -30,7 +30,7 @@ class Admin_Sitemap {
 
 		// ACTIONS & CHECKS.
 		\add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
-		\add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
+		\add_action( 'admin_notices', array( $this, 'check_conflicts' ), 0 );
 		\add_action( 'update_option_xmlsf_server', array( $this, 'update_server' ), 10, 2 );
 		\add_action( 'update_option_xmlsf_disabled_providers', array( $this, 'update_disabled_providers' ), 10, 2 );
 		\add_action( 'update_option_xmlsf_post_types', array( $this, 'update_post_types' ), 10, 2 );
@@ -318,9 +318,9 @@ class Admin_Sitemap {
 		// All in One SEO Pack conflict notices.
 		if ( \is_plugin_active( 'all-in-one-seo-pack/all_in_one_seo_pack.php' ) && ! \in_array( 'aioseop_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 			// check aioseop sitemap module.
-			$aioseop_options = (array) \get_option( 'aioseop_options' );
+			$aioseop = json_decode( \get_option( 'aioseo_options', '' ) );
 
-			if ( isset( $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) && 'on' === $aioseop_options['modules']['aiosp_feature_manager_options']['aiosp_feature_manager_enable_sitemap'] ) {
+			if ( is_object( $aioseop ) && true === $aioseop->sitemap->general->enable ) {
 				// sitemap module on.
 				\add_action(
 					'admin_notices',
@@ -339,6 +339,20 @@ class Admin_Sitemap {
 					include XMLSF_DIR . '/views/admin/notice-google-sitemap-generator.php';
 				}
 			);
+		}
+
+		// Slim SEO conflict notices.
+		if ( \is_plugin_active( 'slim-seo/slim-seo.php' ) && ! \in_array( 'slim_seo_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
+			$slimseo = \get_option( 'slim_seo' );
+
+			if ( empty( $slimseo ) || isset( $slimseo['features'] ) && in_array( 'sitemaps', (array) $slimseo['features'] ) ) {
+				\add_action(
+					'admin_notices',
+					function () {
+						include XMLSF_DIR . '/views/admin/notice-slim-seo-sitemap.php';
+					}
+				);
+			}
 		}
 
 		// SEO Framework conflict notices

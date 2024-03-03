@@ -34,7 +34,7 @@ class Admin {
 		// ACTIONS & CHECKS.
 		\add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
 		\add_action( 'admin_init', array( $this, 'notices_actions' ), 9 );
-		\add_action( 'admin_init', array( $this, 'check_conflicts' ), 11 );
+		\add_action( 'admin_notices', array( $this, 'check_conflicts' ), 0 );
 		\add_action( 'update_option_xmlsf_sitemaps', array( $this, 'update_sitemaps' ), 10, 2 );
 
 		// Shared Admin pages sidebar actions.
