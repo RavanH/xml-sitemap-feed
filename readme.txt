@@ -302,6 +302,7 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 
 = 5.5 =
 * Namespacing & autoloading
+* Admin notices for Slim SEO, Squirrly SEO, Jetpack Sitemaps
 * FIX: Polylang news sitemap category selection
 * FIX: Attempt to read property post_type on null
 

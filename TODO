@@ -1,10 +1,8 @@
 ROADMAP
 
 = 5.5 =
-* fix Attempt to read property “post_type” on null https://wordpress.org/support/topic/php-warning-attempt-to-read-property-post_type-on-null-3/
-* fix Polylang Pro showing homepages everywhere https://wordpress.org/support/topic/polylang-broken-since-last-update/
+* add generator header to core sitemap?
 * fix Polylang issue icw core server
-* fix non-public post types visible icw plugin server
 * subnamespacing?
 * revise readme
 * add missing google news help tab sections: post types, Hierarchical post types
@@ -20,7 +18,6 @@ ROADMAP
 
 TEST
 * test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
-* re-test conflicting plugins/themes messages
 * test bbpress
 
 FIX
