@@ -355,6 +355,37 @@ class Admin_Sitemap {
 			}
 		}
 
+		// Slim SEO conflict notices.
+		if ( \is_plugin_active( 'squirrly-seo/squirrly.php' ) && ! \in_array( 'squirrly_seo_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
+			// check aioseop sitemap module.
+			$squirrly = json_decode( \get_option( 'sq_options', '' ) );
+
+			if ( is_object( $squirrly ) && $squirrly->sq_auto_sitemap ) {
+				// sitemap module on.
+				\add_action(
+					'admin_notices',
+					function () {
+						include XMLSF_DIR . '/views/admin/notice-squirrly-seo-sitemap.php';
+					}
+				);
+			}
+		}
+
+		// Jetpack Sitemaps conflict notices.
+		if (
+			\is_plugin_active( 'jetpack/jetpack.php' ) &&
+			in_array( 'sitemaps', (array) \get_option( 'jetpack_active_modules' ), true ) &&
+			! \in_array( 'jetpack_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true )
+		) {
+			// sitemap module on.
+			\add_action(
+				'admin_notices',
+				function () {
+					include XMLSF_DIR . '/views/admin/notice-jetpack-sitemap.php';
+				}
+			);
+		}
+
 		// SEO Framework conflict notices
 		// autodescription-site-settings[sitemaps_output].
 		if ( \is_plugin_active( 'autodescription/autodescription.php' ) ) {

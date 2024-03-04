@@ -148,6 +148,22 @@ class Admin_Sitemap_News {
 				}
 			}
 		}
+
+		// Slim SEO conflict notices.
+		if ( \is_plugin_active( 'squirrly-seo/squirrly.php' ) && ! \in_array( 'squirrly_seo_sitemap_news', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
+			// check aioseop sitemap module.
+			$squirrly = json_decode( \get_option( 'sq_options', '' ) );
+
+			if ( is_object( $squirrly ) && ! empty( $squirrly->sq_sitemap->{'sitemap-news'}[1] ) ) {
+				// sitemap module on.
+				\add_action(
+					'admin_notices',
+					function () {
+						include XMLSF_DIR . '/views/admin/notice-squirrly-seo-sitemap-news.php';
+					}
+				);
+			}
+		}
 	}
 
 	/**
