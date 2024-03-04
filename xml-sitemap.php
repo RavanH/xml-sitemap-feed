@@ -123,10 +123,6 @@ function xmlsf_init() {
 	if ( is_admin() ) {
 		xmlsf_admin();
 	}
-
-	// Flush rewrite rules?
-	global $wp_rewrite;
-	$wp_rewrite->wp_rewrite_rules(); // Recreates rewrite rules only when needed, and not before wp_loaded.
 }
 
 add_action( 'init', 'xmlsf_init', 9 );
