@@ -125,6 +125,9 @@ class Sitemap_Plugin extends Sitemap {
 		// Save a few db queries.
 		\add_filter( 'split_the_query', '__return_false' );
 
+		// Prepare headers.
+		add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
+
 		/** COMPRESSION */
 
 		// Check for gz request.

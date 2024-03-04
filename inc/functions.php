@@ -171,6 +171,7 @@ function wpml_remove_home_url_filter() {
 		\remove_filter( 'home_url', array( $wpml_url_filters, 'home_url_filter' ), - 10 );
 	}
 }
+
 \add_action( 'xmlsf_add_settings', __NAMESPACE__ . '\wpml_remove_home_url_filter' );
 \add_action( 'xmlsf_news_add_settings', __NAMESPACE__ . '\wpml_remove_home_url_filter' );
 
@@ -238,8 +239,6 @@ function headers( $headers ) {
 	// And return, merged with nocache headers.
 	return \array_merge( $headers, \wp_get_nocache_headers() );
 }
-
-add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
 
 /**
  * Load feed template

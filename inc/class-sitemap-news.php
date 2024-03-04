@@ -123,6 +123,9 @@ class Sitemap_News {
 		\defined( 'DONOTCACHEPAGE' ) || \define( 'DONOTCACHEPAGE', true );
 		\defined( 'DONOTCACHEDB' ) || \define( 'DONOTCACHEDB', true );
 
+		// Prepare headers.
+		add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
+
 		/** COMPRESSION */
 
 		// Check for gz request.
