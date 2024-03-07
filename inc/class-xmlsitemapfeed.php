@@ -132,7 +132,60 @@ class XMLSitemapFeed {
 	 *
 	 * @return void
 	 */
-	public function __construct() {}
+	public function __construct() {
+		add_action( 'init', array( $this, 'init' ), 9 );
+	}
+
+	/**
+	 * Plugin main init.
+	 */
+	public function init() {
+		// Upgrade/install, maybe...
+		$db_version = get_option( 'xmlsf_version', 0 );
+		if ( ! version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
+			require_once XMLSF_DIR . '/upgrade.php';
+		}
+
+		if ( false === namespace\sitemaps_enabled() ) {
+			return;
+		}
+
+		/* DEACTIVEATED.
+		global $polylang;
+		if ( isset( $polylang ) && \is_object( $polylang->sitemaps ) ) {
+			include XMLSF_DIR . '/inc/functions-compat-polylang.php';
+		}
+		*/
+
+		$sitemaps = (array) get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
+
+		// Google News sitemap?
+		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
+			require XMLSF_DIR . '/inc/functions-sitemap-news.php';
+
+			global $xmlsf_sitemap_news;
+			$xmlsf_sitemap_news = new Sitemap_News();
+		}
+
+		// XML Sitemap?
+		if ( ! empty( $sitemaps['sitemap'] ) ) {
+			require XMLSF_DIR . '/inc/functions-sitemap.php';
+
+			global $xmlsf_sitemap;
+			if ( namespace\uses_core_server() ) {
+				// Extend core sitemap.
+				$xmlsf_sitemap = new Sitemap_Core();
+			} else {
+				// Replace core sitemap.
+				remove_action( 'init', 'wp_sitemaps_get_server' );
+
+				$xmlsf_sitemap = new Sitemap_Plugin();
+			}
+		} else {
+			// Disable core sitemap.
+			add_filter( 'wp_sitemaps_enabled', '__return_false' );
+		}
+	}
 
 	/**
 	 * Default options
