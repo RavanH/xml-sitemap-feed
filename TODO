@@ -1,9 +1,10 @@
 ROADMAP
 
 = 5.5 =
+* fix URLs per sitemap
+* XML Sitemaps Manager incompatibilit notice?
 * add generator header to core sitemap?
-* fix Polylang issue icw core server
-* subnamespacing?
+* fix Polylang issue icw plugin server: missing users language archives
 * revise readme
 * add missing google news help tab sections: post types, Hierarchical post types
 * remove help tab section: content labels
@@ -18,7 +19,9 @@ ROADMAP
 
 TEST
 * test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
+* test add-inserter old issue
 * test bbpress
+* test WPML
 
 FIX
 * author sitemap lastmod (in index) = last publication date >>> latest user modified meta...
