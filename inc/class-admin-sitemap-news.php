@@ -497,6 +497,10 @@ class Admin_Sitemap_News {
 	public function name_field() {
 		$name = ! empty( $this->options['name'] ) ? $this->options['name'] : '';
 
+		if ( XMLSF_GOOGLE_NEWS_NAME ) {
+			$name = XMLSF_GOOGLE_NEWS_NAME;
+		}
+
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-news-name.php';
 	}

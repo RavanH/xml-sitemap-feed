@@ -9,6 +9,10 @@ defined( 'WPINC' ) || die;
 
 $options = get_option( 'xmlsf_news_tags' );
 
+if ( XMLSF_GOOGLE_NEWS_NAME ) {
+	$options['name'] = XMLSF_GOOGLE_NEWS_NAME;
+}
+
 // Do xml tag via echo or SVN parser is going to freak out.
 echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charset' ) ) ) . '"?>
 '; ?>

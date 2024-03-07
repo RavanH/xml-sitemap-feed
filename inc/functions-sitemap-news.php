@@ -7,6 +7,8 @@
 
 namespace XMLSF;
 
+defined( 'XMLSF_GOOGLE_NEWS_NAME' ) || define( 'XMLSF_GOOGLE_NEWS_NAME', false );
+
 /**
  * Response headers filter
  * Does not check if we are really in a sitemap feed.
@@ -110,18 +112,3 @@ function wpml_post_language_filter( $locale, $post_id, $post_type = 'post' ) {
 }
 
 \add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\wpml_post_language_filter', 10, 3 );
-
-/**
- * Google News Publisher filter for backward compat with XMLSF_GOOGLE_NEWS_NAME constant.
- *
- * @param string $name Google News Publisher name.
- *
- * @return string
- */
-function google_news_name( $name ) {
-	\defined( 'XMLSF_GOOGLE_NEWS_NAME' ) || \define( 'XMLSF_GOOGLE_NEWS_NAME', false );
-
-	return XMLSF_GOOGLE_NEWS_NAME ? XMLSF_GOOGLE_NEWS_NAME : $name;
-}
-
-\add_filter( 'xmlsf_news_publication_name', __NAMESPACE__ . '\google_news_name' );
