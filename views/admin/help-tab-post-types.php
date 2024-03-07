@@ -34,10 +34,10 @@ if ( ! XMLSF\uses_core_server() ) :
 	<?php esc_html_e( 'Please note: this option can make sitemap generation slower and more resource intensive.', 'xml-sitemap-feed' ); ?>
 </p>
 <p>
-	<strong>[] <?php esc_html_e( 'Update the Last Changed date on each new comment.', 'xml-sitemap-feed' ); ?></strong>
+	<strong>[] <?php esc_html_e( 'Update the Last Modified date on each new comment.', 'xml-sitemap-feed' ); ?></strong>
 	<br />
-	<?php esc_html_e( 'The Last Changed timestamp will be updated whenever a comment is added. Useful for sites where user interaction like comments play a large role and give added content value. But otherwise this is not advised.', 'xml-sitemap-feed' ); ?>
-	<?php esc_html_e( 'Please note: this option can make sitemap generation slower and more resource intensive.', 'xml-sitemap-feed' ); ?>
+	<?php esc_html_e( 'The Last Modified timestamp will be updated whenever a comment is added. Useful for sites where user interaction like comments play a large role and give added content value. But otherwise this is not advised.', 'xml-sitemap-feed' ); ?>
+	<?php esc_html_e( 'Please note: this option will make sitemap generation slower and more resource intensive.', 'xml-sitemap-feed' ); ?>
 </p>
 <?php
 if ( ! XMLSF\uses_core_server() ) :

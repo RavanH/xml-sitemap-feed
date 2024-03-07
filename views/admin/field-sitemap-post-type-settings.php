@@ -63,7 +63,7 @@
 	<p>
 		<label>
 			<input type="checkbox" name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][update_lastmod_on_comments]" id="xmlsf_post_types_<?php echo esc_attr( $obj->name ); ?>_update_lastmod_on_comments" value="1"<?php echo checked( ! empty( $options[ $obj->name ]['update_lastmod_on_comments'] ), true, false ); ?> />
-			<?php esc_html_e( 'Update the Last Changed date on each new comment.', 'xml-sitemap-feed' ); ?>
+			<?php esc_html_e( 'Update the Last Modified date on each new comment.', 'xml-sitemap-feed' ); ?>
 		</label>
 	</p>
 
