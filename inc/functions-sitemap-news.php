@@ -22,7 +22,7 @@ function news_nocache_headers( $headers ) {
 	return $headers;
 }
 
-add_filter( 'nocache_headers', __NAMESPACE__ . '\news_nocache_headers' );
+\add_filter( 'nocache_headers', __NAMESPACE__ . '\news_nocache_headers' );
 
 /**
  * Filter news WHERE
@@ -67,7 +67,7 @@ function parse_language_string( $lang ) {
 	return $lang;
 }
 
-add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\parse_language_string', 99 );
+\add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\parse_language_string', 99 );
 
 /**
  * COMPATIBILITY
@@ -85,7 +85,7 @@ function polylang_post_language_filter( $locale, $post_id ) {
 	return \function_exists( 'pll_get_post_language' ) ? \pll_get_post_language( $post_id, 'locale' ) : $locale;
 }
 
-add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\polylang_post_language_filter', 10, 2 );
+\add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\polylang_post_language_filter', 10, 2 );
 
 /**
  * Post language filter for WPML.
@@ -109,7 +109,7 @@ function wpml_post_language_filter( $locale, $post_id, $post_type = 'post' ) {
 	) : $locale;
 }
 
-add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\wpml_post_language_filter', 10, 3 );
+\add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\wpml_post_language_filter', 10, 3 );
 
 /**
  * Google News Publisher filter for backward compat with XMLSF_GOOGLE_NEWS_NAME constant.
@@ -124,4 +124,4 @@ function google_news_name( $name ) {
 	return XMLSF_GOOGLE_NEWS_NAME ? XMLSF_GOOGLE_NEWS_NAME : $name;
 }
 
-add_filter( 'xmlsf_news_publication_name', __NAMESPACE__ . '\google_news_name' );
+\add_filter( 'xmlsf_news_publication_name', __NAMESPACE__ . '\google_news_name' );

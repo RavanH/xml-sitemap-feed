@@ -109,7 +109,7 @@ class Sitemap_Plugin extends Sitemap {
 		}
 
 		// Short-circuit if request is not a feed, does not start with 'sitemap' or is a news sitemap.
-		if ( empty( $request['feed'] ) || strpos( $request['feed'], 'sitemap' ) !== 0 || 'sitemap-news' === $request['feed'] ) {
+		if ( empty( $request['feed'] ) || \strpos( $request['feed'], 'sitemap' ) !== 0 || 'sitemap-news' === $request['feed'] ) {
 			return $request;
 		}
 
@@ -126,7 +126,7 @@ class Sitemap_Plugin extends Sitemap {
 		\add_filter( 'split_the_query', '__return_false' );
 
 		// Prepare headers.
-		add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
+		\add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
 
 		/** COMPRESSION */
 
