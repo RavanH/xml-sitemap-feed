@@ -111,17 +111,6 @@ class Sitemap_Core extends Sitemap {
 			);
 		}
 
-		// Google News XML Sitemaps provider.
-		if ( namespace\sitemaps_enabled( 'news' ) ) {
-			\add_action(
-				'init',
-				function () {
-					\wp_register_sitemap_provider( 'news', new Sitemaps_Provider_News() );
-				},
-				11
-			);
-		}
-
 		// Stylesheet.
 		\add_filter( 'wp_sitemaps_stylesheet_index_url', array( $this, 'stylesheet_index_url' ) );
 		\add_filter( 'wp_sitemaps_stylesheet_url', array( $this, 'stylesheet_url' ) );

@@ -45,8 +45,9 @@ class Sitemap_News {
 		// NGINX HELPER PURGE URLS.
 		\add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
 
-		// Add nnes sitemap to the index.
-		\add_filter( 'xmlsf_sitemap_index_after', array( $this, 'news_in_index' ) );
+		// Add news sitemap to the index.
+		\add_filter( 'xmlsf_sitemap_index_after', array( $this, 'news_in_plugin_index' ) );
+		\add_action( 'wp_sitemaps_init', array( $this, 'news_in_core_index' ), 11 );
 	}
 
 	/**
@@ -64,9 +65,9 @@ class Sitemap_News {
 	}
 
 	/**
-	 * Add Google News sitemap to the sitemap index
+	 * Add Google News sitemap to the plugin sitemap index
 	 */
-	public function news_in_index() {
+	public function news_in_plugin_index() {
 		$url        = namespace\sitemap_url( 'news' );
 		$options    = \get_option( 'xmlsf_news_tags' );
 		$post_types = isset( $options['post_type'] ) && ! empty( $options['post_type'] ) ? (array) $options['post_type'] : array( 'post' );
@@ -79,6 +80,20 @@ class Sitemap_News {
 			echo '<lastmod>' . \esc_xml( $lastmod ) . '</lastmod>';
 		}
 		echo '</sitemap>' . PHP_EOL;
+	}
+
+	/**
+	 * Add Google News sitemap to the core sitemap index
+	 */
+	public function news_in_core_index() {
+		// Polylang compatibility: prevent sitemap translations.
+		global $polylang;
+		$pll_removed = isset( $polylang ) && \is_object( $polylang->sitemaps ) ? \remove_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) ) : false;
+
+		\wp_register_sitemap_provider( 'news', new Sitemaps_Provider_News() );
+
+		// Re-add Polylang filter.
+		$pll_removed && \add_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) );
 	}
 
 	/**
@@ -149,7 +164,6 @@ class Sitemap_News {
 		$request['no_found_rows'] = true; // found rows calc is slow and only needed for pagination.
 
 		/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
-		$request = \apply_filters( 'xmlsf_news_request', $request );
 
 		/**
 		 * Developers
@@ -161,6 +175,7 @@ class Sitemap_News {
 		 * XMLSF\wpml_request - WPML compatibility
 		 * XMLSF\bbpress_request - bbPress compatibility
 		 */
+		$request = \apply_filters( 'xmlsf_news_request', $request );
 
 		// No caching.
 		$request['cache_results'] = false;

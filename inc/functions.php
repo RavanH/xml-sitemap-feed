@@ -35,6 +35,8 @@ function robots_txt( $output ) {
 	return $output;
 }
 
+\add_filter( 'robots_txt', __NAMESPACE__ . '\robots_txt' );
+
 /**
  * Get the public XML sitemap url.
  *
@@ -371,27 +373,6 @@ function get_translations( $post_id ) {
 
 \add_filter( 'xmlsf_blogpages', __NAMESPACE__ . '\get_translations' );
 \add_filter( 'xmlsf_frontpages', __NAMESPACE__ . '\get_translations' );
-
-/**
- * Polylang compatibility hooked into xml request filter
- *
- * @param array $request The request.
- *
- * @return array
- */
-function polylang_request( $request ) {
-
-	if ( \function_exists( 'pll_languages_list' ) ) {
-		$request['lang'] = 'all';
-		// Prevent language redirections.
-		\add_filter( 'pll_check_canonical_url', '__return_false' );
-	}
-
-	return $request;
-}
-
-\add_filter( 'xmlsf_request', __NAMESPACE__ . '\polylang_request' );
-\add_filter( 'xmlsf_news_request', __NAMESPACE__ . '\polylang_request' );
 
 /**
  * WPML compatibility hooked into xml request filter
