@@ -130,10 +130,6 @@ function xmlsf_init() {
 	if ( is_admin() ) {
 		xmlsf_admin();
 	}
-
-	// Flush rewrite rules?
-	global $wp_rewrite;
-	$wp_rewrite->wp_rewrite_rules();
 }
 
 /**

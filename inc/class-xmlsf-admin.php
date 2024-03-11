@@ -26,6 +26,8 @@ class XMLSF_Admin {
 			require XMLSF_DIR . '/inc/class-xmlsf-admin-sitemap-news.php';
 		}
 
+		\add_action( 'admin_init', array( $this, 'maybe_flush_rewrite_rules' ) );
+
 		// ACTION LINK.
 		add_filter( 'plugin_action_links_' . XMLSF_BASENAME, array( $this, 'add_action_link' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_meta_links' ), 10, 2 );
@@ -42,6 +44,16 @@ class XMLSF_Admin {
 		// Shared Admin pages sidebar actions.
 		add_action( 'xmlsf_admin_sidebar', array( $this, 'admin_sidebar_help' ) );
 		add_action( 'xmlsf_admin_sidebar', array( $this, 'admin_sidebar_contribute' ), 20 );
+	}
+
+	/**
+	 * Maybe flush rewrite rules
+	 *
+	 * Uses $wp_rewrite->wp_rewrite_rules() which checks for empty rewrite_rules option.
+	 */
+	public function maybe_flush_rewrite_rules() {
+		global $wp_rewrite;
+		$wp_rewrite->wp_rewrite_rules(); // Recreates rewrite rules only when needed.
 	}
 
 	/**
