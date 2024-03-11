@@ -575,23 +575,24 @@ function get_term_modified( $term ) {
  *
  * @param string $taxonomy Taxonomy slug.
  *
- * @return string Empty or last found modification date.
+ * @return string|false
  */
 function get_taxonomy_modified( $taxonomy ) {
 
-	$obj     = \get_taxonomy( $taxonomy );
-	$lastmod = '';
+	$obj = \get_taxonomy( $taxonomy );
 
-	if ( false !== $obj ) {
-		$lastmodified = array();
-		foreach ( (array) $obj->object_type as $object_type ) {
-			$lastmodified[] = \get_lastpostdate( 'GMT', $object_type );
-		}
-
-		sort( $lastmodified );
-		$lastmodified = \array_filter( $lastmodified );
-		$lastmod      = \end( $lastmodified );
+	if ( false === $obj ) {
+		return false;
 	}
+
+	$lastmodified = array();
+	foreach ( (array) $obj->object_type as $object_type ) {
+		$lastmodified[] = \get_lastpostdate( 'GMT', $object_type );
+	}
+
+	sort( $lastmodified );
+	$lastmodified = \array_filter( $lastmodified );
+	$lastmod      = \end( $lastmodified );
 
 	return \get_date_from_gmt( $lastmod, DATE_W3C );
 }
