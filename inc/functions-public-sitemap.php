@@ -354,11 +354,16 @@ function xmlsf_get_term_modified( $term ) {
  * Taxonomy Modified
  *
  * @param string $taxonomy Taxonomy slug.
- * @return string
+ *
+ * @return string|false
  */
 function xmlsf_get_taxonomy_modified( $taxonomy ) {
 
 	$obj = get_taxonomy( $taxonomy );
+
+	if ( false === $obj ) {
+		return false;
+	}
 
 	$lastmodified = array();
 	foreach ( (array) $obj->object_type as $object_type ) {
