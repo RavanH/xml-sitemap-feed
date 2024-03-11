@@ -276,7 +276,7 @@ class Sitemap_Core extends Sitemap {
 	 * @return array  $entry
 	 */
 	public function index_entry( $entry, $type, $subtype, $page ) {
-		// Skip if we're not doing a sitemap request, can happen Nginx cache purge for example.
+		// Skip if we're not doing a sitemap request, can happen in Nginx cache purge for example.
 		if ( ! is_sitemap() ) {
 			return $entry;
 		}
