@@ -296,6 +296,11 @@ class XMLSF_Sitemap_Core extends XMLSF_Sitemap {
 	 * @return array  $entry
 	 */
 	public function index_entry( $entry, $type, $subtype, $page ) {
+		// Skip if we're not doing a sitemap request, can happen in Nginx cache purge for example.
+		if ( ! is_sitemap() ) {
+			return $entry;
+		}
+
 		// TODO account for $page 2 and up...
 		if ( $page > 1 ) {
 			return $entry;
