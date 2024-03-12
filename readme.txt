@@ -301,6 +301,7 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 == Changelog ==
 
 = 5.5 =
+* NEW: Filter xmlsf_taxonomies_query_args
 * Namespacing & autoloading
 * Admin notices for Slim SEO, Squirrly SEO, Jetpack Sitemaps
 * FIX: Polylang news sitemap category selection

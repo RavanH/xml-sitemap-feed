@@ -14,7 +14,7 @@ echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charse
 <?php do_action( 'xmlsf_generator' ); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action( 'xmlsf_urlset', 'taxonomy' ); ?>>
 <?php
-$terms = get_terms( array( 'taxonomy' => get_query_var( 'taxonomy' ) ) );
+$terms = get_terms( apply_filters( 'xmlsf_taxonomies_query_args', array( 'taxonomy' => get_query_var( 'taxonomy' ) ) ) );
 
 if ( is_array( $terms ) ) :
 	foreach ( $terms as $tax_term ) :
