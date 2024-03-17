@@ -446,8 +446,8 @@ class Sitemap_Core extends Sitemap {
 		// Front blog page priority always 1.
 		$entry['priority'] = '1';
 
-		// Set front blog page lastmod to last modified post.
-		$entry['lastmod'] = \get_lastpostmodified( 'gmt', 'post' );
+		// Set front blog page lastmod to last published post.
+		$entry['lastmod'] = \get_lastpostdate( 'gmt', 'post' );
 
 		return $entry;
 	}
