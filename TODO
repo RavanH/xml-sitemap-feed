@@ -30,6 +30,10 @@ FIX
 * fix WPML incompatibility https://wordpress.org/support/topic/multilingual-url-issue/
 
 CONSIDER
+* Option for lastmod date for (static) front and blog pages (PRO?):
+	- last publication date for post/any/custom post type
+	- last modification date for latest X posts
+	- page modification date
 * Automatic priority calculation for authors
 * allow CPT taxonomies selection in news sitemap (PRO?)
 * drop all WP pre-5.5 and ClassicPress compatibility routines?
