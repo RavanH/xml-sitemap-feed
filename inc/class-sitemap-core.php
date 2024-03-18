@@ -427,7 +427,10 @@ class Sitemap_Core extends Sitemap {
 		$entry['priority'] = namespace\get_post_priority( $post_object );
 
 		// Add lastmod.
-		$entry['lastmod'] = namespace\get_post_modified( $post_object );
+		$lastmod = namespace\get_post_modified( $post_object );
+		if ( $lastmod ) {
+			$entry['lastmod'] = $lastmod;
+		}
 
 		return $entry;
 	}
@@ -447,7 +450,10 @@ class Sitemap_Core extends Sitemap {
 		$entry['priority'] = '1';
 
 		// Set front blog page lastmod to last published post.
-		$entry['lastmod'] = \get_lastpostdate( 'gmt', 'post' );
+		$lastmod = \get_lastpostdate( 'gmt', 'post' );
+		if ( $lastmod ) {
+			$entry['lastmod'] = $lastmod;
+		}
 
 		return $entry;
 	}
