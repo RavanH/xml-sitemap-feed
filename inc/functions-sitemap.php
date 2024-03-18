@@ -237,7 +237,7 @@ function get_root_data() {
 				$url          = \pll_home_url( $language );
 				$data[ $url ] = array(
 					'priority' => '1.0',
-					'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'GMT' ), DATE_W3C ),
+					'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
 					// TODO make lastmod date language specific.
 				);
 			}
@@ -247,7 +247,7 @@ function get_root_data() {
 			$url          = $sitepress->language_url( $term );
 			$data[ $url ] = array(
 				'priority' => '1.0',
-				'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'GMT' ), DATE_W3C ),
+				'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
 				// TODO make lastmod date language specific.
 			);
 		}
@@ -256,7 +256,7 @@ function get_root_data() {
 		$data = array(
 			\trailingslashit( \home_url() ) => array(
 				'priority' => '1.0',
-				'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'GMT' ), DATE_W3C ),
+				'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
 			),
 		);
 	}
