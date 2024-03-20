@@ -159,32 +159,6 @@ function public_taxonomies() {
 }
 
 /**
- * Santize number value
- * Expects proper locale setting for calculations: setlocale( LC_NUMERIC, 'C' );
- *
- * Returns a float or integer within the set limits.
- *
- * @since 5.2
- *
- * @param float|int|string $number Number value.
- * @param float|int        $min    Minimum value.
- * @param float|int        $max    Maximum value.
- * @param bool             $_float Formating, can be float or integer.
- *
- * @return float|int
- */
-function sanitize_number( $number, $min = .1, $max = 1, $_float = true ) {
-	\setlocale( LC_NUMERIC, 'C' );
-
-	$number = $_float ? \str_replace( ',', '.', $number ) : \str_replace( ',', '', $number );
-	$number = $_float ? \floatval( $number ) : \intval( $number );
-
-	$number = \min( \max( $min, $number ), $max );
-
-	return $_float ? \number_format( $number, 1 ) : $number;
-}
-
-/**
  * Clear cache metadata
  *
  * @param string $type The metadata type to clear.

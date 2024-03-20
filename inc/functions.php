@@ -306,6 +306,32 @@ function load_template( $is_comment_feed, $feed ) {
 }
 
 /**
+ * Santize number value
+ * Expects proper locale setting for calculations: setlocale( LC_NUMERIC, 'C' );
+ *
+ * Returns a float or integer within the set limits.
+ *
+ * @since 5.2
+ *
+ * @param float|int|string $number   Number value.
+ * @param float|int        $min      Minimum value.
+ * @param float|int        $max      Maximum value.
+ * @param int              $decimals Formating, can be float or integer.
+ *
+ * @return float|int
+ */
+function sanitize_number( $number, $min = .1, $max = 1, $decimals = 1 ) {
+	\setlocale( LC_NUMERIC, 'C' );
+
+	$number = $decimals ? \str_replace( ',', '.', $number ) : \str_replace( ',', '', $number );
+	$number = $decimals ? \floatval( $number ) : \intval( $number );
+
+	$number = \min( \max( $min, $number ), $max );
+
+	return \number_format( $number, $decimals, '.', '' );
+}
+
+/**
  * Try to turn on ob_gzhandler output compression
  */
 function output_compression() {

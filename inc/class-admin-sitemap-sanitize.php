@@ -70,7 +70,7 @@ class Admin_Sitemap_Sanitize {
 
 		// Sanitize limit.
 		if ( ! empty( $sanitized['limit'] ) && \is_numeric( $sanitized['limit'] ) ) {
-			$sanitized['limit'] = namespace\sanitize_number( $sanitized['limit'], 1, 50000, false );
+			$sanitized['limit'] = namespace\sanitize_number( $sanitized['limit'], 1, 50000, 0 );
 		}
 
 		return $sanitized;
@@ -112,7 +112,7 @@ class Admin_Sitemap_Sanitize {
 
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = namespace\sanitize_number( $save['limit'], 1, 50000, false );
+			$sanitized['limit'] = namespace\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
 		return $sanitized;
@@ -133,7 +133,7 @@ class Admin_Sitemap_Sanitize {
 
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = namespace\sanitize_number( $save['limit'], 1, 50000, false );
+			$sanitized['limit'] = namespace\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
 		foreach ( $sanitized as $post_type => $settings ) {

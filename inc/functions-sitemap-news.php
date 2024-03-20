@@ -35,7 +35,11 @@ function news_nocache_headers( $headers ) {
  * @return string
  */
 function news_filter_where( $where = '' ) {
-	return $where . ' AND post_date_gmt > \'' . \gmdate( 'Y-m-d H:i:s', \strtotime( '-48 hours' ) ) . '\'';
+	$hours  = (int) \apply_filters( 'xmlsf_news_hours_old', 48 );
+	$hours  = \XMLSF\sanitize_number( $hours, 1, 168, 0 );
+	$where .= ' AND post_date_gmt > \'' . \gmdate( 'Y-m-d H:i:s', \strtotime( '-' . $hours . ' hours' ) ) . '\'';
+
+	return $where;
 }
 
 /**

@@ -90,6 +90,7 @@ class Admin_Sitemap {
 		$old            = (array) $old;
 		$clear_images   = false;
 		$clear_comments = false;
+
 		foreach ( (array) $value as $post_type => $settings ) {
 			// Poll for changes that warrant clearing meta data.
 			if ( isset( $old[ $post_type ] ) && \is_array( $old[ $post_type ] ) ) {
@@ -345,7 +346,7 @@ class Admin_Sitemap {
 		if ( \is_plugin_active( 'slim-seo/slim-seo.php' ) && ! \in_array( 'slim_seo_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 			$slimseo = \get_option( 'slim_seo' );
 
-			if ( empty( $slimseo ) || isset( $slimseo['features'] ) && in_array( 'sitemaps', (array) $slimseo['features'] ) ) {
+			if ( empty( $slimseo ) || isset( $slimseo['features'] ) && in_array( 'sitemaps', (array) $slimseo['features'], true ) ) {
 				\add_action(
 					'admin_notices',
 					function () {
