@@ -72,7 +72,7 @@ if ( have_posts() ) :
 endif;
 
 if ( empty( $did_posts ) ) {
-	// No posts done? Then do at least the homepage to prevent error message in Google Search Console.
+	// No posts done? Then do at least the homepage to prevent empty sitemap error in Google Search Console.
 	echo '<url><loc>' . esc_url( home_url() ) . '</loc></url>' . PHP_EOL;
 }
 ?>

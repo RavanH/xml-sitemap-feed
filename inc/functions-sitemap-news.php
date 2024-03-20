@@ -39,6 +39,16 @@ function news_filter_where( $where = '' ) {
 }
 
 /**
+ * Filter news LIMIT
+ * only posts from the last 48 hours
+ *
+ * @return string
+ */
+function news_filter_limits() {
+	return 'LIMIT 0, 1000';
+}
+
+/**
  * Parse language string into two or three letter ISO 639 code.
  *
  * @param string $lang Unformatted language string.

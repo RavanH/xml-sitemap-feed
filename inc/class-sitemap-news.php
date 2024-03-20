@@ -192,29 +192,8 @@ class Sitemap_News {
 		}
 
 		// Set up query filters.
-		$live = false;
-		foreach ( $post_types as $post_type ) {
-			if ( \strtotime( \get_lastpostdate( 'gmt', $post_type ) ) > \strtotime( \gmdate( 'Y-m-d H:i:s', \strtotime( '-48 hours' ) ) ) ) {
-				$live = true;
-				break;
-			}
-		}
-		if ( $live ) {
-			\add_filter(
-				'post_limits',
-				function () {
-					return 'LIMIT 0, 1000';
-				}
-			);
-			\add_filter( 'posts_where', 'XMLSF\news_filter_where', 10, 1 );
-		} else {
-			\add_filter(
-				'post_limits',
-				function () {
-					return 'LIMIT 0, 1';
-				}
-			);
-		}
+		\add_filter( 'post_limits', 'XMLSF\news_filter_limits' );
+		\add_filter( 'posts_where', 'XMLSF\news_filter_where' );
 
 		/** GENERAL MISC. PREPARATIONS */
 
