@@ -1,6 +1,7 @@
 ROADMAP
 
 = 5.5 =
+* fix xmlsf_news_hours_old filter
 * fix URLs per sitemap
 * XML Sitemaps Manager incompatibilit notice?
 * add generator header to core sitemap?
