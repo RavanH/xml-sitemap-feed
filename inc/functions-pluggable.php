@@ -207,20 +207,12 @@ if ( ! function_exists( 'is_sitemap' ) ) {
 	 * @return bool
 	 */
 	function is_sitemap() {
-		if ( function_exists( 'wp_sitemaps_loaded' ) ) {
-			global $wp_query;
-			if ( ! isset( $wp_query ) ) {
-				_doing_it_wrong( __FUNCTION__, esc_html__( 'Conditional query tags do not work before the query is run. Before then, they always return false.' ), '3.1.0' );
-				return false;
-			}
-			return property_exists( $wp_query, 'is_sitemap' ) ? $wp_query->is_sitemap : false;
-		}
-		global $xmlsf;
-		if ( ! is_object( $xmlsf ) || false === $xmlsf->request_filtered ) {
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
+		global $wp_query;
+		if ( ! isset( $wp_query ) ) {
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Conditional query tags do not work before the query is run. Before then, they always return false.' ), '3.1.0' );
 			return false;
 		}
-		return $xmlsf->is_sitemap;
+		return property_exists( $wp_query, 'is_sitemap' ) ? $wp_query->is_sitemap : false;
 	}
 }
 
@@ -240,3 +232,56 @@ if ( ! function_exists( 'is_news' ) ) {
 		return $xmlsf->is_news;
 	}
 }
+
+
+if ( ! function_exists( 'wp_sitemaps_loaded' ) ) :
+	/**
+	 * Loads the WordPress XML Sitemap Server
+	 *
+	 * @see https://core.trac.wordpress.org/ticket/51912
+	 *
+	 * @since 5.5
+	 *
+	 * @param  WP $wp             Current WordPress environment instance.
+	 * @global WP_Query $wp_query WordPress Query.
+	 * @return void
+	 */
+	function wp_sitemaps_loaded( $wp ) {
+		global $wp_query;
+
+		/**
+		 * Whether this is a Sitemap Request.
+		 *
+		 * @see https://core.trac.wordpress.org/ticket/51543
+		 * @since 1.0
+		 * @var bool
+		 */
+		$wp_query->is_sitemap = ! empty( $wp->query_vars['sitemap'] );
+
+		/**
+		 * Whether this is a Sitemap Stylesheet Request.
+		 *
+		 * @since 1.0
+		 * @var bool
+		 */
+		$wp_query->is_sitemap_stylesheet = ! empty( $wp->query_vars['sitemap-stylesheet'] );
+
+		if ( ! $wp_query->is_sitemap && ! $wp_query->is_sitemap_stylesheet ) {
+			return;
+		}
+
+		do_action( 'wp_sitemaps_loaded' );
+
+		// Prepare query variables.
+		$query_vars           = $wp_query->query_vars;
+		$wp_query->query_vars = $wp->query_vars;
+
+		// Render the sitemap.
+		wp_sitemaps_get_server()->render_sitemaps();
+
+		// Still here? Then it was an invalid sitemap request after all. Undo everything and carry on...
+		$wp_query->is_sitemap            = false;
+		$wp_query->is_sitemap_stylesheet = false;
+		$wp_query->query_vars            = $query_vars;
+	}
+endif;

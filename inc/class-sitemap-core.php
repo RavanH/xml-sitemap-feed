@@ -39,14 +39,12 @@ class Sitemap_Core extends Sitemap {
 		\add_action( 'transition_comment_status', array( $this, 'update_post_comment_meta' ), 10, 3 );
 		\add_action( 'comment_post', array( $this, 'update_post_comment_meta_cp' ), 10, 3 ); // When comment is not held for moderation.
 
-		if ( \function_exists( 'wp_sitemaps_loaded' ) ) {
-			\add_action( 'parse_request', array( $this, 'sitemaps_loaded' ), 9 );
-		} else {
-			// MAIN REQUEST filter.
-			\add_filter( 'request', array( $this, 'filter_request' ) );
-			// FIX core sitemap bugs.
-			\add_filter( 'wp_sitemaps_posts_pre_url_list', array( $this, 'posts_url_list' ), 10, 3 );
-		}
+		// MAIN REQUEST filter.
+		\add_filter( 'request', array( $this, 'filter_request' ) );
+		// FIX core sitemap bugs.
+		\add_filter( 'wp_sitemaps_posts_pre_url_list', array( $this, 'posts_url_list' ), 10, 3 );
+		// LOAD early, using our own rolled wp_sitemaps_loaded.
+		\add_action( 'parse_request', 'wp_sitemaps_loaded' );
 
 		// Add lastmod to index.
 		\add_filter( 'wp_sitemaps_index_entry', array( $this, 'index_entry' ), 10, 4 );
@@ -120,16 +118,6 @@ class Sitemap_Core extends Sitemap {
 	}
 
 	/**
-	 * Parse request
-	 * Hooked into parse_request action.
-	 *
-	 * @param WP $wp WP object.
-	 */
-	public function sitemaps_loaded( $wp ) {
-		\do_action( 'xmlsf_sitemap_loaded' );
-	}
-
-	/**
 	 * Filter request
 	 * Hooked into request filter.
 	 *
@@ -144,7 +132,7 @@ class Sitemap_Core extends Sitemap {
 		if ( ! empty( $request['sitemap'] ) ) {
 
 			/** IT'S A SITEMAP */
-			\do_action( 'xmlsf_sitemap_loaded' );
+			\do_action( 'wp_sitemaps_loaded' );
 
 			// Set the sitemap conditional flag.
 			$xmlsf->is_sitemap = true;

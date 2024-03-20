@@ -384,6 +384,8 @@ class Sitemap_Plugin extends Sitemap {
 	/**
 	 * Post archives data
 	 *
+	 * Hooked to the xmlsf_index_archive_data filter.
+	 *
 	 * @param array  $data         Data.
 	 * @param string $post_type    Post type.
 	 * @param string $archive_type Archive type.

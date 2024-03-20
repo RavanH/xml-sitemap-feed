@@ -19,6 +19,7 @@ function xmlsf_debug_nginx_helper_purge_urls( $urls ) {
 	error_log( 'NGINX Helper purge urls array:' );
 	error_log( print_r( $urls, true ) );
 }
+
 add_action( 'xmlsf_nginx_helper_purge_urls', 'xmlsf_debug_nginx_helper_purge_urls' );
 
 /**
@@ -48,6 +49,11 @@ add_action( 'xmlsf_output_compression', 'xmlsf_debug_output_compression' );
  * @return void
  */
 function xmlsf_debug_usage() {
+	// Short-circuit if not a sitemap.
+	if ( ! is_sitemap() ) {
+		return;
+	}
+
 	global $wpdb, $EZSQL_ERROR;
 
 	$num   = get_num_queries();
@@ -65,7 +71,7 @@ function xmlsf_debug_usage() {
 	}
 	// Saved queries.
 	if ( defined( 'SAVEQUERIES' ) && SAVEQUERIES ) {
-		$saved = PHP_EOL . print_r( $wpdb->queries, true );
+		$saved = PHP_EOL . print_r( $wpdb->queries, true ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 	} else {
 		$saved = 'Set SAVEQUERIES to show saved database queries here.';
 	}
@@ -88,18 +94,13 @@ function xmlsf_debug_usage() {
 	echo '<!-- Average system load during the last minute: ' . esc_xml( $load ) . ' -->' . PHP_EOL;
 }
 
-add_action(
-	'xmlsf_sitemap_loaded',
-	function () {
-		WP_DEBUG_LOG && add_action( 'shutdown', 'xmlsf_debug_usage' );
-	}
-);
+add_action( 'shutdown', 'xmlsf_debug_usage' );
 
 add_action(
 	'xmlsf_install',
 	function () {
 		// Kilroy was here.
-		WP_DEBUG_LOG && error_log( 'XML Sitemap Feeds version ' . XMLSF_VERSION . ' installed.' );
+		WP_DEBUG_LOG && error_log( 'XML Sitemap Feeds version ' . XMLSF_VERSION . ' installed.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 	}
 );
 
@@ -107,6 +108,6 @@ add_action(
 	'xmlsf_upgrade',
 	function ( $db_version ) {
 		// Kilroy was here.
-		WP_DEBUG_LOG && error_log( 'XML Sitemap Feeds upgraded from ' . $db_version . ' to ' . XMLSF_VERSION );
+		WP_DEBUG_LOG && error_log( 'XML Sitemap Feeds upgraded from ' . $db_version . ' to ' . XMLSF_VERSION ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 	}
 );
