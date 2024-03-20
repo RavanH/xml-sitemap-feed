@@ -4,8 +4,9 @@ ROADMAP
 * fix URLs per sitemap
 * XML Sitemaps Manager incompatibilit notice?
 * add generator header to core sitemap?
+* fix Polylang compat with wp_sitemaps_loaded early loading...
 * fix Polylang issue icw plugin server: missing users language archives
-fix get_taxonomy_modified Polylang compat when called from core server (not return false)
+* fix get_taxonomy_modified Polylang compat when called from core server (not return false)
 * remove functions-compat-polylang.php?
 * revise readme
 * add missing google news help tab sections: post types, Hierarchical post types
