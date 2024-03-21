@@ -213,18 +213,20 @@ class XMLSF_Admin_Sitemap {
 		// WP SEO conflict notices.
 		if ( is_plugin_active( 'wordpress-seo/wp-seo.php' ) ) {
 			// check date archive redirection.
-			$wpseo_titles = get_option( 'wpseo_titles' );
-			if ( ! empty( $wpseo_titles['disable-date'] ) ) {
-				// check if Split by option is set anywhere.
-				foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
-					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
-						add_action(
-							'admin_notices',
-							function () {
-								include XMLSF_DIR . '/views/admin/notice-wpseo-date-redirect.php';
-							}
-						);
-						break;
+			if ( 'plugin' === get_option( 'xmlsf_server' ) ) {
+				$wpseo_titles = get_option( 'wpseo_titles' );
+				if ( ! empty( $wpseo_titles['disable-date'] ) ) {
+					// check if Split by option is set anywhere.
+					foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
+						if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
+							add_action(
+								'admin_notices',
+								function () {
+									include XMLSF_DIR . '/views/admin/notice-wpseo-date-redirect.php';
+								}
+							);
+							break;
+						}
 					}
 				}
 			}
@@ -249,18 +251,20 @@ class XMLSF_Admin_Sitemap {
 			// check date archive redirection.
 			$seopress_toggle = get_option( 'seopress_toggle' );
 
-			$seopress_titles = get_option( 'seopress_titles_option_name' );
-			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) ) {
-				// check if Split by option is set anywhere.
-				foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
-					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
-						add_action(
-							'admin_notices',
-							function () {
-								include XMLSF_DIR . '/views/admin/notice-seopress-date-redirect.php';
-							}
-						);
-						break;
+			if ( 'plugin' === get_option( 'xmlsf_server' ) ) {
+				$seopress_titles = get_option( 'seopress_titles_option_name' );
+				if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) ) {
+					// check if Split by option is set anywhere.
+					foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
+						if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
+							add_action(
+								'admin_notices',
+								function () {
+									include XMLSF_DIR . '/views/admin/notice-seopress-date-redirect.php';
+								}
+							);
+							break;
+						}
 					}
 				}
 			}
@@ -283,18 +287,20 @@ class XMLSF_Admin_Sitemap {
 		if ( is_plugin_active( 'seo-by-rank-math/rank-math.php' ) ) {
 
 			// check date archive redirection.
-			$rankmath_titles = get_option( 'rank-math-options-titles' );
-			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] ) {
-				// check if Split by option is set anywhere.
-				foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
-					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
-						add_action(
-							'admin_notices',
-							function () {
-								include XMLSF_DIR . '/views/admin/notice-rankmath-date-redirect.php';
-							}
-						);
-						break;
+			if ( 'plugin' === get_option( 'xmlsf_server' ) ) {
+				$rankmath_titles = get_option( 'rank-math-options-titles' );
+				if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] ) {
+					// check if Split by option is set anywhere.
+					foreach ( (array) get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
+						if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
+							add_action(
+								'admin_notices',
+								function () {
+									include XMLSF_DIR . '/views/admin/notice-rankmath-date-redirect.php';
+								}
+							);
+							break;
+						}
 					}
 				}
 			}
