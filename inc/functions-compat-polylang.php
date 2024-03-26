@@ -37,6 +37,20 @@ add_action(
 );
 
 /**
+ * News publication name filter for Polylang.
+ *
+ * @param string $name Publication name.
+ * @param int    $post_id Post ID.
+ *
+ * @return string
+ */
+function polylang_news_name( $name, $post_id ) {
+	return \pll_translate_string( $name, \pll_get_post_language( $post_id, 'locale' ) );
+}
+
+\add_filter( 'xmlsf_news_publication_name', __NAMESPACE__ . '\polylang_news_name', 10, 2 );
+
+/**
  * Post language filter for Polylang.
  *
  * @param string $locale Locale.
@@ -48,4 +62,4 @@ function polylang_post_language_filter( $locale, $post_id ) {
 	return \function_exists( 'pll_get_post_language' ) ? \pll_get_post_language( $post_id, 'locale' ) : $locale;
 }
 
-//\add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\polylang_post_language_filter', 10, 2 );
+\add_filter( 'xmlsf_news_language', __NAMESPACE__ . '\polylang_post_language_filter', 10, 2 );

@@ -1,6 +1,7 @@
 ROADMAP
 
 = 5.5 =
+* Polylang news name option in translation strings? Or fix news name to blog name?
 * fix xmlsf_news_hours_old filter
 * fix URLs per sitemap
 * XML Sitemaps Manager incompatibilit notice?

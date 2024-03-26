@@ -55,7 +55,7 @@ if ( have_posts() ) :
 		if ( $post_age && $post_age >= $not_before ) {
 			// The news tags.
 			echo '<news:news><news:publication><news:name>';
-			echo esc_xml( apply_filters( 'xmlsf_news_publication_name', ( ! empty( $options['name'] ) ? $options['name'] : get_bloginfo( 'name' ) ) ) );
+			echo esc_xml( apply_filters( 'xmlsf_news_publication_name', ( ! empty( $options['name'] ) ? $options['name'] : get_bloginfo( 'name' ) ), $post->ID, $post->post_type ) );
 			echo '</news:name>';
 			echo '<news:language>' . esc_xml( apply_filters( 'xmlsf_news_language', get_bloginfo( 'language' ), $post->ID, $post->post_type ) ) . '</news:language>';
 			echo '</news:publication>';
