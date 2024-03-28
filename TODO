@@ -1,6 +1,7 @@
 ROADMAP
 
 = 5.5 =
+* don't clear sitemaps option when (temp) switching to private site
 * Polylang news name option in translation strings? Or fix news name to blog name?
 * fix xmlsf_news_hours_old filter
 * fix URLs per sitemap
