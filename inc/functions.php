@@ -23,13 +23,13 @@ function robots_txt( $output ) {
 	// SITEMAPS.
 
 	$output .= PHP_EOL . '# XML Sitemap & Google News version ' . XMLSF_VERSION . ' - https://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
-	if ( '1' !== \get_option( 'blog_public' ) ) {
-		$output .= '# XML Sitemaps are disabled because of this site\'s privacy settings.' . PHP_EOL;
+	if ( 1 !== (int) \get_option( 'blog_public' ) ) {
+		$output .= '# XML Sitemaps are disabled because of this site\'s visibility settings.' . PHP_EOL;
 	} elseif ( ! namespace\sitemaps_enabled() ) {
 		$output .= '# No XML Sitemaps are enabled.' . PHP_EOL;
 	} else {
 		namespace\sitemaps_enabled( 'sitemap' ) && $output .= 'Sitemap: ' . namespace\sitemap_url() . PHP_EOL;
-		namespace\sitemaps_enabled( 'news' ) && $output .= 'Sitemap: ' . namespace\sitemap_url( 'news' ) . PHP_EOL;
+		namespace\sitemaps_enabled( 'news' ) && $output    .= 'Sitemap: ' . namespace\sitemap_url( 'news' ) . PHP_EOL;
 	}
 
 	return $output;
@@ -189,7 +189,7 @@ function wpml_remove_home_url_filter() {
 function sitemaps_enabled( $which = 'any' ) {
 	$sitemaps = (array) \get_option( 'xmlsf_sitemaps', array() );
 
-	if ( '1' !== \get_option( 'blog_public' ) || empty( $sitemaps ) ) {
+	if ( 1 !== (int) \get_option( 'blog_public' ) || empty( $sitemaps ) ) {
 		$return = false;
 	} elseif ( 'any' === $which ) {
 		$return = true;

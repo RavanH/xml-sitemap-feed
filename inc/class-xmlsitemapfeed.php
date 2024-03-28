@@ -198,7 +198,7 @@ class XMLSitemapFeed {
 		if ( empty( $this->defaults ) ) :
 
 			// sitemaps.
-			$sitemaps = ( '1' !== \get_option( 'blog_public' ) ) ? array() : array(
+			$sitemaps = ( 1 !== (int) \get_option( 'blog_public' ) ) ? array() : array(
 				'sitemap' => 'sitemap.xml',
 			);
 
