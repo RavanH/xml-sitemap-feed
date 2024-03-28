@@ -42,10 +42,7 @@
 
 </fieldset>
 <script>
-jQuery( 'document' ).ready( function( $ ) {
-	if ( window.location.hash === '#xmlsf_sitemaps' ) {
-		$( '#xmlsf_sitemaps' ).closest( 'td' ).addClass( 'highlight' );
-		$( 'html, body' ).animate( { scrollTop: $("#xmlsf_sitemaps").offset().top-40 }, 800 );
-	}
-} );
+if ( window.location.hash === '#xmlsf_sitemaps' ) {
+	jQuery( 'html, body' ).animate( { scrollTop: jQuery("#xmlsf_sitemaps").offset().top-40 }, 400, 'swing', function(){ jQuery( '#xmlsf_sitemaps' ).closest( 'td' ).addClass( 'highlight' ); } );
+}
 </script>
