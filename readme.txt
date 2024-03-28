@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.4
 Requires PHP: 5.6
 Tested up to: 6.4.3
-Stable tag: 5.4.7
+Stable tag: 5.4.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -295,13 +295,14 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.4.7 =
-Bugfixes: Incompatibility notices WP SEO, RankMath, SEO Press.
+= 5.4.8 =
+Bugfix: Failing blog_public check.
 
 == Changelog ==
 
-= 5.4.7 =
-20240321
+= 5.4.8 =
+20240329
+* FIX: blog_public can be integer when object cache is used
 * FIX: compatibility date redirect warning when using core server
 * FIX: rewrite rules conflict with Polylang
 * FIX: call to undefined function with Nginx Helper
