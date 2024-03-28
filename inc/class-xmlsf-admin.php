@@ -170,8 +170,7 @@ class XMLSF_Admin {
 	 * Sitemap settings fields
 	 */
 	public function sitemaps_settings_field() {
-		if ( get_option( 'blog_public' ) ) {
-			$sitemaps = (array) get_option( 'xmlsf_sitemaps', xmlsf()->defaults( 'sitemaps' ) );
+		if ( 1 === (int) get_option( 'blog_public' ) ) {
 			// The actual fields for data entry.
 			include XMLSF_DIR . '/views/admin/field-sitemaps.php';
 		} else {
