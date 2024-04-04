@@ -39,8 +39,7 @@ if ( have_posts() ) :
 		}
 
 		// Or if post meta says "exclude me please".
-		$excluded = apply_filters( 'xmlsf_excluded', get_post_meta( $post->ID, '_xmlsf_exclude', true ), $post->ID );
-		if ( $excluded ) {
+		if ( apply_filters( 'xmlsf_excluded', get_post_meta( $post->ID, '_xmlsf_exclude', true ), $post->ID ) ) {
 			continue;
 		}
 
@@ -69,7 +68,7 @@ if ( have_posts() ) :
 endif;
 
 if ( empty( $did_posts ) ) {
-	// No posts done? Then do at least the homepage to prevent error message in GWT.
+	// No posts done? Then do at least the homepage to prevent error message in GSC.
 	echo '<url><loc>' . esc_url( home_url() ) . '</loc><priority>1.0</priority></url>' . PHP_EOL;
 }
 ?>
