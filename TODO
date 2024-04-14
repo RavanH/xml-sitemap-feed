@@ -1,6 +1,7 @@
 ROADMAP
 
 = 5.5 =
+* revisit front page lastmod date as it can return an empty result (when no posts), also see https://github.com/RavanH/xml-sitemap-feed/issues/54#issuecomment-2054071722
 * add XML Sitemaps Manager incompatibility notice
 * don't clear sitemaps option when (temp) switching to private site
 * Polylang news name option in translation strings? Or fix news name to blog name?
