@@ -307,9 +307,16 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 * FIX: Polylang news sitemap category selection
 * FIX: Attempt to read property post_type on null
 
-= 5.4.6 =
+= 5.4.9 =
 20240506
 * FIX: Unauthenticated file inclusion - CVE-2024-4441 reported by Foxyyy
+
+= 5.4.8 =
+20240329
+* FIX: blog_public can be integer when object cache is used
+* FIX: compatibility date redirect warning when using core server
+* FIX: rewrite rules conflict with Polylang
+* FIX: call to undefined function with Nginx Helper
 
 = 5.4.5 =
 20240221
