@@ -307,6 +307,10 @@ Switch between plugin and WP core sitemap. New filter/action hooks. Ping service
 * FIX: Polylang news sitemap category selection
 * FIX: Attempt to read property post_type on null
 
+= 5.4.6 =
+20240506
+* FIX: Unauthenticated file inclusion - CVE-2024-4441 reported by Foxyyy
+
 = 5.4.5 =
 20240221
 * FIX: wp-cli disable plugin incompatibility
