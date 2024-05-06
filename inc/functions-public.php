@@ -66,7 +66,10 @@ function xmlsf_load_template( $is_comment_feed, $feed ) {
 	 * sitemap-[custom_sitemap_name].php
 	 */
 
-	$parts = explode( '-', $feed, 3 );
+	$parts = array();
+	foreach ( \explode( '-', $feed, 3 ) as $part ) {
+		$parts[] = basename( $part ); // Patch unauthenticated file inclusion - CVE-2024-4441 reported by Foxyyy.
+	}
 
 	// Possible theme template file names.
 	$templates = array();

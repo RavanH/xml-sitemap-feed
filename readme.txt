@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.4
 Requires PHP: 5.6
 Tested up to: 6.4.3
-Stable tag: 5.4.8
+Stable tag: 5.4.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -295,10 +295,14 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 == Upgrade Notice ==
 
-= 5.4.8 =
-Bugfix: Failing blog_public check.
+= 5.4.9 =
+Security fix: Unauthenticated file inclusion.
 
 == Changelog ==
+
+= 5.4.9 =
+20240506
+* FIX: Unauthenticated file inclusion - CVE-2024-4441 reported by Foxyyy
 
 = 5.4.8 =
 20240329
