@@ -77,7 +77,6 @@ function sitemap_url( $sitemap = 'index', $args = array() ) {
 				'type' => false,
 				'm'    => false,
 				'w'    => false,
-				'gz'   => false,
 			)
 		)
 	);
@@ -89,10 +88,8 @@ function sitemap_url( $sitemap = 'index', $args = array() ) {
 		$name .= $args['m'] ? '.' . $args['m'] : '';
 		$name .= $args['w'] ? '.' . $args['w'] : '';
 		$name .= '.xml';
-		$name .= $args['gz'] ? '.gz' : '';
 	} else {
 		$name  = '?feed=sitemap-' . $sitemap;
-		$name .= $args['gz'] ? '.gz' : '';
 		$name .= $args['type'] ? '-' . $args['type'] : '';
 		$name .= $args['m'] ? '&m=' . $args['m'] : '';
 		$name .= $args['w'] ? '&w=' . $args['w'] : '';
@@ -281,7 +278,7 @@ function load_template( $is_comment_feed, $feed ) {
 
 	$parts = array();
 	foreach ( \explode( '-', $feed, 3 ) as $part ) {
-		$parts[] = basename( $part ); // Patch unauthenticated file inclusion - CVE-2024-4441 reported by Foxyyy.
+		$parts[] = \basename( $part ); // Patch unauthenticated file inclusion - CVE-2024-4441 reported by Foxyyy.
 	}
 
 	// Possible theme template file names.
@@ -299,7 +296,7 @@ function load_template( $is_comment_feed, $feed ) {
 	\locate_template( $templates, true );
 
 	// Still here? Then fall back on plugin template file.
-	$template = XMLSF_DIR . '/views/feed-' . \implode( '-', array_slice( $parts, 0, 2 ) ) . '.php';
+	$template = XMLSF_DIR . '/views/feed-' . \implode( '-', \array_slice( $parts, 0, 2 ) ) . '.php';
 	if ( \file_exists( $template ) ) {
 		\load_template( $template );
 	} else {
@@ -332,23 +329,6 @@ function sanitize_number( $number, $min = .1, $max = 1, $decimals = 1 ) {
 	$number = \min( \max( $min, $number ), $max );
 
 	return \number_format( $number, $decimals, '.', '' );
-}
-
-/**
- * Try to turn on ob_gzhandler output compression
- */
-function output_compression() {
-	// Try to enable zlib.output_compression or fall back to output buffering with ob_gzhandler.
-	if ( false !== \ini_set( 'zlib.output_compression', 'On' ) ) { // phpcs:ignore WordPress.PHP.IniSet.Risky
-		// If zlib.output_compression turned on, then make sure to remove wp_ob_end_flush_all.
-		\remove_action( 'shutdown', 'wp_ob_end_flush_all', 1 );
-	} else {
-		\ob_get_length()
-		|| \in_array( 'ob_gzhandler', \ob_list_handlers(), true )
-		|| \ob_start( 'ob_gzhandler' );
-	}
-
-	\do_action( 'xmlsf_output_compression' );
 }
 
 /**

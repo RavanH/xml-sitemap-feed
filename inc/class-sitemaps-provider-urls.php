@@ -82,7 +82,7 @@ class Sitemaps_Provider_URLs extends \WP_Sitemaps_Provider {
 			return $url_list;
 		}
 
-		$length = $this->max_urls; // Or better us wp_sitemaps_get_max_urls( 'urls' )?
+		$length = $this->max_urls; // Or better use wp_sitemaps_get_max_urls( 'urls' )?
 		$offset = (int) $page_num > 1 ? ( (int) $page_num - 1 ) * $length : 0;
 
 		$urls = \array_slice(

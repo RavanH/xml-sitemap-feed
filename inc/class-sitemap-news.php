@@ -24,8 +24,8 @@ class Sitemap_News {
 	 * @var array
 	 */
 	public $rewrite_rules = array(
-		'regex' => 'sitemap-news\.xml(\.gz)?$',
-		'query' => '?feed=sitemap-news$matches[1]',
+		'regex' => 'sitemap-news\.xml$',
+		'query' => '?feed=sitemap-news',
 	);
 
 	/**
@@ -58,8 +58,8 @@ class Sitemap_News {
 	public function register_rewrites() {
 		// Register news sitemap provider route.
 		\add_rewrite_rule(
-			'^sitemap-news\.xml(\.gz)?$',
-			'index.php?feed=sitemap-news$matches[1]',
+			'^sitemap-news\.xml$',
+			'index.php?feed=sitemap-news',
 			'top'
 		);
 	}
@@ -141,16 +141,6 @@ class Sitemap_News {
 		// Prepare headers.
 		add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
 
-		/** COMPRESSION */
-
-		// Check for gz request.
-		if ( \substr( $request['feed'], -3 ) === '.gz' ) {
-			// Pop that .gz.
-			$request['feed'] = \substr( $request['feed'], 0, -3 );
-			// Verify/apply compression settings.
-			namespace\output_compression();
-		}
-
 		/** PREPARE TO LOAD TEMPLATE */
 		\add_action(
 			'do_feed_' . $request['feed'],
@@ -231,23 +221,6 @@ class Sitemap_News {
 		\remove_all_actions( 'wp_footer' );
 
 		return $request;
-	}
-
-	/**
-	 * Add sitemap rewrite rules
-	 *
-	 * Hooked into rewrite_rules_array filter
-	 *
-	 * @param array $rewrite_rules Rewrite rules.
-	 *
-	 * @return array
-	 */
-	public function rewrite_rules( $rewrite_rules ) {
-		global $wp_rewrite;
-
-		$rewrite_rules = \array_merge( array( $this->rewrite_rules['regex'] => $wp_rewrite->index . $this->rewrite_rules['query'] ), $rewrite_rules );
-
-		return $rewrite_rules;
 	}
 
 	/**

@@ -60,33 +60,27 @@ class Sitemap_Plugin extends Sitemap {
 	 * @since 5.4.5
 	 */
 	public function register_rewrites() {
+		$slug = \apply_filters( 'xmlsf_sitemap_index_slug', 'sitemap' );
+		// Make sure we got a non-empty string.
+		if ( empty( $slug ) || ! \is_string( $slug ) ) {
+			$slug = 'sitemap';
+		}
+		// Clean slug if altered.
+		if ( 'sitemap' !== $slug ) {
+			$slug = \preg_replace( '/[^a-z0-9_]/i', '', $slug );
+		}
+
 		// Register index route.
-		\add_rewrite_rule( '^sitemap(?:_index)?\.xml$', 'index.php?feed=sitemap', 'top' );
+		\add_rewrite_rule(
+			'^' . $slug . '\.xml$',
+			'index.php?feed=sitemap',
+			'top'
+		);
 
 		// Register routes for providers.
 		\add_rewrite_rule(
-			'^sitemap-root\.xml(\.gz)?$',
-			'index.php?feed=sitemap-root$matches[1]',
-			'top'
-		);
-		\add_rewrite_rule(
-			'^sitemap-posttype-([a-z0-9\-_]+?)(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml(\.gz)?$',
-			'index.php?feed=sitemap-posttype-$matches[1]$matches[4]&m=$matches[2]&w=$matches[3]',
-			'top'
-		);
-		\add_rewrite_rule(
-			'^sitemap-author\.xml(\.gz)?$',
-			'index.php?feed=sitemap-author$matches[1]',
-			'top'
-		);
-		\add_rewrite_rule(
-			'^sitemap-custom\.xml(\.gz)?$',
-			'index.php?feed=sitemap-custom$matches[1]',
-			'top'
-		);
-		\add_rewrite_rule(
-			'^sitemap-taxonomy-([a-z0-9\-_]+?)\.xml(\.gz)?$',
-			'index.php?feed=sitemap-taxonomy-$matches[1]$matches[4]',
+			'^sitemap-([a-z]+?)?(-[a-z0-9\-_]+?)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml$',
+			'index.php?feed=sitemap-$matches[1]$matches[2]&m=$matches[3]&w=$matches[4]',
 			'top'
 		);
 	}
@@ -127,16 +121,6 @@ class Sitemap_Plugin extends Sitemap {
 
 		// Prepare headers.
 		\add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
-
-		/** COMPRESSION */
-
-		// Check for gz request.
-		if ( \substr( $request['feed'], -3 ) === '.gz' ) {
-			// Pop that .gz.
-			$request['feed'] = \substr( $request['feed'], 0, -3 );
-			// Verify/apply compression settings.
-			namespace\output_compression();
-		}
 
 		/** MODIFY REQUEST PARAMETERS */
 
@@ -225,7 +209,7 @@ class Sitemap_Plugin extends Sitemap {
 				// Pass on taxonomy name via request.
 				$request['taxonomy'] = $feed[2];
 				// Set terms args.
-				\add_filter( 'get_terms_args', array( $this, 'set_terms_args' ) );
+				\add_filter( 'get_terms_args', array( $this, 'set_terms_args' ), 9 );
 				break;
 
 			case 'author':
@@ -234,7 +218,7 @@ class Sitemap_Plugin extends Sitemap {
 				}
 
 				// Set users args.
-				\add_filter( 'xmlsf_get_author_args', array( $this, 'set_authors_args' ) );
+				\add_filter( 'xmlsf_get_author_args', array( $this, 'set_authors_args' ), 9 );
 				// Set user filter for multisite.
 				\add_filter( 'xmlsf_skip_user', array( $this, 'skip_deleted_or_spam_authors' ), 10, 2 );
 				break;
@@ -288,12 +272,14 @@ class Sitemap_Plugin extends Sitemap {
 			$args['number'] = $defaults['limit'];
 		}
 
-		$args['order']           = 'DESC';
-		$args['orderby']         = 'count';
-		$args['pad_counts']      = true;
-		$args['lang']            = '';
-		$args['hierarchical']    = 0;
-		$args['suppress_filter'] = true;
+		$args['order']                  = 'DESC';
+		$args['orderby']                = 'count';
+		$args['pad_counts']             = true;
+		$args['lang']                   = '';
+		$args['hierarchical']           = false;
+		$args['suppress_filter']        = true;
+		$args['hide_empty']             = true;
+		$args['update_term_meta_cache'] = false;
 
 		return $args;
 	}
