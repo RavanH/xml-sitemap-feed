@@ -37,13 +37,30 @@ endforeach;
 if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) ) {
 	$taxonomies = XMLSF\get_taxonomies();
 	foreach ( $taxonomies as $the_taxonomy ) :
-		$url     = XMLSF\sitemap_url( 'taxonomy', array( 'type' => $the_taxonomy ) );
-		$lastmod = XMLSF\get_taxonomy_modified( $the_taxonomy );
-		echo '<sitemap><loc>' . esc_xml( $url ) . '</loc>';
-		if ( $lastmod ) {
-			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+		$settings = (array) get_option( 'xmlsf_taxonomy_settings' );
+		$defaults = xmlsf()->defaults( 'taxonomy_settings' );
+		$limit    = ! empty( $settings['limit'] ) && $settings['limit'] > 1 && $settings['limit'] < 50000 ? $settings['limit'] : $defaults['limit'];
+		$args     = apply_filters(
+			'xmlsf_taxonomies_query_args',
+			array(
+				'taxonomy'               => $the_taxonomy,
+				'number'                 => $limit,
+				'hide_empty'             => true,
+				'hierarchical'           => false,
+				'lang'                   => '',
+				'update_term_meta_cache' => false,
+			),
+			$the_taxonomy
+		);
+		if ( wp_count_terms( $args ) ) {
+			$url     = XMLSF\sitemap_url( 'taxonomy', array( 'type' => $the_taxonomy ) );
+			$lastmod = XMLSF\get_taxonomy_modified( $the_taxonomy );
+			echo '<sitemap><loc>' . esc_xml( $url ) . '</loc>';
+			if ( $lastmod ) {
+				echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+			}
+			echo '</sitemap>' . PHP_EOL;
 		}
-		echo '</sitemap>' . PHP_EOL;
 	endforeach;
 }
 
