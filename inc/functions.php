@@ -273,36 +273,34 @@ function load_template( $is_comment_feed, $feed ) {
 	 * sitemap-authors.php
 	 * sitemap-custom.php
 	 * sitemap-news.php
-	 * sitemap-[custom_sitemap_name].php
 	 */
 
-	$parts = array();
-	foreach ( \explode( '-', $feed, 3 ) as $part ) {
-		$parts[] = \basename( $part ); // Patch unauthenticated file inclusion - CVE-2024-4441 reported by Foxyyy.
-	}
+	$parts     = \explode( '-', $feed, 3 );
+	$parts[1]  = \basename( $part[1] );
+	$parts[2]  = \basename( $part[2] );
+	$templates = array();
 
 	// Possible theme template file names.
-	$templates = array();
-	if ( ! empty( $parts[1] ) ) {
+	if ( ! empty( $parts[1] ) && in_array( $parts[1], array( 'posttype', 'taxonomy', 'authors', 'custom', 'news' ), true ) ) {
 		if ( ! empty( $parts[2] ) ) {
-			$templates[] = "{$parts[0]}-{$parts[1]}-{$parts[2]}.php";
+			$templates[] = "sitemap-{$parts[1]}-{$parts[2]}.php";
 		}
-		$templates[] = "{$parts[0]}-{$parts[1]}.php";
+		$templates[] = "sitemap-{$parts[1]}.php";
 	} else {
-		$templates[] = "{$parts[0]}.php";
+		$templates[] = 'sitemap.php';
 	}
 
 	// Find theme template file and load that.
 	\locate_template( $templates, true );
 
-	// Still here? Then fall back on plugin template file.
-	$template = XMLSF_DIR . '/views/feed-' . \implode( '-', \array_slice( $parts, 0, 2 ) ) . '.php';
-	if ( \file_exists( $template ) ) {
-		\load_template( $template );
-	} else {
-		// No template? Then fall back on index.
-		\load_template( XMLSF_DIR . '/views/feed-sitemap.php' );
+	// Still here? Then fall back on a matching plugin template file.
+	foreach ( $templates as $template ) {
+		$file = XMLSF_DIR . '/views/feed-' . $template;
+		\file_exists( $template ) && \load_template( $template );
 	}
+
+	// No match? Then fall back on index template file.
+	\load_template( XMLSF_DIR . '/views/feed-sitemap.php' );
 }
 
 /**
