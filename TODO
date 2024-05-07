@@ -9,7 +9,6 @@ ROADMAP
 * Polylang news name option in translation strings? Or fix news name to blog name?
 * fix xmlsf_news_hours_old filter
 * fix URLs per sitemap
-* XML Sitemaps Manager incompatibilit notice?
 * add generator header to core sitemap?
 * fix Polylang issue icw plugin server: missing users language archives
 * fix get_taxonomy_modified Polylang compat when called from core server (not return false)
@@ -44,5 +43,4 @@ CONSIDER
 * Automatic priority calculation for authors
 * allow CPT taxonomies selection in news sitemap (PRO?)
 * drop all WP pre-5.5 and ClassicPress compatibility routines?
-* remove all .gz stuff (output compression already on most hosting)
 * core sitemap stylesheets per sitemap type (is that possible?)
