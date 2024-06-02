@@ -307,6 +307,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 * FIX: Polylang news sitemap category selection
 * FIX: Attempt to read property post_type on null
 * FIX: Possible empty taxonomy sitemaps in index
+* FIX: Missing textdomain, thanks @itapress
 
 = 5.4.9 =
 20240506
