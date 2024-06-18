@@ -301,6 +301,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 == Changelog ==
 
 = 5.5 =
+Date:
 * NEW: Filter xmlsf_taxonomies_query_args
 * Namespacing & autoloading
 * Admin notices for Slim SEO, Squirrly SEO, Jetpack Sitemaps
@@ -310,18 +311,18 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 * FIX: Missing textdomain, thanks @itapress
 
 = 5.4.9 =
-20240506
+Date: 20240506
 * FIX: Unauthenticated file inclusion - CVE-2024-4441 reported by Foxyyy
 
 = 5.4.8 =
-20240329
+Date: 20240329
 * FIX: blog_public can be integer when object cache is used
 * FIX: compatibility date redirect warning when using core server
 * FIX: rewrite rules conflict with Polylang
 * FIX: call to undefined function with Nginx Helper
 
 = 5.4.5 =
-20240221
+Date: 20240221
 * FIX: wp-cli disable plugin incompatibility
 * FIX: trailing slash
 * FIX: split by month
@@ -331,7 +332,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 * FIX: admin compatibility message
 
 = 5.4 =
-20240219
+Date: 20240219
 * NEW: Switch between Plugin or WP core sitemap server for sitemap generation
 * NEW: xmlsf_generator action hook
 * NEW: xmlsf_sitemap_index_pre and xmlsf_sitemap_index_post action hooks
@@ -346,21 +347,21 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 * FIX: Conversion of false to array deprecated warning
 
 = 5.3.6 =
-20230810
+Date: 20230810
 * FIX: Work around get_users() fatal error in WP 6.3
 * FIX: Wrong Nginx helper purge urls (backport from 5.4-beta)
 
 = 5.3.5 =
-20230629
+Date: 20230629
 * FIX: Forced Status 200 response conflict with Etag/If-None-Match headers, thanks @revolutionnaire
 
 = 5.3.4 =
-20230530
+Date: 20230530
 * FIX: File not found error on invalid sitemap requests
 * FIX: Lastmod date older than post date on scheduled posts
 
 = 5.3.3 =
-20230528
+Date: 20230528
 * FIX: Undefined variable + Invalid argument supplied for foreach(), thanks @yankyaw09
 
 = 5.3.2 =
