@@ -311,7 +311,7 @@ class Sitemap_Core extends Sitemap {
 				break;
 
 			case 'news':
-				$options    = \get_option( 'xmlsf_news_tags' );
+				$options    = (array) \get_option( 'xmlsf_news_tags' );
 				$post_types = isset( $options['post_type'] ) && ! empty( $options['post_type'] ) ? (array) $options['post_type'] : array( 'post' );
 				foreach ( $post_types as $post_type ) {
 					$lastpostdate     = \get_date_from_gmt( \get_lastpostdate( 'GMT', $post_type ), DATE_W3C );
@@ -450,7 +450,7 @@ class Sitemap_Core extends Sitemap {
 		$entry['priority'] = '1';
 
 		// Set front blog page lastmod to last published post.
-		$lastmod = \get_lastpostdate( 'gmt', 'post' );
+		$lastmod = \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C );
 		if ( $lastmod ) {
 			$entry['lastmod'] = $lastmod;
 		}
