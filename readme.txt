@@ -309,6 +309,7 @@ Date:
 * FIX: Attempt to read property post_type on null
 * FIX: Possible empty taxonomy sitemaps in index
 * FIX: Missing textdomain, thanks @itapress
+* FIX: Blog page lastmod date format
 
 = 5.4.9 =
 Date: 20240506

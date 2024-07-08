@@ -1,6 +1,7 @@
 ROADMAP
 
 = 5.5 =
+* priority optional
 * drop all publisher center links ? see https://support.google.com/news/publisher-center/answer/14859160
 * revisit rewrite rules creation: can we not use add_permastruct and remove_permastruct for easier deletion on plugin deactivation? and dynamic sitemap name?
 * revisit front page lastmod date as it can return an empty result (when no posts), also see https://github.com/RavanH/xml-sitemap-feed/issues/54#issuecomment-2054071722
