@@ -121,25 +121,14 @@ class Sitemap_News {
 
 		/** IT'S A NEWS SITEMAP */
 
+		\do_action( 'xmlsf_sitemap_loaded' );
+
 		// Set the sitemap conditional flags.
-		$xmlsf->is_sitemap = true;
-		$xmlsf->is_news    = true;
-
-		// Don't go redirecting anything now..
-		\remove_action( 'template_redirect', 'redirect_canonical' );
-
-		// Save a few db queries.
-		\add_filter( 'split_the_query', '__return_false' );
-
-		// Make sure we have the proper locale setting for calculations.
-		\setlocale( LC_NUMERIC, 'C' );
+		$xmlsf->is_news = true;
 
 		// Disable caching.
 		\defined( 'DONOTCACHEPAGE' ) || \define( 'DONOTCACHEPAGE', true );
 		\defined( 'DONOTCACHEDB' ) || \define( 'DONOTCACHEDB', true );
-
-		// Prepare headers.
-		add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
 
 		/** PREPARE TO LOAD TEMPLATE */
 		\add_action(
@@ -205,20 +194,6 @@ class Sitemap_News {
 				}
 			);
 		}
-
-		/** GENERAL MISC. PREPARATIONS */
-
-		// Prevent public errors breaking xml.
-		@\ini_set( 'display_errors', 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.PHP.IniSet.display_errors_Disallowed
-
-		// Remove filters to prevent stuff like cdn urls for xml stylesheet and images.
-		\remove_all_filters( 'plugins_url' );
-		\remove_all_filters( 'wp_get_attachment_url' );
-		\remove_all_filters( 'image_downsize' );
-
-		// Remove actions that we do not need.
-		\remove_all_actions( 'widgets_init' );
-		\remove_all_actions( 'wp_footer' );
 
 		return $request;
 	}

@@ -8,6 +8,47 @@
 namespace XMLSF;
 
 /**
+ * Sitemap loaded
+ *
+ * Common actions to prepare sitemap loading.
+ * Hooked into xmlsf_sitemap_loaded action.
+ */
+function sitemap_loaded() {
+	global $xmlsf;
+
+	// Prepare headers.
+	\add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
+
+	// Set the sitemap conditional flag.
+	$xmlsf->is_sitemap = true;
+
+	// Make sure we have the proper locale setting for calculations.
+	\setlocale( LC_NUMERIC, 'C' );
+
+	// Save a few db queries.
+	\add_filter( 'split_the_query', '__return_false' );
+
+	// Don't go redirecting anything from now on...
+	\remove_action( 'template_redirect', 'redirect_canonical' );
+
+	/** GENERAL MISC. PREPARATIONS */
+
+	// Prevent public errors breaking xml.
+	@\ini_set( 'display_errors', 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.PHP.IniSet.display_errors_Disallowed
+
+	// Remove filters to prevent stuff like cdn urls for xml stylesheet and images.
+	\remove_all_filters( 'plugins_url' );
+	\remove_all_filters( 'wp_get_attachment_url' );
+	\remove_all_filters( 'image_downsize' );
+
+	// Remove actions that we do not need.
+	\remove_all_actions( 'widgets_init' );
+	\remove_all_actions( 'wp_footer' );
+}
+
+\add_action( 'xmlsf_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
+
+/**
  * Filter robots.txt rules
  *
  * @param string $output Default robots.txt content.

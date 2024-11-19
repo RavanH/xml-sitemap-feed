@@ -310,6 +310,7 @@ Date:
 * FIX: Possible empty taxonomy sitemaps in index
 * FIX: Missing textdomain, thanks @itapress
 * FIX: Blog page lastmod date format
+* FIX: Noindex robots meta header for core sitemap, thanks @ukheather
 
 = 5.4.9 =
 Date: 20240506
