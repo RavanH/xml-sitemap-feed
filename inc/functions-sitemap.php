@@ -460,25 +460,28 @@ function get_post_modified( $post ) {
 
 		$lastmod = \get_lastpostdate( 'GMT', 'post' );
 
-	} else {
-
-		$lastmod = $post->post_modified_gmt;
-
-		// make sure lastmod is not older than publication date (happens on scheduled posts).
-		if ( isset( $post->post_date_gmt ) && \strtotime( $post->post_date_gmt ) > \strtotime( $lastmod ) ) {
-			$lastmod = $post->post_date_gmt;
+		// Only return if we got an actual last post date here.
+		if ( ! empty( $lastmod ) ) {
+			return get_date_from_gmt( $lastmod, DATE_W3C );
 		}
+	}
 
-		// maybe update lastmod to latest comment.
-		$options = (array) \get_option( 'xmlsf_post_types', array() );
+	$lastmod = $post->post_modified_gmt;
 
-		if ( ! empty( $options[ $post->post_type ]['update_lastmod_on_comments'] ) ) {
-			// assuming post meta data has been primed here.
-			$lastcomment = \get_post_meta( $post->ID, '_xmlsf_comment_date_gmt', true ); // only get one.
+	// make sure lastmod is not older than publication date (happens on scheduled posts).
+	if ( isset( $post->post_date_gmt ) && \strtotime( $post->post_date_gmt ) > \strtotime( $lastmod ) ) {
+		$lastmod = $post->post_date_gmt;
+	}
 
-			if ( ! empty( $lastcomment ) && \strtotime( $lastcomment ) > \strtotime( $lastmod ) ) {
-				$lastmod = $lastcomment;
-			}
+	// maybe update lastmod to latest comment.
+	$options = (array) \get_option( 'xmlsf_post_types', array() );
+
+	if ( ! empty( $options[ $post->post_type ]['update_lastmod_on_comments'] ) ) {
+		// assuming post meta data has been primed here.
+		$lastcomment = \get_post_meta( $post->ID, '_xmlsf_comment_date_gmt', true ); // only get one.
+
+		if ( ! empty( $lastcomment ) && \strtotime( $lastcomment ) > \strtotime( $lastmod ) ) {
+			$lastmod = $lastcomment;
 		}
 	}
 

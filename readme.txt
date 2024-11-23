@@ -311,6 +311,7 @@ Date:
 * FIX: Missing textdomain, thanks @itapress
 * FIX: Blog page lastmod date format
 * FIX: Noindex robots meta header for core sitemap, thanks @ukheather
+* FIX: possible empty static front page lastmod
 
 = 5.4.9 =
 Date: 20240506
