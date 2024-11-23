@@ -7,6 +7,10 @@
 
 namespace XMLSF;
 
+if ( ! \function_exists( '\is_plugin_active' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/plugin.php';
+}
+
 if ( \is_plugin_active( 'polylang/polylang.php' ) ) {
 	\add_filter( 'xmlsf_blogpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
 	\add_filter( 'xmlsf_frontpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
