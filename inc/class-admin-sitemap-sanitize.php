@@ -136,7 +136,12 @@ class Admin_Sitemap_Sanitize {
 			$sanitized['limit'] = namespace\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
+		// Sanitize priorities.
 		foreach ( $sanitized as $post_type => $settings ) {
+			if ( ! is_array( $settings ) ) {
+				continue;
+			}
+
 			$sanitized[ $post_type ]['priority'] = \is_numeric( $settings['priority'] ) ? namespace\sanitize_number( \str_replace( ',', '.', $settings['priority'] ), .1, .9 ) : '0.5';
 		}
 
