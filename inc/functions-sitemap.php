@@ -328,12 +328,7 @@ function get_user_modified( $user ) {
 	*/
 	$meta = \get_user_meta( $user->ID );
 
-	if ( ! \array_key_exists( 'user_modified', $meta ) ) {
-		// Last publication date.
-		// TODO.
-	} else {
-		$lastmod = \get_user_meta( $user->ID, 'user_modified', true );
-	}
+	$lastmod = \get_user_meta( $user->ID, 'user_modified', true );
 
 	return ! empty( $lastmod ) ? \mysql2date( DATE_W3C, $lastmod, false ) : false;
 }
