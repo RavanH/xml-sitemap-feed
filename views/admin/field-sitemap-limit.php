@@ -14,7 +14,7 @@
 	<p>
 		<label>
 			<?php esc_html_e( 'Maximum posts per sitemap', 'xml-sitemap-feed' ); ?>
-			<input type="number" step="100" min="0" max="50000" name="xmlsf_general_settings[limit]" id="xmlsf_sitemap_settings_limit" value="<?php echo esc_attr( $limit ); ?>" class="medium-text" />
+			<input type="number" step="100" min="0" max="50000" name="xmlsf_post_types[limit]" id="xmlsf_sitemap_settings_limit" value="<?php echo esc_attr( $limit ); ?>" class="medium-text" />
 		</label>
 	</p>
 
