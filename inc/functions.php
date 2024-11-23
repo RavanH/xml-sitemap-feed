@@ -233,7 +233,7 @@ function sitemaps_enabled( $which = 'any' ) {
 		$return = true;
 	} else {
 		$key    = 'news' === $which ? 'sitemap-news' : $which;
-		$return = array_key_exists( $key, $sitemaps );
+		$return = \array_key_exists( $key, $sitemaps );
 	}
 
 	return \apply_filters( 'xmlsf_sitemaps_enabled', $return, $which );

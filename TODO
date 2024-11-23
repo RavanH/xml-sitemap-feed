@@ -8,12 +8,9 @@ ROADMAP
 * add XML Sitemaps Manager incompatibility notice
 * don't clear sitemaps option when (temp) switching to private site
 * Polylang news name option in translation strings? Or fix news name to blog name?
-* fix xmlsf_news_hours_old filter
 * fix URLs per sitemap
-* add generator header to core sitemap?
 * fix Polylang issue icw plugin server: missing users language archives
 * fix get_taxonomy_modified Polylang compat when called from core server (not return false)
-* remove functions-compat-polylang.php?
 * revise readme
 * add missing google news help tab sections: post types, Hierarchical post types
 * remove help tab section: content labels
