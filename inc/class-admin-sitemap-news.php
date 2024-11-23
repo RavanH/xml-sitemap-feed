@@ -335,7 +335,7 @@ class Admin_Sitemap_News {
 			// SETTINGS.
 			\add_settings_field(
 				'xmlsf_news_name',
-				'<label for="xmlsf_news_name">' . __( 'Publication name', 'xml-sitemap-feed' ) . '</label>',
+				'<label for="xmlsf_news_name">' . \__( 'Publication name', 'xml-sitemap-feed' ) . '</label>',
 				array( $this, 'name_field' ),
 				'xmlsf_news_general',
 				'news_sitemap_general_section'
@@ -409,7 +409,7 @@ class Admin_Sitemap_News {
 		$screen->add_help_tab(
 			array(
 				'id'      => 'sitemap-news-settings',
-				'title'   => __( 'Google News Sitemap', 'xml-sitemap-feed' ),
+				'title'   => \__( 'Google News Sitemap', 'xml-sitemap-feed' ),
 				'content' => $content,
 			)
 		);
@@ -424,7 +424,19 @@ class Admin_Sitemap_News {
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-news-name',
-						'title'   => __( 'Publication name', 'xml-sitemap-feed' ),
+						'title'   => \__( 'Publication name', 'xml-sitemap-feed' ),
+						'content' => $content,
+					)
+				);
+				// Post types.
+				\ob_start();
+				include XMLSF_DIR . '/views/admin/help-tab-news-post-types.php';
+				include XMLSF_DIR . '/views/admin/help-tab-support.php';
+				$content = \ob_get_clean();
+				$screen->add_help_tab(
+					array(
+						'id'      => 'sitemap-news-post-types',
+						'title'   => \__( 'Post types', 'xml-sitemap-feed' ),
 						'content' => $content,
 					)
 				);
@@ -440,21 +452,21 @@ class Admin_Sitemap_News {
 						'content' => $content,
 					)
 				);
-				// Source labels.
+				break;
+
+			case 'advanced':
+				// Hierarchical post types.
 				\ob_start();
-				include XMLSF_DIR . '/views/admin/help-tab-news-labels.php';
+				include XMLSF_DIR . '/views/admin/help-tab-news-hierarchical.php';
 				include XMLSF_DIR . '/views/admin/help-tab-support.php';
 				$content = \ob_get_clean();
 				$screen->add_help_tab(
 					array(
-						'id'      => 'sitemap-news-labels',
-						'title'   => __( 'Content labels', 'xml-sitemap-feed' ),
+						'id'      => 'sitemap-news-post-types',
+						'title'   => \__( 'Hierarchical post types', 'xml-sitemap-feed' ),
 						'content' => $content,
 					)
 				);
-				break;
-
-			case 'advanced':
 				// Keywords.
 				\ob_start();
 				include XMLSF_DIR . '/views/admin/help-tab-news-keywords.php';
@@ -463,11 +475,11 @@ class Admin_Sitemap_News {
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-news-keywords',
-						'title'   => __( 'Keywords', 'xml-sitemap-feed' ),
+						'title'   => \__( 'Keywords', 'xml-sitemap-feed' ),
 						'content' => $content,
 					)
 				);
-				// Stokc tickers.
+				// Stock tickers.
 				\ob_start();
 				include XMLSF_DIR . '/views/admin/help-tab-news-stocktickers.php';
 				include XMLSF_DIR . '/views/admin/help-tab-support.php';
@@ -475,7 +487,7 @@ class Admin_Sitemap_News {
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-news-stocktickers',
-						'title'   => __( 'Stock tickers', 'xml-sitemap-feed' ),
+						'title'   => \__( 'Stock tickers', 'xml-sitemap-feed' ),
 						'content' => $content,
 					)
 				);
