@@ -304,6 +304,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 Date:
 * NEW: Filter xmlsf_taxonomies_query_args
 * NEW: Filter xmlsf_news_hours_old
+* NEW: post types max number
 * Namespacing & autoloading
 * Admin notices for Slim SEO, Squirrly SEO, Jetpack Sitemaps
 * FIX: Polylang news sitemap category selection
