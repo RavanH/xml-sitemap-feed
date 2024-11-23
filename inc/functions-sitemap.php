@@ -196,45 +196,27 @@ function clear_metacache( $type = 'all' ) {
 
 
 /**
- * Get root pages data
+ * Get root page(s) data
  *
  * @return array
  */
 function get_root_data() {
-	global $sitepress;
+	$data = array(
+		\trailingslashit( \home_url() ) => array(
+			'priority' => '1.0',
+			'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
+		),
+	);
 
-	// Polylang and WPML compat.
-	if ( \function_exists( 'pll_languages_list' ) && \function_exists( 'pll_home_url' ) ) {
-		$languages = \pll_languages_list();
-		if ( is_array( $languages ) ) {
-			foreach ( $languages as $language ) {
-				$url          = \pll_home_url( $language );
-				$data[ $url ] = array(
-					'priority' => '1.0',
-					'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
-					// TODO make lastmod date language specific.
-				);
-			}
-		}
-	} elseif ( \is_object( $sitepress ) && \method_exists( $sitepress, 'get_languages' ) && \method_exists( $sitepress, 'language_url' ) ) {
-		foreach ( \array_keys( $sitepress->get_languages( false, true ) ) as $term ) {
-			$url          = $sitepress->language_url( $term );
-			$data[ $url ] = array(
-				'priority' => '1.0',
-				'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
-				// TODO make lastmod date language specific.
-			);
-		}
-	} else {
-		// Single site root.
-		$data = array(
-			\trailingslashit( \home_url() ) => array(
-				'priority' => '1.0',
-				'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
-			),
-		);
-	}
-
+	/**
+	 * Developers
+	 *
+	 * Modify the root data array with: add_filter( 'xmlsf_root_data', 'your_filter_function' );
+	 *
+	 * Possible filters hooked here:
+	 * XMLSF\Compat/Polylang->root_data - Polylang compatibility
+	 * XMLSF\Compat\WPML->root_data - WPML compatibility
+	 */
 	return \apply_filters( 'xmlsf_root_data', $data );
 }
 

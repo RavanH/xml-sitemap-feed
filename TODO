@@ -10,10 +10,8 @@ ROADMAP
 * Polylang news name option in translation strings? Or fix news name to blog name?
 * fix URLs per sitemap
 * fix Polylang issue icw plugin server: missing users language archives
-* fix get_taxonomy_modified Polylang compat when called from core server (not return false)
 * revise readme
-* add missing google news help tab sections: post types, Hierarchical post types
-* remove help tab section: content labels
+
 * Move automatic priority calc + update lastmod on comments to General section
 * switch to Exclude... instead of Include...
 * move away from feed templates, adopt ?sitemap=... approach from core
@@ -22,6 +20,14 @@ ROADMAP
 * add inline comment blocks for hooks
 * dynamic stylesheets
 * revisit/regroup views
+
+DOCUMENT
+* xmlsf_blogpages
+* xmlsf_frontpages
+* xmlsf_register_news_sitemap_provider
+* xmlsf_register_news_sitemap_provider_after
+* xmlsf_add_settings
+* xmlsf_news_add_settings
 
 TEST
 * test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active

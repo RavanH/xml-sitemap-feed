@@ -156,13 +156,6 @@ class XMLSitemapFeed {
 			return;
 		}
 
-		/* DEACTIVEATED.
-		global $polylang;
-		if ( isset( $polylang ) && \is_object( $polylang->sitemaps ) ) {
-			include XMLSF_DIR . '/inc/functions-compat-polylang.php';
-		}
-		*/
-
 		$sitemaps = (array) get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
 
 		// Google News sitemap?

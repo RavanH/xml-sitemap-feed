@@ -86,14 +86,11 @@ class Sitemap_News {
 	 * Add Google News sitemap to the core sitemap index
 	 */
 	public function news_in_core_index() {
-		// Polylang compatibility: prevent sitemap translations.
-		global $polylang;
-		$pll_removed = isset( $polylang ) && \is_object( $polylang->sitemaps ) ? \remove_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) ) : false;
+		\do_action( 'xmlsf_register_news_sitemap_provider' );
 
 		\wp_register_sitemap_provider( 'news', new Sitemaps_Provider_News() );
 
-		// Re-add Polylang filter.
-		$pll_removed && \add_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) );
+		\do_action( 'xmlsf_register_news_sitemap_provider_after' );
 	}
 
 	/**
@@ -121,7 +118,7 @@ class Sitemap_News {
 
 		/** IT'S A NEWS SITEMAP */
 
-		\do_action( 'xmlsf_sitemap_loaded' );
+		\do_action( 'xmlsf_news_sitemap_loaded' );
 
 		// Set the sitemap conditional flags.
 		$xmlsf->is_news = true;
@@ -149,10 +146,10 @@ class Sitemap_News {
 		 *
 		 * Add your actions that should run when a news sitemap request is found with: add_filter( 'xmlsf_news_request', 'your_filter_function' );
 		 *
-		 * Filters hooked here already:
-		 * XMLSF\polylang_request - Polylang compatibility
-		 * XMLSF\wpml_request - WPML compatibility
-		 * XMLSF\bbpress_request - bbPress compatibility
+		 * Possible filters hooked here:
+		 * XMLSF\Compat/Polylang->filter_request - Polylang compatibility
+		 * XMLSF\Compat\WPML->filter_request - WPML compatibility
+		 * XMLSF\Compat/BBPress->filter_request - bbPress compatibility
 		 */
 		$request = \apply_filters( 'xmlsf_news_request', $request );
 

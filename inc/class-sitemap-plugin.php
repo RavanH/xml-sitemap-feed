@@ -108,7 +108,6 @@ class Sitemap_Plugin extends Sitemap {
 		}
 
 		/** IT'S A SITEMAP */
-		\do_action( 'xmlsf_sitemap_loaded' );
 
 		/** MODIFY REQUEST PARAMETERS */
 
@@ -124,17 +123,20 @@ class Sitemap_Plugin extends Sitemap {
 		 *
 		 * Use add_filter( 'xmlsf_request', 'your_filter_function' );
 		 *
-		 * Filters hooked here already:
-		 * XMLSF\polylang_request - Polylang compatibility
-		 * XMLSF\wpml_request - WPML compatibility
-		 * XMLSF\bbpress_request - bbPress compatibility
+		 * Possible filters hooked here:
+		 * XMLSF\Compat/Polylang->filter_request - Polylang compatibility
+		 * XMLSF\Compat\WPML->filter_request - WPML compatibility
+		 * XMLSF\Compat/BBPress->filter_request - bbPress compatibility
 		 */
 		$request = \apply_filters( 'xmlsf_request', $request );
 
 		$feed     = \explode( '-', $request['feed'], 3 );
 		$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
+		$type     = isset( $feed[1] ) ? $feed[1] : '';
 
-		switch ( isset( $feed[1] ) ? $feed[1] : '' ) {
+		\do_action( 'xmlsf_sitemap_loaded', 'plugin', $type );
+
+		switch ( $type ) {
 
 			case 'posttype':
 				if ( ! isset( $feed[2] ) || empty( $this->post_types[ $feed[2] ] ) || ! is_array( $this->post_types[ $feed[2] ] ) || empty( $this->post_types[ $feed[2] ]['active'] ) ) {

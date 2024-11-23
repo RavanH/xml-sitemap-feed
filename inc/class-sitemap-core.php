@@ -130,7 +130,7 @@ class Sitemap_Core extends Sitemap {
 		if ( ! empty( $request['sitemap'] ) ) {
 
 			/** IT'S A SITEMAP */
-			\do_action( 'xmlsf_sitemap_loaded' );
+			\do_action( 'xmlsf_sitemap_loaded', 'core', $request['sitemap'] );
 
 			/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
 			/**

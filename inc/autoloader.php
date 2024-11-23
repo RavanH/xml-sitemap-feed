@@ -21,11 +21,13 @@ function autoloader( $class_name ) {
 		return;
 	}
 
-	// Build the filename.
-	$class_name = \str_replace( 'XMLSF\\', '', $class_name );
-	$class_name = \strtolower( $class_name );
+	// Build the filename and path.
+	$class_name = \str_replace( 'XMLSF', 'inc', $class_name );
+	$path_array = \explode( '\\', $class_name );
+	$class_name = \array_pop( $path_array );
 	$class_name = \str_replace( '_', '-', $class_name );
-	$file       = \realpath( XMLSF_DIR ) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'class-' . $class_name . '.php';
+	$path_array = array_filter( $path_array, 'strtolower' );
+	$file       = \realpath( XMLSF_DIR ) . DIRECTORY_SEPARATOR . implode( DIRECTORY_SEPARATOR, $path_array ) . DIRECTORY_SEPARATOR . 'class-' . $class_name . '.php';
 
 	// If the file exists for the class name, load it.
 	if ( file_exists( $file ) ) {
