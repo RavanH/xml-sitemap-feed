@@ -23,16 +23,16 @@ function autoloader( $class_name ) {
 
 	// Build the filename and path.
 	$class_name = \str_replace( 'XMLSF', 'inc', $class_name );
+	$class_name = \strtolower( $class_name );
 	$path_array = \explode( '\\', $class_name );
 	$class_name = \array_pop( $path_array );
 	$class_name = \str_replace( '_', '-', $class_name );
-	$path_array = array_filter( $path_array, 'strtolower' );
-	$file       = \realpath( XMLSF_DIR ) . DIRECTORY_SEPARATOR . implode( DIRECTORY_SEPARATOR, $path_array ) . DIRECTORY_SEPARATOR . 'class-' . $class_name . '.php';
+	$file       = \realpath( XMLSF_DIR ) . DIRECTORY_SEPARATOR . \implode( DIRECTORY_SEPARATOR, $path_array ) . DIRECTORY_SEPARATOR . 'class-' . $class_name . '.php';
 
 	// If the file exists for the class name, load it.
-	if ( file_exists( $file ) ) {
-		include $file;
+	if ( \file_exists( $file ) ) {
+		include_once $file;
 	}
 }
 
-spl_autoload_register( 'XMLSF\autoloader' );
+\spl_autoload_register( __NAMESPACE__ . '\autoloader' );
