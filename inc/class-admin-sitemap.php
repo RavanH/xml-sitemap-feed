@@ -551,7 +551,7 @@ class Admin_Sitemap {
 		);
 		\add_settings_field(
 			'disabled_providers',
-			\translate( 'Exclude:' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
+			\esc_html__( 'Disable sitemaps', 'xml-sitemap-feed' ),
 			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'disable_fields' ),
 			'xmlsf_general',
 			'general'

@@ -26,9 +26,11 @@ if ( is_array( $custom_urls ) ) :
 
 		do_action( 'xmlsf_url', 'custom', $data );
 
-		echo '<url><loc>' . esc_url( $data[0] ) . '</loc><priority>';
-		echo ( isset( $data[1] ) && is_numeric( $data[1] ) ) ? esc_xml( $data[1] ) : '0.5';
-		echo '</priority>';
+		echo '<url><loc>' . esc_url( $data[0] ) . '</loc>';
+
+		if ( ! empty( $data[1] ) && is_numeric( $data[1] ) ) {
+			echo '<priority>' . esc_xml( $data[1] ) . '</priority>';
+		}
 
 		do_action( 'xmlsf_tags_after', 'custom', $data );
 

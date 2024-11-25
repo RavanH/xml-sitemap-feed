@@ -42,7 +42,7 @@
 		<?php
 	}
 
-	$priority_val = ! empty( $options[ $obj->name ]['priority'] ) ? $options[ $obj->name ]['priority'] : '0.5';
+	$priority_val = ! empty( $options[ $obj->name ]['priority'] ) ? $options[ $obj->name ]['priority'] : '';
 	$image        = isset( $options[ $obj->name ]['tags']['image'] ) ? $options[ $obj->name ]['tags']['image'] : 'attached';
 	$context      = ( 'page' === $obj->name ) ? 'page' : 'post';
 	?>
@@ -51,6 +51,9 @@
 		<label><?php esc_html_e( 'Priority', 'xml-sitemap-feed' ); ?>
 			<input type="number" step="0.1" min="0.1" max="0.9" name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][priority]" id="xmlsf_post_types_<?php echo esc_attr( $obj->name ); ?>_priority" value="<?php echo esc_attr( $priority_val ); ?>" class="small-text" />
 		</label>
+		<span class="description">
+			<?php esc_html_e( 'The default priority value must be between 0 and 1. To disable priority, leave this field empty.', 'xml-sitemap-feed' ); ?>
+		</span>
 	</p>
 
 	<p>

@@ -203,7 +203,6 @@ function clear_metacache( $type = 'all' ) {
 function get_root_data() {
 	$data = array(
 		\trailingslashit( \home_url() ) => array(
-			'priority' => '1.0',
 			'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
 		),
 	);
@@ -232,9 +231,11 @@ function get_user_priority( $user ) {
 
 	$author_settings = \get_option( 'xmlsf_author_settings' );
 
-	$priority = isset( $author_settings['priority'] ) && \is_numeric( $author_settings['priority'] ) ? \floatval( $author_settings['priority'] ) : 0.5;
+	if ( empty( $author_settings['priority'] ) ) {
+		return '';
+	}
 
-	// TODO dynamic priority calculation?
+	$priority = \is_numeric( $author_settings['priority'] ) ? \floatval( $author_settings['priority'] ) : 0.5;
 
 	$priority = \apply_filters( 'xmlsf_user_priority', $priority, $user );
 
@@ -558,9 +559,11 @@ function get_taxonomy_modified( $taxonomy ) {
  * @return float
  */
 function get_post_priority( $post ) {
-	// locale LC_NUMERIC should be set to C for these calculations
-	// it is assumed to be done once at the request filter
-	// setlocale( LC_NUMERIC, 'C' );.
+	$options = (array) \get_option( 'xmlsf_post_types', array() );
+
+	if ( empty( $options[ $post->post_type ]['priority'] ) ) {
+		return '';
+	}
 
 	// Check for front page.
 	if ( in_array( $post->ID, namespace\get_frontpages(), true ) ) {
@@ -581,8 +584,7 @@ function get_post_priority( $post ) {
 	}
 
 	// Still here? Then get calculating...
-	$options  = (array) \get_option( 'xmlsf_post_types', array() );
-	$priority = isset( $options[ $post->post_type ]['priority'] ) && \is_numeric( $options[ $post->post_type ]['priority'] ) ? \floatval( $options[ $post->post_type ]['priority'] ) : 0.5;
+	$priority = \is_numeric( $options[ $post->post_type ]['priority'] ) ? \floatval( $options[ $post->post_type ]['priority'] ) : 0.5;
 
 	if ( ! empty( $options[ $post->post_type ]['dynamic_priority'] ) ) {
 		$post_modified = \mysql2date( 'U', $post->post_modified );
@@ -613,13 +615,13 @@ function get_post_priority( $post ) {
  * @return float
  */
 function get_term_priority( $term ) {
-	// locale LC_NUMERIC should be set to C for these calculations
-	// it is assumed to be done at the request filter
-	// setlocale( LC_NUMERIC, 'C' );.
-
 	$options = \get_option( 'xmlsf_taxonomy_settings' );
 
-	$priority = isset( $options['priority'] ) && \is_numeric( $options['priority'] ) ? \floatval( $options['priority'] ) : 0.5;
+	if ( empty( $options['priority'] ) ) {
+		return '';
+	}
+
+	$priority = \is_numeric( $options['priority'] ) ? \floatval( $options['priority'] ) : 0.5;
 
 	if ( \is_numeric( $term ) ) {
 		$term = \get_term( $term );

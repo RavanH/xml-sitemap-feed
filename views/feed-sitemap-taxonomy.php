@@ -35,7 +35,13 @@ if ( is_array( $terms ) ) :
 
 		do_action( 'xmlsf_url', 'taxonomy', $tax_term );
 
-		echo '<url><loc>' . esc_xml( $url ) . '</loc><priority>' . esc_xml( XMLSF\get_term_priority( $tax_term ) ) . '</priority>';
+		echo '<url><loc>' . esc_xml( $url ) . '</loc>';
+
+		$priority = XMLSF\get_term_priority( $tax_term );
+		if ( $priority ) {
+			echo '<priority>' . esc_xml( $priority ) . '</priority>';
+		}
+
 		$lastmod = XMLSF\get_term_modified( $tax_term );
 		if ( $lastmod ) {
 			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';

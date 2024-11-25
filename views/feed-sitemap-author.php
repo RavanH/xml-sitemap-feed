@@ -41,7 +41,13 @@ foreach ( $users as $user ) {
 
 	do_action( 'xmlsf_url', 'author', $user );
 
-	echo '<url><loc>' . esc_xml( esc_url( $url ) ) . '</loc><priority>' . esc_xml( XMLSF\get_user_priority( $user ) ) . '</priority>';
+	echo '<url><loc>' . esc_xml( esc_url( $url ) ) . '</loc>';
+
+	$priority = XMLSF\get_user_priority( $user );
+	if ( $priority ) {
+		echo '<priority>' . esc_xml( $priority ) . '</priority>';
+	}
+
 	$lastmod = XMLSF\get_user_modified( $user );
 	if ( $lastmod ) {
 		echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';

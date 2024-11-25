@@ -142,7 +142,7 @@ class Sitemap_Plugin extends Sitemap {
 				\wp_raise_memory_limit( 'sitemap-posttype-' . $feed[2] );
 
 				// Prepare priority calculation.
-				if ( ! empty( $this->post_types[ $feed[2] ]['dynamic_priority'] ) ) {
+				if ( ! empty( $this->post_types[ $feed[2] ]['priority'] ) && ! empty( $this->post_types[ $feed[2] ]['dynamic_priority'] ) ) {
 					// Last of this post type modified date in Unix seconds.
 					\xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $feed[2] ), 'U' );
 					// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!

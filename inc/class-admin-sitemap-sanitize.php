@@ -61,16 +61,19 @@ class Admin_Sitemap_Sanitize {
 	 * @return array
 	 */
 	public static function taxonomy_settings( $save ) {
-		$sanitized = (array) $save;
+		$sanitized = \xmlsf()->defaults( 'taxonomy_settings' );
+		$save      = (array) $save;
 
 		// Sanitize priority.
-		if ( ! empty( $sanitized['priority'] ) && \is_numeric( $sanitized['priority'] ) ) {
-			$sanitized['priority'] = namespace\sanitize_number( $sanitized['priority'], .1, .9 );
+		if ( ! empty( $save['priority'] ) && \is_numeric( $save['priority'] ) ) {
+			$sanitized['priority'] = namespace\sanitize_number( $save['priority'], .1, .9 );
+		} else {
+			$sanitized['priority'] = '';
 		}
 
 		// Sanitize limit.
-		if ( ! empty( $sanitized['limit'] ) && \is_numeric( $sanitized['limit'] ) ) {
-			$sanitized['limit'] = namespace\sanitize_number( $sanitized['limit'], 1, 50000, 0 );
+		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
+			$sanitized['limit'] = namespace\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
 		return $sanitized;
@@ -99,8 +102,7 @@ class Admin_Sitemap_Sanitize {
 	 * @return array
 	 */
 	public static function author_settings( $save ) {
-		\setlocale( LC_NUMERIC, 'C' );
-		$sanitized = \xmlsf()->defaults( 'taxonomy_settings' );
+		$sanitized = \xmlsf()->defaults( 'author_settings' );
 		$save      = (array) $save;
 
 		$sanitized['dynamic_priority'] = ! empty( $save['dynamic_priority'] ) ? '1' : '';
@@ -108,6 +110,8 @@ class Admin_Sitemap_Sanitize {
 		// Sanitize priority.
 		if ( ! empty( $save['priority'] ) && \is_numeric( $save['priority'] ) ) {
 			$sanitized['priority'] = namespace\sanitize_number( $save['priority'], .1, .9 );
+		} else {
+			$sanitized['priority'] = '';
 		}
 
 		// Sanitize limit.
@@ -128,8 +132,8 @@ class Admin_Sitemap_Sanitize {
 	 * @return array
 	 */
 	public static function post_types( $save = array() ) {
-		\setlocale( LC_NUMERIC, 'C' );
-		$sanitized = \is_array( $save ) ? $save : array();
+		$sanitized = \xmlsf()->defaults( 'post_types' );
+		$save      = (array) $save;
 
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
@@ -137,12 +141,16 @@ class Admin_Sitemap_Sanitize {
 		}
 
 		// Sanitize priorities.
-		foreach ( $sanitized as $post_type => $settings ) {
+		foreach ( $save as $post_type => $settings ) {
 			if ( ! is_array( $settings ) ) {
 				continue;
 			}
 
-			$sanitized[ $post_type ]['priority'] = \is_numeric( $settings['priority'] ) ? namespace\sanitize_number( \str_replace( ',', '.', $settings['priority'] ), .1, .9 ) : '0.5';
+			if ( ! empty( $settings['priority'] ) && \is_numeric( $settings['priority'] ) ) {
+				$sanitized[ $post_type ]['priority'] = namespace\sanitize_number( $settings['priority'], .1, .9 );
+			} else {
+				$sanitized[ $post_type ]['priority'] = '';
+			}
 		}
 
 		return $sanitized;

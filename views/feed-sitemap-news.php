@@ -23,7 +23,6 @@ echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charse
 global $wp_query, $post;
 
 setlocale( LC_TIME, 'C' );
-$not_before = strtotime( '-48 hours' );
 
 // Loop away!
 if ( have_posts() ) :
@@ -52,7 +51,7 @@ if ( have_posts() ) :
 		// Make sure the post is not older than 2 days.
 		$post_age = strtotime( $post->post_date_gmt );
 
-		if ( $post_age && $post_age >= $not_before ) {
+		if ( $post_age && $post_age >= strtotime( '-48 hours' ) ) {
 			// The news tags.
 			echo '<news:news><news:publication><news:name>';
 			echo esc_xml( apply_filters( 'xmlsf_news_publication_name', ( ! empty( $options['name'] ) ? $options['name'] : get_bloginfo( 'name' ) ), $post->ID, $post->post_type ) );

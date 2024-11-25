@@ -167,7 +167,7 @@ class Sitemap_Core extends Sitemap {
 					);
 
 					// Prepare priority calculation.
-					if ( $subtype && ! empty( $this->post_types[ $subtype ]['dynamic_priority'] ) ) {
+					if ( $subtype && ! empty( $this->post_types[ $subtype ]['priority'] ) && ! empty( $this->post_types[ $subtype ]['dynamic_priority'] ) ) {
 						// Last of this post type modified date in Unix seconds.
 						\xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $subtype ), 'U' );
 						// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
@@ -398,7 +398,10 @@ class Sitemap_Core extends Sitemap {
 	 */
 	public function posts_entry( $entry, $post_object, $post_type ) {
 		// Add priority.
-		$entry['priority'] = namespace\get_post_priority( $post_object );
+		$priority = namespace\get_post_priority( $post_object );
+		if ( ! empty( $entry['priority'] ) ) {
+			$entry['priority'] = $priority;
+		}
 
 		// Add lastmod.
 		if ( empty( $entry['lastmod'] ) ) {

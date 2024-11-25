@@ -131,9 +131,7 @@ class Polylang {
 				foreach ( $languages as $language ) {
 					$url          = \pll_home_url( $language );
 					$data[ $url ] = array(
-						'priority' => '1.0',
 						'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
-						// TODO make lastmod date language specific.
 					);
 				}
 			}

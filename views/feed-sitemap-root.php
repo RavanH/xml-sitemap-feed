@@ -14,6 +14,9 @@ echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charse
 <?php do_action( 'xmlsf_generator' ); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" <?php do_action( 'xmlsf_urlset', 'home' ); ?>>
 <?php
+$settings    = (array) get_option( 'xmlsf_post_types' );
+$do_priority = ! empty( $settings['page']['priority'] );
+
 foreach ( XMLSF\get_root_data() as $url => $data ) {
 	$url = apply_filters( 'xmlsf_entry_url', $url, 'home' );
 
@@ -24,7 +27,15 @@ foreach ( XMLSF\get_root_data() as $url => $data ) {
 
 	do_action( 'xmlsf_url', 'home', $data );
 
-	echo '<url><loc>' . esc_url( $url ) . '</loc><priority>' . esc_xml( $data['priority'] ) . '</priority><lastmod>' . esc_xml( $data['lastmod'] ) . '</lastmod>';
+	echo '<url><loc>' . esc_url( $url ) . '</loc>';
+
+	if ( $do_priority ) {
+		echo '<priority>1.0</priority>';
+	}
+
+	if ( $data['lastmod'] ) {
+		echo '<lastmod>' . esc_xml( $data['lastmod'] ) . '</lastmod>';
+	}
 
 	do_action( 'xmlsf_tags_after', 'home', $data );
 
