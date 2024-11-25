@@ -104,8 +104,8 @@ register_deactivation_hook( __FILE__, 'xmlsf_deactivate' );
  *
  * @since 5.0
  *
- * @global XMLSitemapFeed $xmlsf
- * @return XMLSitemapFeed object by reference
+ * @global XMLSF\XMLSitemapFeed $xmlsf
+ * @return XMLSF\XMLSitemapFeed object by reference
  */
 function &xmlsf() {
 	global $xmlsf;
