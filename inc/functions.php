@@ -302,31 +302,29 @@ function load_template( $is_comment_feed, $feed ) {
 	 */
 
 	$parts     = \explode( '-', $feed, 3 );
-	$parts[1]  = \basename( $part[1] );
-	$parts[2]  = \basename( $part[2] );
 	$templates = array();
+	$found     = false;
 
 	// Possible theme template file names.
-	if ( ! empty( $parts[1] ) && in_array( $parts[1], array( 'posttype', 'taxonomy', 'authors', 'custom', 'news' ), true ) ) {
+	if ( ! empty( $parts[1] ) && \in_array( $parts[1], array( 'news', 'posttype', 'taxonomy', 'authors', 'custom', 'root' ), true ) ) {
 		if ( ! empty( $parts[2] ) ) {
 			$templates[] = "sitemap-{$parts[1]}-{$parts[2]}.php";
 		}
 		$templates[] = "sitemap-{$parts[1]}.php";
-	} else {
-		$templates[] = 'sitemap.php';
 	}
+	$templates[] = 'sitemap.php';
 
-	// Find theme template file and load that.
-	\locate_template( $templates, true );
-
-	// Still here? Then fall back on a matching plugin template file.
-	foreach ( $templates as $template ) {
-		$file = XMLSF_DIR . '/views/feed-' . $template;
-		\file_exists( $template ) && \load_template( $template );
+	// Find and load theme template file or use plugin template.
+	if ( ! \locate_template( $templates, true ) ) {
+		// Still here? Then fall back on a matching plugin template file.
+		foreach ( $templates as $template ) {
+			$file = XMLSF_DIR . '/views/feed-' . $template;
+			if ( \file_exists( $file ) ) {
+				\load_template( $file );
+				break;
+			}
+		}
 	}
-
-	// No match? Then fall back on index template file.
-	\load_template( XMLSF_DIR . '/views/feed-sitemap.php' );
 }
 
 /**
