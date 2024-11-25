@@ -53,3 +53,7 @@ if ( \is_plugin_active( 'bbpress/bbpress.php' ) ) {
 	\add_filter( 'xmlsf_request', array( __NAMESPACE__ . '\Compat\BBPress', 'filter_request' ) );
 	\add_filter( 'xmlsf_news_request', array( __NAMESPACE__ . '\Compat\BBPress', 'filter_request' ) );
 }
+
+if ( \is_plugin_active( 'xml-sitemaps-manager/xml-sitemaps-manager.php' ) ) {
+	add_action( 'plugins_loaded', array( __NAMESPACE__ . '\Compat\XMLSM', 'plugins_loaded' ) );
+}

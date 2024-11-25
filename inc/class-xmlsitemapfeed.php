@@ -140,12 +140,6 @@ class XMLSitemapFeed {
 	 * Plugin main init.
 	 */
 	public function init() {
-		// If XML Sitemaps Manager is active, remove its init and admin_init hooks.
-		if ( \function_exists( 'xmlsm_init' ) ) {
-			\remove_action( 'init', 'xmlsm_init', 9 );
-			\remove_action( 'admin_init', 'xmlsm_admin_init' );
-		}
-
 		// Upgrade/install, maybe...
 		$db_version = \get_option( 'xmlsf_version', 0 );
 		if ( ! \version_compare( XMLSF_VERSION, $db_version, '=' ) ) {

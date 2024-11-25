@@ -18,7 +18,7 @@ class BBPress {
 	 *
 	 * @return array
 	 */
-	public function filter_request( $request ) {
+	public static function filter_request( $request ) {
 		\remove_filter( 'bbp_request', 'bbp_request_feed_trap' );
 
 		return $request;

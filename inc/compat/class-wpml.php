@@ -18,7 +18,7 @@ class WPML {
 	 *
 	 * @return array
 	 */
-	public function get_translations( $post_id ) {
+	public static function get_translations( $post_id ) {
 
 		global $sitepress;
 		$translation_ids = array();
@@ -41,7 +41,7 @@ class WPML {
 	 *
 	 * @return void
 	 */
-	public function remove_home_url_filter() {
+	public static function remove_home_url_filter() {
 		// Remove WPML home url filter.
 		global $wpml_url_filters;
 		if ( \is_object( $wpml_url_filters ) ) {
@@ -56,7 +56,7 @@ class WPML {
 	 *
 	 * @return array
 	 */
-	public function filter_request( $request ) {
+	public static function filter_request( $request ) {
 		global $sitepress, $wpml_query_filter;
 
 		if ( \is_object( $sitepress ) ) {
@@ -84,7 +84,7 @@ class WPML {
 	 *
 	 * @see https://wpml.org/wpml-hook/wpml_post_language_details/
 	 */
-	public function language_switcher() {
+	public static function language_switcher() {
 		global $sitepress, $post;
 
 		if ( \is_object( $sitepress ) ) {

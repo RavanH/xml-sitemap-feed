@@ -3,7 +3,6 @@ ROADMAP
 = 5.5 =
 * Exclude otion to Quick Edit !
 * make priority optional
-* add XML Sitemaps Manager incompatibility notice
 * fix Polylang issue icw plugin server: missing users language archives
 * revise readme
 * prepare compatibility routine for additional premium modules

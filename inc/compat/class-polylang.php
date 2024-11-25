@@ -19,7 +19,7 @@ class Polylang {
 	 *
 	 * @return array
 	 */
-	public function get_translations( $post_id ) {
+	public static function get_translations( $post_id ) {
 		$translation_ids = array();
 
 		if ( \function_exists( 'pll_get_post_translations' ) ) {
@@ -42,7 +42,7 @@ class Polylang {
 	 *
 	 * @return array
 	 */
-	public function filter_request( $request ) {
+	public static function filter_request( $request ) {
 		$request['lang'] = '';
 
 		return $request;
@@ -55,7 +55,7 @@ class Polylang {
 	 *
 	 * @return array
 	 */
-	public function request_actions( $request ) {
+	public static function request_actions( $request ) {
 		global $polylang;
 
 		// Prevent language redirections.
@@ -79,7 +79,7 @@ class Polylang {
 	 *
 	 * @return string
 	 */
-	public function news_name( $name, $post_id ) {
+	public static function news_name( $name, $post_id ) {
 		return \function_exists( 'pll_translate_string' ) ? \pll_translate_string( $name, \pll_get_post_language( $post_id, 'locale' ) ) : $name;
 	}
 
@@ -91,14 +91,14 @@ class Polylang {
 	 *
 	 * @return string
 	 */
-	public function post_language_filter( $locale, $post_id ) {
+	public static function post_language_filter( $locale, $post_id ) {
 		return \function_exists( 'pll_get_post_language' ) ? \pll_get_post_language( $post_id, 'locale' ) : $locale;
 	}
 
 	/**
 	 * Pre register news provider action.
 	 */
-	public function pre_register_news_provider() {
+	public static function pre_register_news_provider() {
 		// Polylang compatibility: prevent sitemap translations.
 		global $polylang;
 		if ( isset( $polylang ) && \is_object( $polylang->sitemaps ) ) {
@@ -109,7 +109,7 @@ class Polylang {
 	/**
 	 * Post register news provider action.
 	 */
-	public function post_register_news_provider() {
+	public static function post_register_news_provider() {
 		global $polylang;
 		if ( isset( $polylang ) && ! \has_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) ) ) {
 			// Re-add Polylang filter.
@@ -124,7 +124,7 @@ class Polylang {
 	 *
 	 * @return array
 	 */
-	public function root_data( $data ) {
+	public static function root_data( $data ) {
 		if ( \function_exists( 'pll_languages_list' ) && \function_exists( 'pll_home_url' ) ) {
 			$languages = \pll_languages_list();
 			if ( is_array( $languages ) ) {

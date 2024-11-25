@@ -254,6 +254,16 @@ class Admin {
 			return;
 		}
 
+		// If XML Sitemaps Manager is active, remove its init and admin_init hooks.
+		if ( \is_plugin_active( 'xml-sitemaps-manager/xml-sitemaps-manager.php' ) && ! \in_array( 'xml_sitemaps_manager', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
+			\add_action(
+				'admin_notices',
+				function () {
+					include XMLSF_DIR . '/views/admin/notice-xml-sitemaps-manager.php';
+				}
+			);
+		}
+
 		// Catch Box Pro feed redirect.
 		if ( \function_exists( 'catchbox_is_feed_url_present' ) && \catchbox_is_feed_url_present( null ) ) {
 			\add_action(
