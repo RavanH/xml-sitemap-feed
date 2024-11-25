@@ -306,7 +306,7 @@ function load_template( $is_comment_feed, $feed ) {
 	$found     = false;
 
 	// Possible theme template file names.
-	if ( ! empty( $parts[1] ) && \in_array( $parts[1], array( 'news', 'posttype', 'taxonomy', 'authors', 'custom', 'root' ), true ) ) {
+	if ( ! empty( $parts[1] ) && \in_array( $parts[1], array( 'news', 'posttype', 'taxonomy', 'author', 'custom', 'root' ), true ) ) {
 		if ( ! empty( $parts[2] ) ) {
 			$templates[] = "sitemap-{$parts[1]}-{$parts[2]}.php";
 		}
