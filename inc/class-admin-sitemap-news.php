@@ -290,7 +290,6 @@ class Admin_Sitemap_News {
 				'',
 				'xmlsf_news_advanced'
 			);
-
 			// Hierarchical post types.
 			\add_settings_field(
 				'xmlsf_news_hierarchical',
@@ -354,7 +353,13 @@ class Admin_Sitemap_News {
 
 			foreach ( $news_post_type as $post_type ) {
 				if ( \in_array( $post_type, $post_types, true ) ) {
-					\add_settings_field( 'xmlsf_news_categories', \translate( 'Categories' ), array( $this, 'categories_field' ), 'xmlsf_news_general', 'news_sitemap_general_section' ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
+					\add_settings_field(
+						'xmlsf_news_categories',
+						\translate( 'Categories' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
+						array( $this, 'categories_field' ),
+						'xmlsf_news_general',
+						'news_sitemap_general_section'
+					);
 					break;
 				}
 			}
@@ -380,6 +385,12 @@ class Admin_Sitemap_News {
 			'xmlsf_news_general',
 			'xmlsf_news_tags',
 			array( $this, 'sanitize_news_tags' )
+		);
+
+		// Dummy register setting to prevent admin error on Save Settings from Advanced tab.
+		register_setting(
+			'xmlsf_news_advanced',
+			''
 		);
 	}
 
@@ -600,7 +611,7 @@ class Admin_Sitemap_News {
 	 *
 	 * @return array
 	 */
-	public static function santize_news_tags( $save ) {
+	public static function sanitize_news_tags( $save ) {
 		$sanitized = \is_array( $save ) ? $save : array();
 
 		// At least one, default post type.
