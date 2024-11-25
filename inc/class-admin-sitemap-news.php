@@ -120,6 +120,10 @@ class Admin_Sitemap_News {
 	 * Check for conflicting themes and plugins
 	 */
 	public function check_conflicts() {
+		if ( \wp_doing_ajax() || ! \current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
 		// Catch Box Pro feed redirect.
 		if ( \function_exists( 'catchbox_is_feed_url_present' ) && \catchbox_is_feed_url_present( null ) ) {
 			\add_action(

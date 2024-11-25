@@ -4,10 +4,8 @@ ROADMAP
 * Exclude otion to Quick Edit !
 * make priority optional
 * add XML Sitemaps Manager incompatibility notice
-* don't clear sitemaps option when (temp) switching to private site
 * fix Polylang issue icw plugin server: missing users language archives
 * revise readme
-* switch to Exclude... instead of Include...
 * prepare compatibility routine for additional premium modules
 
 DOCUMENT

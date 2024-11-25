@@ -100,7 +100,7 @@ class Admin {
 		// Sitemaps.
 		\register_setting(
 			'reading',
-			'xmlsf_sitemaps'
+			\get_option( 'blog_public' ) ? 'xmlsf_sitemaps' : ''
 		);
 		\add_settings_field(
 			'xmlsf_sitemaps',
@@ -250,6 +250,10 @@ class Admin {
 	 * Check for conflicting themes and plugins
 	 */
 	public function check_conflicts() {
+		if ( \wp_doing_ajax() || ! \current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
 		// Catch Box Pro feed redirect.
 		if ( \function_exists( 'catchbox_is_feed_url_present' ) && \catchbox_is_feed_url_present( null ) ) {
 			\add_action(
