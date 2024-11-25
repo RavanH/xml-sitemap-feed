@@ -114,7 +114,6 @@ class WPML {
 			foreach ( \array_keys( $sitepress->get_languages( false, true ) ) as $term ) {
 				$url          = $sitepress->language_url( $term );
 				$data[ $url ] = array(
-					'priority' => '1.0',
 					'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
 					// TODO make lastmod date language specific.
 				);
