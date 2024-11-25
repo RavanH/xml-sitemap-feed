@@ -133,7 +133,7 @@ class XMLSitemapFeed {
 	 * @return void
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'init' ), 9 );
+		\add_action( 'init', array( $this, 'init' ), 9 );
 	}
 
 	/**
@@ -141,14 +141,14 @@ class XMLSitemapFeed {
 	 */
 	public function init() {
 		// If XML Sitemaps Manager is active, remove its init and admin_init hooks.
-		if ( function_exists( 'xmlsm_init' ) ) {
-			remove_action( 'init', 'xmlsm_init', 9 );
-			remove_action( 'admin_init', 'xmlsm_admin_init' );
+		if ( \function_exists( 'xmlsm_init' ) ) {
+			\remove_action( 'init', 'xmlsm_init', 9 );
+			\remove_action( 'admin_init', 'xmlsm_admin_init' );
 		}
 
 		// Upgrade/install, maybe...
-		$db_version = get_option( 'xmlsf_version', 0 );
-		if ( ! version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
+		$db_version = \get_option( 'xmlsf_version', 0 );
+		if ( ! \version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
 			require_once XMLSF_DIR . '/upgrade.php';
 		}
 
@@ -156,7 +156,7 @@ class XMLSitemapFeed {
 			return;
 		}
 
-		$sitemaps = (array) get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
+		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
 
 		// Google News sitemap?
 		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
@@ -176,13 +176,13 @@ class XMLSitemapFeed {
 				$xmlsf_sitemap = new Sitemap_Core();
 			} else {
 				// Replace core sitemap.
-				remove_action( 'init', 'wp_sitemaps_get_server' );
+				\remove_action( 'init', 'wp_sitemaps_get_server' );
 
 				$xmlsf_sitemap = new Sitemap_Plugin();
 			}
 		} else {
 			// Disable core sitemap.
-			add_filter( 'wp_sitemaps_enabled', '__return_false' );
+			\add_filter( 'wp_sitemaps_enabled', '__return_false' );
 		}
 	}
 
@@ -203,7 +203,7 @@ class XMLSitemapFeed {
 
 			$this->defaults = array(
 				'sitemaps'           => $sitemaps,
-				'server'             => \class_exists( 'SimpleXMLElement' ) && function_exists( 'get_sitemap_url' ) ? 'core' : 'plugin',
+				'server'             => \class_exists( 'SimpleXMLElement' ) && \function_exists( 'get_sitemap_url' ) ? 'core' : 'plugin',
 				'disabled_providers' => array(),
 				'post_types'         => array(
 					'post'  => array(
