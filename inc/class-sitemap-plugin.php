@@ -17,10 +17,7 @@ class Sitemap_Plugin extends Sitemap {
 	 * Runs on init
 	 */
 	public function __construct() {
-		global $wp_rewrite;
-
-		$this->index = $wp_rewrite->using_permalinks() ? 'sitemap.xml' : '?feed=sitemap';
-
+		$this->slug       = 'sitemap';
 		$this->post_types = (array) \get_option( 'xmlsf_post_types', array() );
 
 		$this->register_rewrites();
@@ -60,15 +57,13 @@ class Sitemap_Plugin extends Sitemap {
 	 * @since 5.4.5
 	 */
 	public function register_rewrites() {
-		$slug = \apply_filters( 'xmlsf_sitemap_index_slug', 'sitemap' );
-		// Make sure we got a non-empty string.
-		if ( empty( $slug ) || ! \is_string( $slug ) ) {
-			$slug = 'sitemap';
+		global $wp_rewrite;
+
+		if ( ! $wp_rewrite->using_permalinks() ) {
+			return;
 		}
-		// Clean slug if altered.
-		if ( 'sitemap' !== $slug ) {
-			$slug = \preg_replace( '/[^a-z0-9_]/i', '', $slug );
-		}
+
+		$slug = $this->slug();
 
 		// Register index route.
 		\add_rewrite_rule(
@@ -79,7 +74,7 @@ class Sitemap_Plugin extends Sitemap {
 
 		// Register routes for providers.
 		\add_rewrite_rule(
-			'^sitemap-([a-z]+?)?(-[a-z0-9\-_]+?)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml$',
+			'^' . $slug . '-([a-z]+?)?(-[a-z0-9\-_]+?)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml$',
 			'index.php?feed=sitemap-$matches[1]$matches[2]&m=$matches[3]&w=$matches[4]',
 			'top'
 		);

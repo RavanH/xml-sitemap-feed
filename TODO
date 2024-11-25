@@ -1,7 +1,6 @@
 ROADMAP
 
 = 5.5 =
-* fix news sitemap showing index
 * Exclude otion to Quick Edit !
 * make priority optional
 * add XML Sitemaps Manager incompatibility notice
@@ -21,6 +20,7 @@ DOCUMENT
 * add inline comment blocks for hooks
 
 TEST
+* theme template overrides
 * test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 * test add-inserter old issue
 * test bbpress

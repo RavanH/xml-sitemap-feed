@@ -12,12 +12,11 @@ namespace XMLSF;
  */
 abstract class Sitemap {
 	/**
-	 * Sitemap index name
+	 * Sitemap slug
 	 *
 	 * @var string
 	 */
-	protected $index;
-
+	protected $slug;
 	/**
 	 * Post types included in sitemap index
 	 *
@@ -26,10 +25,19 @@ abstract class Sitemap {
 	protected $post_types = array();
 
 	/**
-	 * Get sitemap index file name.
+	 * Get sitemap slug.
+	 *
+	 * @since 5.7
 	 */
-	public function index() {
-		return \apply_filters( 'xmlsf_sitemap_filename', $this->index );
+	public function slug() {
+		$slug = (string) \apply_filters( 'xmlsf_sitemap_slug', $this->slug );
+
+		// Clean filename if altered.
+		if ( $this->slug !== $slug ) {
+			$slug = \preg_replace( '/[^a-z0-9_\-]/i', '', $slug );
+		}
+
+		return ! empty( $slug ) ? $slug : $this->slug;
 	}
 
 	/**

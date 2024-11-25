@@ -12,30 +12,19 @@ namespace XMLSF;
  */
 class Sitemap_News {
 	/**
-	 * Sitemap index name
+	 * Sitemap slug
 	 *
 	 * @var string
 	 */
-	private $sitemap;
-
-	/**
-	 * Rewrite rules
-	 *
-	 * @var array
-	 */
-	public $rewrite_rules = array(
-		'regex' => 'sitemap-news\.xml$',
-		'query' => '?feed=sitemap-news',
-	);
+	private $slug = 'sitemap-news';
 
 	/**
 	 * CONSTRUCTOR
-	 * Runs on init
 	 *
-	 * @param string $sitemap Sitemap slug.
+	 * Runs on init
 	 */
-	public function __construct( $sitemap = 'sitemap-news.xml' ) {
-		$this->sitemap = $sitemap;
+	public function __construct() {
+		global $wp_rewrite;
 
 		$this->register_rewrites();
 
@@ -56,12 +45,36 @@ class Sitemap_News {
 	 * @since 5.4.5
 	 */
 	public function register_rewrites() {
+		global $wp_rewrite;
+
+		if ( ! $wp_rewrite->using_permalinks() ) {
+			return;
+		}
+
+		$slug = $this->slug();
+
 		// Register news sitemap provider route.
 		\add_rewrite_rule(
-			'^sitemap-news\.xml$',
+			'^' . $slug . '\.xml$',
 			'index.php?feed=sitemap-news',
 			'top'
 		);
+	}
+
+	/**
+	 * Get sitemap slug.
+	 *
+	 * @since 5.7
+	 */
+	public function slug() {
+		$slug = (string) \apply_filters( 'xmlsf_sitemap_news_slug', $this->slug );
+
+		// Clean filename if altered.
+		if ( $this->slug !== $slug ) {
+			$slug = \preg_replace( '/[^a-z0-9_\-]/i', '', $slug );
+		}
+
+		return ! empty( $slug ) ? $slug : $this->slug;
 	}
 
 	/**

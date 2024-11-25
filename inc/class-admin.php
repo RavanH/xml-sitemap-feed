@@ -65,7 +65,7 @@ class Admin {
 	 * @param mixed $value Saved option value.
 	 */
 	public function update_sitemaps( $old, $value ) {
-		global $xmlsf_sitemap;
+		global $xmlsf_sitemap, $xmlsf_sitemap_news;
 		$old   = (array) $old;
 		$value = (array) $value;
 
@@ -74,12 +74,14 @@ class Admin {
 
 			// Switched on sitemap.
 			if ( ! empty( $value['sitemap'] ) && empty( $old['sitemap'] ) ) {
-				$files[] = \is_object( $xmlsf_sitemap ) ? $xmlsf_sitemap->index() : \apply_filters( 'xmlsf_sitemap_filename', 'sitemap.xml' );
+				$slug    = \is_object( $xmlsf_sitemap ) ? $xmlsf_sitemap->slug() : ( namespace\uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+				$files[] = $slug . '.xml';
 			}
 
 			// Switched on news sitemap.
 			if ( ! empty( $value['sitemap-news'] ) && empty( $old['sitemap-news'] ) ) {
-				$files[] = \apply_filters( 'xmlsf_sitemap_news_filename', 'sitemap-news.xml' );
+				$slug    = \is_object( $xmlsf_sitemap_news ) ? $xmlsf_sitemap_news->slug() : 'sitemap-news';
+				$files[] = $slug . '.xml';
 			}
 
 			// Check static files.

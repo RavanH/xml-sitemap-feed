@@ -152,7 +152,7 @@ class Admin_Sitemap_Fields {
 	public static function xmlsf_sitemap_name_field() {
 		global $wp_rewrite, $xmlsf_sitemap;
 		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', array() );
-		$name     = \is_object( $xmlsf_sitemap ) ? $xmlsf_sitemap->index() : \apply_filters( 'xmlsf_sitemap_filename', 'sitemap.xml' );
+		$slug     = \is_object( $xmlsf_sitemap ) ? $xmlsf_sitemap->slug() : ( namespace\uses_core_server() ? 'wp-sitemap' : 'sitemap' );
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-name.php';

@@ -17,10 +17,7 @@ class Sitemap_Core extends Sitemap {
 	 * Runs on init
 	 */
 	public function __construct() {
-		global $wp_rewrite;
-
-		$this->index = $wp_rewrite->using_permalinks() ? 'wp-sitemap.xml' : '?sitemap=index';
-
+		$this->slug       = 'wp-sitemap';
 		$this->post_types = (array) \get_option( 'xmlsf_post_types', array() );
 
 		// Cache clearance.

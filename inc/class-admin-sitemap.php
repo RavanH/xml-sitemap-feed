@@ -51,7 +51,9 @@ class Admin_Sitemap {
 			global $xmlsf_sitemap;
 
 			// Check static file.
-			$filename = \is_object( $xmlsf_sitemap ) ? $xmlsf_sitemap->index() : \apply_filters( 'xmlsf_sitemap_filename', ( 'core' === $value ) ? 'wp-sitemap.xml' : 'sitemap.xml' );
+			$slug     = \is_object( $xmlsf_sitemap ) ? $xmlsf_sitemap->slug() : ( namespace\uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+			$filename = $slug . '.xml';
+
 			\xmlsf_admin()->check_static_files( $filename, 1 );
 
 			// Flush rewrite rules on next init.
@@ -150,7 +152,7 @@ class Admin_Sitemap {
 			// When core sitemap server is used.
 			global $xmlsf_sitemap;
 			if ( \is_object( $xmlsf_sitemap ) ) {
-				\xmlsf_admin()->check_static_files( $xmlsf_sitemap->index() );
+				\xmlsf_admin()->check_static_files( $xmlsf_sitemap->slug() . '.xml' );
 			}
 		}
 
@@ -511,13 +513,16 @@ class Admin_Sitemap {
 	 */
 	public function add_settings_page() {
 		// This page will be under "Settings".
-		$this->screen_id = \add_options_page(
+		$screen_id = \add_options_page(
 			__( 'XML Sitemap', 'xml-sitemap-feed' ),
 			__( 'XML Sitemap', 'xml-sitemap-feed' ),
 			'manage_options',
 			'xmlsf',
 			array( $this, 'settings_page' )
 		);
+
+		// Help tabs.
+		\add_action( 'load-' . $screen_id, array( $this, 'help_tabs' ) );
 	}
 
 	/**
@@ -697,9 +702,6 @@ class Admin_Sitemap {
 	 * Register and add settings
 	 */
 	public function register_settings() {
-		// Help tabs.
-		\add_action( 'load-' . $this->screen_id, array( $this, 'help_tabs' ) );
-
 		// general.
 		\register_setting(
 			'xmlsf_general',
