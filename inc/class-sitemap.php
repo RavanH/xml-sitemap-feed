@@ -34,7 +34,7 @@ abstract class Sitemap {
 
 		// Clean filename if altered.
 		if ( $this->slug !== $slug ) {
-			$slug = \preg_replace( '/[^a-z0-9_\-]/i', '', $slug );
+			$slug = \sanitize_key( $slug );
 		}
 
 		return ! empty( $slug ) ? $slug : $this->slug;
