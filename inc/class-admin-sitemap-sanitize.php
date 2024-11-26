@@ -210,7 +210,7 @@ class Admin_Sitemap_Sanitize {
 			$url = \filter_var( \esc_url( \trim( $arr[0] ) ), FILTER_VALIDATE_URL );
 
 			if ( ! empty( $url ) ) {
-				$priority    = isset( $arr[1] ) ? namespace\sanitize_number( \str_replace( ',', '.', $arr[1] ) ) : '0.5';
+				$priority    = isset( $arr[1] ) ? namespace\sanitize_number( \str_replace( ',', '.', $arr[1] ) ) : '';
 				$sanitized[] = array( $url, $priority );
 			}
 		}

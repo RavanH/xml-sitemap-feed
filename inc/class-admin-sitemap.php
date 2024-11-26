@@ -478,7 +478,7 @@ class Admin_Sitemap {
 	public function save_metadata( $post_id ) {
 		if (
 			// verify nonce.
-			! isset( $_POST['_xmlsf_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( \wp_unslash( $_POST['_xmlsf_nonce'] ) ), XMLSF_BASENAME ) ||
+			! isset( $_POST['_xmlsf_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_xmlsf_nonce'] ), XMLSF_BASENAME ) ||
 			// user not allowed.
 			! \current_user_can( 'edit_post', $post_id )
 		) {
@@ -489,7 +489,7 @@ class Admin_Sitemap {
 		if ( empty( $_POST['xmlsf_priority'] ) || ! \is_numeric( $_POST['xmlsf_priority'] ) ) {
 			\delete_post_meta( $post_id, '_xmlsf_priority' );
 		} else {
-			\update_post_meta( $post_id, '_xmlsf_priority', namespace\sanitize_number( \sanitize_key( $_POST['xmlsf_priority'] ) ) );
+			\update_post_meta( $post_id, '_xmlsf_priority', namespace\sanitize_number( \sanitize_text_field( \wp_unslash( $_POST['xmlsf_priority'] ) ) ) );
 		}
 
 		// _xmlsf_exclude
@@ -935,27 +935,19 @@ class Admin_Sitemap {
 	public function populate_columns( $column_name ) {
 		global $post;
 		if ( 'xmlsf_exclude' === $column_name ) {
-			$exclude_meta = get_post_meta( $post->ID, '_xmlsf_exclude', true );
-			// disable options and (visibly) set excluded to true for private posts.
-			if ( 'publish' !== $post->post_status ) {
-				$exclude = true;
-			}
+			$exclude_meta = \get_post_meta( $post->ID, '_xmlsf_exclude', true );
 
-			// disable options and (visibly) set priority to 1 for front page.
-			if ( (int) \get_option( 'page_on_front' ) === $post->ID || (int) \get_option( 'page_for_posts' ) === $post->ID ) {
-				$exclude = false;
-			}
 			if ( $exclude_meta ) {
-				$title = translate( 'No' );
+				$title = \translate( 'No' );
 				echo '<span class="dashicons-before dashicons-no" style="color:red" title="' . \esc_attr( $title ) . '"><span class="screen-reader-text">' . \esc_attr( $title ) . '</span></span>';
-			} elseif ( $exclude ) {
-				$title = translate( 'No' );
+			} elseif ( 'publish' !== $post->post_status ) {
+				$title = \translate( 'No' );
 				echo '<span class="dashicons-before dashicons-no-alt" style="color:orange" title="' . \esc_attr( $title ) . '"><span class="screen-reader-text">' . \esc_attr( $title ) . '</span></span>';
 			} else {
-				$title = translate( 'Yes' );
+				$title = \translate( 'Yes' );
 				echo '<span class="dashicons-before dashicons-yes" style="color:green" title="' . \esc_attr( $title ) . '"><span class="screen-reader-text">' . \esc_attr( $title ) . '</span></span>';
 			}
-			echo '<input type="hidden" name="_xmlsf_exclude" class="_xmlsf_exclude" value="' . esc_attr( $exclude_meta ) . '">';
+			echo '<input type="hidden" name="_xmlsf_exclude" class="_xmlsf_exclude" value="' . \esc_attr( $exclude_meta ) . '">';
 		}
 	}
 
@@ -999,10 +991,11 @@ class Admin_Sitemap {
 	 * Hooked on admin_footer.
 	 */
 	public function quick_edit_script() {
-		if ( 'edit' !== get_current_screen()->parent_base ) {
+		if ( 'edit' !== \get_current_screen()->parent_base ) {
 			return;
 		}
 		?>
+<style>th#xmlsf_exclude{width:20px}</style>
 <script>
 jQuery(document).ready(function ($) {
 const wp_inline_edit = inlineEditPost.edit;
