@@ -19,19 +19,67 @@ echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charse
 <?php
 global $wp_query, $post;
 
+/**
+ * Add a URL for the homepage in the pages sitemap.
+ * Shows only on the first page if the reading settings are set to display latest posts.
+ */
+if ( 'page' === $post->post_type && 'posts' === get_option( 'show_on_front' ) ) {
+	$home_pages = array(
+		\trailingslashit( \home_url() ) => array(
+			'lastmod' => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
+		),
+	);
+
+	/**
+	 * Developers
+	 *
+	 * Modify the root data array with: add_filter( 'xmlsf_root_data', 'your_filter_function' );
+	 *
+	 * Possible filters hooked here:
+	 * XMLSF\Compat/Polylang->root_data - Polylang compatibility
+	 * XMLSF\Compat\WPML->root_data - WPML compatibility
+	 */
+	$home_pages = \apply_filters( 'xmlsf_root_data', $home_pages );
+
+	foreach ( $home_pages as $url => $data ) {
+		$url = apply_filters( 'xmlsf_entry_url', $url, 'home' );
+
+		// Use xmlsf_entry_url filter to return falsy value to exclude a specific URL.
+		if ( empty( $url ) ) {
+			continue;
+		}
+
+		do_action( 'xmlsf_url', 'home', $data );
+
+		echo '<url><loc>' . esc_url( $url ) . '</loc>';
+
+		$priority = XMLSF\get_home_priority();
+		if ( $priority ) {
+			echo '<priority>' . esc_xml( $priority ) . '</priority>';
+		}
+
+
+		if ( $data['lastmod'] ) {
+			echo '<lastmod>' . esc_xml( $data['lastmod'] ) . '</lastmod>';
+		}
+
+		do_action( 'xmlsf_tags_after', 'home', $data );
+
+		echo '</url>';
+
+		do_action( 'xmlsf_url_after', 'home', $data );
+
+		echo PHP_EOL;
+	}
+}
+
 // Loop away!
 if ( have_posts() ) :
 	$wp_query->in_the_loop = true;
 	while ( have_posts() ) :
 		// Don't do the_post() here to avoid expensive setup_postdata(), just do the following.
 		$post = $wp_query->next_post(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-
-		// Check if page is front page.
-		if ( (int) get_option( 'page_on_front' ) === $post->ID ) {
-			continue;
-		}
-
-		$url = apply_filters( 'xmlsf_entry_url', get_permalink(), 'post_type', $post );
+		$url  = apply_filters( 'xmlsf_entry_url', get_permalink(), 'post_type', $post );
 
 		// Use xmlsf_entry_url filter to return falsy value to exclude a specific URL.
 		if ( empty( $url ) ) {

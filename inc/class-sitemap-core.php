@@ -402,7 +402,7 @@ class Sitemap_Core extends Sitemap {
 	public function posts_entry( $entry, $post_object, $post_type ) {
 		// Add priority.
 		$priority = namespace\get_post_priority( $post_object );
-		if ( ! empty( $entry['priority'] ) ) {
+		if ( ! empty( $priority ) ) {
 			$entry['priority'] = $priority;
 		}
 
@@ -428,8 +428,10 @@ class Sitemap_Core extends Sitemap {
 	 * @return array
 	 */
 	public function posts_show_on_front_entry( $entry ) {
-		// Front blog page priority always 1.
-		$entry['priority'] = '1';
+		$priority = XMLSF\get_home_priority();
+		if ( $priority ) {
+			$entry['priority'] = $priority;
+		}
 
 		// Set front blog page lastmod to last published post.
 		if ( empty( $entry['lastmod'] ) ) {
@@ -556,7 +558,7 @@ class Sitemap_Core extends Sitemap {
 	public function stylesheet_url( $url ) {
 		// TODO make this optional: get_option( 'xmlsf_core_sitemap_stylesheet' )
 		// TODO make these match sitemap type.
-		$url = namespace\get_stylesheet_url( 'root' );
+		$url = namespace\get_stylesheet_url( 'posttype' );
 
 		return $url;
 	}

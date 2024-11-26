@@ -1,6 +1,7 @@
 ROADMAP
 
 = 5.5 =
+* core->sitemap posts_show_on_front_entry allow editable priority >>> new options: homepage priority
 * add Bulk editor Pro plugin message
 * fix Polylang issue icw plugin server: missing users language archives
 * revise readme
@@ -17,6 +18,7 @@ DOCUMENT
 * add inline comment blocks for hooks
 
 TEST
+* XMLSF Advanced plugin compatibility
 * theme template overrides
 * test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 * test add-inserter old issue

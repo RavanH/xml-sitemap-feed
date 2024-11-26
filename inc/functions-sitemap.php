@@ -196,27 +196,21 @@ function clear_metacache( $type = 'all' ) {
 
 
 /**
- * Get root page(s) data
+ * Get root page(s) priority
  *
  * @return array
  */
-function get_root_data() {
-	$data = array(
-		\trailingslashit( \home_url() ) => array(
-			'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
-		),
-	);
+function get_home_priority() {
+	$options = (array) \get_option( 'xmlsf_post_types', array() );
 
-	/**
-	 * Developers
-	 *
-	 * Modify the root data array with: add_filter( 'xmlsf_root_data', 'your_filter_function' );
-	 *
-	 * Possible filters hooked here:
-	 * XMLSF\Compat/Polylang->root_data - Polylang compatibility
-	 * XMLSF\Compat\WPML->root_data - WPML compatibility
-	 */
-	return \apply_filters( 'xmlsf_root_data', $data );
+	if ( empty( $options['page']['priority'] ) ) {
+		return '';
+	}
+
+	$priority = \apply_filters( 'xmlsf_post_priority', '1.0', 0 ); // TODO make this optional.
+
+	// A final check for limits and round it.
+	return namespace\sanitize_number( $priority );
 }
 
 /**
@@ -563,14 +557,6 @@ function get_post_priority( $post ) {
 
 	if ( empty( $options[ $post->post_type ]['priority'] ) ) {
 		return '';
-	}
-
-	// Check for front page.
-	if ( in_array( $post->ID, namespace\get_frontpages(), true ) ) {
-		$priority = \apply_filters( 'xmlsf_post_priority', 1, $post->ID );
-
-		// A final check for limits and round it.
-		return namespace\sanitize_number( $priority );
 	}
 
 	// Check for meta data.
