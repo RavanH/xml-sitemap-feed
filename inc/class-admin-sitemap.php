@@ -43,6 +43,8 @@ class Admin_Sitemap {
 		\add_action( 'quick_edit_custom_box', array( $this, 'quick_edit_fields' ) );
 		\add_action( 'save_post', array( $this, 'quick_edit_save' ) );
 		\add_action( 'admin_footer', array( $this, 'quick_edit_script' ) );
+		// BULK EDIT.
+		\add_action( 'bulk_edit_custom_box', array( $this, 'bulk_edit_fields' ) );
 	}
 
 	/**
@@ -906,6 +908,8 @@ class Admin_Sitemap {
 	/**
 	 * Quick edit columns.
 	 * Hooked on admin_init.
+	 *
+	 * @since 5.7
 	 */
 	public function add_columns() {
 		foreach ( namespace\get_post_types() as $post_type => $settings ) {
@@ -916,6 +920,8 @@ class Admin_Sitemap {
 
 	/**
 	 * Quick edit columns.
+	 *
+	 * @since 5.7
 	 *
 	 * @param string $column_array Column array.
 	 */
@@ -928,9 +934,11 @@ class Admin_Sitemap {
 	}
 
 	/**
-	 * Populat columns.
+	 * Populate columns.
 	 *
-	 * @param string $column_name Column name.
+	 * @since 5.7
+	 *
+	 *  @param string $column_name Column name.
 	 */
 	public function populate_columns( $column_name ) {
 		global $post;
@@ -954,6 +962,8 @@ class Admin_Sitemap {
 	/**
 	 * Quick edit fields allows to add HTML in Quick Edit.
 	 *
+	 * @since 5.7
+	 *
 	 * @param string $column_name Column name.
 	 */
 	public function quick_edit_fields( $column_name ) {
@@ -965,6 +975,8 @@ class Admin_Sitemap {
 
 	/**
 	 * Quick edit save.
+	 *
+	 * @since 5.7
 	 *
 	 * @param int $post_id Post ID.
 	 */
@@ -989,6 +1001,8 @@ class Admin_Sitemap {
 	/**
 	 * Quick edit populate script.
 	 * Hooked on admin_footer.
+	 *
+	 * @since 5.7
 	 */
 	public function quick_edit_script() {
 		if ( 'edit' !== \get_current_screen()->parent_base ) {
@@ -1015,5 +1029,20 @@ inlineEditPost.edit = function (post_id) {
 }; });
 </script>
 		<?php
+	}
+
+	/**
+	 * Bulk edit fields allows to add HTML in Quick Edit.
+	 *
+	 * @since 5.7
+	 *
+	 * @param string $column_name Column name.
+	 */
+	public function bulk_edit_fields( $column_name ) {
+		if ( 'xmlsf_exclude' === $column_name ) {
+			$disabled = ! apply_filters( 'xmlsf_advanced_enabled', false );
+			// The actual fields for data entry.
+			include XMLSF_DIR . '/views/admin/bulk-edit.php';
+		}
 	}
 }
