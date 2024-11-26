@@ -358,7 +358,7 @@ function image_tag( $type, $post = null ) {
 	}
 }
 
-add_action( 'xmlsf_tags_after', __NAMESPACE__ . '\image_tag', 10, 2 );
+\add_action( 'xmlsf_tags_after', __NAMESPACE__ . '\image_tag', 10, 2 );
 
 /**
  * Image schema
@@ -387,7 +387,7 @@ function image_schema( $type ) {
 	}
 }
 
-add_action( 'xmlsf_urlset', __NAMESPACE__ . '\image_schema' );
+\add_action( 'xmlsf_urlset', __NAMESPACE__ . '\image_schema' );
 
 /**
  * Get front pages

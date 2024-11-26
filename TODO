@@ -1,10 +1,11 @@
 ROADMAP
 
 = 5.5 =
-* Exclude option to Quick Edit !
+* add Bulk editor Pro plugin message
 * fix Polylang issue icw plugin server: missing users language archives
 * revise readme
 * prepare compatibility routine for additional premium modules
+* move homepage back to page sitemap and allow priority/exclude options (also for blog page)
 
 DOCUMENT
 * xmlsf_blogpages

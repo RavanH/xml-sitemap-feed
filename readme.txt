@@ -302,6 +302,7 @@ Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both
 
 = 5.5 =
 Date:
+* NEW: Exclude option in Quick Editor
 * NEW: Filter xmlsf_taxonomies_query_args
 * NEW: Filter xmlsf_news_hours_old
 * NEW: post types max number

@@ -37,6 +37,12 @@ class Admin_Sitemap {
 
 		// Placeholders for advanced options.
 		\add_action( 'xmlsf_posttype_archive_field_options', array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'advanced_archive_field_options' ) );
+
+		// QUICK EDIT.
+		\add_action( 'admin_init', array( $this, 'add_columns' ) );
+		\add_action( 'quick_edit_custom_box', array( $this, 'quick_edit_fields' ) );
+		\add_action( 'save_post', array( $this, 'quick_edit_save' ) );
+		\add_action( 'admin_footer', array( $this, 'quick_edit_script' ) );
 	}
 
 	/**
@@ -449,23 +455,9 @@ class Admin_Sitemap {
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form.
 		$exclude  = \get_post_meta( $post->ID, '_xmlsf_exclude', true );
 		$priority = \get_post_meta( $post->ID, '_xmlsf_priority', true );
-		$disabled = false;
 
 		// value prechecks to prevent "invalid form control not focusable" when meta box is hidden.
 		$priority = \is_numeric( $priority ) ? namespace\sanitize_number( $priority ) : '';
-
-		// disable options and (visibly) set excluded to true for private posts.
-		if ( 'private' === $post->post_status ) {
-			$disabled = true;
-			$exclude  = true;
-		}
-
-		// disable options and (visibly) set priority to 1 for front page.
-		if ( (int) \get_option( 'page_on_front' ) === $post->ID ) {
-			$disabled = true;
-			$exclude  = false;
-			$priority = '1'; // force priority to 1 for front page.
-		}
 
 		$description = sprintf(
 			/* translators: Settings admin menu name, XML Sitemap admin page name */
@@ -809,7 +801,7 @@ class Admin_Sitemap {
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-general-disable',
-						'title'   => \translate( 'Exclude:' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
+						'title'   => \esc_html__( 'Disable sitemaps', 'xml-sitemap-feed' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
 						'content' => $content,
 					)
 				);
@@ -909,5 +901,126 @@ class Admin_Sitemap {
 		$content = \ob_get_clean();
 
 		$screen->set_help_sidebar( $content );
+	}
+
+	/**
+	 * Quick edit columns.
+	 * Hooked on admin_init.
+	 */
+	public function add_columns() {
+		foreach ( namespace\get_post_types() as $post_type => $settings ) {
+			\add_filter( "manage_{$post_type}_posts_columns", array( $this, 'quick_edit_columns' ) );
+			\add_action( "manage_{$post_type}_posts_custom_column", array( $this, 'populate_columns' ) );
+		}
+	}
+
+	/**
+	 * Quick edit columns.
+	 *
+	 * @param string $column_array Column array.
+	 */
+	public function quick_edit_columns( $column_array ) {
+		$title = __( 'XML Sitemap', 'xml-sitemap-feed' );
+
+		$column_array['xmlsf_exclude'] = '<span class="dashicons-before dashicons-networking" title="' . \esc_attr( $title ) . '"><span class="screen-reader-text">' . \esc_html( $title ) . '</span></span>';
+
+		return $column_array;
+	}
+
+	/**
+	 * Populat columns.
+	 *
+	 * @param string $column_name Column name.
+	 */
+	public function populate_columns( $column_name ) {
+		global $post;
+		if ( 'xmlsf_exclude' === $column_name ) {
+			$exclude_meta = get_post_meta( $post->ID, '_xmlsf_exclude', true );
+			// disable options and (visibly) set excluded to true for private posts.
+			if ( 'publish' !== $post->post_status ) {
+				$exclude = true;
+			}
+
+			// disable options and (visibly) set priority to 1 for front page.
+			if ( (int) \get_option( 'page_on_front' ) === $post->ID || (int) \get_option( 'page_for_posts' ) === $post->ID ) {
+				$exclude = false;
+			}
+			if ( $exclude_meta ) {
+				$title = translate( 'No' );
+				echo '<span class="dashicons-before dashicons-no" style="color:red" title="' . \esc_attr( $title ) . '"><span class="screen-reader-text">' . \esc_attr( $title ) . '</span></span>';
+			} elseif ( $exclude ) {
+				$title = translate( 'No' );
+				echo '<span class="dashicons-before dashicons-no-alt" style="color:orange" title="' . \esc_attr( $title ) . '"><span class="screen-reader-text">' . \esc_attr( $title ) . '</span></span>';
+			} else {
+				$title = translate( 'Yes' );
+				echo '<span class="dashicons-before dashicons-yes" style="color:green" title="' . \esc_attr( $title ) . '"><span class="screen-reader-text">' . \esc_attr( $title ) . '</span></span>';
+			}
+			echo '<input type="hidden" name="_xmlsf_exclude" class="_xmlsf_exclude" value="' . esc_attr( $exclude_meta ) . '">';
+		}
+	}
+
+	/**
+	 * Quick edit fields allows to add HTML in Quick Edit.
+	 *
+	 * @param string $column_name Column name.
+	 */
+	public function quick_edit_fields( $column_name ) {
+		if ( 'xmlsf_exclude' === $column_name ) {
+			// The actual fields for data entry.
+			include XMLSF_DIR . '/views/admin/quick-edit.php';
+		}
+	}
+
+	/**
+	 * Quick edit save.
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	public function quick_edit_save( $post_id ) {
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		// check inlint edit nonce.
+		if ( empty( $_POST['_inline_edit'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_inline_edit'] ), 'inlineeditnonce' ) ) {
+			return;
+		}
+
+		// _xmlsf_exclude
+		if ( empty( $_POST['xmlsf_exclude'] ) ) {
+			\delete_post_meta( $post_id, '_xmlsf_exclude' );
+		} else {
+			\update_post_meta( $post_id, '_xmlsf_exclude', \sanitize_key( $_POST['xmlsf_exclude'] ) );
+		}
+	}
+
+	/**
+	 * Quick edit populate script.
+	 * Hooked on admin_footer.
+	 */
+	public function quick_edit_script() {
+		if ( 'edit' !== get_current_screen()->parent_base ) {
+			return;
+		}
+		?>
+<script>
+jQuery(document).ready(function ($) {
+const wp_inline_edit = inlineEditPost.edit;
+inlineEditPost.edit = function (post_id) {
+	wp_inline_edit.apply(this, arguments);
+	if (typeof (post_id) == 'object') {
+		post_id = parseInt(this.getId(post_id));
+	}
+	if (post_id > 0) {
+		const edit_row = $('#edit-' + post_id);
+		const post_row = $('#post-' + post_id);
+
+		const exclude = 1 == $('._xmlsf_exclude', post_row).val() ? true : false;
+		console.log( exclude );
+		$(':input[name="xmlsf_exclude"]', edit_row).prop('checked', exclude);
+	}
+}; });
+</script>
+		<?php
 	}
 }

@@ -22,7 +22,7 @@ class Sitemap_Plugin extends Sitemap {
 
 		$this->register_rewrites();
 
-		// Redirect wp-sitemap requests.
+		// Redirect wp-sitemap.xml requests.
 		\add_action( 'template_redirect', array( $this, 'redirect' ), 0 );
 
 		// Cache clearance.
@@ -329,8 +329,10 @@ class Sitemap_Plugin extends Sitemap {
 	 * @uses wp_redirect()
 	 */
 	public function redirect() {
-		if ( ! empty( $_SERVER['REQUEST_URI'] ) && \substr( \wp_unslash( $_SERVER['REQUEST_URI'] ), 0, 15 ) === '/wp-sitemap.xml' ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			\wp_safe_redirect( \home_url( $this->index ), 301, 'XML Sitemap & Google News for WordPress' );
+		if ( ! empty( $_SERVER['REQUEST_URI'] ) && 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/wp-sitemap.xml' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+			\wp_safe_redirect( namespace\sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
+
 			exit();
 		}
 	}

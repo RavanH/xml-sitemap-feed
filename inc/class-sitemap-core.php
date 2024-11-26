@@ -20,6 +20,9 @@ class Sitemap_Core extends Sitemap {
 		$this->slug       = 'wp-sitemap';
 		$this->post_types = (array) \get_option( 'xmlsf_post_types', array() );
 
+		// Redirect sitemap.xml requests.
+		\add_action( 'template_redirect', array( $this, 'redirect' ), 0 );
+
 		// Cache clearance.
 		\add_action( 'clean_post_cache', array( $this, 'clean_post_cache' ), 99, 2 );
 
@@ -670,5 +673,19 @@ class Sitemap_Core extends Sitemap {
 		}
 
 		return $url_list;
+	}
+
+	/**
+	 * Do WP plugin sitemap index redirect
+	 *
+	 * @uses wp_redirect()
+	 */
+	public function redirect() {
+		if ( ! empty( $_SERVER['REQUEST_URI'] ) && 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/sitemap.xml' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+			\wp_safe_redirect( namespace\sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
+
+			exit();
+		}
 	}
 }
