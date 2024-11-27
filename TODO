@@ -29,6 +29,7 @@ TEST
 * test bbpress
 * test WPML
 * test Polylang
+* de/reactivation + uninstall
 
 FIX
 * author sitemap lastmod (in index) = last publication date >>> latest user modified meta...
