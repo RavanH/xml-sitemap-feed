@@ -48,7 +48,6 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Custom/static sitemaps can be added to the index.
 * Works out-of-the-box, even on **Multisite** installations.
 * Include featured images or attached images with title.
-* Pings sitemap to Google & Yandex on new post publication.
 * Options to define which post types and taxonomies get included in the sitemap.
 * Updates Lastmod on post modification or on comments.
 * Set Priority per post type, per taxonomy and per individual post.
@@ -60,7 +59,6 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Set a News Publication Name or uses site name.
 * Supports custom post types.
 * Limit inclusion to certain post categories.
-* Pings Google on new publications, once per 5 minutes.
 
 = Pro Features =
 
@@ -69,7 +67,6 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Multiple post types - Include more than one post type in the same News Sitemap.
 * Keywords - Add the keywords tag to your News Sitemap. Keywords can be created from Tags, Categories or a dedicated Keywords taxonomy.
 * Stock tickers - Add stock tickers tag to your News Sitemap. A dedicated Stock Tickers taxonomy will be available to manage them.
-
 
 = Privacy / GDPR =
 
@@ -84,8 +81,7 @@ An author sitemap can be included, which will contain links to author archive pa
 
 **Data that is transmitted**
 
-Data actively transmitted to search engines is your sitemap location and time of publication. This happens upon each post publication when at least one of the Ping options on Settings > Writing is enabled. In this case, the selected search engines are alerted of the location and updated state of your sitemap.
-
+No data actively transmitted.
 
 = Contribute =
 
@@ -136,6 +132,7 @@ Upon uninstalling the plugin from the Admin > Plugins page, plugin options and m
 
 On multisite, the uninstall.php *can* loop through all sites in the network to perform the uninstalltion process for each site. However, this does not scale for large networks so it *only* does a per-site uninstallation when `define('XMLSF_MULTISITE_UNINSTALL', true);` is explicitly set in wp-config.php.
 
+
 == Frequently Asked Questions ==
 
 = Where are the options? =
@@ -143,8 +140,6 @@ On multisite, the uninstall.php *can* loop through all sites in the network to p
 On **Settings > Reading** you can enable the XML Sitemap Index and (if needed) the Google News Sitemap. There is also an Additional robots.txt rules field.
 
 Once a sitemap is enabled, its options can be found on **Settings > XML Sitemap** or on **Settings > Google News**.
-
-Ping settings can be found on **Settings > Writing**.
 
 = How do I get my latest articles listed on Google News? =
 
@@ -262,7 +257,7 @@ and upload it to your web root...
 
 **Error loading stylesheet: An unknown error has occurred**
 
-On some setups (usually using the WordPress MU Domain Mapping plugin) this error occurs. The problem is known, the cause is not... Until I find out why this is happening, please take comfort in knowing that this only affects reading the sitemap in normal browsers but will NOT affect any spidering/indexing on your site. The sitemap is still readable by all search engines!
+On some setups (usually using the WordPress MU Domain Mapping plugin) this error may occur. The problem is known, the cause is not... Until I find out why this is happening, please take comfort in knowing that this only affects reading the sitemap in normal browsers but will NOT affect any spidering/indexing on your site. The sitemap is still readable by all search engines!
 
 **XML declaration allowed only at the start of the document**
 
