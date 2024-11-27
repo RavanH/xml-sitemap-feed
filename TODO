@@ -1,10 +1,16 @@
 ROADMAP
 
 = 5.5 =
-* get_home_priority() allow editable priority >>> new options: homepage priority
 * fix Polylang issue icw plugin server: missing users language archives
 * revise readme
-* prepare compatibility routine for additional premium modules
+
+= 5.6 =
+General settings for Home page:
+* get_home_priority() : allow editable priority >>> homepage priority
+* Option for lastmod date for (static) front and blog pages (PRO?):
+	- last publication date for post post type
+	- page modification date
+	++ advanced options
 
 DOCUMENT
 * xmlsf_blogpages
@@ -29,14 +35,10 @@ FIX
 * fix WPML incompatibility https://wordpress.org/support/topic/multilingual-url-issue/
 
 CONSIDER
+* Quick edit colums sortable
 * Move automatic priority calc + update lastmod on comments to General section
 * make prime meta caches (async crawler?)
-* Option for lastmod date for (static) front and blog pages (PRO?):
-	- last publication date for post/any/custom post type
-	- last modification date for latest X posts
-	- page modification date
 * Automatic priority calculation for authors
-* allow CPT taxonomies selection in news sitemap (PRO?)
 * drop all WP pre-5.5 and ClassicPress compatibility routines?
 * core sitemap stylesheets per sitemap type (is that possible?)
 * drop all publisher center links ? see https://support.google.com/news/publisher-center/answer/14859160
@@ -44,3 +46,4 @@ CONSIDER
 * move away from feed templates, adopt ?sitemap=... approach from core
 * dynamic stylesheets
 * revisit/regroup views
+* quick edit fields for google news?

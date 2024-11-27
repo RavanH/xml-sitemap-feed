@@ -21,6 +21,7 @@ class XMLSitemapFeed {
 
 	/**
 	 * News defaults
+	 * Keep for backward compatibility with XMLSF Advanced News 1.3.5 and earlier.
 	 *
 	 * @var array
 	 */
