@@ -431,7 +431,7 @@ class Sitemap_Core extends Sitemap {
 	 * @return array
 	 */
 	public function posts_show_on_front_entry( $entry ) {
-		$priority = XMLSF\get_home_priority();
+		$priority = namespace\get_home_priority();
 		if ( $priority ) {
 			$entry['priority'] = $priority;
 		}
