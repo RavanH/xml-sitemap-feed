@@ -159,43 +159,6 @@ function public_taxonomies() {
 }
 
 /**
- * Clear cache metadata
- *
- * @param string $type The metadata type to clear.
- */
-function clear_metacache( $type = 'all' ) {
-	switch ( $type ) {
-		case 'images':
-			// Clear all images meta caches...
-			\delete_metadata( 'post', 0, '_xmlsf_image_attached', '', true );
-			\delete_metadata( 'post', 0, '_xmlsf_image_featured', '', true );
-			\set_transient( 'xmlsf_images_meta_primed', array() );
-			break;
-
-		case 'comments':
-			\delete_metadata( 'post', 0, '_xmlsf_comment_date_gmt', '', true );
-			\set_transient( 'xmlsf_comments_meta_primed', array() );
-			break;
-
-		case 'terms':
-			\delete_metadata( 'term', 0, 'term_modified', '', true );
-			break;
-
-		case 'users':
-			\delete_metadata( 'user', 0, 'user_modified', '', true );
-			break;
-
-		case 'all':
-		default:
-			$all_types = array( 'images', 'comments', 'terms', 'users' );
-			foreach ( $all_types as $_type ) {
-				namespace\clear_metacache( $_type );
-			}
-	}
-}
-
-
-/**
  * Get root page(s) priority
  *
  * @return array
