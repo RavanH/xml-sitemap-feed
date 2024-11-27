@@ -6,7 +6,7 @@
  */
 
 ?>
-<fieldset class="inline-edit-col-left">
+<fieldset class="inline-edit-col-right">
 	<div class="inline-edit-col column-<?php echo esc_attr( $column_name ); ?>">
 		<label class="inline-edit-group">
 			<?php esc_html_e( 'Exclude from XML Sitemap', 'xml-sitemap-feed' ); ?>
