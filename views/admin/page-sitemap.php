@@ -49,6 +49,13 @@
 	</div>
 
 	<div class="sidebar">
+		<?php
+		if ( is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) && ! $this->compatible_with_advanced() ) {
+			$class = 'notice notice-error notice-alt';
+			include XMLSF_DIR . '/views/admin/section-advanced-compat-message.php';
+		}
+		?>
+
 		<h3><span class="dashicons dashicons-welcome-view-site"></span> <?php echo esc_html( translate( 'View' ) ); ?></h3>
 		<p>
 			<?php

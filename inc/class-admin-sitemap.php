@@ -45,6 +45,8 @@ class Admin_Sitemap {
 		\add_action( 'admin_footer', array( $this, 'quick_edit_script' ) );
 		// BULK EDIT.
 		\add_action( 'bulk_edit_custom_box', array( $this, 'bulk_edit_fields' ) );
+
+		\add_action( 'admin_notices', array( $this, 'check_advanced' ), 0 );
 	}
 
 	/**
@@ -469,7 +471,7 @@ class Admin_Sitemap {
 		);
 
 		// The actual fields for data entry.
-		include XMLSF_DIR . '/views/admin/meta-box.php';
+		include XMLSF_DIR . '/views/admin/field-meta-box.php';
 	}
 
 	/**
@@ -969,7 +971,7 @@ class Admin_Sitemap {
 	public function quick_edit_fields( $column_name ) {
 		if ( 'xmlsf_exclude' === $column_name ) {
 			// The actual fields for data entry.
-			include XMLSF_DIR . '/views/admin/quick-edit.php';
+			include XMLSF_DIR . '/views/admin/field-quick-edit.php';
 		}
 	}
 
@@ -1042,7 +1044,40 @@ inlineEditPost.edit = function (post_id) {
 		if ( 'xmlsf_exclude' === $column_name ) {
 			$disabled = ! apply_filters( 'xmlsf_advanced_enabled', false );
 			// The actual fields for data entry.
-			include XMLSF_DIR . '/views/admin/bulk-edit.php';
+			include XMLSF_DIR . '/views/admin/field-bulk-edit.php';
 		}
+	}
+
+	/**
+	 * Google News Advanced incompatibility notice
+	 */
+	public function check_advanced() {
+		// Skip if no advanced plugin or dismissed.
+		if (
+			\wp_doing_ajax() ||
+			! \is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) ||
+			\in_array( 'xmlsf_advanced', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true )
+		) {
+			return;
+		}
+
+		if ( ! $this->compatible_with_advanced() ) {
+			\add_action(
+				'admin_notices',
+				function () {
+					include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced.php';
+				}
+			);
+		}
+	}
+
+	/**
+	 * Compare versions to known compatibility.
+	 */
+	public function compatible_with_advanced() {
+		// Check version.
+		\defined( 'XMLSF_ADV_VERSION' ) || \define( 'XMLSF_ADV_VERSION', XMLSF_ADV_MIN_VERSION );
+
+		return \version_compare( XMLSF_ADV_MIN_VERSION, XMLSF_ADV_VERSION, '<=' );
 	}
 }

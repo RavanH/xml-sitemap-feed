@@ -19,13 +19,6 @@ class Admin_Sitemap_News {
 	private $options;
 
 	/**
-	 * Minimal compatible pro version
-	 *
-	 * @var float
-	 */
-	public static $compat_pro_min = '1.3.5';
-
-	/**
 	 * Start up.
 	 */
 	public function __construct() {
@@ -50,7 +43,7 @@ class Admin_Sitemap_News {
 	 */
 	public function clear_settings() {
 		// Update to defaults.
-		\update_option( 'xmlsf_news_tags', xmlsf()->default_news_tags );
+		\update_option( 'xmlsf_news_tags', xmlsf()->defaults( 'news_tags' ) );
 	}
 
 	/**
@@ -111,9 +104,9 @@ class Admin_Sitemap_News {
 	 */
 	public function compatible_with_advanced() {
 		// Check version.
-		\defined( 'XMLSF_NEWS_ADV_VERSION' ) || \define( 'XMLSF_NEWS_ADV_VERSION', '0.1' );
+		\defined( 'XMLSF_NEWS_ADV_VERSION' ) || \define( 'XMLSF_NEWS_ADV_VERSION', '0' );
 
-		return \version_compare( self::$compat_pro_min, XMLSF_NEWS_ADV_VERSION, '<=' );
+		return \version_compare( XMLSF_NEWS_ADV_MIN_VERSION, XMLSF_NEWS_ADV_VERSION, '<=' );
 	}
 
 	/**
@@ -207,7 +200,7 @@ class Admin_Sitemap_News {
 		$disabled = 'private' === $post->post_status;
 
 		// The actual fields for data entry.
-		include XMLSF_DIR . '/views/admin/meta-box-news.php';
+		include XMLSF_DIR . '/views/admin/field-meta-box-news.php';
 	}
 
 	/**
