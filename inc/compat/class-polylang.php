@@ -129,9 +129,13 @@ class Polylang {
 			$languages = \pll_languages_list();
 			if ( is_array( $languages ) ) {
 				foreach ( $languages as $language ) {
-					$url          = \pll_home_url( $language );
+					$url     = \pll_home_url( $language );
+					$lastmod = \get_lastpostdate( 'gmt', 'post' ); // TODO make lastmod date language specific.
+					if ( $lastmod ) {
+						$lastmod = \get_date_from_gmt( $lastmod, DATE_W3C );
+					}
 					$data[ $url ] = array(
-						'lastmod'  => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
+						'lastmod' => $lastmod,
 					);
 				}
 			}

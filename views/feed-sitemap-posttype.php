@@ -24,9 +24,13 @@ global $wp_query, $post;
  * Shows only on the first page if the reading settings are set to display latest posts.
  */
 if ( 'page' === $post->post_type && 'posts' === get_option( 'show_on_front' ) ) {
+	$lastmod = \get_lastpostdate( 'gmt', 'post' );
+	if ( $lastmod ) {
+		$lastmod = \get_date_from_gmt( $lastmod, DATE_W3C );
+	}
 	$home_pages = array(
 		\trailingslashit( \home_url() ) => array(
-			'lastmod' => \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C ),
+			'lastmod' => $lastmod,
 		),
 	);
 
@@ -54,12 +58,12 @@ if ( 'page' === $post->post_type && 'posts' === get_option( 'show_on_front' ) ) 
 		echo '<url><loc>' . esc_url( $url ) . '</loc>';
 
 		$priority = XMLSF\get_home_priority();
-		if ( $priority ) {
+		if ( ! empty( $priority ) ) {
 			echo '<priority>' . esc_xml( $priority ) . '</priority>';
 		}
 
 
-		if ( $data['lastmod'] ) {
+		if ( ! empty( $data['lastmod'] ) ) {
 			echo '<lastmod>' . esc_xml( $data['lastmod'] ) . '</lastmod>';
 		}
 

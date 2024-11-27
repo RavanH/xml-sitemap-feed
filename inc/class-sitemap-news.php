@@ -85,8 +85,11 @@ class Sitemap_News {
 		$options    = \get_option( 'xmlsf_news_tags' );
 		$post_types = isset( $options['post_type'] ) && ! empty( $options['post_type'] ) ? (array) $options['post_type'] : array( 'post' );
 		foreach ( $post_types as $post_type ) {
-			$lastpostdate = \get_date_from_gmt( \get_lastpostdate( 'GMT', $post_type ), DATE_W3C );
-			$lastmod      = isset( $lastmod ) && $lastmod > $lastpostdate ? $lastmod : $lastpostdate; // Absolute last post date.
+			$lastpostdate = \get_lastpostdate( 'GMT', $post_type );
+			if ( $lastpostdate ) {
+				$lastpostdate = \get_date_from_gmt( $lastpostdate, DATE_W3C );
+				$lastmod      = isset( $lastmod ) && $lastmod > $lastpostdate ? $lastmod : $lastpostdate; // Absolute last post date.
+			}
 		}
 		echo '<sitemap><loc>' . \esc_xml( $url ) . '</loc>';
 		if ( isset( $lastmod ) ) {
@@ -183,7 +186,8 @@ class Sitemap_News {
 		// Set up query filters.
 		$live = false;
 		foreach ( $post_types as $post_type ) {
-			if ( \strtotime( \get_lastpostdate( 'gmt', $post_type ) ) > \strtotime( \gmdate( 'Y-m-d H:i:s', \strtotime( '-48 hours' ) ) ) ) {
+			$lastpostdate = \get_lastpostdate( 'gmt', $post_type );
+			if ( $lastpostdate && \strtotime( $lastpostdate ) > \strtotime( \gmdate( 'Y-m-d H:i:s', \strtotime( '-48 hours' ) ) ) ) {
 				$live = true;
 				break;
 			}

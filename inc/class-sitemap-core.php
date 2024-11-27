@@ -281,9 +281,9 @@ class Sitemap_Core extends Sitemap {
 
 			case 'user':
 				// TODO make this xmlsf_author_has_published_posts filter compatible.
-				$lastmod = \get_date_from_gmt( \get_lastpostdate( 'GMT', 'post' ), DATE_W3C ); // Absolute last post date.
+				$lastmod = \get_lastpostdate( 'GMT', 'post' ); // Absolute last post date.
 				if ( $lastmod ) {
-					$entry['lastmod'] = $lastmod;
+					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 				}
 				break;
 
@@ -291,8 +291,11 @@ class Sitemap_Core extends Sitemap {
 				$options    = (array) \get_option( 'xmlsf_news_tags' );
 				$post_types = isset( $options['post_type'] ) && ! empty( $options['post_type'] ) ? (array) $options['post_type'] : array( 'post' );
 				foreach ( $post_types as $post_type ) {
-					$lastpostdate     = \get_date_from_gmt( \get_lastpostdate( 'GMT', $post_type ), DATE_W3C );
-					$entry['lastmod'] = ! empty( $entry['lastmod'] ) && $entry['lastmod'] > $lastpostdate ? $entry['lastmod'] : $lastpostdate; // Absolute last post date.
+					$lastpostdate = \get_lastpostdate( 'GMT', $post_type );
+					if ( $lastpostdate ) {
+						$lastpostdate     = \get_date_from_gmt( $lastpostdate, DATE_W3C );
+						$entry['lastmod'] = ! empty( $entry['lastmod'] ) && $entry['lastmod'] > $lastpostdate ? $entry['lastmod'] : $lastpostdate; // Absolute last post date.
+					}
 				}
 				break;
 
@@ -435,9 +438,9 @@ class Sitemap_Core extends Sitemap {
 
 		// Set front blog page lastmod to last published post.
 		if ( empty( $entry['lastmod'] ) ) {
-			$lastmod = \get_date_from_gmt( \get_lastpostdate( 'gmt', 'post' ), DATE_W3C );
+			$lastmod = \get_lastpostdate( 'gmt', 'post' );
 			if ( $lastmod ) {
-				$entry['lastmod'] = $lastmod;
+				$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 			}
 		}
 

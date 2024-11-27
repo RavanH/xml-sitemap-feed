@@ -401,7 +401,7 @@ function get_post_modified( $post ) {
 		$lastmod = \get_lastpostdate( 'GMT', 'post' );
 
 		// Only return if we got an actual last post date here.
-		if ( ! empty( $lastmod ) ) {
+		if ( $lastmod ) {
 			return get_date_from_gmt( $lastmod, DATE_W3C );
 		}
 	}
@@ -497,16 +497,14 @@ function get_taxonomy_modified( $taxonomy ) {
 		return false;
 	}
 
-	$lastmodified = array();
 	foreach ( (array) $obj->object_type as $object_type ) {
-		$lastmodified[] = \get_lastpostdate( 'GMT', $object_type );
+		$lastpostdate = \get_lastpostdate( 'GMT', $object_type );
+		if ( $lastpostdate ) {
+			$lastmod = ! empty( $lastmod ) && $lastmod > $lastpostdate ? $lastmod : $lastpostdate; // Absolute last post date.
+		}
 	}
 
-	sort( $lastmodified );
-	$lastmodified = \array_filter( $lastmodified );
-	$lastmod      = \end( $lastmodified );
-
-	return \get_date_from_gmt( $lastmod, DATE_W3C );
+	return ! empty( $lastmod ) ? \get_date_from_gmt( $lastmod, DATE_W3C ) : '';
 }
 
 /**
