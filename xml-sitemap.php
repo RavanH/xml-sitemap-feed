@@ -78,6 +78,42 @@ if ( is_admin() ) {
 }
 
 /**
+ * Get instantiated sitemap class
+ *
+ * @since 5.0
+ *
+ * @static XMLSF\XMLSitemapFeed $xmlsf
+ * @return XMLSF\XMLSitemapFeed object by reference
+ */
+function &xmlsf() {
+	static $xmlsf;
+
+	if ( ! isset( $xmlsf ) ) {
+		$xmlsf = new XMLSF\XMLSitemapFeed();
+	}
+
+	return $xmlsf;
+}
+
+/**
+ * Get instantiated sitemap admin class
+ *
+ * @since 5.4
+ *
+ * @static XMLSF\Admin $xmlsf_admin
+ * @return XMLSF\Admin object by reference
+ */
+function &xmlsf_admin() {
+	static $xmlsf_admin;
+
+	if ( ! isset( $xmlsf_admin ) ) {
+		$xmlsf_admin = new XMLSF\Admin();
+	}
+
+	return $xmlsf_admin;
+}
+
+/**
  * Plugin de-activation
  *
  * @since 5.0
@@ -96,39 +132,3 @@ function xmlsf_deactivate() {
 }
 
 register_deactivation_hook( __FILE__, 'xmlsf_deactivate' );
-
-/**
- * Get instantiated sitemap class
- *
- * @since 5.0
- *
- * @global XMLSF\XMLSitemapFeed $xmlsf
- * @return XMLSF\XMLSitemapFeed object by reference
- */
-function &xmlsf() {
-	global $xmlsf;
-
-	if ( ! isset( $xmlsf ) ) {
-		$xmlsf = new XMLSF\XMLSitemapFeed();
-	}
-
-	return $xmlsf;
-}
-
-/**
- * Get instantiated sitemap admin class
- *
- * @since 5.4
- *
- * @global XMLSF\Admin $xmlsf_admin
- * @return XMLSF\Admin object by reference
- */
-function &xmlsf_admin() {
-	global $xmlsf_admin;
-
-	if ( ! isset( $xmlsf_admin ) ) {
-		$xmlsf_admin = new XMLSF\Admin();
-	}
-
-	return $xmlsf_admin;
-}

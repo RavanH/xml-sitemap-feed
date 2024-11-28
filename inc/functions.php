@@ -14,13 +14,11 @@ namespace XMLSF;
  * Hooked into xmlsf_sitemap_loaded action.
  */
 function sitemap_loaded() {
-	global $xmlsf;
-
 	// Prepare headers.
 	\add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
 
 	// Set the sitemap conditional flag.
-	$xmlsf->is_sitemap = true;
+	xmlsf()->is_sitemap = true;
 
 	// Make sure we have the proper locale setting for calculations.
 	\setlocale( LC_NUMERIC, 'C' );

@@ -124,8 +124,8 @@ class Sitemap_Core extends Sitemap {
 	 * @return array $request filtered
 	 */
 	public function filter_request( $request ) {
-		global $xmlsf;
-		$xmlsf->request_filtered = true;
+
+		xmlsf()->request_filtered = true;
 
 		if ( ! empty( $request['sitemap'] ) ) {
 

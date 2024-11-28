@@ -88,13 +88,13 @@ class Sitemap_Plugin extends Sitemap {
 	 * @return array $request Filtered request.
 	 */
 	public function filter_request( $request ) {
-		global $xmlsf, $wp_rewrite;
+		global $wp_rewrite;
 
 		// Short-circuit if request was already filtered by this plugin.
-		if ( $xmlsf->request_filtered ) {
+		if ( xmlsf()->request_filtered ) {
 			return $request;
 		} else {
-			$xmlsf->request_filtered = true;
+			xmlsf()->request_filtered = true;
 		}
 
 		// Short-circuit if request is not a feed, does not start with 'sitemap' or is a news sitemap.
