@@ -262,12 +262,6 @@ function get_user_modified( $user ) {
 		\add_user_meta( $user->ID, 'user_modified', $lastmod );
 	}
 
-	/*
-	* Getting ALL meta here because if checking for single key, we cannot
-	* distiguish between empty value or non-exisiting key as both return ''.
-	*/
-	$meta = \get_user_meta( $user->ID );
-
 	$lastmod = \get_user_meta( $user->ID, 'user_modified', true );
 
 	return ! empty( $lastmod ) ? \mysql2date( DATE_W3C, $lastmod, false ) : false;
@@ -425,7 +419,7 @@ function get_post_modified( $post ) {
 		}
 	}
 
-	return ! empty( $lastmod ) ? \get_date_from_gmt( $lastmod, DATE_W3C ) : false;
+	return ! empty( $lastmod ) ? $lastmod : false;
 }
 
 /**
@@ -504,7 +498,7 @@ function get_taxonomy_modified( $taxonomy ) {
 		}
 	}
 
-	return ! empty( $lastmod ) ? \get_date_from_gmt( $lastmod, DATE_W3C ) : '';
+	return ! empty( $lastmod ) ? $lastmod : false;
 }
 
 /**

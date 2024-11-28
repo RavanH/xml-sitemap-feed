@@ -24,13 +24,9 @@ global $wp_query, $post;
  * Shows only on the first page if the reading settings are set to display latest posts.
  */
 if ( 'page' === $post->post_type && 'posts' === get_option( 'show_on_front' ) ) {
-	$lastmod = \get_lastpostdate( 'gmt', 'post' );
-	if ( $lastmod ) {
-		$lastmod = \get_date_from_gmt( $lastmod, DATE_W3C );
-	}
 	$home_pages = array(
 		\trailingslashit( \home_url() ) => array(
-			'lastmod' => $lastmod,
+			'lastmod' => get_lastpostdate( 'gmt', 'post' ),
 		),
 	);
 
@@ -62,9 +58,8 @@ if ( 'page' === $post->post_type && 'posts' === get_option( 'show_on_front' ) ) 
 			echo '<priority>' . esc_xml( $priority ) . '</priority>';
 		}
 
-
 		if ( ! empty( $data['lastmod'] ) ) {
-			echo '<lastmod>' . esc_xml( $data['lastmod'] ) . '</lastmod>';
+			echo '<lastmod>' . esc_xml( get_date_from_gmt( $data['lastmod'], DATE_W3C ) ) . '</lastmod>';
 		}
 
 		do_action( 'xmlsf_tags_after', 'home', $data );
@@ -109,7 +104,7 @@ if ( have_posts() ) :
 
 		$lastmod = XMLSF\get_post_modified( $post );
 		if ( $lastmod ) {
-			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+			echo '<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';
 		}
 
 		do_action( 'xmlsf_tags_after', 'post_type', $post );

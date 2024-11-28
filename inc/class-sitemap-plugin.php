@@ -104,32 +104,12 @@ class Sitemap_Plugin extends Sitemap {
 
 		/** IT'S A SITEMAP */
 
-		/** MODIFY REQUEST PARAMETERS */
-
-		$request['post_status']   = 'publish';
-		$request['no_found_rows'] = true; // Found rows calc is slow and only needed for pagination.
-
-		// SPECIFIC REQUEST FILTERING AND PREPARATIONS.
-
-		/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
-
-		/**
-		 * Filters the request.
-		 *
-		 * Use add_filter( 'xmlsf_request', 'your_filter_function' );
-		 *
-		 * Possible filters hooked here:
-		 * XMLSF\Compat/Polylang->filter_request - Polylang compatibility
-		 * XMLSF\Compat\WPML->filter_request - WPML compatibility
-		 * XMLSF\Compat/BBPress->filter_request - bbPress compatibility
-		 */
-		$request = \apply_filters( 'xmlsf_request', $request );
-
-		$feed     = \explode( '-', $request['feed'], 3 );
-		$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
-		$type     = isset( $feed[1] ) ? $feed[1] : '';
+		$feed = \explode( '-', $request['feed'], 3 );
+		$type = isset( $feed[1] ) ? $feed[1] : '';
 
 		\do_action( 'xmlsf_sitemap_loaded', 'plugin', $type );
+
+		/** MODIFY REQUEST PARAMETERS */
 
 		switch ( $type ) {
 
@@ -177,6 +157,7 @@ class Sitemap_Plugin extends Sitemap {
 				break;
 
 			case 'taxonomy':
+				$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
 				if ( ! isset( $feed[2] ) || ( ! empty( $disabled ) && in_array( 'taxonomies', (array) $disabled, true ) ) ) {
 					return $request;
 				}
@@ -195,6 +176,7 @@ class Sitemap_Plugin extends Sitemap {
 				break;
 
 			case 'author':
+				$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
 				if ( ! empty( $disabled ) && \in_array( 'users', (array) $disabled, true ) ) {
 					return $request;
 				}
@@ -208,6 +190,25 @@ class Sitemap_Plugin extends Sitemap {
 			default:
 				// We're on the index. Do nothing.
 		}
+
+		$request['post_status']   = 'publish';
+		$request['no_found_rows'] = true; // Found rows calc is slow and only needed for pagination.
+
+		// SPECIFIC REQUEST FILTERING AND PREPARATIONS.
+
+		/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
+
+		/**
+		 * Filters the request.
+		 *
+		 * Use add_filter( 'xmlsf_request', 'your_filter_function' );
+		 *
+		 * Possible filters hooked here:
+		 * XMLSF\Compat/Polylang->filter_request - Polylang compatibility
+		 * XMLSF\Compat\WPML->filter_request - WPML compatibility
+		 * XMLSF\Compat/BBPress->filter_request - bbPress compatibility
+		 */
+		$request = \apply_filters( 'xmlsf_request', $request );
 
 		/** PREPARE TO LOAD TEMPLATE */
 		\add_action(
@@ -466,7 +467,6 @@ class Sitemap_Plugin extends Sitemap {
 		} else {
 			// No wildcard, go through the motions.
 			$urls[] = '/sitemap.xml';
-			$urls[] = '/sitemap-root.xml';
 			$urls[] = '/sitemap-author.xml';
 			$urls[] = '/sitemap-custom.xml';
 

@@ -127,15 +127,13 @@ class Polylang {
 	public static function root_data( $data ) {
 		if ( \function_exists( 'pll_languages_list' ) && \function_exists( 'pll_home_url' ) ) {
 			$languages = \pll_languages_list();
+			$data      = array();
+
 			if ( is_array( $languages ) ) {
 				foreach ( $languages as $language ) {
-					$url     = \pll_home_url( $language );
-					$lastmod = \get_lastpostdate( 'gmt', 'post' ); // TODO make lastmod date language specific.
-					if ( $lastmod ) {
-						$lastmod = \get_date_from_gmt( $lastmod, DATE_W3C );
-					}
+					$url          = \pll_home_url( $language );
 					$data[ $url ] = array(
-						'lastmod' => $lastmod,
+						'lastmod' => \get_lastpostdate( 'gmt', 'post' ), // TODO make lastmod date language specific.
 					);
 				}
 			}

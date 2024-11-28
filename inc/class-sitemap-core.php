@@ -169,7 +169,7 @@ class Sitemap_Core extends Sitemap {
 						$subtype
 					);
 
-					// Prepare priority calculation.
+					// Prepare dynamic priority calculation.
 					if ( $subtype && ! empty( $this->post_types[ $subtype ]['priority'] ) && ! empty( $this->post_types[ $subtype ]['dynamic_priority'] ) ) {
 						// Last of this post type modified date in Unix seconds.
 						\xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $subtype ), 'U' );
@@ -266,16 +266,16 @@ class Sitemap_Core extends Sitemap {
 		// Add lastmod.
 		switch ( $type ) {
 			case 'post':
-				$lastmod = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $subtype ), DATE_W3C );
+				$lastmod = \get_lastpostmodified( 'GMT', $subtype );
 				if ( $lastmod ) {
-					$entry['lastmod'] = $lastmod;
+					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 				}
 				break;
 
 			case 'term':
 				$lastmod = namespace\get_taxonomy_modified( $subtype );
 				if ( $lastmod ) {
-					$entry['lastmod'] = $lastmod;
+					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 				}
 				break;
 
@@ -293,9 +293,11 @@ class Sitemap_Core extends Sitemap {
 				foreach ( $post_types as $post_type ) {
 					$lastpostdate = \get_lastpostdate( 'GMT', $post_type );
 					if ( $lastpostdate ) {
-						$lastpostdate     = \get_date_from_gmt( $lastpostdate, DATE_W3C );
-						$entry['lastmod'] = ! empty( $entry['lastmod'] ) && $entry['lastmod'] > $lastpostdate ? $entry['lastmod'] : $lastpostdate; // Absolute last post date.
+						$lastmod = ! empty( $lastmod ) && $lastmod > $lastpostdate ? $lastmod : $lastpostdate; // Absolute last post date.
 					}
+				}
+				if ( $lastmod ) {
+					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 				}
 				break;
 
@@ -326,7 +328,7 @@ class Sitemap_Core extends Sitemap {
 		// Add lastmod.
 		$lastmod = namespace\get_user_modified( $user_object );
 		if ( $lastmod ) {
-			$entry['lastmod'] = $lastmod;
+			$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 		}
 		return $entry;
 	}
@@ -359,7 +361,7 @@ class Sitemap_Core extends Sitemap {
 		// Add lastmod.
 		$lastmod = namespace\get_term_modified( $term_object );
 		if ( $lastmod ) {
-			$entry['lastmod'] = $lastmod;
+			$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 		}
 
 		return $entry;
@@ -413,7 +415,7 @@ class Sitemap_Core extends Sitemap {
 		if ( empty( $entry['lastmod'] ) ) {
 			$lastmod = namespace\get_post_modified( $post_object );
 			if ( $lastmod ) {
-				$entry['lastmod'] = $lastmod;
+				$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 			}
 		}
 

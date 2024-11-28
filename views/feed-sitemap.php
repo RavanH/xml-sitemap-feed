@@ -20,13 +20,13 @@ $disabled = get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled
 // Public post types.
 $post_types = XMLSF\get_post_types();
 foreach ( $post_types as $the_post_type => $settings ) :
-	$archive      = isset( $settings['archive'] ) ? $settings['archive'] : '';
-	$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $the_post_type, $archive );
+	$archive_type = isset( $settings['archive'] ) ? $settings['archive'] : '';
+	$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $the_post_type, $archive_type );
 
 	foreach ( $archive_data as $url => $lastmod ) {
 		echo '<sitemap><loc>' . esc_url( $url ) . '</loc>';
 		if ( $lastmod ) {
-			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+			echo '<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';
 		}
 		echo '</sitemap>' . PHP_EOL;
 	}
@@ -56,7 +56,7 @@ if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) )
 			$lastmod = XMLSF\get_taxonomy_modified( $the_taxonomy );
 			echo '<sitemap><loc>' . esc_xml( $url ) . '</loc>';
 			if ( $lastmod ) {
-				echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+				echo '<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';
 			}
 			echo '</sitemap>' . PHP_EOL;
 		}
@@ -65,7 +65,13 @@ if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) )
 
 // Authors.
 if ( empty( $disabled ) || ! in_array( 'users', (array) $disabled, true ) ) {
-	echo '<sitemap><loc>' . esc_xml( XMLSF\sitemap_url( 'author' ) ) . '</loc><lastmod>' . esc_xml( get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ) ) . '</lastmod></sitemap>' . PHP_EOL;
+	echo '<sitemap><loc>' . esc_xml( XMLSF\sitemap_url( 'author' ) ) . '</loc>';
+	$lastmod = get_lastpostdate( 'GMT' );
+	if ( $lastmod ) {
+		'<lastmod>' . esc_xml( get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ) ) . '</lastmod>';
+	}
+	echo '</sitemap>' . PHP_EOL;
+
 }
 
 // Custom URLs sitemap.

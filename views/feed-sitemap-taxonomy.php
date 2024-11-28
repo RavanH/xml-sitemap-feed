@@ -44,7 +44,7 @@ if ( is_array( $terms ) ) :
 
 		$lastmod = XMLSF\get_term_modified( $tax_term );
 		if ( $lastmod ) {
-			echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+			echo '<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';
 		}
 
 		do_action( 'xmlsf_tags_after', 'taxonomy', $tax_term );

@@ -111,14 +111,12 @@ class WPML {
 		global $sitepress;
 
 		if ( \is_object( $sitepress ) && \method_exists( $sitepress, 'get_languages' ) && \method_exists( $sitepress, 'language_url' ) ) {
+			$data = array();
+
 			foreach ( \array_keys( $sitepress->get_languages( false, true ) ) as $term ) {
-				$url     = $sitepress->language_url( $term );
-				$lastmod = \get_lastpostdate( 'gmt', 'post' ); // TODO make lastmod date language specific.
-				if ( $lastmod ) {
-					$lastmod = \get_date_from_gmt( $lastmod, DATE_W3C );
-				}
+				$url          = $sitepress->language_url( $term );
 				$data[ $url ] = array(
-					'lastmod' => $lastmod,
+					'lastmod' => \get_lastpostdate( 'gmt', 'post' ), // TODO make lastmod date language specific.
 				);
 			}
 		}

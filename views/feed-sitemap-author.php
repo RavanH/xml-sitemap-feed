@@ -50,7 +50,7 @@ foreach ( $users as $user ) {
 
 	$lastmod = XMLSF\get_user_modified( $user );
 	if ( $lastmod ) {
-		echo '<lastmod>' . esc_xml( $lastmod ) . '</lastmod>';
+		echo '<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';
 	}
 
 	do_action( 'xmlsf_tags_after', 'author', $user );
