@@ -98,7 +98,7 @@ class Polylang {
 	/**
 	 * Pre register news provider action.
 	 */
-	public static function pre_register_news_provider() {
+	public static function remove_replace_provider() {
 		// Polylang compatibility: prevent sitemap translations.
 		global $polylang;
 		if ( isset( $polylang ) && \is_object( $polylang->sitemaps ) ) {
@@ -109,7 +109,7 @@ class Polylang {
 	/**
 	 * Post register news provider action.
 	 */
-	public static function post_register_news_provider() {
+	public static function add_replace_provider() {
 		global $polylang;
 		if ( isset( $polylang ) && ! \has_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) ) ) {
 			// Re-add Polylang filter.

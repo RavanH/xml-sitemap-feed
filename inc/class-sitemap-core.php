@@ -91,7 +91,11 @@ class Sitemap_Core extends Sitemap {
 			\add_action(
 				'init',
 				function () {
+					\do_action( 'xmlsf_register_sitemap_provider', 'urls' );
+
 					\wp_register_sitemap_provider( 'urls', new Sitemaps_Provider_URLs() );
+
+					\do_action( 'xmlsf_register_sitemap_provider_after', 'urls' );
 				},
 				11
 			);
@@ -101,7 +105,11 @@ class Sitemap_Core extends Sitemap {
 			\add_action(
 				'init',
 				function () {
+					\do_action( 'xmlsf_register_sitemap_provider', 'custom' );
+
 					\wp_register_sitemap_provider( 'custom', new Sitemaps_Provider_Custom() );
+
+					\do_action( 'xmlsf_register_sitemap_provider_after', 'custom' );
 				},
 				11
 			);

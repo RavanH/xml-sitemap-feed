@@ -102,11 +102,11 @@ class Sitemap_News {
 	 * Add Google News sitemap to the core sitemap index
 	 */
 	public function news_in_core_index() {
-		\do_action( 'xmlsf_register_news_sitemap_provider' );
+		\do_action( 'xmlsf_register_sitemap_provider', 'news' );
 
 		\wp_register_sitemap_provider( 'news', new Sitemaps_Provider_News() );
 
-		\do_action( 'xmlsf_register_news_sitemap_provider_after' );
+		\do_action( 'xmlsf_register_sitemap_provider_after', 'news' );
 	}
 
 	/**

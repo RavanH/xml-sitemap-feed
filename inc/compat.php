@@ -27,8 +27,8 @@ if ( \is_plugin_active( 'polylang/polylang.php' ) ) {
 
 	\add_filter( 'xmlsf_news_language', array( __NAMESPACE__ . '\Compat\Polylang', 'post_language_filter' ), 10, 2 );
 
-	\add_action( 'xmlsf_register_news_sitemap_provider', array( __NAMESPACE__ . '\Compat\Polylang', 'pre_register_news_provider' ) );
-	\add_action( 'xmlsf_register_news_sitemap_provider_after', array( __NAMESPACE__ . '\Compat\Polylang', 'post_register_news_provider' ) );
+	\add_action( 'xmlsf_register_sitemap_provider', array( __NAMESPACE__ . '\Compat\Polylang', 'remove_replace_provider' ) );
+	\add_action( 'xmlsf_register_sitemap_provider_after', array( __NAMESPACE__ . '\Compat\Polylang', 'add_replace_provider' ) );
 
 	\add_filter( 'xmlsf_root_data', array( __NAMESPACE__ . '\Compat\Polylang', 'root_data' ) );
 }
@@ -55,5 +55,5 @@ if ( \is_plugin_active( 'bbpress/bbpress.php' ) ) {
 }
 
 if ( \is_plugin_active( 'xml-sitemaps-manager/xml-sitemaps-manager.php' ) ) {
-	add_action( 'plugins_loaded', array( __NAMESPACE__ . '\Compat\XMLSM', 'plugins_loaded' ) );
+	add_action( 'plugins_loaded', array( __NAMESPACE__ . '\Compat\XMLSM', 'remove_init' ) );
 }
