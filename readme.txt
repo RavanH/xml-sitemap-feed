@@ -13,11 +13,9 @@ XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cac
 
 == Description ==
 
-This plugin dynamically creates dynamic feeds that comply with the **XML Sitemap** and the **Google News Sitemap** protocol. **Multisite**, **Polylang** and **WPML** compatible and there are no static files created.
+This plugin creates dynamic feeds that comply with the **XML Sitemap** and the **Google News Sitemap** protocol. **Multisite**, **Polylang** and **WPML** compatible and there are no static files created.
 
 There are options to control which sitemaps are enabled, which Post Types and archive pages (like taxonomy terms and author pages) are included, how Priority and Lastmod are calculated and a possibility to set additional robots.txt rules from within the WordPress admin.
-
-The main advantage of this plugin over other XML Sitemap plugins is **simplicity**. No need to change file or folder permissions, move files or spend time tweaking difficult plugin options.
 
 You, or site owners on your Multisite network, will not be bothered with overly complicated settings like most other XML Sitemap plugins. The default settings will suffice in most cases.
 
@@ -143,9 +141,13 @@ Once a sitemap is enabled, its options can be found on **Settings > XML Sitemap*
 
 = How do I get my latest articles listed on Google News? =
 
-Go to [Suggest News Content for Google News](http://www.google.com/support/news_pub/bin/request.py?contact_type=suggest_content) and submit your website info as detailed as possible there. Give them the URL(s) of your fresh new Google News Sitemap in the text field 'Other' at the bottom.
+Since April 2024, it's [no longer possible to submit new sites](https://support.google.com/news/publisher-center/answer/14859160?sjid=17606446789427013880-EU) to the Google News Publisher Center.
 
-You will also want to add the sitemap to your [Google Search Console account](https://search.google.com/search-console) to check its validity and performance. Create an account if you don't have one yet.
+If your site is new, you can only:
+
+1. Create quality news articles.
+2. Submit your Google News sitemap to your [Google Search Console account](https://search.google.com/search-console) to check its validity and performance. Create an account if you don't have one yet.
+3. Continue publishing quality content and wait for Google News to discover and distribute it.
 
 = Can I manipulate values for Priority and Changefreq? =
 
@@ -155,13 +157,15 @@ Changefreq has been dropped since version 4.9 because it is no longer taken into
 
 = Do I need to submit the sitemap to search engines? =
 
-No. In normal circumstances, your site will be indexed by the major search engines before you know it. The search engines will be looking for a robots.txt file and (with this plugin activated) find a pointer in it to the XML Sitemap on your blog. The search engines will return on a regular basis to see if your site has updates.
+No. In normal circumstances, your site will be indexed by the major search engines before you know it. The search engines will be looking for a robots.txt file and (with this plugin activated) find a pointer in it to the XML Sitemap on your blog. The search engine crawlers will return on a regular basis to see if your site has updates.
+
+But you _can_ submit your sitemap(s) in [Google Search Console account](https://search.google.com/search-console), [Bing Webmaster Tools](https://www.bing.com/webmasters), [Yandex Webmaster](https://webmaster.yandex.com/) and [Baidu Webmaster Tools](https://ziyuan.baidu.com/login/index?u=/site/siteadd) to monitor yous site and sitemap performance.
 
 **NOTE:** If you have a server _without rewrite rules_, use your blog _without fancy URLs_ (meaning, you have WordPress Permalinks set to the old default value) or have it installed in a _subdirectory_, then read **Do I need to change my robots.txt** for more instructions.
 
 = Does this plugin ping search engines? =
 
-Google & Bing are no longer accepting sitemap pings.
+No. Google & Bing are no longer accepting sitemap pings.
 
 = Do I need to change my robots.txt? =
 
@@ -267,7 +271,7 @@ This error occurs when blank lines or other output is generated before the start
 
 There are several cases where this might happen.
 
-Open your sitemap in a browser and look at the source code. This can usually be seen by hitting Ctrl+U or right-click then select 'View source...' Then scan the produced source (if any) for errors.
+Open your sitemap in a browser and look at the source code. This can usually be seen with the key combination Cmd/Ctrl+U or right click then select 'View source...' Then scan the produced source (if any) for errors.
 
 A. If you see strange output in the first few lines (head tags) of the source, then there is a conflict or bug occuring on your installation. Please go to the [Support forum](http://wordpress.org/support/plugin/xml-sitemap-feed) for help.
 
@@ -277,7 +281,7 @@ This can happen on large sites. To avoid these issues, there is an option to spl
 
 Read more on [Increasing memory allocated to PHP](http://codex.wordpress.org/Editing_wp-config.php#Increasing_memory_allocated_to_PHP) (try a value higher than 256M) or ask your hosting provider what you can do.
 
-= Can I run this on a WPMU / WP3+ Multi-Site setup? =
+= Can I run this on a WPMU / WP3+ Multi-Site / Network setup? =
 
 Yes. In fact, it has been designed for it. Tested on WPMU 2.9.2 and WPMS 3+ both with normal activation and with Network Activate / Site Wide Activate.
 
