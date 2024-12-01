@@ -74,46 +74,7 @@ class Sitemap_Core extends Sitemap {
 		/**
 		 * Add sitemaps.
 		 */
-		// TODO Maybe add dedicated Media sitemap if image tags are (still) not possible OR completely replace the renderer?
-
-		// TODO
-		// add custom post type root pages...
-		// EITHER with:
-		// wp_sitemaps_posts_pre_url_list (replacing the whole posts provider url_list);
-		// * if ( $post_type_archive_url = get_post_type_archive_link( $post_type ) ) {
-		// *     $sitemap_entry = array( 'loc' => $post_type_archive_url );
-		// *     $url_list[] = apply_filters( 'xmlsf_post_type_archive_entry', $sitemap_entry, $post_type );;
-		// * }*/
-		// OR with a separate "root" sitemap.
-
-		// Additional URLs sitemap provider.
-		if ( \get_option( 'xmlsf_urls' ) ) {
-			\add_action(
-				'init',
-				function () {
-					\do_action( 'xmlsf_register_sitemap_provider', 'urls' );
-
-					\wp_register_sitemap_provider( 'urls', new Sitemaps_Provider_URLs() );
-
-					\do_action( 'xmlsf_register_sitemap_provider_after', 'urls' );
-				},
-				11
-			);
-		}
-		// External XML Sitemaps provider.
-		if ( \get_option( 'xmlsf_custom_sitemaps' ) ) {
-			\add_action(
-				'init',
-				function () {
-					\do_action( 'xmlsf_register_sitemap_provider', 'custom' );
-
-					\wp_register_sitemap_provider( 'custom', new Sitemaps_Provider_Custom() );
-
-					\do_action( 'xmlsf_register_sitemap_provider_after', 'custom' );
-				},
-				11
-			);
-		}
+		\add_action( 'wp_sitemaps_init', array( $this, 'register_sitemap_providers' ) );
 
 		// Stylesheet.
 		\add_filter( 'wp_sitemaps_stylesheet_index_url', array( $this, 'stylesheet_index_url' ) );
@@ -125,6 +86,25 @@ class Sitemap_Core extends Sitemap {
 
 	/**
 	 * Filter request
+	 * Hooked into wp_sitemaps_init.
+	 */
+	public function register_sitemap_providers() {
+		\do_action( 'xmlsf_register_sitemap_provider' );
+
+		// Additional URLs sitemap provider.
+		if ( \get_option( 'xmlsf_urls' ) ) {
+			\wp_register_sitemap_provider( 'urls', new Sitemaps_Provider_URLs() );
+		}
+		// External XML Sitemaps provider.
+		if ( \get_option( 'xmlsf_custom_sitemaps' ) ) {
+			\wp_register_sitemap_provider( 'custom', new Sitemaps_Provider_Custom() );
+		}
+
+		\do_action( 'xmlsf_register_sitemap_provider_after' );
+	}
+
+	/**
+	 * Register sitemap providers
 	 * Hooked into request filter.
 	 *
 	 * @param array $request Request.

@@ -13,6 +13,13 @@ namespace XMLSF\Compat;
 class Polylang {
 
 	/**
+	 * PLL links model.
+	 *
+	 * @var PLL_Links_...
+	 */
+	private static $links_model = null;
+
+	/**
 	 * Get Polylang translations
 	 *
 	 * @param int $post_id Post id.
@@ -140,5 +147,46 @@ class Polylang {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Do author archives for non-default languages
+	 * Hooked into xmlsf_url_after
+	 *
+	 * @param string $which Which sitemap.
+	 * @param obj    $user  User object.
+	 * @param array  $data  User sitemap data.
+	 */
+	public static function author_archive_translations( $which, $user, $data ) {
+		if ( 'author' === $which && \function_exists( 'PLL' ) && is_object( PLL() ) ) {
+			$languages = \pll_languages_list(
+				array(
+					'hide_empty' => true,
+					'fields'     => 'slug',
+				)
+			);
+			if ( null === self::$links_model ) {
+				self::$links_model = PLL()->model->get_links_model();
+			}
+
+			foreach ( $languages as $language ) {
+				$transl_url = self::$links_model->switch_language_in_link( $data['url'], $language );
+				if ( $transl_url === $data['url'] ) {
+					continue;
+				}
+
+				echo '<url><loc>' . esc_xml( esc_url( $transl_url ) ) . '</loc>';
+
+				if ( ! empty( $data['priority'] ) ) {
+					echo '<priority>' . esc_xml( $data['priority'] ) . '</priority>';
+				}
+
+				if ( ! empty( $data['lastmod'] ) ) {
+					echo '<lastmod>' . esc_xml( get_date_from_gmt( $data['lastmod'], DATE_W3C ) ) . '</lastmod>';
+				}
+
+				echo '</url>';
+			}
+		}
 	}
 }

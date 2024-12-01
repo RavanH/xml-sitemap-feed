@@ -341,6 +341,10 @@ function load_template( $is_comment_feed, $feed ) {
  * @return float|int
  */
 function sanitize_number( $number, $min = .1, $max = 1, $decimals = 1 ) {
+	if ( ! is_numeric( $number ) ) {
+		return $number;
+	}
+
 	\setlocale( LC_NUMERIC, 'C' );
 
 	$number = $decimals ? \str_replace( ',', '.', $number ) : \str_replace( ',', '', $number );

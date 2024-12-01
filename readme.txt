@@ -306,8 +306,9 @@ Date:
 * NEW: Filter xmlsf_news_hours_old
 * NEW: post types max number
 * Namespacing & autoloading
-* Admin notices for Slim SEO, Squirrly SEO, Jetpack Sitemaps
+* Admin notices for Slim SEO, Squirrly SEO, Jetpack Sitemaps & XML Sitemaps Manager
 * FIX: Polylang news sitemap category selection
+* FIX: Polylang user archive translations on Plugin sitemap
 * FIX: Attempt to read property post_type on null
 * FIX: Possible empty taxonomy sitemaps in index
 * FIX: Missing textdomain, thanks @itapress

@@ -26,6 +26,7 @@ $users = get_users(
 		)
 	)
 );
+
 foreach ( $users as $user ) {
 	$url = apply_filters( 'xmlsf_entry_url', get_author_posts_url( $user->ID ), 'author', $user );
 
@@ -57,7 +58,12 @@ foreach ( $users as $user ) {
 
 	echo '</url>';
 
-	do_action( 'xmlsf_url_after', 'author', $user );
+	$data = array(
+		'url'      => $url,
+		'priority' => $priority,
+		'lastmod'  => $lastmod,
+	);
+	do_action( 'xmlsf_url_after', 'author', $user, $data );
 
 	echo PHP_EOL;
 }
