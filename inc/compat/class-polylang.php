@@ -157,8 +157,8 @@ class Polylang {
 	 * @param obj    $user  User object.
 	 * @param array  $data  User sitemap data.
 	 */
-	public static function author_archive_translations( $which, $user, $data ) {
-		if ( 'author' === $which && \function_exists( 'PLL' ) && is_object( PLL() ) ) {
+	public static function author_archive_translations( $which, $user, $data = array() ) {
+		if ( 'author' === $which && ! empty( $data ) && \function_exists( 'PLL' ) && \is_object( PLL() ) ) {
 			$languages = \pll_languages_list(
 				array(
 					'hide_empty' => true,
@@ -166,7 +166,7 @@ class Polylang {
 				)
 			);
 			if ( null === self::$links_model ) {
-				self::$links_model = PLL()->model->get_links_model();
+				self::$links_model = \PLL()->model->get_links_model();
 			}
 
 			foreach ( $languages as $language ) {
@@ -175,14 +175,14 @@ class Polylang {
 					continue;
 				}
 
-				echo '<url><loc>' . esc_xml( esc_url( $transl_url ) ) . '</loc>';
+				echo '<url><loc>' . \esc_xml( \esc_url( $transl_url ) ) . '</loc>';
 
 				if ( ! empty( $data['priority'] ) ) {
-					echo '<priority>' . esc_xml( $data['priority'] ) . '</priority>';
+					echo '<priority>' . \esc_xml( $data['priority'] ) . '</priority>';
 				}
 
 				if ( ! empty( $data['lastmod'] ) ) {
-					echo '<lastmod>' . esc_xml( get_date_from_gmt( $data['lastmod'], DATE_W3C ) ) . '</lastmod>';
+					echo '<lastmod>' . \esc_xml( \get_date_from_gmt( $data['lastmod'], DATE_W3C ) ) . '</lastmod>';
 				}
 
 				echo '</url>';
