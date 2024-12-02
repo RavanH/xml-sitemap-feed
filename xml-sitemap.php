@@ -85,7 +85,7 @@ if ( is_admin() ) {
  * @static XMLSF\XMLSitemapFeed $xmlsf
  * @return XMLSF\XMLSitemapFeed object by reference
  */
-function &xmlsf() {
+function xmlsf() {
 	static $xmlsf;
 
 	if ( ! isset( $xmlsf ) ) {
@@ -103,7 +103,7 @@ function &xmlsf() {
  * @static XMLSF\Admin $xmlsf_admin
  * @return XMLSF\Admin object by reference
  */
-function &xmlsf_admin() {
+function xmlsf_admin() {
 	static $xmlsf_admin;
 
 	if ( ! isset( $xmlsf_admin ) ) {
