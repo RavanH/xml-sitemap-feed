@@ -2,6 +2,8 @@ ROADMAP
 
 = 5.5 =
 * revise readme: move troubleshooting FAQs to premium.status301.com
+* FIX: wordpress server lastmod date formatting for homepage, news sitemap, users sitemap
+* FIX: wordpress server lastmod date calculation for posts sitemap
 
 = 5.6 =
 * Make leaner still: only load sitemap class and functions on xmlsf_sitemap_loaded ... same for news.
