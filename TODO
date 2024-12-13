@@ -25,6 +25,7 @@ DOCUMENT
 * add inline comment blocks for hooks
 
 TEST
+* Nginx Helper purge wildcard not working?
 * XMLSF Advanced plugin compatibility
 * theme template overrides
 * test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
