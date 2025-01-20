@@ -107,7 +107,7 @@ class WPML {
 	 *
 	 * @return array
 	 */
-	public function root_data( $data ) {
+	public static function root_data( $data ) {
 		global $sitepress;
 
 		if ( \is_object( $sitepress ) && \method_exists( $sitepress, 'get_languages' ) && \method_exists( $sitepress, 'language_url' ) ) {
