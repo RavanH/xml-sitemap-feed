@@ -58,10 +58,8 @@ class Admin_Sitemap {
 	public function update_server( $old, $value ) {
 
 		if ( $old !== $value ) {
-			global $xmlsf_sitemap;
-
 			// Check static file.
-			$slug     = \is_object( $xmlsf_sitemap ) ? $xmlsf_sitemap->slug() : ( namespace\uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+			$slug     = \is_object( xmlsf()->sitemap ) ? xmlsf()->sitemap->slug() : ( namespace\uses_core_server() ? 'wp-sitemap' : 'sitemap' );
 			$filename = $slug . '.xml';
 
 			\xmlsf_admin()->check_static_files( $filename, 1 );
@@ -160,9 +158,8 @@ class Admin_Sitemap {
 			\delete_user_meta( \get_current_user_id(), 'xmlsf_dismissed' );
 
 			// When core sitemap server is used.
-			global $xmlsf_sitemap;
-			if ( \is_object( $xmlsf_sitemap ) ) {
-				\xmlsf_admin()->check_static_files( $xmlsf_sitemap->slug() . '.xml' );
+			if ( \is_object( xmlsf()->sitemap ) ) {
+				\xmlsf_admin()->check_static_files( xmlsf()->sitemap->slug() . '.xml' );
 			}
 		}
 

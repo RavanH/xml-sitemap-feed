@@ -71,16 +71,8 @@ add_action( 'init', array( 'XMLSF\XMLSitemapFeed', 'init' ), 9 );
 add_action( 'admin_init', array( 'XMLSF\XMLSitemapFeed', 'admin_init' ), 9 );
 add_filter( 'robots_txt', array( 'XMLSF\XMLSitemapFeed', 'robots_txt' ) );
 
-// Instantiate main class.
-//xmlsf();
-
-// Instantiate admin class.
-//if ( is_admin() ) {
-//	xmlsf_admin();
-//}
-
 /**
- * Get instantiated sitemap class
+ * Get sitemap object
  *
  * @since 5.0
  *
@@ -98,7 +90,7 @@ function xmlsf() {
 }
 
 /**
- * Get instantiated sitemap admin class
+ * Get sitemap admin object
  *
  * @since 5.4
  *

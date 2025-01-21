@@ -17,6 +17,20 @@ class XMLSF {
 	 *
 	 * @var array
 	 */
+	public $sitemap = null;
+
+	/**
+	 * Defaults
+	 *
+	 * @var array
+	 */
+	public $sitemap_news = null;
+
+	/**
+	 * Defaults
+	 *
+	 * @var array
+	 */
 	private $defaults = array();
 
 	/**
@@ -146,8 +160,7 @@ class XMLSF {
 
 			\add_action( 'xmlsf_news_sitemap_loaded', array( __CLASS__, 'sitemap_loaded' ) );
 
-			global $xmlsf_sitemap_news;
-			$xmlsf_sitemap_news = new Sitemap_News();
+			$this->sitemap_news = new Sitemap_News();
 		}
 
 		// XML Sitemap?
@@ -156,15 +169,14 @@ class XMLSF {
 
 			\add_action( 'xmlsf_sitemap_loaded', array( __CLASS__, 'sitemap_loaded' ) );
 
-			global $xmlsf_sitemap;
 			if ( namespace\uses_core_server() ) {
 				// Extend core sitemap.
-				$xmlsf_sitemap = new Sitemap_Core();
+				$this->sitemap = new Sitemap_Core();
 			} else {
 				// Replace core sitemap.
 				\remove_action( 'init', 'wp_sitemaps_get_server' );
 
-				$xmlsf_sitemap = new Sitemap_Plugin();
+				$this->sitemap = new Sitemap_Plugin();
 			}
 		} else {
 			// Disable core sitemap.

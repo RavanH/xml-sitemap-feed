@@ -24,24 +24,22 @@ class Admin {
 			new Admin_Sitemap_News();
 		}
 
+		//\add_action( 'admin_init', array( $this, 'register_settings' ), 0 );
 		//\add_action( 'admin_init', array( $this, 'maybe_flush_rewrite_rules' ) );
+		//\add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
+		//\add_action( 'admin_init', array( $this, 'notices_actions' ), 9 );
+
 		$this->register_settings();
 		$this->maybe_flush_rewrite_rules();
 		$this->tools_actions();
 		$this->notices_actions();
 
+		\add_action( 'admin_notices', array( $this, 'check_conflicts' ), 0 );
+		\add_action( 'update_option_xmlsf_sitemaps', array( $this, 'update_sitemaps' ), 10, 2 );
+
 		// ACTION LINK.
 		\add_filter( 'plugin_action_links_' . XMLSF_BASENAME, array( $this, 'add_action_link' ) );
 		\add_filter( 'plugin_row_meta', array( $this, 'plugin_meta_links' ), 10, 2 );
-
-		// REGISTER SETTINGS.
-		//\add_action( 'admin_init', array( $this, 'register_settings' ), 0 );
-
-		// ACTIONS & CHECKS.
-		//\add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
-		//\add_action( 'admin_init', array( $this, 'notices_actions' ), 9 );
-		\add_action( 'admin_notices', array( $this, 'check_conflicts' ), 0 );
-		\add_action( 'update_option_xmlsf_sitemaps', array( $this, 'update_sitemaps' ), 10, 2 );
 
 		// Shared Admin pages sidebar actions.
 		\add_action( 'xmlsf_admin_sidebar', array( $this, 'admin_sidebar_help' ) );
@@ -69,7 +67,6 @@ class Admin {
 	 * @param mixed $value Saved option value.
 	 */
 	public function update_sitemaps( $old, $value ) {
-		global $xmlsf_sitemap, $xmlsf_sitemap_news;
 		$old   = (array) $old;
 		$value = (array) $value;
 
@@ -78,13 +75,13 @@ class Admin {
 
 			// Switched on sitemap.
 			if ( ! empty( $value['sitemap'] ) && empty( $old['sitemap'] ) ) {
-				$slug    = \is_object( $xmlsf_sitemap ) ? $xmlsf_sitemap->slug() : ( namespace\uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+				$slug    = \is_object( xmlsf()->sitemap ) ? xmlsf()->sitemap->slug() : ( namespace\uses_core_server() ? 'wp-sitemap' : 'sitemap' );
 				$files[] = $slug . '.xml';
 			}
 
 			// Switched on news sitemap.
 			if ( ! empty( $value['sitemap-news'] ) && empty( $old['sitemap-news'] ) ) {
-				$slug    = \is_object( $xmlsf_sitemap_news ) ? $xmlsf_sitemap_news->slug() : 'sitemap-news';
+				$slug    = \is_object( xmlsf()->sitemap_news ) ? xmlsf()->sitemap_news->slug() : 'sitemap-news';
 				$files[] = $slug . '.xml';
 			}
 
