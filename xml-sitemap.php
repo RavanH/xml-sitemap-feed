@@ -3,7 +3,7 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.5-alpha18
+ * Version: 5.5-alpha19
  * Text Domain: xml-sitemap-feed
  * Requires at least: 4.4
  * Requires PHP: 5.6
@@ -13,7 +13,7 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.5-alpha18' );
+define( 'XMLSF_VERSION', '5.5-alpha19' );
 define( 'XMLSF_ADV_MIN_VERSION', '0.1' );
 define( 'XMLSF_NEWS_ADV_MIN_VERSION', '1.3.5' );
 
@@ -63,19 +63,21 @@ require_once XMLSF_DIR . '/inc/functions-pluggable.php';
 // Shared functions.
 require_once XMLSF_DIR . '/inc/functions.php';
 
-// Compatibility functions.
-require_once XMLSF_DIR . '/inc/compat.php';
-
 // Prepare hooks for debugging.
 WP_DEBUG && require_once XMLSF_DIR . '/inc/functions-debugging.php';
 
+add_action( 'init', array( 'XMLSF\XMLSitemapFeed', 'maybe_upgrade' ), 8 );
+add_action( 'init', array( 'XMLSF\XMLSitemapFeed', 'init' ), 9 );
+add_action( 'admin_init', array( 'XMLSF\XMLSitemapFeed', 'admin_init' ), 9 );
+add_filter( 'robots_txt', array( 'XMLSF\XMLSitemapFeed', 'robots_txt' ) );
+
 // Instantiate main class.
-xmlsf();
+//xmlsf();
 
 // Instantiate admin class.
-if ( is_admin() ) {
-	xmlsf_admin();
-}
+//if ( is_admin() ) {
+//	xmlsf_admin();
+//}
 
 /**
  * Get instantiated sitemap class
@@ -89,7 +91,7 @@ function xmlsf() {
 	static $xmlsf;
 
 	if ( ! isset( $xmlsf ) ) {
-		$xmlsf = new XMLSF\XMLSitemapFeed();
+		$xmlsf = new XMLSF\XMLSF();
 	}
 
 	return $xmlsf;

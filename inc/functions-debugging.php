@@ -19,6 +19,7 @@ function xmlsf_debug_nginx_helper_purge_urls( $urls ) {
 	error_log( 'NGINX Helper purge urls array:' );
 	error_log( print_r( $urls, true ) );
 }
+
 add_action( 'xmlsf_nginx_helper_purge_urls', 'xmlsf_debug_nginx_helper_purge_urls' );
 
 /**

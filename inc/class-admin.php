@@ -24,18 +24,22 @@ class Admin {
 			new Admin_Sitemap_News();
 		}
 
-		\add_action( 'admin_init', array( $this, 'maybe_flush_rewrite_rules' ) );
+		//\add_action( 'admin_init', array( $this, 'maybe_flush_rewrite_rules' ) );
+		$this->register_settings();
+		$this->maybe_flush_rewrite_rules();
+		$this->tools_actions();
+		$this->notices_actions();
 
 		// ACTION LINK.
 		\add_filter( 'plugin_action_links_' . XMLSF_BASENAME, array( $this, 'add_action_link' ) );
 		\add_filter( 'plugin_row_meta', array( $this, 'plugin_meta_links' ), 10, 2 );
 
 		// REGISTER SETTINGS.
-		\add_action( 'admin_init', array( $this, 'register_settings' ), 0 );
+		//\add_action( 'admin_init', array( $this, 'register_settings' ), 0 );
 
 		// ACTIONS & CHECKS.
-		\add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
-		\add_action( 'admin_init', array( $this, 'notices_actions' ), 9 );
+		//\add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
+		//\add_action( 'admin_init', array( $this, 'notices_actions' ), 9 );
 		\add_action( 'admin_notices', array( $this, 'check_conflicts' ), 0 );
 		\add_action( 'update_option_xmlsf_sitemaps', array( $this, 'update_sitemaps' ), 10, 2 );
 

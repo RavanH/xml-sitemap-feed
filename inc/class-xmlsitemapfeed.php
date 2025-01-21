@@ -11,276 +11,108 @@ namespace XMLSF;
  * XMLSitemapFeed CLASS
  */
 class XMLSitemapFeed {
-
-	/**
-	 * Defaults
-	 *
-	 * @var array
-	 */
-	private $defaults = array();
-
-	/**
-	 * News defaults
-	 * Keep for backward compatibility with XMLSF Advanced News 1.3.5 and earlier.
-	 *
-	 * @var array
-	 */
-	public $default_news_tags = array(
-		'name'       => '',
-		'post_type'  => array( 'post' ),
-		'categories' => '',
-	);
-
-	/**
-	 * Front pages
-	 *
-	 * @var null/array $frontpages
-	 */
-	public $frontpages = null;
-
-	/**
-	 * Signifies whether the request has been filtered.
-	 *
-	 * @var bool
-	 */
-	public $request_filtered = false;
-
-	/**
-	 * Signifies whether the current query is for a sitemap feed.
-	 *
-	 * @var bool
-	 */
-	public $is_sitemap = false;
-
-	/**
-	 * Signifies whether the request has been filtered for news.
-	 *
-	 * @var bool
-	 */
-	public $request_filtered_news = false;
-
-	/**
-	 * Signifies whether the current query is for a news feed.
-	 *
-	 * @var bool
-	 */
-	public $is_news = false;
-
-	/**
-	 * Site public scheme
-	 *
-	 * @var string $domain
-	 */
-	private $scheme;
-
-	/**
-	 * Excluded post types
-	 *
-	 * @var array
-	 */
-	private $disabled_post_types = array(
-		'attachment',
-		'reply', // bbPress.
-	);
-
-	/**
-	 * Excluded taxonomies
-	 *
-	 * @var array
-	 */
-	private $disabled_taxonomies = array(
-		'product_shipping_class',
-		// 'post_format',
-	);
-
-	/**
-	 * Maximum number of posts in any taxonomy term
-	 *
-	 * @var null|int $taxonomy_termmaxposts
-	 */
-	public $taxonomy_termmaxposts = null;
-
-	/**
-	 * Unix last modified date
-	 *
-	 * @var int $lastmodified
-	 */
-	public $lastmodified;
-
-	/**
-	 * Unix time spanning first post date and last modified date
-	 *
-	 * @var int $timespan
-	 */
-	public $timespan = 0;
-
-	/**
-	 * Post type total approved comment count
-	 *
-	 * @var int $comment_count
-	 */
-	public $comment_count = 0;
-
-	/**
-	 * Blog pages
-	 *
-	 * @var null/array $blogpages
-	 */
-	public $blogpages = null;
-
 	/**
 	 * Constructor
 	 *
 	 * @return void
 	 */
-	public function __construct() {
-		\add_action( 'init', array( $this, 'init' ), 9 );
+	public function __construct() {}
+
+	/**
+	 * Plugin compatibility hooks and filters.
+	 */
+	public static function compat() {
+		//if ( ! \function_exists( '\is_plugin_active' ) ) {
+		//	require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		//}
+
+		if ( \is_plugin_active( 'polylang/polylang.php' ) ) {
+			\add_filter( 'xmlsf_blogpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
+			\add_filter( 'xmlsf_frontpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
+			\add_filter( 'xmlsf_request', array( __NAMESPACE__ . '\Compat\Polylang', 'filter_request' ) );
+			\add_filter( 'xmlsf_core_request', array( __NAMESPACE__ . '\Compat\Polylang', 'filter_request' ) );
+			\add_filter( 'xmlsf_news_request', array( __NAMESPACE__ . '\Compat\Polylang', 'filter_request' ) );
+			\add_filter( 'xmlsf_request', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
+			\add_filter( 'xmlsf_news_request', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
+			\add_filter( 'xmlsf_news_publication_name', array( __NAMESPACE__ . '\Compat\Polylang', 'news_name' ), 10, 2 );
+			\add_filter( 'xmlsf_news_language', array( __NAMESPACE__ . '\Compat\Polylang', 'post_language_filter' ), 10, 2 );
+			\add_action( 'xmlsf_register_sitemap_provider', array( __NAMESPACE__ . '\Compat\Polylang', 'remove_replace_provider' ) );
+			\add_action( 'xmlsf_register_sitemap_provider_after', array( __NAMESPACE__ . '\Compat\Polylang', 'add_replace_provider' ) );
+			\add_filter( 'xmlsf_root_data', array( __NAMESPACE__ . '\Compat\Polylang', 'root_data' ) );
+			\add_filter( 'xmlsf_url_after', array( __NAMESPACE__ . '\Compat\Polylang', 'author_archive_translations' ), 10, 3 );
+		}
+
+		if ( \is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' ) ) {
+			\add_filter( 'xmlsf_blogpages', array( __NAMESPACE__ . '\Compat\WPML', 'get_translations' ) );
+			\add_filter( 'xmlsf_frontpages', array( __NAMESPACE__ . '\Compat\WPML', 'get_translations' ) );
+			\add_action( 'xmlsf_add_settings', array( __NAMESPACE__ . '\Compat\WPML', 'remove_home_url_filter' ) );
+			\add_action( 'xmlsf_news_add_settings', array( __NAMESPACE__ . '\Compat\WPML', 'remove_home_url_filter' ) );
+			\add_filter( 'xmlsf_request', array( __NAMESPACE__ . '\Compat\WPML', 'filter_request' ) );
+			\add_filter( 'xmlsf_news_request', array( __NAMESPACE__ . '\Compat\WPML', 'filter_request' ) );
+			\add_action( 'xmlsf_url', array( __NAMESPACE__ . '\Compat\WPML', 'language_switcher' ) );
+			\add_action( 'xmlsf_news_url', array( __NAMESPACE__ . '\Compat\WPML', 'language_switcher' ) );
+			\add_filter( 'xmlsf_root_data', array( __NAMESPACE__ . '\Compat\WPML', 'root_data' ) );
+		}
+
+		if ( \is_plugin_active( 'bbpress/bbpress.php' ) ) {
+			\add_filter( 'xmlsf_request', array( __NAMESPACE__ . '\Compat\BBPress', 'filter_request' ) );
+			\add_filter( 'xmlsf_news_request', array( __NAMESPACE__ . '\Compat\BBPress', 'filter_request' ) );
+		}
 	}
 
 	/**
-	 * Plugin main init.
+	 * Plugin upgrade.
 	 */
-	public function init() {
+	public static function maybe_upgrade() {
 		// Upgrade/install, maybe...
 		$db_version = \get_option( 'xmlsf_version', 0 );
 		if ( ! \version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
 			require_once XMLSF_DIR . '/upgrade.php';
 		}
-
-		if ( false === namespace\sitemaps_enabled() ) {
-			return;
-		}
-
-		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
-
-		// Google News sitemap?
-		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-			require XMLSF_DIR . '/inc/functions-sitemap-news.php';
-
-			global $xmlsf_sitemap_news;
-			$xmlsf_sitemap_news = new Sitemap_News();
-		}
-
-		// XML Sitemap?
-		if ( ! empty( $sitemaps['sitemap'] ) ) {
-			require XMLSF_DIR . '/inc/functions-sitemap.php';
-
-			global $xmlsf_sitemap;
-			if ( namespace\uses_core_server() ) {
-				// Extend core sitemap.
-				$xmlsf_sitemap = new Sitemap_Core();
-			} else {
-				// Replace core sitemap.
-				\remove_action( 'init', 'wp_sitemaps_get_server' );
-
-				$xmlsf_sitemap = new Sitemap_Plugin();
-			}
-		} else {
-			// Disable core sitemap.
-			\add_filter( 'wp_sitemaps_enabled', '__return_false' );
-		}
 	}
 
 	/**
-	 * Default options
-	 *
-	 * @param bool $key Which key to get.
-	 *
-	 * @return array
+	 * Plugin admin init.
 	 */
-	public function defaults( $key = false ) {
-		if ( empty( $this->defaults ) ) :
-
-			// sitemaps.
-			$sitemaps = ( 1 !== (int) \get_option( 'blog_public' ) ) ? array() : array(
-				'sitemap' => 'sitemap.xml',
-			);
-
-			$this->defaults = array(
-				'sitemaps'           => $sitemaps,
-				'server'             => \class_exists( 'SimpleXMLElement' ) && \function_exists( 'get_sitemap_url' ) ? 'core' : 'plugin',
-				'disabled_providers' => array(),
-				'post_types'         => array(
-					'post'  => array(
-						'active'           => '1',
-						'archive'          => 'yearly',
-						'priority'         => .7,
-						'dynamic_priority' => '',
-						'tags'             => array(
-							'image' => 'featured',
-							/*'video' => ''*/
-						),
-					),
-					'page'  => array(
-						'active'           => '1',
-						'priority'         => .5,
-						'dynamic_priority' => '',
-						'tags'             => array(
-							'image' => 'attached',
-							/*'video' => ''*/
-						),
-					),
-					'limit' => 2000,
-				),
-				'taxonomies'         => '',
-				'taxonomy_settings'  => array(
-					'priority'         => .3,
-					'dynamic_priority' => '',
-					'include_empty'    => '',
-					'limit'            => 2000,
-				),
-				'authors'            => '',
-				'author_settings'    => array(
-					'priority' => .3,
-					'limit'    => 2000,
-				),
-				'robots'             => '',
-				'urls'               => '',
-				'custom_sitemaps'    => '',
-				'news_tags'          => $this->default_news_tags,
-			);
-
-		endif;
-
-		if ( $key ) {
-			$return = ( isset( $this->defaults[ $key ] ) ) ? $this->defaults[ $key ] : '';
-		} else {
-			$return = $this->defaults;
-		}
-
-		return \apply_filters( 'xmlsf_defaults', $return, $key );
+	public static function admin_init() {
+		xmlsf_admin();
 	}
 
 	/**
-	 * Get scheme
+	 * Plugin main init.
+	 */
+	public static function init() {
+		// Load plugin core.
+		xmlsf();
+
+		self::compat();
+	}
+
+	/**
+	 * Filter robots.txt rules
+	 *
+	 * @param string $output Default robots.txt content.
 	 *
 	 * @return string
 	 */
-	public function scheme() {
-		// Scheme to use.
-		if ( empty( $this->scheme ) ) {
-			$scheme       = \wp_parse_url( home_url(), PHP_URL_SCHEME );
-			$this->scheme = $scheme ? $scheme : 'http';
+	public static function robots_txt( $output ) {
+
+		// CUSTOM ROBOTS.
+		$robots_custom = \get_option( 'xmlsf_robots' );
+		$output       .= $robots_custom ? $robots_custom . PHP_EOL : '';
+
+		// SITEMAPS.
+
+		$output .= PHP_EOL . '# XML Sitemap & Google News version ' . XMLSF_VERSION . ' - https://status301.net/wordpress-plugins/xml-sitemap-feed/' . PHP_EOL;
+		if ( 1 !== (int) \get_option( 'blog_public' ) ) {
+			$output .= '# XML Sitemaps are disabled because of this site\'s visibility settings.' . PHP_EOL;
+		} elseif ( ! namespace\sitemaps_enabled() ) {
+			$output .= '# No XML Sitemaps are enabled.' . PHP_EOL;
+		} else {
+			namespace\sitemaps_enabled( 'sitemap' ) && $output .= 'Sitemap: ' . namespace\sitemap_url() . PHP_EOL;
+			namespace\sitemaps_enabled( 'news' ) && $output    .= 'Sitemap: ' . namespace\sitemap_url( 'news' ) . PHP_EOL;
 		}
 
-		return $this->scheme;
-	}
-
-	/**
-	 * Get disabled taxonomies
-	 *
-	 * @return array
-	 */
-	public function disabled_taxonomies() {
-		return \apply_filters( 'xmlsf_disabled_taxonomies', $this->disabled_taxonomies );
-	}
-
-	/**
-	 * Get disabled post types
-	 *
-	 * @return array
-	 */
-	public function disabled_post_types() {
-		return (array) \apply_filters( 'xmlsf_disabled_post_types', $this->disabled_post_types );
+		return $output;
 	}
 }
