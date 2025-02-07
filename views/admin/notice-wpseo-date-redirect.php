@@ -15,12 +15,12 @@
 		);
 		?>
 		<?php
-		printf( /* translators: Date archives (linked to WP SEO plugin settings), Split by, None, Included post types (linked to Sitemap settings) */
+		printf( /* translators: Date archives (linked to WP SEO plugin settings), Split by, None, post types (linked to Sitemap settings) */
 			esc_html__( 'Please either enable %1$s in your SEO settings or set all %2$s options to %3$s under %4$s in your XML Sitemap settings.', 'xml-sitemap-feed' ),
 			'<strong><a href="' . esc_url( admin_url( 'admin.php' ) ) . '?page=wpseo_page_settings#/date-archives">' . esc_html__( 'Date archives', 'wordpress-seo' ) . '</a></strong>',
 			'<strong>' . esc_html__( 'Split by', 'xml-sitemap-feed' ) . '</strong>',
 			'<strong>' . esc_html( translate( 'None' ) ) . '</strong>',
-			'<a href="' . esc_url( admin_url( 'options-general.php' ) ) . '?page=xmlsf&tab=post_types">' . esc_html__( 'Included post types', 'xml-sitemap-feed' ) . '</a>'
+			'<a href="' . esc_url( admin_url( 'options-general.php' ) ) . '?page=xmlsf&tab=post_types">' . esc_html__( 'Post types', 'xml-sitemap-feed' ) . '</a>'
 		);
 		?>
 	</p>

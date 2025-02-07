@@ -27,7 +27,7 @@ global $wpdb;
 // if so, run the uninstall function for each blog id.
 if ( is_multisite() && defined( 'XMLSF_MULTISITE_UNINSTALL' ) && XMLSF_MULTISITE_UNINSTALL && ! wp_is_large_network() ) {
 	// Logging.
-	WP_DEBUG_LOG && error_log( 'Clearing XML Sitemap Feeds settings from each site before uninstall:' );
+	WP_DEBUG && WP_DEBUG_LOG && error_log( 'Clearing XML Sitemap Feeds settings from each site before uninstall:' );
 
 	$blogs = $wpdb->get_col( $wpdb->prepare( 'SELECT %s FROM %s', array( 'blog_id', $wpdb->prefix . 'blogs' ) ) );
 
@@ -36,13 +36,13 @@ if ( is_multisite() && defined( 'XMLSF_MULTISITE_UNINSTALL' ) && XMLSF_MULTISITE
 		xmlsf_uninstall();
 		restore_current_blog();
 		// Logging.
-		WP_DEBUG_LOG && error_log( $_id );
+		WP_DEBUG && WP_DEBUG_LOG && error_log( $_id );
 	}
 } else {
 	xmlsf_uninstall();
 
 	// Logging.
-	WP_DEBUG_LOG && error_log( 'XML Sitemap Feeds settings cleared on uninstall.' );
+	WP_DEBUG && WP_DEBUG_LOG && error_log( 'XML Sitemap Feeds settings cleared on uninstall.' );
 }
 
 

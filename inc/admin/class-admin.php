@@ -5,7 +5,7 @@
  * @package XML Sitemap & Google News
  */
 
-namespace XMLSF;
+namespace XMLSF\Admin;
 
 /**
  * XMLSF Admin CLASS
@@ -14,36 +14,104 @@ class Admin {
 	/**
 	 * CONSTRUCTOR
 	 */
-	public function __construct() {
+	private function __construct() {}
 
-		if ( namespace\sitemaps_enabled( 'sitemap' ) ) {
-			new Admin_Sitemap();
-		}
+	/**
+	 * INIT
+	 */
+	public static function init() {
 
-		if ( namespace\sitemaps_enabled( 'news' ) ) {
-			new Admin_Sitemap_News();
-		}
+		\add_action( 'admin_menu', array( __CLASS__, 'add_settings_pages' ) );
 
-		//\add_action( 'admin_init', array( $this, 'register_settings' ), 0 );
-		//\add_action( 'admin_init', array( $this, 'maybe_flush_rewrite_rules' ) );
-		//\add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
-		//\add_action( 'admin_init', array( $this, 'notices_actions' ), 9 );
+		\add_action( 'admin_init', array( __CLASS__, 'register_settings' ), 7 );
+		\add_action( 'rest_api_init', array( __CLASS__, 'register_settings' ) );
+		\add_action( 'admin_init', array( __CLASS__, 'tools_actions' ), 9 );
+		\add_action( 'admin_init', array( __CLASS__, 'notices_actions' ), 9 );
+		\add_action( 'admin_init', array( __CLASS__, 'maybe_flush_rewrite_rules' ), 11 );
 
-		$this->register_settings();
-		$this->maybe_flush_rewrite_rules();
-		$this->tools_actions();
-		$this->notices_actions();
-
-		\add_action( 'admin_notices', array( $this, 'check_conflicts' ), 0 );
-		\add_action( 'update_option_xmlsf_sitemaps', array( $this, 'update_sitemaps' ), 10, 2 );
+		\add_action( 'admin_notices', array( __CLASS__, 'check_conflicts' ), 0 );
+		\add_action( 'update_option_xmlsf_sitemaps', array( __CLASS__, 'update_sitemaps' ), 10, 2 );
 
 		// ACTION LINK.
-		\add_filter( 'plugin_action_links_' . XMLSF_BASENAME, array( $this, 'add_action_link' ) );
-		\add_filter( 'plugin_row_meta', array( $this, 'plugin_meta_links' ), 10, 2 );
+		\add_filter( 'plugin_action_links_' . XMLSF_BASENAME, array( __CLASS__, 'add_action_link' ) );
+		\add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_meta_links' ), 10, 2 );
 
 		// Shared Admin pages sidebar actions.
-		\add_action( 'xmlsf_admin_sidebar', array( $this, 'admin_sidebar_help' ) );
-		\add_action( 'xmlsf_admin_sidebar', array( $this, 'admin_sidebar_contribute' ), 20 );
+		\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_help' ) );
+		\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_contribute' ), 20 );
+
+		if ( \XMLSF\sitemaps_enabled( 'sitemap' ) ) {
+			\add_action( 'admin_init', array( __NAMESPACE__ . '\Sitemap', 'register_settings' ), 7 );
+			\add_action( 'rest_api_init', array( __NAMESPACE__ . '\Sitemap', 'register_settings' ) );
+			\add_action( 'admin_init', array( __NAMESPACE__ . '\Sitemap', 'tools_actions' ), 9 );
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Sitemap', 'check_conflicts' ), 0 );
+
+			// META.
+			\add_action( 'add_meta_boxes', array( __NAMESPACE__ . '\Sitemap', 'add_meta_box' ) );
+			\add_action( 'save_post', array( __NAMESPACE__ . '\Sitemap', 'save_metadata' ) );
+
+			// Placeholders for advanced options.
+			\add_action( 'xmlsf_posttype_archive_field_options', array( __NAMESPACE__ . '\Fields', 'advanced_archive_field_options' ) );
+
+			// QUICK EDIT.
+			\add_action( 'admin_init', array( __NAMESPACE__ . '\Sitemap', 'add_columns' ) );
+			\add_action( 'quick_edit_custom_box', array( __NAMESPACE__ . '\Fields', 'quick_edit_fields' ) );
+			\add_action( 'save_post', array( __NAMESPACE__ . '\Sitemap', 'quick_edit_save' ) );
+			\add_action( 'admin_head', array( __NAMESPACE__ . '\Sitemap', 'quick_edit_script' ), 99 );
+			// BULK EDIT.
+			\add_action( 'bulk_edit_custom_box', array( __NAMESPACE__ . '\Fields', 'bulk_edit_fields' ), 0 );
+		}
+
+		if ( \XMLSF\sitemaps_enabled( 'news' ) ) {
+			\add_action( 'admin_init', array( __NAMESPACE__ . '\Sitemap_News', 'register_settings' ), 7 );
+			\add_action( 'rest_api_init', array( __NAMESPACE__ . '\Sitemap_News', 'register_settings' ) );
+			\add_action( 'admin_init', array( __NAMESPACE__ . '\Sitemap_News', 'tools_actions' ), 9 );
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Sitemap_News', 'check_conflicts' ), 0 );
+
+			// META.
+			\add_action( 'add_meta_boxes', array( __NAMESPACE__ . '\Sitemap_News', 'add_meta_box' ) );
+			\add_action( 'save_post', array( __NAMESPACE__ . '\Sitemap_News', 'save_metadata' ) );
+		}
+	}
+
+	/**
+	 * Add options page
+	 */
+	public static function add_settings_pages() {
+
+		if ( \XMLSF\sitemaps_enabled( 'sitemap' ) ) {
+			// This page will be under "Settings".
+			$screen_id = \add_options_page(
+				__( 'XML Sitemap', 'xml-sitemap-feed' ),
+				__( 'XML Sitemap', 'xml-sitemap-feed' ),
+				'manage_options',
+				'xmlsf',
+				array( __NAMESPACE__ . '\Sitemap', 'settings_page' )
+			);
+
+			// Settings hooks.
+			\add_action( 'xmlsf_add_settings', array( __NAMESPACE__ . '\Sitemap', 'add_settings' ) );
+
+			// Help tabs.
+			\add_action( 'load-' . $screen_id, array( __NAMESPACE__ . '\Sitemap', 'help_tabs' ) );
+		}
+
+		if ( \XMLSF\sitemaps_enabled( 'news' ) ) {
+			// This page will be under "Settings".
+			$screen_id = \add_options_page(
+				__( 'Google News Sitemap', 'xml-sitemap-feed' ),
+				__( 'Google News', 'xml-sitemap-feed' ),
+				'manage_options',
+				'xmlsf_news',
+				array( __NAMESPACE__ . '\Sitemap_News', 'settings_page' )
+			);
+
+			// Settings hooks.
+			\add_action( 'xmlsf_news_add_settings', array( __NAMESPACE__ . '\Sitemap_News', 'add_settings' ) );
+
+			// Help tab.
+			\add_action( 'load-' . $screen_id, array( __NAMESPACE__ . '\Sitemap_News', 'help_tab' ) );
+		}
 	}
 
 	/**
@@ -51,7 +119,7 @@ class Admin {
 	 *
 	 * Uses $wp_rewrite->wp_rewrite_rules() which checks for empty rewrite_rules option.
 	 */
-	public function maybe_flush_rewrite_rules() {
+	public static function maybe_flush_rewrite_rules() {
 		global $wp_rewrite;
 		$wp_rewrite->wp_rewrite_rules(); // Recreates rewrite rules only when needed.
 	}
@@ -66,7 +134,9 @@ class Admin {
 	 * @param mixed $old   Old option value.
 	 * @param mixed $value Saved option value.
 	 */
-	public function update_sitemaps( $old, $value ) {
+	public static function update_sitemaps( $old, $value ) {
+		global $xmlsf;
+
 		$old   = (array) $old;
 		$value = (array) $value;
 
@@ -75,18 +145,18 @@ class Admin {
 
 			// Switched on sitemap.
 			if ( ! empty( $value['sitemap'] ) && empty( $old['sitemap'] ) ) {
-				$slug    = \is_object( xmlsf()->sitemap ) ? xmlsf()->sitemap->slug() : ( namespace\uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+				$slug    = \is_object( $xmlsf->sitemap ) ? $xmlsf->sitemap->slug() : ( $xmlsf->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
 				$files[] = $slug . '.xml';
 			}
 
 			// Switched on news sitemap.
 			if ( ! empty( $value['sitemap-news'] ) && empty( $old['sitemap-news'] ) ) {
-				$slug    = \is_object( xmlsf()->sitemap_news ) ? xmlsf()->sitemap_news->slug() : 'sitemap-news';
+				$slug    = \is_object( $xmlsf->sitemap_news ) ? $xmlsf->sitemap_news->slug() : 'sitemap-news';
 				$files[] = $slug . '.xml';
 			}
 
 			// Check static files.
-			empty( $files ) || \xmlsf_admin()->check_static_files( $files, 1 );
+			empty( $files ) || self::check_static_files( $files, 1 );
 
 			// Flush rewrite rules on next init.
 			\delete_option( 'rewrite_rules' );
@@ -96,7 +166,7 @@ class Admin {
 	/**
 	 * Register settings and add settings fields
 	 */
-	public function register_settings() {
+	public static function register_settings() {
 
 		// Sitemaps.
 		\register_setting(
@@ -106,14 +176,14 @@ class Admin {
 		\add_settings_field(
 			'xmlsf_sitemaps',
 			__( 'Enable XML sitemaps', 'xml-sitemap-feed' ),
-			array( $this, 'sitemaps_settings_field' ),
+			array( __CLASS__, 'sitemaps_settings_field' ),
 			'reading'
 		);
 
 		// Help tab.
 		\add_action(
 			'load-options-reading.php',
-			array( $this, 'xml_sitemaps_help' )
+			array( __CLASS__, 'xml_sitemaps_help' )
 		);
 
 		// Robots rules.
@@ -125,7 +195,7 @@ class Admin {
 		\add_settings_field(
 			'xmlsf_robots',
 			__( 'Additional robots.txt rules', 'xml-sitemap-feed' ),
-			array( $this, 'robots_settings_field' ),
+			array( __CLASS__, 'robots_settings_field' ),
 			'reading'
 		);
 	}
@@ -137,7 +207,7 @@ class Admin {
 	/**
 	 * Sitemaps help tabs
 	 */
-	public function xml_sitemaps_help() {
+	public static function xml_sitemaps_help() {
 		\ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-sitemaps.php';
 		include XMLSF_DIR . '/views/admin/help-tab-support.php';
@@ -170,9 +240,11 @@ class Admin {
 	/**
 	 * Sitemap settings fields
 	 */
-	public function sitemaps_settings_field() {
+	public static function sitemaps_settings_field() {
+		global $xmlsf;
+
 		if ( 1 === (int) \get_option( 'blog_public' ) ) {
-			$sitemaps = (array) \get_option( 'xmlsf_sitemaps', \xmlsf()->defaults( 'sitemaps' ) );
+			$sitemaps = (array) \get_option( 'xmlsf_sitemaps', $xmlsf->defaults( 'sitemaps' ) );
 			// The actual fields for data entry.
 			include XMLSF_DIR . '/views/admin/field-sitemaps.php';
 		} else {
@@ -183,11 +255,11 @@ class Admin {
 	/**
 	 * ROBOTS
 	 */
-	public function robots_settings_field() {
+	public static function robots_settings_field() {
 		global $wp_rewrite;
 
 		$rules  = (array) \get_option( 'rewrite_rules' );
-		$found  = $this->check_static_files( 'robots.txt', 0 );
+		$found  = self::check_static_files( 'robots.txt', 0 );
 		$static = ! empty( $found ) && \in_array( 'robots.txt', $found, true );
 
 		// The actual fields for data entry.
@@ -197,7 +269,7 @@ class Admin {
 	/**
 	 * Clear settings
 	 */
-	public function clear_settings() {
+	public static function clear_settings() {
 		// TODO reset Settings > Reading options here...
 
 		\add_settings_error(
@@ -216,7 +288,7 @@ class Admin {
 	 *
 	 * @return array Found static files.
 	 */
-	public function check_static_files( $files, $verbosity = 2 ) {
+	public static function check_static_files( $files, $verbosity = 2 ) {
 		$home_path = \trailingslashit( \get_home_path() );
 		$found     = array();
 
@@ -250,7 +322,7 @@ class Admin {
 	/**
 	 * Check for conflicting themes and plugins
 	 */
-	public function check_conflicts() {
+	public static function check_conflicts() {
 		if ( \wp_doing_ajax() || ! \current_user_can( 'manage_options' ) ) {
 			return;
 		}
@@ -298,28 +370,28 @@ class Admin {
 	/**
 	 * Admin sidbar help section
 	 */
-	public function admin_sidebar_help() {
+	public static function admin_sidebar_help() {
 		include XMLSF_DIR . '/views/admin/sidebar-help.php';
 	}
 
 	/**
 	 * Admin sidbar contribute section
 	 */
-	public function admin_sidebar_contribute() {
+	public static function admin_sidebar_contribute() {
 		include XMLSF_DIR . '/views/admin/sidebar-contribute.php';
 	}
 
 	/**
 	 * Tools actions
 	 */
-	public function tools_actions() {
+	public static function tools_actions() {
 		if ( ! isset( $_POST['_xmlsf_help_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
 			return;
 		}
 
 		// TODO clear global settings.
 		if ( isset( $_POST['xmlsf-clear-settings-general'] ) ) {
-			$this->clear_settings();
+			self::clear_settings();
 		}
 
 		if ( isset( $_POST['xmlsf-flush-rewrite-rules'] ) ) {
@@ -337,7 +409,7 @@ class Admin {
 	/**
 	 * Admin notices actions
 	 */
-	public function notices_actions() {
+	public static function notices_actions() {
 		if ( ! isset( $_POST['_xmlsf_notice_nonce'] ) || ! \wp_verify_nonce( sanitize_key( $_POST['_xmlsf_notice_nonce'] ), XMLSF_BASENAME . '-notice' ) ) {
 			return;
 		}
@@ -359,7 +431,7 @@ class Admin {
 	 *
 	 * @param array $links Array of links.
 	 */
-	public function add_action_link( $links ) {
+	public static function add_action_link( $links ) {
 		$settings_link = '<a href="' . \admin_url( 'options-reading.php' ) . '#xmlsf_sitemaps">' . \translate( 'Settings' ) . '</a>';
 		\array_unshift( $links, $settings_link );
 		return $links;
@@ -371,7 +443,7 @@ class Admin {
 	 * @param array  $links Array of links.
 	 * @param string $file Plugin file name.
 	 */
-	public function plugin_meta_links( $links, $file ) {
+	public static function plugin_meta_links( $links, $file ) {
 		if ( XMLSF_BASENAME === $file ) {
 			$links[] = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/">' . __( 'Support', 'xml-sitemap-feed' ) . '</a>';
 			$links[] = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/?filter=5#new-post">' . __( 'Rate ★★★★★', 'xml-sitemap-feed' ) . '</a>';

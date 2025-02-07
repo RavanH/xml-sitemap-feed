@@ -5,49 +5,16 @@
  * @package XML Sitemap & Google News
  */
 
-namespace XMLSF;
+namespace XMLSF\Admin;
 
 /**
  * Admin Sitemap Class
  */
-class Admin_Sitemap {
+class Sitemap {
 	/**
-	 * Holds the values to be used in the fields callbacks
-	 *
-	 * @var array $screen_id Admin screen id array.
+	 * Constructor
 	 */
-	private $screen_id;
-
-	/**
-	 * Start up
-	 */
-	public function __construct() {
-		// SETTINGS.
-		\add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
-		\add_action( 'admin_init', array( $this, 'register_settings' ) );
-		\add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
-		\add_action( 'save_post', array( $this, 'save_metadata' ) );
-
-		// ACTIONS & CHECKS.
-		\add_action( 'admin_init', array( $this, 'tools_actions' ), 9 );
-		\add_action( 'admin_notices', array( $this, 'check_conflicts' ), 0 );
-		\add_action( 'update_option_xmlsf_server', array( $this, 'update_server' ), 10, 2 );
-		\add_action( 'update_option_xmlsf_disabled_providers', array( $this, 'update_disabled_providers' ), 10, 2 );
-		\add_action( 'update_option_xmlsf_post_types', array( $this, 'update_post_types' ), 10, 2 );
-
-		// Placeholders for advanced options.
-		\add_action( 'xmlsf_posttype_archive_field_options', array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'advanced_archive_field_options' ) );
-
-		// QUICK EDIT.
-		\add_action( 'admin_init', array( $this, 'add_columns' ) );
-		\add_action( 'quick_edit_custom_box', array( $this, 'quick_edit_fields' ) );
-		\add_action( 'save_post', array( $this, 'quick_edit_save' ) );
-		\add_action( 'admin_footer', array( $this, 'quick_edit_script' ) );
-		// BULK EDIT.
-		\add_action( 'bulk_edit_custom_box', array( $this, 'bulk_edit_fields' ) );
-
-		\add_action( 'admin_notices', array( $this, 'check_advanced' ), 0 );
-	}
+	private function __construct() {}
 
 	/**
 	 * Update actions for General Settings
@@ -55,14 +22,15 @@ class Admin_Sitemap {
 	 * @param mixed $old   Old option value.
 	 * @param mixed $value Saved option value.
 	 */
-	public function update_server( $old, $value ) {
+	public static function update_server( $old, $value ) {
+		global $xmlsf;
 
 		if ( $old !== $value ) {
 			// Check static file.
-			$slug     = \is_object( xmlsf()->sitemap ) ? xmlsf()->sitemap->slug() : ( namespace\uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+			$slug     = \is_object( $xmlsf->sitemap ) ? $xmlsf->sitemap->slug() : ( $xmlsf->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
 			$filename = $slug . '.xml';
 
-			\xmlsf_admin()->check_static_files( $filename, 1 );
+			\XMLSF\Admin\Admin::check_static_files( $filename, 1 );
 
 			// Flush rewrite rules on next init.
 			\delete_option( 'rewrite_rules' );
@@ -75,7 +43,7 @@ class Admin_Sitemap {
 	 * @param mixed $old   Old option value.
 	 * @param mixed $value Saved option value.
 	 */
-	public function update_disabled_providers( $old, $value ) {
+	public static function update_disabled_providers( $old, $value ) {
 
 		if ( $old === $value ) {
 			return;
@@ -83,12 +51,11 @@ class Admin_Sitemap {
 
 		// When taxonomies have been disabled...
 		if ( \in_array( 'taxonomies', (array) $value, true ) && ! \in_array( 'taxonomies', (array) $old, true ) ) {
-			namespace\clear_metacache( 'terms' );
+			\XMLSF\clear_metacache( 'terms' );
 		}
 
 		// TODO Clear user meta cache if deactivating...
 	}
-
 
 	/**
 	 * Update actions for Post Types setting
@@ -96,12 +63,16 @@ class Admin_Sitemap {
 	 * @param mixed $old   Old option value.
 	 * @param mixed $value Saved option value.
 	 */
-	public function update_post_types( $old, $value ) {
+	public static function update_post_types( $old, $value ) {
+		if ( $old === $value || ! is_array( $value ) ) {
+			return;
+		}
+
 		$old            = (array) $old;
 		$clear_images   = false;
 		$clear_comments = false;
 
-		foreach ( (array) $value as $post_type => $settings ) {
+		foreach ( $value as $post_type => $settings ) {
 			// Poll for changes that warrant clearing meta data.
 			if ( isset( $old[ $post_type ] ) && \is_array( $old[ $post_type ] ) ) {
 
@@ -123,20 +94,21 @@ class Admin_Sitemap {
 
 		// Clear images meta caches...
 		if ( $clear_images ) {
-			namespace\clear_metacache( 'images' );
+			\XMLSF\clear_metacache( 'images' );
 		}
 
 		// Clear comments meta caches...
 		if ( $clear_comments ) {
-			namespace\clear_metacache( 'comments' );
+			\XMLSF\clear_metacache( 'comments' );
 		}
 	}
 
 	/**
 	 * Clear settings
 	 */
-	public function clear_settings() {
-		$defaults = \xmlsf()->defaults();
+	public static function clear_settings() {
+		global $xmlsf;
+		$defaults = $xmlsf->defaults();
 
 		unset( $defaults['sitemaps'] );
 
@@ -148,7 +120,9 @@ class Admin_Sitemap {
 	/**
 	 * Tools actions
 	 */
-	public function tools_actions() {
+	public static function tools_actions() {
+		global $xmlsf;
+
 		if ( ! isset( $_POST['_xmlsf_help_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
 			return;
 		}
@@ -158,13 +132,13 @@ class Admin_Sitemap {
 			\delete_user_meta( \get_current_user_id(), 'xmlsf_dismissed' );
 
 			// When core sitemap server is used.
-			if ( \is_object( xmlsf()->sitemap ) ) {
-				\xmlsf_admin()->check_static_files( xmlsf()->sitemap->slug() . '.xml' );
+			if ( \is_object( $xmlsf->sitemap ) ) {
+				\XMLSF\Admin\Admin::check_static_files( $xmlsf->sitemap->slug() . '.xml' );
 			}
 		}
 
 		if ( isset( $_POST['xmlsf-clear-settings-sitemap'] ) ) {
-			$this->clear_settings();
+			self::clear_settings();
 			\add_settings_error(
 				'notice_clear_settings',
 				'notice_clear_settings',
@@ -175,7 +149,7 @@ class Admin_Sitemap {
 
 		if ( isset( $_POST['xmlsf-clear-term-meta'] ) ) {
 			// Remove terms metadata.
-			namespace\clear_metacache( 'terms' );
+			\XMLSF\clear_metacache( 'terms' );
 
 			\add_settings_error(
 				'clear_meta_notice',
@@ -187,7 +161,7 @@ class Admin_Sitemap {
 
 		if ( isset( $_POST['xmlsf-clear-user-meta'] ) ) {
 			// Remove terms metadata.
-			namespace\clear_metacache( 'users' );
+			\XMLSF\clear_metacache( 'users' );
 
 			\add_settings_error(
 				'clear_meta_notice',
@@ -199,8 +173,8 @@ class Admin_Sitemap {
 
 		if ( isset( $_POST['xmlsf-clear-post-meta'] ) ) {
 			// Remove metadata.
-			namespace\clear_metacache( 'images' );
-			namespace\clear_metacache( 'comments' );
+			\XMLSF\clear_metacache( 'images' );
+			\XMLSF\clear_metacache( 'comments' );
 
 			\add_settings_error(
 				'clear_meta_notice',
@@ -212,11 +186,37 @@ class Admin_Sitemap {
 	}
 
 	/**
+	 * Compare versions to known compatibility.
+	 */
+	public static function compatible_with_advanced() {
+		// Check version.
+		\defined( 'XMLSF_ADV_VERSION' ) || \define( 'XMLSF_ADV_VERSION', XMLSF_ADV_MIN_VERSION );
+
+		return \version_compare( XMLSF_ADV_MIN_VERSION, XMLSF_ADV_VERSION, '<=' );
+	}
+
+	/**
 	 * Check for conflicting plugins and their settings
 	 */
-	public function check_conflicts() {
+	public static function check_conflicts() {
+		global $xmlsf;
+
 		if ( \wp_doing_ajax() || ! \current_user_can( 'manage_options' ) ) {
 			return;
+		}
+
+		// XML Sitemap Advanced incompatibility notice.
+		if (
+			is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) &&
+			! \in_array( 'xmlsf_advanced', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) &&
+			! self::compatible_with_advanced()
+		) {
+			\add_action(
+				'admin_notices',
+				function () {
+					include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced.php';
+				}
+			);
 		}
 
 		// TODO:
@@ -226,7 +226,7 @@ class Admin_Sitemap {
 		if ( \is_plugin_active( 'wordpress-seo/wp-seo.php' ) ) {
 			// check date archive redirection.
 			$wpseo_titles = \get_option( 'wpseo_titles' );
-			if ( ! empty( $wpseo_titles['disable-date'] ) && ! namespace\uses_core_server() ) {
+			if ( ! empty( $wpseo_titles['disable-date'] ) && ! $xmlsf->uses_core_server() ) {
 				// check if Split by option is set anywhere.
 				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
@@ -262,7 +262,7 @@ class Admin_Sitemap {
 			$seopress_toggle = \get_option( 'seopress_toggle' );
 
 			$seopress_titles = \get_option( 'seopress_titles_option_name' );
-			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) && ! namespace\uses_core_server() ) {
+			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) && ! $xmlsf->uses_core_server() ) {
 				// check if Split by option is set anywhere.
 				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
@@ -296,7 +296,7 @@ class Admin_Sitemap {
 
 			// check date archive redirection.
 			$rankmath_titles = \get_option( 'rank-math-options-titles' );
-			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] && ! namespace\uses_core_server() ) {
+			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] && ! $xmlsf->uses_core_server() ) {
 				// check if Split by option is set anywhere.
 				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
@@ -423,7 +423,7 @@ class Admin_Sitemap {
 	/**
 	 * Adds a XML Sitemap box to the side column
 	 */
-	public function add_meta_box() {
+	public static function add_meta_box() {
 		$post_types = \get_option( 'xmlsf_post_types' );
 		if ( ! \is_array( $post_types ) ) {
 			return;
@@ -435,7 +435,7 @@ class Admin_Sitemap {
 				\add_meta_box(
 					'xmlsf_section',
 					__( 'XML Sitemap', 'xml-sitemap-feed' ),
-					array( $this, 'meta_box' ),
+					array( __CLASS__, 'meta_box' ),
 					$post_type,
 					'side',
 					'low'
@@ -449,7 +449,7 @@ class Admin_Sitemap {
 	 *
 	 * @param WP_Post $post Post object.
 	 */
-	public function meta_box( $post ) {
+	public static function meta_box( $post ) {
 		// Use nonce for verification.
 		\wp_nonce_field( XMLSF_BASENAME, '_xmlsf_nonce' );
 
@@ -458,7 +458,7 @@ class Admin_Sitemap {
 		$priority = \get_post_meta( $post->ID, '_xmlsf_priority', true );
 
 		// value prechecks to prevent "invalid form control not focusable" when meta box is hidden.
-		$priority = \is_numeric( $priority ) ? namespace\sanitize_number( $priority ) : '';
+		$priority = \is_numeric( $priority ) ? \XMLSF\sanitize_number( $priority ) : '';
 
 		$description = sprintf(
 			/* translators: Settings admin menu name, XML Sitemap admin page name */
@@ -476,7 +476,7 @@ class Admin_Sitemap {
 	 *
 	 * @param int $post_id Post ID.
 	 */
-	public function save_metadata( $post_id ) {
+	public static function save_metadata( $post_id ) {
 		if (
 			// verify nonce.
 			! isset( $_POST['_xmlsf_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_xmlsf_nonce'] ), XMLSF_BASENAME ) ||
@@ -490,7 +490,7 @@ class Admin_Sitemap {
 		if ( empty( $_POST['xmlsf_priority'] ) || ! \is_numeric( $_POST['xmlsf_priority'] ) ) {
 			\delete_post_meta( $post_id, '_xmlsf_priority' );
 		} else {
-			\update_post_meta( $post_id, '_xmlsf_priority', namespace\sanitize_number( \sanitize_text_field( \wp_unslash( $_POST['xmlsf_priority'] ) ) ) );
+			\update_post_meta( $post_id, '_xmlsf_priority', \XMLSF\sanitize_number( \sanitize_text_field( \wp_unslash( $_POST['xmlsf_priority'] ) ) ) );
 		}
 
 		// _xmlsf_exclude
@@ -502,179 +502,17 @@ class Admin_Sitemap {
 	}
 
 	/**
-	 * Add options page
-	 */
-	public function add_settings_page() {
-		// This page will be under "Settings".
-		$screen_id = \add_options_page(
-			__( 'XML Sitemap', 'xml-sitemap-feed' ),
-			__( 'XML Sitemap', 'xml-sitemap-feed' ),
-			'manage_options',
-			'xmlsf',
-			array( $this, 'settings_page' )
-		);
-
-		// Help tabs.
-		\add_action( 'load-' . $screen_id, array( $this, 'help_tabs' ) );
-	}
-
-	/**
 	 * Options page callback
 	 */
-	public function settings_page() {
-		/**
-		 * ADD SECTIONS & FIELDS
-		 */
-
-		/** GENERAL */
-		// Sections.
-		\add_settings_section(
-			'general', // Section ID.
-			'', // Title.
-			'', // Intro callback.
-			'xmlsf_general' // Page slug.
-		);
-		// Fields.
-		\add_settings_field(
-			'server',
-			\translate( 'Server' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'server_field' ),
-			'xmlsf_general',
-			'general'
-		);
-		\add_settings_field(
-			'disabled_providers',
-			\esc_html__( 'Disable sitemaps', 'xml-sitemap-feed' ),
-			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'disable_fields' ),
-			'xmlsf_general',
-			'general'
-		);
-
-		/** POST TYPES */
-		\add_settings_section(
-			'xml_sitemap_post_types_section',
-			'',
-			'',
-			'xmlsf_post_types'
-		);
-
-		namespace\uses_core_server() && \add_settings_field(
-			'xmlsf_sitemap_post_types_limit',
-			\translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'post_types_general_fields' ),
-			'xmlsf_post_types',
-			'xml_sitemap_post_types_section'
-		);
-
-		$post_types = (array) \apply_filters( 'xmlsf_post_types', \get_post_types( array( 'public' => true ) ) );
-		// Make sure post types are allowed and publicly viewable.
-		$post_types = \array_diff( $post_types, \xmlsf()->disabled_post_types() );
-		$post_types = \array_filter( $post_types, 'is_post_type_viewable' );
-
-		if ( \is_array( $post_types ) && ! empty( $post_types ) ) :
-			foreach ( $post_types as $post_type ) {
-				$obj = \get_post_type_object( $post_type );
-				if ( ! \is_object( $obj ) ) {
-					continue;
-				}
-				\add_settings_field(
-					'xmlsf_post_type_' . $obj->name,
-					$obj->label,
-					array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'post_type_fields' ),
-					'xmlsf_post_types',
-					'xml_sitemap_post_types_section',
-					$post_type
-				);
-				// Note: (ab)using section name parameter to pass post type name.
-			}
-		endif;
-
-		/** TAXONOMIES */
-		\add_settings_section(
-			'xml_sitemap_taxonomies_section',
-			'',
-			'',
-			'xmlsf_taxonomies'
-		);
-		\add_settings_field(
-			'xmlsf_taxonomy_settings',
-			translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'taxonomy_settings_field' ),
-			'xmlsf_taxonomies',
-			'xml_sitemap_taxonomies_section'
-		);
-		\add_settings_field(
-			'xmlsf_taxonomies',
-			__( 'Taxonomies', 'xml-sitemap-feed' ),
-			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'taxonomies_field' ),
-			'xmlsf_taxonomies',
-			'xml_sitemap_taxonomies_section'
-		);
-
-		/** AUTHORS */
-		\add_settings_section(
-			'xml_sitemap_authors_section',
-			'',
-			'',
-			'xmlsf_authors'
-		);
-		\add_settings_field(
-			'xmlsf_author_settings',
-			translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'author_settings_field' ),
-			'xmlsf_authors',
-			'xml_sitemap_authors_section'
-		);
-		\add_settings_field(
-			'xmlsf_authors',
-			__( 'Authors', 'xml-sitemap-feed' ),
-			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'authors_field' ),
-			'xmlsf_authors',
-			'xml_sitemap_authors_section'
-		);
-
-		/** ADVANCED */
-		\add_settings_section(
-			'xml_sitemap_advanced_section',
-			'',
-			'',
-			'xmlsf_advanced'
-		);
-		// custom name.
-		\add_settings_field(
-			'xmlsf_sitemap_name',
-			'<label for="xmlsf_sitemap_name">' . __( 'XML Sitemap URL', 'xml-sitemap-feed' ) . '</label>',
-			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'xmlsf_sitemap_name_field' ),
-			'xmlsf_advanced',
-			'xml_sitemap_advanced_section'
-		);
-		// custom urls.
-		\add_settings_field(
-			'xmlsf_urls',
-			__( 'External web pages', 'xml-sitemap-feed' ),
-			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'urls_settings_field' ),
-			'xmlsf_advanced',
-			'xml_sitemap_advanced_section'
-		);
-		// custom sitemaps.
-		\add_settings_field(
-			'xmlsf_custom_sitemaps',
-			__( 'External XML Sitemaps', 'xml-sitemap-feed' ),
-			array( __NAMESPACE__ . '\Admin_Sitemap_Fields', 'custom_sitemaps_settings_field' ),
-			'xmlsf_advanced',
-			'xml_sitemap_advanced_section'
-		);
-
-		/**
-		 * PREPARE VIEW
-		 */
+	public static function settings_page() {
+		global $xmlsf;
 
 		$active_tab = isset( $_GET['tab'] ) ? \sanitize_key( \wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		\do_action( 'xmlsf_add_settings', $active_tab );
 
 		// prepare sitemap link url.
-		$sitemap_url = namespace\sitemap_url();
+		$sitemap_url = \XMLSF\sitemap_url();
 
 		// Sidebar actions.
 		\add_action(
@@ -685,67 +523,232 @@ class Admin_Sitemap {
 			9
 		);
 
-		$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
+		$disabled = \get_option( 'xmlsf_disabled_providers', $xmlsf->defaults( 'disabled_providers' ) );
 
 		// The actual settings page.
 		include XMLSF_DIR . '/views/admin/page-sitemap.php';
 	}
 
 	/**
+	 * Add settings sections and fields.
+	 *
+	 * @param string $active_tab The active tab slug.
+	 */
+	public static function add_settings( $active_tab = '' ) {
+		global $xmlsf;
+
+		switch ( $active_tab ) {
+			case 'post_types':
+				/** POST TYPES */
+				\add_settings_section(
+					'xml_sitemap_post_types_section',
+					'',
+					'',
+					'xmlsf_post_types'
+				);
+
+				$xmlsf->uses_core_server() && \add_settings_field(
+					'xmlsf_sitemap_post_types_limit',
+					\translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
+					array( __NAMESPACE__ . '\Fields', 'post_types_general_fields' ),
+					'xmlsf_post_types',
+					'xml_sitemap_post_types_section'
+				);
+
+				$post_types = (array) \apply_filters( 'xmlsf_post_types', \get_post_types( array( 'public' => true ) ) );
+				// Make sure post types are allowed and publicly viewable.
+				$post_types = \array_diff( $post_types, $xmlsf->disabled_post_types() );
+				$post_types = \array_filter( $post_types, 'is_post_type_viewable' );
+
+				if ( \is_array( $post_types ) && ! empty( $post_types ) ) {
+					foreach ( $post_types as $post_type ) {
+						$obj = \get_post_type_object( $post_type );
+						if ( ! \is_object( $obj ) ) {
+							continue;
+						}
+						\add_settings_field(
+							'xmlsf_post_type_' . $obj->name,
+							$obj->label,
+							array( __NAMESPACE__ . '\Fields', 'post_type_fields' ),
+							'xmlsf_post_types',
+							'xml_sitemap_post_types_section',
+							$post_type
+						);
+						// Note: (ab)using section name parameter to pass post type name.
+					}
+				}
+				break;
+
+			case 'taxonomies':
+				/** TAXONOMIES */
+				\add_settings_section(
+					'xml_sitemap_taxonomies_section',
+					'',
+					'',
+					'xmlsf_taxonomies'
+				);
+				\add_settings_field(
+					'xmlsf_taxonomy_settings',
+					translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
+					array( __NAMESPACE__ . '\Fields', 'taxonomy_settings_field' ),
+					'xmlsf_taxonomies',
+					'xml_sitemap_taxonomies_section'
+				);
+				\add_settings_field(
+					'xmlsf_taxonomies',
+					__( 'Taxonomies', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Fields', 'taxonomies_field' ),
+					'xmlsf_taxonomies',
+					'xml_sitemap_taxonomies_section'
+				);
+				break;
+
+			case 'authors':
+				/** AUTHORS */
+				\add_settings_section(
+					'xml_sitemap_authors_section',
+					'',
+					'',
+					'xmlsf_authors'
+				);
+				\add_settings_field(
+					'xmlsf_author_settings',
+					translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
+					array( __NAMESPACE__ . '\Fields', 'author_settings_field' ),
+					'xmlsf_authors',
+					'xml_sitemap_authors_section'
+				);
+				\add_settings_field(
+					'xmlsf_authors',
+					__( 'Authors', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Fields', 'authors_field' ),
+					'xmlsf_authors',
+					'xml_sitemap_authors_section'
+				);
+				break;
+
+			case 'advanced':
+				/** ADVANCED */
+				\add_settings_section(
+					'xml_sitemap_advanced_section',
+					'',
+					'',
+					'xmlsf_advanced'
+				);
+				// custom name.
+				\add_settings_field(
+					'xmlsf_sitemap_name',
+					'<label for="xmlsf_sitemap_name">' . __( 'XML Sitemap URL', 'xml-sitemap-feed' ) . '</label>',
+					array( __NAMESPACE__ . '\Fields', 'xmlsf_sitemap_name_field' ),
+					'xmlsf_advanced',
+					'xml_sitemap_advanced_section'
+				);
+				// custom urls.
+				\add_settings_field(
+					'xmlsf_urls',
+					__( 'External web pages', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Fields', 'urls_settings_field' ),
+					'xmlsf_advanced',
+					'xml_sitemap_advanced_section'
+				);
+				// custom sitemaps.
+				\add_settings_field(
+					'xmlsf_custom_sitemaps',
+					__( 'External XML Sitemaps', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Fields', 'custom_sitemaps_settings_field' ),
+					'xmlsf_advanced',
+					'xml_sitemap_advanced_section'
+				);
+				break;
+
+			case 'general':
+			default:
+				/** GENERAL */
+				// Sections.
+				\add_settings_section(
+					'general', // Section ID.
+					'', // Title.
+					'', // Intro callback.
+					'xmlsf_general' // Page slug.
+				);
+				// Fields.
+				\add_settings_field(
+					'server',
+					\translate( 'Server' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
+					array( __NAMESPACE__ . '\Fields', 'server_field' ),
+					'xmlsf_general',
+					'general'
+				);
+				\add_settings_field(
+					'disabled_providers',
+					\esc_html__( 'Disable sitemaps', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Fields', 'disable_fields' ),
+					'xmlsf_general',
+					'general'
+				);
+		}
+	}
+
+	/**
 	 * Register and add settings
 	 */
-	public function register_settings() {
+	public static function register_settings() {
 		// general.
 		\register_setting(
 			'xmlsf_general',
 			'xmlsf_server',
-			array( __NAMESPACE__ . '\Admin_Sitemap_Sanitize', 'server' )
+			array( __NAMESPACE__ . '\Sanitize', 'server' )
 		);
 		\register_setting(
 			'xmlsf_general',
 			'xmlsf_disabled_providers',
-			array( __NAMESPACE__ . '\Admin_Sitemap_Sanitize', 'disabled_providers' )
+			array( __NAMESPACE__ . '\Sanitize', 'disabled_providers' )
 		);
 		// post_types.
 		\register_setting(
 			'xmlsf_post_types',
 			'xmlsf_post_types',
-			array( __NAMESPACE__ . '\Admin_Sitemap_Sanitize', 'post_types' )
+			array( __NAMESPACE__ . '\Sanitize', 'post_types' )
 		);
 		// taxonomies.
 		\register_setting(
 			'xmlsf_taxonomies',
 			'xmlsf_taxonomy_settings',
-			array( __NAMESPACE__ . '\Admin_Sitemap_Sanitize', 'taxonomy_settings' )
+			array( __NAMESPACE__ . '\Sanitize', 'taxonomy_settings' )
 		);
 		\register_setting(
 			'xmlsf_taxonomies',
 			'xmlsf_taxonomies',
-			array( __NAMESPACE__ . '\Admin_Sitemap_Sanitize', 'taxonomies' )
+			array( __NAMESPACE__ . '\Sanitize', 'taxonomies' )
 		);
 		// authors.
 		\register_setting(
 			'xmlsf_authors',
 			'xmlsf_author_settings',
-			array( __NAMESPACE__ . '\Admin_Sitemap_Sanitize', 'author_settings' )
+			array( __NAMESPACE__ . '\Sanitize', 'author_settings' )
 		);
 		\register_setting(
 			'xmlsf_authors',
 			'xmlsf_authors',
-			array( __NAMESPACE__ . '\Admin_Sitemap_Sanitize', 'authors' )
+			array( __NAMESPACE__ . '\Sanitize', 'authors' )
 		);
 		// custom urls.
 		\register_setting(
 			'xmlsf_advanced',
 			'xmlsf_urls',
-			array( __NAMESPACE__ . '\Admin_Sitemap_Sanitize', 'custom_urls_settings' )
+			array( __NAMESPACE__ . '\Sanitize', 'custom_urls_settings' )
 		);
 		// custom sitemaps.
 		\register_setting(
 			'xmlsf_advanced',
 			'xmlsf_custom_sitemaps',
-			array( __NAMESPACE__ . '\Admin_Sitemap_Sanitize', 'custom_sitemaps_settings' )
+			array( __NAMESPACE__ . '\Sanitize', 'custom_sitemaps_settings' )
 		);
+
+		// Settings ACTIONS & CHECKS.
+		\add_action( 'update_option_xmlsf_server', array( __CLASS__, 'update_server' ), 10, 2 );
+		\add_action( 'update_option_xmlsf_disabled_providers', array( __CLASS__, 'update_disabled_providers' ), 10, 2 );
+		\add_action( 'update_option_xmlsf_post_types', array( __CLASS__, 'update_post_types' ), 10, 2 );
 	}
 
 	/**
@@ -755,7 +758,9 @@ class Admin_Sitemap {
 	/**
 	 * Help tabs
 	 */
-	public function help_tabs() {
+	public static function help_tabs() {
+		global $xmlsf;
+
 		$screen     = \get_current_screen();
 		$active_tab = isset( $_GET['tab'] ) ? \sanitize_key( $_GET['tab'] ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
@@ -809,7 +814,7 @@ class Admin_Sitemap {
 				break;
 
 			case 'post_types':
-				if ( namespace\uses_core_server() ) {
+				if ( $xmlsf->uses_core_server() ) {
 					\ob_start();
 					include XMLSF_DIR . '/views/admin/help-tab-post-types-general.php';
 					$content = \ob_get_clean();
@@ -910,10 +915,12 @@ class Admin_Sitemap {
 	 *
 	 * @since 5.7
 	 */
-	public function add_columns() {
-		foreach ( namespace\get_post_types() as $post_type => $settings ) {
-			\add_filter( "manage_{$post_type}_posts_columns", array( $this, 'quick_edit_columns' ) );
-			\add_action( "manage_{$post_type}_posts_custom_column", array( $this, 'populate_columns' ) );
+	public static function add_columns() {
+		include_once \XMLSF_DIR . '/inc/functions-sitemap.php';
+
+		foreach ( \XMLSF\get_post_types() as $post_type => $settings ) {
+			\add_filter( "manage_{$post_type}_posts_columns", array( __CLASS__, 'quick_edit_columns' ) );
+			\add_action( "manage_{$post_type}_posts_custom_column", array( __CLASS__, 'populate_columns' ) );
 		}
 	}
 
@@ -924,7 +931,7 @@ class Admin_Sitemap {
 	 *
 	 * @param string $column_array Column array.
 	 */
-	public function quick_edit_columns( $column_array ) {
+	public static function quick_edit_columns( $column_array ) {
 		$title = __( 'XML Sitemap', 'xml-sitemap-feed' );
 
 		$column_array['xmlsf_exclude'] = '<span class="dashicons-before dashicons-networking" title="' . \esc_attr( $title ) . '"><span class="screen-reader-text">' . \esc_html( $title ) . '</span></span>';
@@ -939,7 +946,7 @@ class Admin_Sitemap {
 	 *
 	 *  @param string $column_name Column name.
 	 */
-	public function populate_columns( $column_name ) {
+	public static function populate_columns( $column_name ) {
 		global $post;
 		if ( 'xmlsf_exclude' === $column_name ) {
 			$exclude_meta = \get_post_meta( $post->ID, '_xmlsf_exclude', true );
@@ -959,27 +966,13 @@ class Admin_Sitemap {
 	}
 
 	/**
-	 * Quick edit fields allows to add HTML in Quick Edit.
-	 *
-	 * @since 5.7
-	 *
-	 * @param string $column_name Column name.
-	 */
-	public function quick_edit_fields( $column_name ) {
-		if ( 'xmlsf_exclude' === $column_name ) {
-			// The actual fields for data entry.
-			include XMLSF_DIR . '/views/admin/field-quick-edit.php';
-		}
-	}
-
-	/**
 	 * Quick edit save.
 	 *
 	 * @since 5.7
 	 *
 	 * @param int $post_id Post ID.
 	 */
-	public function quick_edit_save( $post_id ) {
+	public static function quick_edit_save( $post_id ) {
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
@@ -999,15 +992,17 @@ class Admin_Sitemap {
 
 	/**
 	 * Quick edit populate script.
-	 * Hooked on admin_footer.
+	 * Hooked on admin_head.
 	 *
 	 * @since 5.7
 	 */
-	public function quick_edit_script() {
-		if ( 'edit' !== \get_current_screen()->parent_base ) {
+	public static function quick_edit_script() {
+		$screen = get_current_screen();
+		if ( ! $screen || 'edit' !== $screen->base ) {
 			return;
 		}
 		?>
+
 <style>th#xmlsf_exclude{width:20px}</style>
 <script>
 jQuery(document).ready(function ($) {
@@ -1028,53 +1023,5 @@ inlineEditPost.edit = function (post_id) {
 }; });
 </script>
 		<?php
-	}
-
-	/**
-	 * Bulk edit fields allows to add HTML in Quick Edit.
-	 *
-	 * @since 5.7
-	 *
-	 * @param string $column_name Column name.
-	 */
-	public function bulk_edit_fields( $column_name ) {
-		if ( 'xmlsf_exclude' === $column_name ) {
-			$disabled = ! apply_filters( 'xmlsf_advanced_enabled', false );
-			// The actual fields for data entry.
-			include XMLSF_DIR . '/views/admin/field-bulk-edit.php';
-		}
-	}
-
-	/**
-	 * Google News Advanced incompatibility notice
-	 */
-	public function check_advanced() {
-		// Skip if no advanced plugin or dismissed.
-		if (
-			\wp_doing_ajax() ||
-			! \is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) ||
-			\in_array( 'xmlsf_advanced', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true )
-		) {
-			return;
-		}
-
-		if ( ! $this->compatible_with_advanced() ) {
-			\add_action(
-				'admin_notices',
-				function () {
-					include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced.php';
-				}
-			);
-		}
-	}
-
-	/**
-	 * Compare versions to known compatibility.
-	 */
-	public function compatible_with_advanced() {
-		// Check version.
-		\defined( 'XMLSF_ADV_VERSION' ) || \define( 'XMLSF_ADV_VERSION', XMLSF_ADV_MIN_VERSION );
-
-		return \version_compare( XMLSF_ADV_MIN_VERSION, XMLSF_ADV_VERSION, '<=' );
 	}
 }

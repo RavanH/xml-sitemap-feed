@@ -5,19 +5,21 @@
  * @package XML Sitemap & Google News
  */
 
-namespace XMLSF;
+namespace XMLSF\Admin;
 
 /**
  * Admin Sitemap Class
  */
-class Admin_Sitemap_Fields {
+class Fields {
 
 	/**
 	 * Server field
 	 */
 	public static function server_field() {
+		global $xmlsf;
+
 		$server       = \get_option( 'xmlsf_server' );
-		$server       = ! \in_array( $server, array( 'core', 'plugin' ), true ) ? \xmlsf()->defaults( 'server' ) : $server;
+		$server       = ! \in_array( $server, array( 'core', 'plugin' ), true ) ? $xmlsf->defaults( 'server' ) : $server;
 		$nosimplexml  = ! \class_exists( 'SimpleXMLElement' );
 		$nocoreserver = ! \function_exists( 'get_sitemap_url' );
 
@@ -29,6 +31,8 @@ class Admin_Sitemap_Fields {
 	 * Deactivate fields
 	 */
 	public static function disable_fields() {
+		global $xmlsf;
+
 		$post_types = \get_post_types( array( 'public' => true ) );
 		// We're not supporting sitemaps for author pages for attachments and pages.
 		unset( $post_types['attachment'] );
@@ -46,7 +50,7 @@ class Admin_Sitemap_Fields {
 		 */
 		$post_types = \apply_filters( 'xmlsf_author_has_published_posts', $post_types );
 
-		$disabled   = (array) \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
+		$disabled   = (array) \get_option( 'xmlsf_disabled_providers', $xmlsf->defaults( 'disabled_providers' ) );
 		$public_tax = \get_taxonomies( array( 'public' => true ) );
 		$users_args = array(
 			'fields'              => 'ID',
@@ -61,8 +65,10 @@ class Admin_Sitemap_Fields {
 	 * Limit field
 	 */
 	public static function post_types_general_fields() {
+		global $xmlsf;
+
 		$settings = (array) \get_option( 'xmlsf_post_types' );
-		$defaults = \xmlsf()->defaults( 'post_types' );
+		$defaults = $xmlsf->defaults( 'post_types' );
 		$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 
 		// The actual fields for data entry.
@@ -75,6 +81,8 @@ class Admin_Sitemap_Fields {
 	 * @param string $post_type Post type.
 	 */
 	public static function post_type_fields( $post_type ) {
+		global $xmlsf;
+
 		// post type slug passed as section name.
 		$obj     = \get_post_type_object( $post_type );
 		$count   = \wp_count_posts( $obj->name );
@@ -150,8 +158,10 @@ class Admin_Sitemap_Fields {
 	 * Sitemap name field
 	 */
 	public static function xmlsf_sitemap_name_field() {
+		global $xmlsf;
+
 		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', array() );
-		$slug     = \is_object( xmlsf()->sitemap ) ? xmlsf()->sitemap->slug() : ( namespace\uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+		$slug     = \is_object( $xmlsf->sitemap ) ? $xmlsf->sitemap->slug() : ( $xmlsf->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-name.php';
@@ -196,5 +206,34 @@ class Admin_Sitemap_Fields {
 			<?php \esc_html_e( 'Week', 'xml-sitemap-feed' ); ?>
 		</option>
 		<?php
+	}
+
+	/**
+	 * Quick edit fields allows to add HTML in Quick Edit.
+	 *
+	 * @since 5.7
+	 *
+	 * @param string $column_name Column name.
+	 */
+	public static function quick_edit_fields( $column_name ) {
+		if ( 'xmlsf_exclude' === $column_name ) {
+			// The actual fields for data entry.
+			include XMLSF_DIR . '/views/admin/field-quick-edit.php';
+		}
+	}
+
+	/**
+	 * Bulk edit fields allows to add HTML in Quick Edit.
+	 *
+	 * @since 5.7
+	 *
+	 * @param string $column_name Column name.
+	 */
+	public static function bulk_edit_fields( $column_name ) {
+		if ( 'xmlsf_exclude' === $column_name ) {
+			$disabled = ! apply_filters( 'xmlsf_advanced_enabled', false );
+			// The actual fields for data entry.
+			include XMLSF_DIR . '/views/admin/field-bulk-edit.php';
+		}
 	}
 }

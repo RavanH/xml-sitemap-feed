@@ -16,6 +16,7 @@ namespace XMLSF;
  * @return array
  */
 function get_post_types() {
+	global $xmlsf;
 	$active_post_types = array();
 	$post_types        = (array) \get_option( 'xmlsf_post_types', array() );
 	// Get active post types.
@@ -27,7 +28,7 @@ function get_post_types() {
 
 	$available = (array) \apply_filters( 'xmlsf_post_types', \get_post_types( array( 'public' => true ) ) );
 	// Make sure post types are allowed and publicly viewable.
-	$available = \array_diff( $available, \xmlsf()->disabled_post_types() );
+	$available = \array_diff( $available, $xmlsf->disabled_post_types() );
 	$available = \array_filter( $available, 'is_post_type_viewable' );
 
 	$post_types_settings = \array_intersect_key( $active_post_types, \array_flip( $available ) );
@@ -44,7 +45,8 @@ function get_post_types() {
  * @return array
  */
 function get_taxonomies() {
-	$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
+	global $xmlsf;
+	$disabled = \get_option( 'xmlsf_disabled_providers', $xmlsf->defaults( 'disabled_providers' ) );
 
 	if ( ! empty( $disabled ) && \in_array( 'taxonomies', (array) $disabled, true ) ) {
 		return array();
@@ -137,9 +139,10 @@ function images_data( $post, $which ) {
  * @return array
  */
 function public_taxonomies() {
+	global $xmlsf;
 
 	$tax_array = array();
-	$disabled  = (array) \xmlsf()->disabled_taxonomies();
+	$disabled  = (array) $xmlsf->disabled_taxonomies();
 
 	foreach ( (array) \get_option( 'xmlsf_post_types' ) as $post_type => $settings ) {
 
@@ -346,19 +349,20 @@ function image_schema( $type ) {
  * @return array
  */
 function get_frontpages() {
+	global $xmlsf;
 
-	if ( null === \xmlsf()->frontpages ) :
+	if ( null === $xmlsf->frontpages ) :
 
 		$frontpages = array();
 		if ( 'page' === \get_option( 'show_on_front' ) ) {
 			$frontpage  = (int) \get_option( 'page_on_front' );
 			$frontpages = (array) \apply_filters( 'xmlsf_frontpages', $frontpage );
 		}
-		\xmlsf()->frontpages = $frontpages;
+		$xmlsf->frontpages = $frontpages;
 
 	endif;
 
-	return \xmlsf()->frontpages;
+	return $xmlsf->frontpages;
 }
 
 /**
@@ -367,17 +371,18 @@ function get_frontpages() {
  * @return array
  */
 function get_blogpages() {
+	global $xmlsf;
 
-	if ( null === \xmlsf()->blogpages ) :
+	if ( null === $xmlsf->blogpages ) :
 		$blogpages = array();
 		if ( 'page' === \get_option( 'show_on_front' ) ) {
 			$blogpage  = (int) \get_option( 'page_for_posts' );
 			$blogpages = (array) \apply_filters( 'xmlsf_blogpages', $blogpage );
 		}
-		\xmlsf()->blogpages = $blogpages;
+		$xmlsf->blogpages = $blogpages;
 	endif;
 
-	return \xmlsf()->blogpages;
+	return $xmlsf->blogpages;
 }
 
 /**
@@ -508,6 +513,8 @@ function get_taxonomy_modified( $taxonomy ) {
  * @return float
  */
 function get_post_priority( $post ) {
+	global $xmlsf;
+
 	$options = (array) \get_option( 'xmlsf_post_types', array() );
 
 	if ( empty( $options[ $post->post_type ]['priority'] ) ) {
@@ -532,13 +539,13 @@ function get_post_priority( $post ) {
 
 		// Reduce by age.
 		// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age.
-		if ( \xmlsf()->timespan > 0 && ! \is_sticky( $post->ID ) && ! \in_array( $post->ID, namespace\get_blogpages(), true ) ) {
-			$priority -= $priority * ( \xmlsf()->lastmodified - $post_modified ) / \xmlsf()->timespan;
+		if ( $xmlsf->timespan > 0 && ! \is_sticky( $post->ID ) && ! \in_array( $post->ID, namespace\get_blogpages(), true ) ) {
+			$priority -= $priority * ( $xmlsf->lastmodified - $post_modified ) / $xmlsf->timespan;
 		}
 
 		// Increase by relative comment count.
-		if ( $post->comment_count > 0 && $priority < 1 && \xmlsf()->comment_count > 0 ) {
-			$priority += 0.1 + ( 1 - $priority ) * $post->comment_count / \xmlsf()->comment_count;
+		if ( $post->comment_count > 0 && $priority < 1 && $xmlsf->comment_count > 0 ) {
+			$priority += 0.1 + ( 1 - $priority ) * $post->comment_count / $xmlsf->comment_count;
 		}
 	}
 
@@ -556,6 +563,8 @@ function get_post_priority( $post ) {
  * @return float
  */
 function get_term_priority( $term ) {
+	global $xmlsf;
+
 	$options = \get_option( 'xmlsf_taxonomy_settings' );
 
 	if ( empty( $options['priority'] ) ) {
@@ -570,11 +579,11 @@ function get_term_priority( $term ) {
 
 	if ( ! empty( $options['dynamic_priority'] ) && $priority > 0.1 ) {
 		// set first and highest term post count as maximum.
-		if ( null === \xmlsf()->taxonomy_termmaxposts ) {
-			\xmlsf()->taxonomy_termmaxposts = $term->count + 1;
+		if ( null === $xmlsf->taxonomy_termmaxposts ) {
+			$xmlsf->taxonomy_termmaxposts = $term->count + 1;
 		}
 
-		$priority -= ( \xmlsf()->taxonomy_termmaxposts - $term->count ) * ( $priority - 0.1 ) / (int) \xmlsf()->taxonomy_termmaxposts;
+		$priority -= ( $xmlsf->taxonomy_termmaxposts - $term->count ) * ( $priority - 0.1 ) / (int) $xmlsf->taxonomy_termmaxposts;
 	}
 
 	$priority = \apply_filters( 'xmlsf_term_priority', $priority, $term->slug );

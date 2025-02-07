@@ -7,7 +7,9 @@
 
 defined( 'WPINC' ) || die;
 
-xmlsf()->sitemap->prefetch_posts_meta();
+global $xmlsf;
+
+$xmlsf->sitemap->prefetch_posts_meta();
 
 // Do xml tag via echo or SVN parser is going to freak out.
 echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charset' ) ) ) . '"?>

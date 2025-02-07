@@ -28,10 +28,12 @@ delete_option( 'rewrite_rules' );
  * @param bool $update Wether to add or update options.
  */
 function xmlsf_update_from_defaults( $update = true ) {
+	global $xmlsf;
+
 	// Options that need not be autoloaded.
 	$not_autoload = array( 'robots' );
 
-	foreach ( xmlsf()->defaults() as $option => $default ) {
+	foreach ( $xmlsf->defaults() as $option => $default ) {
 		if ( $update ) {
 			update_option( 'xmlsf_' . $option, $default, '', ! in_array( $option, $not_autoload, true ) );
 		} else {
@@ -59,7 +61,7 @@ function xmlsf_install() {
  * @since 5.1
  */
 function xmlsf_upgrade( $db_version ) {
-	global $wpdb;
+	global $wpdb, $xmlsf;
 
 	if ( version_compare( '4.4', $db_version, '>' ) ) {
 		// Remove robots.txt rules blocking stylesheets.
@@ -122,7 +124,7 @@ function xmlsf_upgrade( $db_version ) {
 				$taxonomies = get_object_taxonomies( $post_type, 'objects' );
 				// Check each tax public flag and term count and append name to array.
 				foreach ( $taxonomies as $taxonomy ) {
-					if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) ) {
+					if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, $xmlsf->disabled_taxonomies() ) ) {
 						++$available;
 					}
 				}
@@ -197,6 +199,19 @@ function xmlsf_upgrade( $db_version ) {
 
 		// Remove deprecated transient.
 		delete_transient( 'xmlsf_static_files' );
+	}
+
+	if ( version_compare( '5.5-alpha20', $db_version, '>' ) ) {
+		$post_type_settings = get_option( 'xmlsf_post_types' );
+		add_option( 'xmlsf_post_type_settings', $post_type_settings );
+		error_log( print_r( $post_type_settings, true ) );
+		$post_types = array();
+		foreach ( $post_type_settings as $post_type => $settings ) {
+			if ( ! empty( $settings['active'] ) ) {
+				$post_types[] = $post_type;
+			}
+		}
+		update_option( 'xmlsf_post_types', $post_types );
 	}
 
 	// Add missing new defaults.

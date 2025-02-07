@@ -3,7 +3,7 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.5-alpha20
+ * Version: 5.5-alpha21
  * Text Domain: xml-sitemap-feed
  * Requires at least: 4.4
  * Requires PHP: 5.6
@@ -13,7 +13,7 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.5-alpha20' );
+define( 'XMLSF_VERSION', '5.5-alpha21' );
 define( 'XMLSF_ADV_MIN_VERSION', '0.1' );
 define( 'XMLSF_NEWS_ADV_MIN_VERSION', '1.3.5' );
 
@@ -54,9 +54,6 @@ define( 'XMLSF_DIR', __DIR__ );
 
 define( 'XMLSF_BASENAME', plugin_basename( __FILE__ ) );
 
-// Autoloader.
-require_once XMLSF_DIR . '/inc/autoloader.php';
-
 // Pluggable functions.
 require_once XMLSF_DIR . '/inc/functions-pluggable.php';
 
@@ -66,13 +63,14 @@ require_once XMLSF_DIR . '/inc/functions.php';
 // Prepare hooks for debugging.
 WP_DEBUG && require_once XMLSF_DIR . '/inc/functions-debugging.php';
 
-add_action( 'init', array( 'XMLSF\XMLSitemapFeed', 'maybe_upgrade' ), 8 );
-add_action( 'init', array( 'XMLSF\XMLSitemapFeed', 'init' ), 9 );
-add_action( 'admin_init', array( 'XMLSF\XMLSitemapFeed', 'admin_init' ), 9 );
-add_filter( 'robots_txt', array( 'XMLSF\XMLSitemapFeed', 'robots_txt' ) );
+add_action( 'plugins_loaded', 'xmlsf' );
+
+if ( is_admin() ) {
+	add_action( 'plugins_loaded', array( 'XMLSF\Admin\Admin', 'init' ) );
+}
 
 /**
- * Get sitemap object
+ * Get sitemap object. Keep for backward compatibility.
  *
  * @since 5.0
  *
@@ -80,31 +78,13 @@ add_filter( 'robots_txt', array( 'XMLSF\XMLSitemapFeed', 'robots_txt' ) );
  * @return XMLSF\XMLSitemapFeed object by reference
  */
 function xmlsf() {
-	static $xmlsf;
+	global $xmlsf;
 
-	if ( ! isset( $xmlsf ) ) {
-		$xmlsf = new XMLSF\XMLSF();
+	if ( empty( $xmlsf ) ) {
+		$xmlsf = new XMLSF\XMLSitemapFeed();
 	}
 
 	return $xmlsf;
-}
-
-/**
- * Get sitemap admin object
- *
- * @since 5.4
- *
- * @static XMLSF\Admin $xmlsf_admin
- * @return XMLSF\Admin object by reference
- */
-function xmlsf_admin() {
-	static $xmlsf_admin;
-
-	if ( ! isset( $xmlsf_admin ) ) {
-		$xmlsf_admin = new XMLSF\Admin();
-	}
-
-	return $xmlsf_admin;
 }
 
 /**
@@ -126,3 +106,33 @@ function xmlsf_deactivate() {
 }
 
 register_deactivation_hook( __FILE__, 'xmlsf_deactivate' );
+
+/**
+ * Register XMLSF autoloader
+ * http://justintadlock.com/archives/2018/12/14/php-namespaces-for-wordpress-developers
+ *
+ * @since 5.5
+ *
+ * @param string $class_name Namespaced class name.
+ */
+function xmlsf_autoloader( $class_name ) {
+	// Bail if the class is not in our namespace.
+	if ( 0 !== strpos( $class_name, 'XMLSF\\' ) ) {
+		return;
+	}
+
+	// Build the filename and path.
+	$class_name = str_replace( 'XMLSF', 'inc', $class_name );
+	$class_name = strtolower( $class_name );
+	$path_array = explode( '\\', $class_name );
+	$class_name = array_pop( $path_array );
+	$class_name = str_replace( '_', '-', $class_name );
+	$file       = realpath( XMLSF_DIR ) . DIRECTORY_SEPARATOR . \implode( DIRECTORY_SEPARATOR, $path_array ) . DIRECTORY_SEPARATOR . 'class-' . $class_name . '.php';
+
+	// If the file exists for the class name, load it.
+	if ( file_exists( $file ) ) {
+		include_once $file;
+	}
+}
+
+spl_autoload_register( 'xmlsf_autoloader' );

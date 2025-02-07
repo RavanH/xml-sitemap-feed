@@ -78,6 +78,8 @@ abstract class Sitemap {
 	 * @param WP_Post $post       Post object.
 	 */
 	public function update_term_modified_meta( $new_status, $old_status, $post ) {
+		global $xmlsf;
+
 		// Bail when...
 		if (
 			// no status transition or not moving in or out of 'publish' status.
@@ -85,7 +87,7 @@ abstract class Sitemap {
 			// inactive post type.
 			! \array_key_exists( $post->post_type, $this->post_types ) || empty( $this->post_types[ $post->post_type ]['active'] ) ||
 			// no taxonomies activated.
-			\in_array( 'taxonomies', (array) \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) ), true )
+			\in_array( 'taxonomies', (array) \get_option( 'xmlsf_disabled_providers', $xmlsf->defaults( 'disabled_providers' ) ), true )
 		) {
 			return;
 		}

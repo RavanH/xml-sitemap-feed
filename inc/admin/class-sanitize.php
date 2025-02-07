@@ -5,12 +5,12 @@
  * @package XML Sitemap & Google News
  */
 
-namespace XMLSF;
+namespace XMLSF\Admin;
 
 /**
  * Sanitization Class
  */
-class Admin_Sitemap_Sanitize {
+class Sanitize {
 
 	/**
 	 * Sanitize server setting
@@ -20,7 +20,9 @@ class Admin_Sitemap_Sanitize {
 	 * @return string
 	 */
 	public static function server( $save ) {
-		$sanitized = empty( $save ) || ! \in_array( $save, array( 'core', 'plugin' ), true ) ? \xmlsf()->defaults( 'server' ) : $save;
+		global $xmlsf;
+
+		$sanitized = empty( $save ) || ! \in_array( $save, array( 'core', 'plugin' ), true ) ? $xmlsf->defaults( 'server' ) : $save;
 
 		return $sanitized;
 	}
@@ -61,19 +63,21 @@ class Admin_Sitemap_Sanitize {
 	 * @return array
 	 */
 	public static function taxonomy_settings( $save ) {
-		$sanitized = \xmlsf()->defaults( 'taxonomy_settings' );
+		global $xmlsf;
+
+		$sanitized = $xmlsf->defaults( 'taxonomy_settings' );
 		$save      = (array) $save;
 
 		// Sanitize priority.
 		if ( ! empty( $save['priority'] ) && \is_numeric( $save['priority'] ) ) {
-			$sanitized['priority'] = namespace\sanitize_number( $save['priority'], .1, .9 );
+			$sanitized['priority'] = \XMLSF\sanitize_number( $save['priority'], .1, .9 );
 		} else {
 			$sanitized['priority'] = '';
 		}
 
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = namespace\sanitize_number( $save['limit'], 1, 50000, 0 );
+			$sanitized['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
 		return $sanitized;
@@ -102,21 +106,23 @@ class Admin_Sitemap_Sanitize {
 	 * @return array
 	 */
 	public static function author_settings( $save ) {
-		$sanitized = \xmlsf()->defaults( 'author_settings' );
+		global $xmlsf;
+
+		$sanitized = $xmlsf->defaults( 'author_settings' );
 		$save      = (array) $save;
 
 		$sanitized['dynamic_priority'] = ! empty( $save['dynamic_priority'] ) ? '1' : '';
 
 		// Sanitize priority.
 		if ( ! empty( $save['priority'] ) && \is_numeric( $save['priority'] ) ) {
-			$sanitized['priority'] = namespace\sanitize_number( $save['priority'], .1, .9 );
+			$sanitized['priority'] = \XMLSF\sanitize_number( $save['priority'], .1, .9 );
 		} else {
 			$sanitized['priority'] = '';
 		}
 
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = namespace\sanitize_number( $save['limit'], 1, 50000, 0 );
+			$sanitized['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
 		return $sanitized;
@@ -132,12 +138,14 @@ class Admin_Sitemap_Sanitize {
 	 * @return array
 	 */
 	public static function post_types( $save = array() ) {
-		$sanitized = \xmlsf()->defaults( 'post_types' );
+		global $xmlsf;
+
+		$sanitized = $xmlsf->defaults( 'post_types' );
 		$save      = (array) $save;
 
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = namespace\sanitize_number( $save['limit'], 1, 50000, 0 );
+			$sanitized['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
 		// Sanitize priorities.
@@ -147,7 +155,7 @@ class Admin_Sitemap_Sanitize {
 			}
 
 			if ( ! empty( $settings['priority'] ) && \is_numeric( $settings['priority'] ) ) {
-				$sanitized[ $post_type ]['priority'] = namespace\sanitize_number( $settings['priority'], .1, .9 );
+				$sanitized[ $post_type ]['priority'] = \XMLSF\sanitize_number( $settings['priority'], .1, .9 );
 			} else {
 				$sanitized[ $post_type ]['priority'] = '';
 			}
@@ -210,7 +218,7 @@ class Admin_Sitemap_Sanitize {
 			$url = \filter_var( \esc_url( \trim( $arr[0] ) ), FILTER_VALIDATE_URL );
 
 			if ( ! empty( $url ) ) {
-				$priority    = isset( $arr[1] ) ? namespace\sanitize_number( \str_replace( ',', '.', $arr[1] ) ) : '';
+				$priority    = isset( $arr[1] ) ? \XMLSF\sanitize_number( \str_replace( ',', '.', $arr[1] ) ) : '';
 				$sanitized[] = array( $url, $priority );
 			}
 		}

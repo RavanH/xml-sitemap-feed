@@ -207,11 +207,12 @@ if ( ! function_exists( 'is_sitemap' ) ) {
 	 * @return bool
 	 */
 	function is_sitemap() {
-		if ( false === xmlsf()->request_filtered ) {
+		global $xmlsf;
+		if ( false === $xmlsf->request_filtered ) {
 			_doing_it_wrong( __FUNCTION__, esc_html__( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
 			return false;
 		}
-		return xmlsf()->is_sitemap;
+		return $xmlsf->is_sitemap;
 	}
 }
 
@@ -223,10 +224,11 @@ if ( ! function_exists( 'is_news' ) ) {
 	 * @return bool
 	 */
 	function is_news() {
-		if ( false === xmlsf()->request_filtered_news ) {
+		global $xmlsf;
+		if ( false === $xmlsf->request_filtered_news ) {
 			_doing_it_wrong( __FUNCTION__, esc_html__( 'Conditional sitemap tags do not work before the sitemap request filter is run. Before then, they always return false.', 'xml-sitemap-feed' ), '4.8' );
 			return false;
 		}
-		return xmlsf()->is_news;
+		return $xmlsf->is_news;
 	}
 }
