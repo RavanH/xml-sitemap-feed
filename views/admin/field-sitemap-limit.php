@@ -8,7 +8,7 @@
 ?>
 <fieldset id="xmlsf_general_settings_limit">
 	<legend class="screen-reader-text">
-		<?php esc_html_e( 'Limit', 'xml-sitemap-feed' ); ?>
+		<?php echo esc_html( translate( 'General' ) ); ?>
 	</legend>
 
 	<p>
