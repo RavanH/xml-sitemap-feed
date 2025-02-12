@@ -16,7 +16,7 @@
 	</label>
 
 	<p class="description">
-		<?php printf( /* Translators: Pages, General */ esc_html__( 'Activating this option will make all hierarchical post types like %1$s available on the %2$s tab.', 'xml-sitemap-feed' ), esc_html__( 'Pages' ), esc_html__( 'General' ) ); ?>
-		<?php printf( /* Translators: Sitemap tag name, Advanced plugin name */ esc_html__( '%1$s are provided by the %2$s module.', 'xml-sitemap-feed' ), esc_html__( 'Hierarchical post types', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/google-news-advanced/" target="_blank">' . esc_html__( 'Google News Advanced', 'xml-sitemap-feed' ) . '</a>' ); ?>
+		<?php printf( /* Translators: Pages, General */ esc_html__( 'Activating this option will make all hierarchical post types like %1$s available on the %2$s tab.', 'xml-sitemap-feed' ), esc_html( translate( 'Pages' ) ), esc_html( translate( 'General' ) ) ); ?>
+		<?php printf( /* Translators: Hierarchical post types, Google News Advanced (linked to web site) */ esc_html__( '%1$s are provided by the %2$s module.', 'xml-sitemap-feed' ), esc_html__( 'Hierarchical post types', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/google-news-advanced/" target="_blank">' . esc_html__( 'Google News Advanced', 'xml-sitemap-feed' ) . '</a>' ); ?>
 	</p>
 </fieldset>
