@@ -8,7 +8,7 @@
 ?>
 <fieldset id="xmlsf_author_settings">
 	<legend class="screen-reader-text">
-		<?php echo esc_html( translate( 'General' ) ); ?>
+		<?php echo esc_html_e( translate( 'General' ) ); ?>
 	</legend>
 	<p>
 		<label>
