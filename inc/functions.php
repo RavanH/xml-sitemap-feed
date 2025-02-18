@@ -14,13 +14,11 @@ namespace XMLSF;
  * Hooked into xmlsf_sitemap_loaded action.
  */
 function sitemap_loaded() {
-	global $xmlsf;
-
 	// Prepare headers.
 	\add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
 
 	// Set the sitemap conditional flag.
-	$xmlsf->is_sitemap = true;
+	xmlsf()->is_sitemap = true;
 
 	// Make sure we have the proper locale setting for calculations.
 	\setlocale( LC_NUMERIC, 'C' );
@@ -61,14 +59,14 @@ function sitemap_loaded() {
  * @return string|false The sitemap URL or false if the sitemap doesn't exist.
  */
 function sitemap_url( $sitemap = 'index', $args = array() ) {
-	global $wp_rewrite, $xmlsf;
+	global $wp_rewrite;
 
 	if ( 'news' === $sitemap ) {
 		return $wp_rewrite->using_permalinks() ? \esc_url( \trailingslashit( \home_url() ) . 'sitemap-news.xml' ) : \esc_url( \trailingslashit( \home_url() ) . '?feed=sitemap-news' );
 	}
 
 	// Use core function get_sitemap_url if using core sitemaps.
-	if ( $xmlsf->uses_core_server() ) {
+	if ( xmlsf()->uses_core_server() ) {
 		return \get_sitemap_url( $sitemap );
 	}
 

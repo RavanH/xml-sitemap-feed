@@ -28,12 +28,10 @@ delete_option( 'rewrite_rules' );
  * @param bool $update Wether to add or update options.
  */
 function xmlsf_update_from_defaults( $update = true ) {
-	global $xmlsf;
-
 	// Options that need not be autoloaded.
 	$not_autoload = array( 'robots' );
 
-	foreach ( $xmlsf->defaults() as $option => $default ) {
+	foreach ( xmlsf()->defaults() as $option => $default ) {
 		if ( $update ) {
 			update_option( 'xmlsf_' . $option, $default, '', ! in_array( $option, $not_autoload, true ) );
 		} else {
@@ -61,7 +59,7 @@ function xmlsf_install() {
  * @since 5.1
  */
 function xmlsf_upgrade( $db_version ) {
-	global $wpdb, $xmlsf;
+	global $wpdb;
 
 	if ( version_compare( '4.4', $db_version, '>' ) ) {
 		// Remove robots.txt rules blocking stylesheets.
@@ -124,7 +122,7 @@ function xmlsf_upgrade( $db_version ) {
 				$taxonomies = get_object_taxonomies( $post_type, 'objects' );
 				// Check each tax public flag and term count and append name to array.
 				foreach ( $taxonomies as $taxonomy ) {
-					if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, $xmlsf->disabled_taxonomies() ) ) {
+					if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) ) {
 						++$available;
 					}
 				}

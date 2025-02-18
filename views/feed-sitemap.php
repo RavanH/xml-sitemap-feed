@@ -7,8 +7,6 @@
 
 defined( 'WPINC' ) || die;
 
-global $xmlsf;
-
 // Do xml tag via echo or SVN parser is going to freak out.
 echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charset' ) ) ) . '"?>'; ?>
 <?php XMLSF\xml_stylesheet(); ?>
@@ -17,7 +15,7 @@ echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charse
 <?php
 do_action( 'xmlsf_sitemap_index' );
 
-$disabled = get_option( 'xmlsf_disabled_providers', $xmlsf->defaults( 'disabled_providers' ) );
+$disabled = get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
 
 // Public post types.
 $post_types = XMLSF\get_post_types();
@@ -39,7 +37,7 @@ if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) )
 	$taxonomies = XMLSF\get_taxonomies();
 	foreach ( $taxonomies as $the_taxonomy ) :
 		$settings = (array) get_option( 'xmlsf_taxonomy_settings' );
-		$defaults = $xmlsf->defaults( 'taxonomy_settings' );
+		$defaults = xmlsf()->defaults( 'taxonomy_settings' );
 		$limit    = ! empty( $settings['limit'] ) && $settings['limit'] > 1 && $settings['limit'] < 50000 ? $settings['limit'] : $defaults['limit'];
 		$args     = apply_filters(
 			'xmlsf_taxonomies_query_args',

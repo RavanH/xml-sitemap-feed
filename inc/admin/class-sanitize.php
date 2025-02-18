@@ -20,9 +20,7 @@ class Sanitize {
 	 * @return string
 	 */
 	public static function server( $save ) {
-		global $xmlsf;
-
-		$sanitized = empty( $save ) || ! \in_array( $save, array( 'core', 'plugin' ), true ) ? $xmlsf->defaults( 'server' ) : $save;
+		$sanitized = empty( $save ) || ! \in_array( $save, array( 'core', 'plugin' ), true ) ? xmlsf()->defaults( 'server' ) : $save;
 
 		return $sanitized;
 	}
@@ -63,9 +61,7 @@ class Sanitize {
 	 * @return array
 	 */
 	public static function taxonomy_settings( $save ) {
-		global $xmlsf;
-
-		$sanitized = $xmlsf->defaults( 'taxonomy_settings' );
+		$sanitized = xmlsf()->defaults( 'taxonomy_settings' );
 		$save      = (array) $save;
 
 		// Sanitize priority.
@@ -106,9 +102,7 @@ class Sanitize {
 	 * @return array
 	 */
 	public static function author_settings( $save ) {
-		global $xmlsf;
-
-		$sanitized = $xmlsf->defaults( 'author_settings' );
+		$sanitized = xmlsf()->defaults( 'author_settings' );
 		$save      = (array) $save;
 
 		$sanitized['dynamic_priority'] = ! empty( $save['dynamic_priority'] ) ? '1' : '';
@@ -138,9 +132,7 @@ class Sanitize {
 	 * @return array
 	 */
 	public static function post_types( $save = array() ) {
-		global $xmlsf;
-
-		$sanitized = $xmlsf->defaults( 'post_types' );
+		$sanitized = xmlsf()->defaults( 'post_types' );
 		$save      = (array) $save;
 
 		// Sanitize limit.

@@ -112,8 +112,7 @@ class Sitemap_Core extends Sitemap {
 	 * @return array $request filtered
 	 */
 	public function filter_request( $request ) {
-		global $xmlsf;
-		$xmlsf->request_filtered = true;
+		xmlsf()->request_filtered = true;
 
 		if ( ! empty( $request['sitemap'] ) ) {
 
@@ -160,11 +159,11 @@ class Sitemap_Core extends Sitemap {
 					// Prepare dynamic priority calculation.
 					if ( $subtype && ! empty( $this->post_types[ $subtype ]['priority'] ) && ! empty( $this->post_types[ $subtype ]['dynamic_priority'] ) ) {
 						// Last of this post type modified date in Unix seconds.
-						$xmlsf->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $subtype ), 'U' );
+						xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $subtype ), 'U' );
 						// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
-						$xmlsf->timespan = $xmlsf->lastmodified - \get_date_from_gmt( \get_firstpostdate( 'GMT', $subtype ), 'U' );
+						xmlsf()->timespan = xmlsf()->lastmodified - \get_date_from_gmt( \get_firstpostdate( 'GMT', $subtype ), 'U' );
 						// Total post type comment count.
-						$xmlsf->comment_count = \wp_count_comments()->approved;
+						xmlsf()->comment_count = \wp_count_comments()->approved;
 						// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
 						// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/.
 					}
@@ -448,24 +447,23 @@ class Sitemap_Core extends Sitemap {
 	 * @return int
 	 */
 	public function max_urls( $max_urls, $object_type ) {
-		global $xmlsf;
 		switch ( $object_type ) {
 			case 'user':
 				$settings = (array) \get_option( 'xmlsf_author_settings' );
-				$defaults = $xmlsf->defaults( 'author_settings' );
+				$defaults = xmlsf()->defaults( 'author_settings' );
 				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 				break;
 
 			case 'term':
 				$settings = (array) \get_option( 'xmlsf_taxonomy_settings' );
-				$defaults = $xmlsf->defaults( 'taxonomy_settings' );
+				$defaults = xmlsf()->defaults( 'taxonomy_settings' );
 				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 				break;
 
 			case 'post':
 			default:
 				$settings = (array) \get_option( 'xmlsf_post_types' );
-				$defaults = $xmlsf->defaults( 'post_types' );
+				$defaults = xmlsf()->defaults( 'post_types' );
 				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 		}
 
@@ -485,8 +483,7 @@ class Sitemap_Core extends Sitemap {
 	 * @return false|obj Provider or false if disabled.
 	 */
 	public function add_provider( $provider, $name ) {
-		global $xmlsf;
-		$disabled = \get_option( 'xmlsf_disabled_providers', $xmlsf->defaults( 'disabled_providers' ) );
+		$disabled = \get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
 
 		// Match disabled settings.
 		if ( ! empty( $disabled ) && \in_array( $name, (array) $disabled, true ) ) {

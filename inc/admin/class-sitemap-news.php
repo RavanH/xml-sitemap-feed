@@ -20,9 +20,8 @@ class Sitemap_News {
 	 * Clear settings
 	 */
 	public static function clear_settings() {
-		global $xmlsf;
 		// Update to defaults.
-		\update_option( 'xmlsf_news_tags', $xmlsf->defaults( 'news_tags' ) );
+		\update_option( 'xmlsf_news_tags', xmlsf()->defaults( 'news_tags' ) );
 	}
 
 	/**
@@ -147,6 +146,24 @@ class Sitemap_News {
 						include XMLSF_DIR . '/views/admin/notice-squirrly-seo-sitemap-news.php';
 					}
 				);
+			}
+		}
+
+		// WP SEO conflict notices.
+		if ( \is_plugin_active( 'wordpress-seo/wp-seo.php' ) ) {
+			// Check Remove category feeds option. TODO move to google news.
+			$wpseo = \get_option( 'wpseo' );
+			if ( ! empty( $wpseo['remove_feed_categories'] ) && \XMLSF\sitemaps_enabled( 'sitemap-news' ) ) {
+				// check if Google News sitemap is limited to categories.
+				$news_tags = \get_option( 'xmlsf_news_tags' );
+				if ( ! empty( $news_tags['categories'] ) ) {
+					\add_action(
+						'admin_notices',
+						function () {
+							include XMLSF_DIR . '/views/admin/notice-wpseo-category-feed-redirect.php';
+						}
+					);
+				}
 			}
 		}
 	}
@@ -508,7 +525,7 @@ class Sitemap_News {
 	 * Post type field
 	 */
 	public static function post_type_field() {
-		global $wp_taxonomies, $xmlsf;
+		global $wp_taxonomies;
 
 		$post_types = \apply_filters(
 			'xmlsf_news_post_types',
@@ -522,7 +539,7 @@ class Sitemap_News {
 		);
 
 		// Make sure post types are allowed and publicly viewable.
-		$post_types = \array_diff( $post_types, $xmlsf->disabled_post_types() );
+		$post_types = \array_diff( $post_types, xmlsf()->disabled_post_types() );
 		$post_types = \array_filter( $post_types, 'is_post_type_viewable' );
 
 		if ( ! \is_array( $post_types ) || empty( $post_types ) ) {

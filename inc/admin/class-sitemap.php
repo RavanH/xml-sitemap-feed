@@ -23,11 +23,9 @@ class Sitemap {
 	 * @param mixed $value Saved option value.
 	 */
 	public static function update_server( $old, $value ) {
-		global $xmlsf;
-
 		if ( $old !== $value ) {
 			// Check static file.
-			$slug     = \is_object( $xmlsf->sitemap ) ? $xmlsf->sitemap->slug() : ( $xmlsf->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+			$slug     = \is_object( xmlsf()->sitemap ) ? xmlsf()->sitemap->slug() : ( xmlsf()->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
 			$filename = $slug . '.xml';
 
 			\XMLSF\Admin\Admin::check_static_files( $filename, 1 );
@@ -107,8 +105,7 @@ class Sitemap {
 	 * Clear settings
 	 */
 	public static function clear_settings() {
-		global $xmlsf;
-		$defaults = $xmlsf->defaults();
+		$defaults = xmlsf()->defaults();
 
 		unset( $defaults['sitemaps'] );
 
@@ -121,8 +118,6 @@ class Sitemap {
 	 * Tools actions
 	 */
 	public static function tools_actions() {
-		global $xmlsf;
-
 		if ( ! isset( $_POST['_xmlsf_help_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
 			return;
 		}
@@ -132,8 +127,8 @@ class Sitemap {
 			\delete_user_meta( \get_current_user_id(), 'xmlsf_dismissed' );
 
 			// When core sitemap server is used.
-			if ( \is_object( $xmlsf->sitemap ) ) {
-				\XMLSF\Admin\Admin::check_static_files( $xmlsf->sitemap->slug() . '.xml' );
+			if ( \is_object( xmlsf()->sitemap ) ) {
+				\XMLSF\Admin\Admin::check_static_files( xmlsf()->sitemap->slug() . '.xml' );
 			}
 		}
 
@@ -199,8 +194,6 @@ class Sitemap {
 	 * Check for conflicting plugins and their settings
 	 */
 	public static function check_conflicts() {
-		global $xmlsf;
-
 		if ( \wp_doing_ajax() || ! \current_user_can( 'manage_options' ) ) {
 			return;
 		}
@@ -226,7 +219,7 @@ class Sitemap {
 		if ( \is_plugin_active( 'wordpress-seo/wp-seo.php' ) ) {
 			// check date archive redirection.
 			$wpseo_titles = \get_option( 'wpseo_titles' );
-			if ( ! empty( $wpseo_titles['disable-date'] ) && ! $xmlsf->uses_core_server() ) {
+			if ( ! empty( $wpseo_titles['disable-date'] ) && ! xmlsf()->uses_core_server() ) {
 				// check if Split by option is set anywhere.
 				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
@@ -262,7 +255,7 @@ class Sitemap {
 			$seopress_toggle = \get_option( 'seopress_toggle' );
 
 			$seopress_titles = \get_option( 'seopress_titles_option_name' );
-			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) && ! $xmlsf->uses_core_server() ) {
+			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) && ! xmlsf()->uses_core_server() ) {
 				// check if Split by option is set anywhere.
 				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
@@ -296,7 +289,7 @@ class Sitemap {
 
 			// check date archive redirection.
 			$rankmath_titles = \get_option( 'rank-math-options-titles' );
-			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] && ! $xmlsf->uses_core_server() ) {
+			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] && ! xmlsf()->uses_core_server() ) {
 				// check if Split by option is set anywhere.
 				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
@@ -505,8 +498,6 @@ class Sitemap {
 	 * Options page callback
 	 */
 	public static function settings_page() {
-		global $xmlsf;
-
 		$active_tab = isset( $_GET['tab'] ) ? \sanitize_key( \wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		\do_action( 'xmlsf_add_settings', $active_tab );
@@ -523,7 +514,7 @@ class Sitemap {
 			9
 		);
 
-		$disabled = \get_option( 'xmlsf_disabled_providers', $xmlsf->defaults( 'disabled_providers' ) );
+		$disabled = \get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
 
 		// The actual settings page.
 		include XMLSF_DIR . '/views/admin/page-sitemap.php';
@@ -535,8 +526,6 @@ class Sitemap {
 	 * @param string $active_tab The active tab slug.
 	 */
 	public static function add_settings( $active_tab = '' ) {
-		global $xmlsf;
-
 		switch ( $active_tab ) {
 			case 'post_types':
 				/** POST TYPES */
@@ -547,7 +536,7 @@ class Sitemap {
 					'xmlsf_post_types'
 				);
 
-				$xmlsf->uses_core_server() && \add_settings_field(
+				xmlsf()->uses_core_server() && \add_settings_field(
 					'xmlsf_sitemap_post_types_limit',
 					\translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
 					array( __NAMESPACE__ . '\Fields', 'post_types_general_fields' ),
@@ -557,7 +546,7 @@ class Sitemap {
 
 				$post_types = (array) \apply_filters( 'xmlsf_post_types', \get_post_types( array( 'public' => true ) ) );
 				// Make sure post types are allowed and publicly viewable.
-				$post_types = \array_diff( $post_types, $xmlsf->disabled_post_types() );
+				$post_types = \array_diff( $post_types, xmlsf()->disabled_post_types() );
 				$post_types = \array_filter( $post_types, 'is_post_type_viewable' );
 
 				if ( \is_array( $post_types ) && ! empty( $post_types ) ) {
@@ -759,8 +748,6 @@ class Sitemap {
 	 * Help tabs
 	 */
 	public static function help_tabs() {
-		global $xmlsf;
-
 		$screen     = \get_current_screen();
 		$active_tab = isset( $_GET['tab'] ) ? \sanitize_key( $_GET['tab'] ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
@@ -814,7 +801,7 @@ class Sitemap {
 				break;
 
 			case 'post_types':
-				if ( $xmlsf->uses_core_server() ) {
+				if ( xmlsf()->uses_core_server() ) {
 					\ob_start();
 					include XMLSF_DIR . '/views/admin/help-tab-post-types-general.php';
 					$content = \ob_get_clean();

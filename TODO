@@ -1,5 +1,7 @@
+FIX
+*
+
 ROADMAP
-* restore xmlsf()
 * move sitemap fields (back) to Sitemap class?
 * rethink xmlsf_post_types and optional xmlsf_post_type_settings
 
@@ -29,7 +31,6 @@ DOCUMENT
 * add inline comment blocks for hooks
 
 TEST
-
 * quick/blk edit fields should not be in non-included post types
 * Nginx Helper purge wildcard not working?
 * XMLSF Advanced plugin compatibility
@@ -42,6 +43,8 @@ TEST
 * de/reactivation + uninstall
 
 CONSIDER
+* make sitemaps_enabled use static value for faster repsonse
+* Get rid of the whole feed business...
 * Quick edit colums sortable
 * Move automatic priority calc + update lastmod on comments to General section
 * make prime meta caches (async crawler?)

@@ -135,8 +135,6 @@ class Admin {
 	 * @param mixed $value Saved option value.
 	 */
 	public static function update_sitemaps( $old, $value ) {
-		global $xmlsf;
-
 		$old   = (array) $old;
 		$value = (array) $value;
 
@@ -145,13 +143,13 @@ class Admin {
 
 			// Switched on sitemap.
 			if ( ! empty( $value['sitemap'] ) && empty( $old['sitemap'] ) ) {
-				$slug    = \is_object( $xmlsf->sitemap ) ? $xmlsf->sitemap->slug() : ( $xmlsf->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+				$slug    = \is_object( xmlsf()->sitemap ) ? xmlsf()->sitemap->slug() : ( xmlsf()->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
 				$files[] = $slug . '.xml';
 			}
 
 			// Switched on news sitemap.
 			if ( ! empty( $value['sitemap-news'] ) && empty( $old['sitemap-news'] ) ) {
-				$slug    = \is_object( $xmlsf->sitemap_news ) ? $xmlsf->sitemap_news->slug() : 'sitemap-news';
+				$slug    = \is_object( xmlsf()->sitemap_news ) ? xmlsf()->sitemap_news->slug() : 'sitemap-news';
 				$files[] = $slug . '.xml';
 			}
 
@@ -241,10 +239,8 @@ class Admin {
 	 * Sitemap settings fields
 	 */
 	public static function sitemaps_settings_field() {
-		global $xmlsf;
-
 		if ( 1 === (int) \get_option( 'blog_public' ) ) {
-			$sitemaps = (array) \get_option( 'xmlsf_sitemaps', $xmlsf->defaults( 'sitemaps' ) );
+			$sitemaps = (array) \get_option( 'xmlsf_sitemaps', xmlsf()->defaults( 'sitemaps' ) );
 			// The actual fields for data entry.
 			include XMLSF_DIR . '/views/admin/field-sitemaps.php';
 		} else {
