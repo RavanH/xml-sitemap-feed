@@ -56,7 +56,6 @@ CONSIDER
 * move away from feed templates, adopt ?sitemap=... approach from core
 * dynamic stylesheets
 * revisit/regroup views
-* quick edit fields for google news?
 
 CORE SITEMAP:
 * TODO Maybe add dedicated Media sitemap if image tags are (still) not possible OR completely replace the renderer?
