@@ -77,10 +77,10 @@ if ( is_admin() ) {
  * @static XMLSF\XMLSitemapFeed $xmlsf
  * @return XMLSF\XMLSitemapFeed object by reference
  */
-function xmlsf() {
+function &xmlsf() {
 	global $xmlsf;
 
-	if ( empty( $xmlsf ) ) {
+	if ( ! isset( $xmlsf ) ) {
 		$xmlsf = new XMLSF\XMLSitemapFeed();
 	}
 
