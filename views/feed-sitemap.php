@@ -68,7 +68,7 @@ if ( empty( $disabled ) || ! in_array( 'users', (array) $disabled, true ) ) {
 	echo '<sitemap><loc>' . esc_xml( XMLSF\sitemap_url( 'author' ) ) . '</loc>';
 	$lastmod = get_lastpostdate( 'GMT' );
 	if ( $lastmod ) {
-		'<lastmod>' . esc_xml( get_date_from_gmt( get_lastpostdate( 'GMT' ), DATE_W3C ) ) . '</lastmod>';
+		'<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';
 	}
 	echo '</sitemap>' . PHP_EOL;
 
