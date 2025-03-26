@@ -4,10 +4,9 @@ FIX
 ROADMAP
 * move sitemap fields (back) to Sitemap class?
 * rethink xmlsf_post_types and optional xmlsf_post_type_settings
+* quick edit "exclude" option for news sitemap too...
 
 = 5.5 =
-* quick edit "exclude" option for news sitemap too...
-* revise readme: move troubleshooting FAQs to premium.status301.com
 * FIX: wordpress server lastmod date formatting for homepage, news sitemap, users sitemap
 * FIX: wordpress server lastmod date calculation for posts sitemap
 * author sitemap lastmod language compatible...
