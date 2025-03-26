@@ -3,7 +3,7 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.5-alpha22
+ * Version: 5.5-alpha23
  * Text Domain: xml-sitemap-feed
  * Requires at least: 4.4
  * Requires PHP: 5.6
@@ -13,7 +13,7 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.5-alpha22' );
+define( 'XMLSF_VERSION', '5.5-alpha23' );
 define( 'XMLSF_ADV_MIN_VERSION', '0.1' );
 define( 'XMLSF_NEWS_ADV_MIN_VERSION', '1.3.5' );
 
@@ -63,6 +63,7 @@ require_once XMLSF_DIR . '/inc/functions.php';
 // Prepare hooks for debugging.
 WP_DEBUG && require_once XMLSF_DIR . '/inc/functions-debugging.php';
 
+// Fire it up at plugins_loaded.
 add_action( 'plugins_loaded', 'xmlsf' );
 
 if ( is_admin() ) {
@@ -70,7 +71,7 @@ if ( is_admin() ) {
 }
 
 /**
- * Get sitemap object. Keep for backward compatibility.
+ * Get sitemap object.
  *
  * @since 5.0
  *
@@ -136,3 +137,11 @@ function xmlsf_autoloader( $class_name ) {
 }
 
 spl_autoload_register( 'xmlsf_autoloader' );
+
+/**
+ * Init, deprecated.
+ * Keep for backwards compatibility with Google News Advanced pre 1.3.6
+ */
+function xmlsf_init() {
+	_deprecated_function( __FUNCTION__, '1.3.6', 'xmlsf' );
+}
