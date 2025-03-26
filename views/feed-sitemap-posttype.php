@@ -18,62 +18,63 @@ echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charse
 <?php
 global $wp_query, $post;
 
-/**
- * Add a URL for the homepage in the pages sitemap.
- * Shows only on the first page if the reading settings are set to display latest posts.
- */
-if ( 'page' === $post->post_type && 'posts' === get_option( 'show_on_front' ) ) {
-	$home_pages = array(
-		\trailingslashit( \home_url() ) => array(
-			'lastmod' => get_lastpostdate( 'gmt', 'post' ),
-		),
-	);
-
-	/**
-	 * Developers
-	 *
-	 * Modify the root data array with: add_filter( 'xmlsf_root_data', 'your_filter_function' );
-	 *
-	 * Possible filters hooked here:
-	 * XMLSF\Compat/Polylang->root_data - Polylang compatibility
-	 * XMLSF\Compat\WPML->root_data - WPML compatibility
-	 */
-	$home_pages = \apply_filters( 'xmlsf_root_data', $home_pages );
-
-	foreach ( $home_pages as $url => $data ) {
-		$url = apply_filters( 'xmlsf_entry_url', $url, 'home' );
-
-		// Use xmlsf_entry_url filter to return falsy value to exclude a specific URL.
-		if ( empty( $url ) ) {
-			continue;
-		}
-
-		do_action( 'xmlsf_url', 'home', $data );
-
-		echo '<url><loc>' . esc_url( $url ) . '</loc>';
-
-		$priority = XMLSF\get_home_priority();
-		if ( ! empty( $priority ) ) {
-			echo '<priority>' . esc_xml( $priority ) . '</priority>';
-		}
-
-		if ( ! empty( $data['lastmod'] ) ) {
-			echo '<lastmod>' . esc_xml( get_date_from_gmt( $data['lastmod'], DATE_W3C ) ) . '</lastmod>';
-		}
-
-		do_action( 'xmlsf_tags_after', 'home', $data );
-
-		echo '</url>';
-
-		do_action( 'xmlsf_url_after', 'home', $data );
-
-		echo PHP_EOL;
-	}
-}
-
-// Loop away!
 if ( have_posts() ) :
+	/**
+	 * Add a URL for the homepage in the pages sitemap.
+	 * Shows only on the first page if the reading settings are set to display latest posts.
+	 */
+	if ( 'page' === $post->post_type && 'posts' === get_option( 'show_on_front' ) ) {
+		$home_pages = array(
+			\trailingslashit( \home_url() ) => array(
+				'lastmod' => get_lastpostdate( 'gmt', 'post' ),
+			),
+		);
+
+		/**
+		 * Developers
+		 *
+		 * Modify the root data array with: add_filter( 'xmlsf_root_data', 'your_filter_function' );
+		 *
+		 * Possible filters hooked here:
+		 * XMLSF\Compat/Polylang->root_data - Polylang compatibility
+		 * XMLSF\Compat\WPML->root_data - WPML compatibility
+		 */
+		$home_pages = \apply_filters( 'xmlsf_root_data', $home_pages );
+
+		foreach ( $home_pages as $url => $data ) {
+			$url = apply_filters( 'xmlsf_entry_url', $url, 'home' );
+
+			// Use xmlsf_entry_url filter to return falsy value to exclude a specific URL.
+			if ( empty( $url ) ) {
+				continue;
+			}
+
+			do_action( 'xmlsf_url', 'home', $data );
+
+			echo '<url><loc>' . esc_url( $url ) . '</loc>';
+
+			$priority = XMLSF\get_home_priority();
+			if ( ! empty( $priority ) ) {
+				echo '<priority>' . esc_xml( $priority ) . '</priority>';
+			}
+
+			if ( ! empty( $data['lastmod'] ) ) {
+				echo '<lastmod>' . esc_xml( get_date_from_gmt( $data['lastmod'], DATE_W3C ) ) . '</lastmod>';
+			}
+
+			do_action( 'xmlsf_tags_after', 'home', $data );
+
+			echo '</url>';
+
+			do_action( 'xmlsf_url_after', 'home', $data );
+
+			echo PHP_EOL;
+		}
+	}
+
+	// Loop away!
 	$wp_query->in_the_loop = true;
+
 	while ( have_posts() ) :
 		// Don't do the_post() here to avoid expensive setup_postdata(), just do the following.
 		$post = $wp_query->next_post(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
@@ -114,7 +115,9 @@ if ( have_posts() ) :
 
 		echo PHP_EOL;
 	endwhile;
+
 	$wp_query->in_the_loop = false;
+
 endif;
 
 if ( empty( $did_posts ) ) {
