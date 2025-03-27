@@ -5,10 +5,12 @@ ROADMAP
 * move sitemap fields (back) to Sitemap class?
 * rethink xmlsf_post_types and optional xmlsf_post_type_settings
 * quick edit "exclude" option for news sitemap too...
+* drop dynamic priority?
 
 = 5.5 =
-
-* FIX Polylang home pages for non-default languages
+* FIX Polylang home pages for non-default languages in core server page sitemaps
+* FIX Polylang lastmod for post/pages sitemaps in core server index
+* Make Polylang lastmod dates per language
 
 TEST
 * quick/bulk edit fields should not be in non-included post types
@@ -19,7 +21,6 @@ TEST
 * test add-inserter old issue
 * test bbpress
 * test WPML
-* test Polylang
 * de/reactivation + uninstall
 
 = 5.6 =
@@ -44,9 +45,9 @@ CONSIDER
 * make sitemaps_enabled use static value for faster repsonse
 * Get rid of the whole feed business...
 * Quick edit colums sortable
-* Move automatic priority calc + update lastmod on comments to General section
+* Move automatic priority calc + update lastmod on comments to General section or drop automatic priority?
 * make prime meta caches (async crawler?)
-* Automatic priority calculation for authors
+* Automatic priority calculation for authors or drop automatic priority?
 * drop all WP pre-5.5 and ClassicPress compatibility routines?
 * core sitemap stylesheets per sitemap type (is that possible?)
 * drop all publisher center links ? see https://support.google.com/news/publisher-center/answer/14859160
