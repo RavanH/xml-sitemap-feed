@@ -76,6 +76,7 @@ if ( is_admin() ) {
  * @since 5.0
  *
  * @static XMLSF\XMLSitemapFeed $xmlsf
+ *
  * @return XMLSF\XMLSitemapFeed object by reference
  */
 function &xmlsf() {
@@ -139,9 +140,10 @@ function xmlsf_autoloader( $class_name ) {
 spl_autoload_register( 'xmlsf_autoloader' );
 
 /**
- * Init, deprecated.
+ * Init. That's deprecated, innit?
+ *
  * Keep for backwards compatibility with Google News Advanced pre 1.3.6
  */
 function xmlsf_init() {
-	_deprecated_function( __FUNCTION__, '1.3.6', 'xmlsf' );
+	_deprecated_function( __FUNCTION__, '5.5', 'xmlsf' );
 }
