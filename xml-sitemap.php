@@ -64,7 +64,7 @@ require_once XMLSF_DIR . '/inc/functions.php';
 WP_DEBUG && require_once XMLSF_DIR . '/inc/functions-debugging.php';
 
 // Fire it up at plugins_loaded.
-add_action( 'plugins_loaded', 'xmlsf' );
+add_action( 'plugins_loaded', 'xmlsf', 1 );
 
 if ( is_admin() ) {
 	add_action( 'plugins_loaded', array( 'XMLSF\Admin\Admin', 'init' ) );

@@ -50,7 +50,9 @@ class Polylang {
 	 * @return array
 	 */
 	public static function filter_request( $request ) {
-		$request['lang'] = '';
+		if ( ! xmlsf()->uses_core_server() ) {
+			$request['lang'] = '';
+		}
 
 		return $request;
 	}
@@ -58,11 +60,11 @@ class Polylang {
 	/**
 	 * Polylang compatibility actions
 	 *
-	 * @param array $request The request.
+	 * @param array $server The sitemap server.
 	 *
-	 * @return array
+	 * @return void
 	 */
-	public static function request_actions( $request ) {
+	public static function request_actions( $server ) {
 		global $polylang;
 
 		// Prevent language redirections.
@@ -70,12 +72,10 @@ class Polylang {
 
 		if ( isset( $polylang ) ) {
 			// Remove Polylang filters to place all languages in the same sitemaps.
-			\remove_filter( 'pll_set_language_from_query', array( $polylang->sitemaps, 'set_language_from_query' ) );
-			\remove_filter( 'rewrite_rules_array', array( $polylang->sitemaps, 'rewrite_rules' ) );
-			\remove_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) );
+			'plugin' === $server && \remove_filter( 'pll_set_language_from_query', array( $polylang->sitemaps, 'set_language_from_query' ) );
+			// \remove_filter( 'rewrite_rules_array', array( $polylang->sitemaps, 'rewrite_rules' ) );
+			// \remove_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) );
 		}
-
-		return $request;
 	}
 
 	/**

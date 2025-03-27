@@ -1,5 +1,5 @@
 FIX
-*
+* ?
 
 ROADMAP
 * move sitemap fields (back) to Sitemap class?
@@ -7,9 +7,20 @@ ROADMAP
 * quick edit "exclude" option for news sitemap too...
 
 = 5.5 =
-* FIX: wordpress server lastmod date formatting for homepage, news sitemap, users sitemap
-* FIX: wordpress server lastmod date calculation for posts sitemap
-* author sitemap lastmod language compatible...
+
+* FIX Polylang home pages for non-default languages
+
+TEST
+* quick/bulk edit fields should not be in non-included post types
+* Nginx Helper purge wildcard not working?
+* XMLSF Advanced plugin compatibility
+* theme template overrides
+* test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
+* test add-inserter old issue
+* test bbpress
+* test WPML
+* test Polylang
+* de/reactivation + uninstall
 
 = 5.6 =
 * Make leaner still: only load sitemap class and functions on xmlsf_sitemap_loaded ... same for news.
@@ -28,18 +39,6 @@ DOCUMENT
 * xmlsf_add_settings
 * xmlsf_news_add_settings
 * add inline comment blocks for hooks
-
-TEST
-* quick/blk edit fields should not be in non-included post types
-* Nginx Helper purge wildcard not working?
-* XMLSF Advanced plugin compatibility
-* theme template overrides
-* test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
-* test add-inserter old issue
-* test bbpress
-* test WPML
-* test Polylang
-* de/reactivation + uninstall
 
 CONSIDER
 * make sitemaps_enabled use static value for faster repsonse
