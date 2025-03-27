@@ -345,16 +345,14 @@ function image_schema( $type ) {
  * @return array
  */
 function get_frontpages() {
-	if ( null === xmlsf()->frontpages ) :
-
+	if ( null === xmlsf()->frontpages ) {
 		$frontpages = array();
 		if ( 'page' === \get_option( 'show_on_front' ) ) {
 			$frontpage  = (int) \get_option( 'page_on_front' );
 			$frontpages = (array) \apply_filters( 'xmlsf_frontpages', $frontpage );
 		}
 		xmlsf()->frontpages = $frontpages;
-
-	endif;
+	}
 
 	return xmlsf()->frontpages;
 }
@@ -365,14 +363,14 @@ function get_frontpages() {
  * @return array
  */
 function get_blogpages() {
-	if ( null === xmlsf()->blogpages ) :
+	if ( null === xmlsf()->blogpages ) {
 		$blogpages = array();
 		if ( 'page' === \get_option( 'show_on_front' ) ) {
 			$blogpage  = (int) \get_option( 'page_for_posts' );
 			$blogpages = (array) \apply_filters( 'xmlsf_blogpages', $blogpage );
 		}
 		xmlsf()->blogpages = $blogpages;
-	endif;
+	}
 
 	return xmlsf()->blogpages;
 }
