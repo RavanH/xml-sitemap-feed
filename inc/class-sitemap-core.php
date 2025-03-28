@@ -41,8 +41,6 @@ class Sitemap_Core extends Sitemap {
 
 		// MAIN REQUEST filter. Calls xmlsf_sitemap_loaded action if sitemap request is detected.
 		\add_filter( 'request', array( $this, 'filter_request' ) );
-		// FIX some core sitemap bugs.
-		\add_filter( 'wp_sitemaps_posts_pre_url_list', array( $this, 'posts_url_list' ), 10, 3 );
 
 		// Add lastmod to index.
 		\add_filter( 'wp_sitemaps_index_entry', array( $this, 'index_entry' ), 10, 4 );
@@ -253,14 +251,14 @@ class Sitemap_Core extends Sitemap {
 		// Add lastmod.
 		switch ( $type ) {
 			case 'post':
-				$lastmod = \get_lastpostmodified( 'GMT', $subtype );
+				$lastmod = \get_lastpostmodified( 'GMT', \apply_filters( 'xmlsf_sitemap_subtype', $subtype ) );
 				if ( $lastmod ) {
 					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 				}
 				break;
 
 			case 'term':
-				$lastmod = namespace\get_taxonomy_modified( $subtype );
+				$lastmod = namespace\get_taxonomy_modified( \apply_filters( 'xmlsf_sitemap_subtype', $subtype ) );
 				if ( $lastmod ) {
 					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 				}
@@ -608,74 +606,12 @@ class Sitemap_Core extends Sitemap {
 	}
 
 	/**
-	 * Uses the main query to get the posts URL list before it is generated.
-	 * Hooked into wp_sitemaps_posts_pre_url_list.
-	 *
-	 * @since 5.4
-	 *
-	 * @param array[]|null $url_list  The URL list. Default null.
-	 * @param string       $post_type Post type name.
-	 * @param int          $page_num  Page of results.
-	 * @return array[]     The URL list.
-	 */
-	public function posts_url_list( $url_list, $post_type, $page_num ) {
-		global $wp_query;
-
-		if ( null === $wp_query->posts ) {
-			return $url_list;
-		}
-
-		$url_list = array();
-
-		/*
-		 * Add a URL for the homepage in the pages sitemap.
-		 * Shows only on the first page if the reading settings are set to display latest posts.
-		 */
-		if ( 'page' === $post_type && 1 === $page_num && 'posts' === \get_option( 'show_on_front' ) ) {
-			// Extract the data needed for home URL to add to the array.
-			$sitemap_entry = array(
-				'loc' => \home_url( '/' ),
-			);
-
-			/**
-			 * Filters the sitemap entry for the home page when the 'show_on_front' option equals 'posts'.
-			 *
-			 * @since 5.4
-			 *
-			 * @param array $sitemap_entry Sitemap entry for the home page.
-			 */
-			$sitemap_entry = \apply_filters( 'wp_sitemaps_posts_show_on_front_entry', $sitemap_entry );
-			$url_list[]    = $sitemap_entry;
-		}
-
-		foreach ( $wp_query->posts as $post ) {
-			$sitemap_entry = array(
-				'loc' => \get_permalink( $post ),
-			);
-
-			/**
-			 * Filters the sitemap entry for an individual post.
-			 *
-			 * @since 5.4
-			 *
-			 * @param array   $sitemap_entry Sitemap entry for the post.
-			 * @param WP_Post $post          Post object.
-			 * @param string  $post_type     Name of the post_type.
-			 */
-			$sitemap_entry = \apply_filters( 'wp_sitemaps_posts_entry', $sitemap_entry, $post, $post_type );
-			$url_list[]    = $sitemap_entry;
-		}
-
-		return $url_list;
-	}
-
-	/**
 	 * Do WP plugin sitemap index redirect
 	 *
 	 * @uses wp_redirect()
 	 */
 	public function redirect() {
-		if ( ! empty( $_SERVER['REQUEST_URI'] ) && 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/sitemap.xml' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( ! empty( $_SERVER['REQUEST_URI'] ) && ( 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/sitemap.xml' ) || 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?feed=sitemap' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			\wp_safe_redirect( namespace\sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
 

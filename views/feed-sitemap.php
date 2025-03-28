@@ -46,7 +46,6 @@ if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) )
 				'number'                 => $limit,
 				'hide_empty'             => true,
 				'hierarchical'           => false,
-				'lang'                   => '',
 				'update_term_meta_cache' => false,
 			),
 			$the_taxonomy
@@ -66,12 +65,11 @@ if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) )
 // Authors.
 if ( empty( $disabled ) || ! in_array( 'users', (array) $disabled, true ) ) {
 	echo '<sitemap><loc>' . esc_xml( XMLSF\sitemap_url( 'author' ) ) . '</loc>';
-	$lastmod = get_lastpostdate( 'GMT' );
+	$lastmod = get_lastpostdate( 'GMT', 'post' );
 	if ( $lastmod ) {
-		'<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';
+		echo '<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';
 	}
 	echo '</sitemap>' . PHP_EOL;
-
 }
 
 // Custom URLs sitemap.

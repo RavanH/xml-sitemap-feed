@@ -8,22 +8,19 @@ ROADMAP
 * drop dynamic priority?
 
 = 5.5 =
-* FIX Polylang home pages for non-default languages in core server page sitemaps
-* FIX Polylang lastmod for post/pages sitemaps in core server index
-* Make Polylang lastmod dates per language
+
 
 TEST
-* quick/bulk edit fields should not be in non-included post types
-* Nginx Helper purge wildcard not working?
 * XMLSF Advanced plugin compatibility
+* Nginx Helper purge wildcard not working?
 * theme template overrides
 * test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 * test add-inserter old issue
 * test bbpress
 * test WPML
-* de/reactivation + uninstall
 
 = 5.6 =
+* Make Polylang lastmod dates per language
 * Make leaner still: only load sitemap class and functions on xmlsf_sitemap_loaded ... same for news.
 General settings for Home page:
 * get_home_priority() : allow editable priority >>> homepage priority
@@ -58,11 +55,4 @@ CONSIDER
 
 CORE SITEMAP:
 * TODO Maybe add dedicated Media sitemap if image tags are (still) not possible OR completely replace the renderer?
-* add custom post type root pages...
-		// EITHER with:
-		// wp_sitemaps_posts_pre_url_list (replacing the whole posts provider url_list);
-		// * if ( $post_type_archive_url = get_post_type_archive_link( $post_type ) ) {
-		// *     $sitemap_entry = array( 'loc' => $post_type_archive_url );
-		// *     $url_list[] = apply_filters( 'xmlsf_post_type_archive_entry', $sitemap_entry, $post_type );;
-		// * }*/
-		// OR with a separate "root" sitemap.
+* add custom post type root pages... with a separate "root" sitemap?

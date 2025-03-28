@@ -108,7 +108,7 @@ class Polylang {
 	public static function remove_replace_provider() {
 		// Polylang compatibility: prevent sitemap translations.
 		global $polylang;
-		if ( isset( $polylang ) && \is_object( $polylang->sitemaps ) ) {
+		if ( isset( $polylang ) && is_object( $polylang ) && property_exists( $polylang, 'sitemaps' ) && \is_object( $polylang->sitemaps ) ) {
 			\remove_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) );
 		}
 	}
@@ -118,7 +118,7 @@ class Polylang {
 	 */
 	public static function add_replace_provider() {
 		global $polylang;
-		if ( isset( $polylang ) && ! \has_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) ) ) {
+		if ( isset( $polylang ) && is_object( $polylang ) && property_exists( $polylang, 'sitemaps' ) && ! \has_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) ) ) {
 			// Re-add Polylang filter.
 			\add_filter( 'wp_sitemaps_add_provider', array( $polylang->sitemaps, 'replace_provider' ) );
 		}
@@ -188,5 +188,16 @@ class Polylang {
 				echo '</url>';
 			}
 		}
+	}
+
+	/**
+	 * Polylang sitemap subtype filter
+	 *
+	 * @param string $subtype The subtype.
+	 *
+	 * @return string
+	 */
+	public static function filter_sitemap_subtype( $subtype ) {
+		return array_shift( explode( '-', $subtype ) );
 	}
 }

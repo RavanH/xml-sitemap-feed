@@ -17,12 +17,20 @@ abstract class Sitemap {
 	 * @var string
 	 */
 	protected $slug;
+
 	/**
 	 * Post types included in sitemap index
 	 *
 	 * @var array
 	 */
 	protected $post_types = array();
+
+	/**
+	 * Post types included in sitemap index
+	 *
+	 * @var array
+	 */
+	protected $rewrite_rules = array();
 
 	/**
 	 * Get sitemap slug.
@@ -38,6 +46,40 @@ abstract class Sitemap {
 		}
 
 		return ! empty( $slug ) ? $slug : $this->slug;
+	}
+
+	/**
+	 * Registers sitemap rewrite tags and routing rules.
+	 *
+	 * @since 5.4.5
+	 */
+	public function register_rewrites() {
+		global $wp_rewrite;
+
+		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() ) {
+			return;
+		}
+
+		foreach ( $this->rewrite_rules as $regex => $query ) {
+			\add_rewrite_rule( $regex, $query, 'top' );
+		}
+	}
+
+	/**
+	 * Unregisters sitemap rewrite tags and routing rules.
+	 *
+	 * @since 5.5
+	 */
+	public function unregister_rewrites() {
+		global $wp_rewrite;
+
+		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() ) {
+			return;
+		}
+
+		foreach ( $this->rewrite_rules as $regex => $query ) {
+			\remove_rewrite_rule( $regex, $query, 'top' );
+		}
 	}
 
 	/**

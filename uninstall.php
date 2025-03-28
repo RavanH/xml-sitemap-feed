@@ -77,6 +77,8 @@ function xmlsf_uninstall() {
 	delete_option( 'xmlsf_custom_sitemaps' );
 	delete_option( 'xmlsf_domains' );
 	delete_option( 'xmlsf_news_tags' );
+	delete_option( 'xmlsf_authors' );
+	delete_option( 'xmlsf_post_type_settings' );
 
 	// Remove old transient.
 	delete_transient( 'xmlsf_images_meta_primed' );

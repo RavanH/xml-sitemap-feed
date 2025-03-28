@@ -32,7 +32,7 @@ class Sanitize {
 	 *
 	 * @return mixed
 	 */
-	public static function disabled( $save ) {
+	public static function disabled_providers( $save ) {
 		// Nothing to do really...
 
 		return $save;
@@ -61,22 +61,21 @@ class Sanitize {
 	 * @return array
 	 */
 	public static function taxonomy_settings( $save ) {
-		$sanitized = xmlsf()->defaults( 'taxonomy_settings' );
-		$save      = (array) $save;
+		$save = (array) $save;
 
 		// Sanitize priority.
 		if ( ! empty( $save['priority'] ) && \is_numeric( $save['priority'] ) ) {
-			$sanitized['priority'] = \XMLSF\sanitize_number( $save['priority'], .1, .9 );
+			$save['priority'] = \XMLSF\sanitize_number( $save['priority'], .1, .9 );
 		} else {
 			$sanitized['priority'] = '';
 		}
 
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
+			$save['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
-		return $sanitized;
+		return $save;
 	}
 
 	/**
@@ -102,42 +101,38 @@ class Sanitize {
 	 * @return array
 	 */
 	public static function author_settings( $save ) {
-		$sanitized = xmlsf()->defaults( 'author_settings' );
-		$save      = (array) $save;
+		$save = (array) $save;
 
-		$sanitized['dynamic_priority'] = ! empty( $save['dynamic_priority'] ) ? '1' : '';
+		$save['dynamic_priority'] = ! empty( $save['dynamic_priority'] ) ? '1' : '';
 
 		// Sanitize priority.
 		if ( ! empty( $save['priority'] ) && \is_numeric( $save['priority'] ) ) {
-			$sanitized['priority'] = \XMLSF\sanitize_number( $save['priority'], .1, .9 );
+			$save['priority'] = \XMLSF\sanitize_number( $save['priority'], .1, .9 );
 		} else {
-			$sanitized['priority'] = '';
+			$save['priority'] = '';
 		}
 
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
+			$save['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
-		return $sanitized;
+		return $save;
 	}
 
 	/**
 	 * Sanitize post types
 	 *
-	 * Clears the comment and image meta data from the database when settings have changed.
-
 	 * @param array $save Settings array.
 	 *
 	 * @return array
 	 */
 	public static function post_types( $save = array() ) {
-		$sanitized = xmlsf()->defaults( 'post_types' );
-		$save      = (array) $save;
+		$save = (array) $save;
 
 		// Sanitize limit.
 		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
-			$sanitized['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
+			$save['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
 		// Sanitize priorities.
@@ -147,13 +142,13 @@ class Sanitize {
 			}
 
 			if ( ! empty( $settings['priority'] ) && \is_numeric( $settings['priority'] ) ) {
-				$sanitized[ $post_type ]['priority'] = \XMLSF\sanitize_number( $settings['priority'], .1, .9 );
+				$save[ $post_type ]['priority'] = \XMLSF\sanitize_number( $settings['priority'], .1, .9 );
 			} else {
-				$sanitized[ $post_type ]['priority'] = '';
+				$save[ $post_type ]['priority'] = '';
 			}
 		}
 
-		return $sanitized;
+		return $save;
 	}
 
 	/**

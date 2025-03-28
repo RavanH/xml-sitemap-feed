@@ -17,8 +17,12 @@ class Sitemap_Plugin extends Sitemap {
 	 * Runs on init
 	 */
 	public function __construct() {
-		$this->slug       = 'sitemap';
-		$this->post_types = (array) \get_option( 'xmlsf_post_types', array() );
+		$this->slug          = 'sitemap';
+		$this->post_types    = (array) \get_option( 'xmlsf_post_types', array() );
+		$this->rewrite_rules = array(
+			'^' . $this->slug . '\.xml$' => 'index.php?feed=sitemap',
+			'^' . $this->slug . '-([a-z]+?)?(-[a-z0-9\-_]+?)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml$' => 'index.php?feed=sitemap-$matches[1]$matches[2]&m=$matches[3]&w=$matches[4]',
+		);
 
 		\add_action( 'init', array( $this, 'register_rewrites' ) );
 
@@ -49,35 +53,6 @@ class Sitemap_Plugin extends Sitemap {
 
 		// Add RT Camp Nginx Helper NGINX HELPER PURGE URLS filter.
 		\add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
-	}
-
-	/**
-	 * Registers sitemap rewrite tags and routing rules.
-	 *
-	 * @since 5.4.5
-	 */
-	public function register_rewrites() {
-		global $wp_rewrite;
-
-		if ( ! $wp_rewrite->using_permalinks() ) {
-			return;
-		}
-
-		$slug = $this->slug();
-
-		// Register index route.
-		\add_rewrite_rule(
-			'^' . $slug . '\.xml$',
-			'index.php?feed=sitemap',
-			'top'
-		);
-
-		// Register routes for providers.
-		\add_rewrite_rule(
-			'^' . $slug . '-([a-z]+?)?(-[a-z0-9\-_]+?)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml$',
-			'index.php?feed=sitemap-$matches[1]$matches[2]&m=$matches[3]&w=$matches[4]',
-			'top'
-		);
 	}
 
 	/**
@@ -124,9 +99,9 @@ class Sitemap_Plugin extends Sitemap {
 				// Prepare priority calculation.
 				if ( ! empty( $this->post_types[ $feed[2] ]['priority'] ) && ! empty( $this->post_types[ $feed[2] ]['dynamic_priority'] ) ) {
 					// Last of this post type modified date in Unix seconds.
-					xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $feed[2] ), 'U' );
+					xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $feed[2] ), DATE_W3C );
 					// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
-					xmlsf()->timespan = xmlsf()->lastmodified - \get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2] ), 'U' );
+					xmlsf()->timespan = xmlsf()->lastmodified - \get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2] ), DATE_W3C );
 					// Total post type comment count.
 					xmlsf()->comment_count = \wp_count_comments()->approved;
 					// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
@@ -330,7 +305,7 @@ class Sitemap_Plugin extends Sitemap {
 	 * @uses wp_redirect()
 	 */
 	public function redirect() {
-		if ( ! empty( $_SERVER['REQUEST_URI'] ) && 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/wp-sitemap.xml' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( ! empty( $_SERVER['REQUEST_URI'] ) && ( 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/wp-sitemap.xml' ) || 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?sitemap=' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			\wp_safe_redirect( namespace\sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
 

@@ -253,7 +253,6 @@ function get_user_modified( $user ) {
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 				'update_cache'           => false,
-				'lang'                   => '', // TODO make multilanguage compatible.
 			)
 		);
 		$lastmod = ! empty( $posts ) ? \get_post_field( 'post_date', $posts[0] ) : '';
@@ -453,7 +452,6 @@ function get_term_modified( $term ) {
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 				'update_cache'           => false,
-				'lang'                   => '',
 				'tax_query'              => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 					array(
 						'taxonomy' => $term->taxonomy,

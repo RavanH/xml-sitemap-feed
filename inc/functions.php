@@ -375,7 +375,7 @@ function plugin_compat() {
 		\add_filter( 'xmlsf_frontpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
 		\add_filter( 'xmlsf_request', array( __NAMESPACE__ . '\Compat\Polylang', 'filter_request' ) );
 		\add_filter( 'xmlsf_news_request', array( __NAMESPACE__ . '\Compat\Polylang', 'filter_request' ) );
-		\add_filter( 'xmlsf_sitemap_loaded', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
+		\add_action( 'xmlsf_sitemap_loaded', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
 		\add_filter( 'xmlsf_news_sitemap_loaded', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
 		\add_filter( 'xmlsf_news_publication_name', array( __NAMESPACE__ . '\Compat\Polylang', 'news_name' ), 10, 2 );
 		\add_filter( 'xmlsf_news_language', array( __NAMESPACE__ . '\Compat\Polylang', 'post_language_filter' ), 10, 2 );
@@ -383,6 +383,7 @@ function plugin_compat() {
 		\add_action( 'xmlsf_register_sitemap_provider_after', array( __NAMESPACE__ . '\Compat\Polylang', 'add_replace_provider' ) );
 		\add_filter( 'xmlsf_root_data', array( __NAMESPACE__ . '\Compat\Polylang', 'root_data' ) );
 		\add_filter( 'xmlsf_url_after', array( __NAMESPACE__ . '\Compat\Polylang', 'author_archive_translations' ), 10, 3 );
+		\add_filter( 'xmlsf_sitemap_subtype', array( __NAMESPACE__ . '\Compat\Polylang', 'filter_sitemap_subtype' ) );
 	}
 
 	if ( in_array( 'sitepress-multilingual-cms/sitepress.php', $active_plugins, true ) ) {
@@ -391,6 +392,8 @@ function plugin_compat() {
 		\add_action( 'xmlsf_add_settings', array( __NAMESPACE__ . '\Compat\WPML', 'remove_home_url_filter' ) );
 		\add_action( 'xmlsf_news_add_settings', array( __NAMESPACE__ . '\Compat\WPML', 'remove_home_url_filter' ) );
 		\add_filter( 'xmlsf_request', array( __NAMESPACE__ . '\Compat\WPML', 'filter_request' ) );
+		\add_filter( 'xmlsf_core_request', array( __NAMESPACE__ . '\Compat\WPML', 'filter_request' ) );
+		\add_action( 'xmlsf_sitemap_loaded', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
 		\add_filter( 'xmlsf_news_request', array( __NAMESPACE__ . '\Compat\WPML', 'filter_request' ) );
 		\add_action( 'xmlsf_url', array( __NAMESPACE__ . '\Compat\WPML', 'language_switcher' ) );
 		\add_action( 'xmlsf_news_url', array( __NAMESPACE__ . '\Compat\WPML', 'language_switcher' ) );

@@ -57,6 +57,17 @@ class WPML {
 	 * @return array
 	 */
 	public static function filter_request( $request ) {
+		$request['lang'] = ''; // Strip off potential lang url parameter.
+
+		return $request;
+	}
+
+	/**
+	 * WPML compatibility hooked into xml request filter
+	 *
+	 * @return void
+	 */
+	public static function request_actions() {
 		global $sitepress, $wpml_query_filter;
 
 		if ( \is_object( $sitepress ) ) {
@@ -73,10 +84,6 @@ class WPML {
 			\remove_filter( 'posts_join', array( $wpml_query_filter, 'posts_join_filter' ), 10, 2 );
 			\remove_filter( 'posts_where', array( $wpml_query_filter, 'posts_where_filter' ), 10, 2 );
 		}
-
-		$request['lang'] = ''; // Strip off potential lang url parameter.
-
-		return $request;
 	}
 
 	/**
