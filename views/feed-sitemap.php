@@ -51,7 +51,7 @@ if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) )
 			$the_taxonomy
 		);
 		if ( wp_count_terms( $args ) ) {
-			$url     = XMLSF\sitemap_url( 'taxonomy', array( 'type' => $the_taxonomy ) );
+			$url     = xmlsf()->sitemap->get_sitemap_url( 'taxonomy', array( 'type' => $the_taxonomy ) );
 			$lastmod = XMLSF\get_taxonomy_modified( $the_taxonomy );
 			echo '<sitemap><loc>' . esc_xml( $url ) . '</loc>';
 			if ( $lastmod ) {
@@ -64,7 +64,7 @@ if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) )
 
 // Authors.
 if ( empty( $disabled ) || ! in_array( 'users', (array) $disabled, true ) ) {
-	echo '<sitemap><loc>' . esc_xml( XMLSF\sitemap_url( 'author' ) ) . '</loc>';
+	echo '<sitemap><loc>' . esc_xml( xmlsf()->sitemap->get_sitemap_url( 'author' ) ) . '</loc>';
 	$lastmod = get_lastpostdate( 'GMT', 'post' );
 	if ( $lastmod ) {
 		echo '<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';
@@ -74,7 +74,7 @@ if ( empty( $disabled ) || ! in_array( 'users', (array) $disabled, true ) ) {
 
 // Custom URLs sitemap.
 if ( apply_filters( 'xmlsf_custom_urls', get_option( 'xmlsf_urls' ) ) ) {
-	echo '<sitemap><loc>' . esc_xml( XMLSF\sitemap_url( 'custom' ) ) . '</loc></sitemap>' . PHP_EOL;
+	echo '<sitemap><loc>' . esc_xml( xmlsf()->sitemap->get_sitemap_url( 'custom' ) ) . '</loc></sitemap>' . PHP_EOL;
 }
 
 // Custom sitemaps.

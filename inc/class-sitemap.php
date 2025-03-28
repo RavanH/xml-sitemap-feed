@@ -33,9 +33,16 @@ abstract class Sitemap {
 	protected $rewrite_rules = array();
 
 	/**
+	 * Uses core server?
+	 *
+	 * @var null|bool
+	 */
+	protected $uses_core_server;
+
+	/**
 	 * Get sitemap slug.
 	 *
-	 * @since 5.7
+	 * @since 5.5
 	 */
 	public function slug() {
 		$slug = (string) \apply_filters( 'xmlsf_sitemap_slug', $this->slug );
@@ -54,13 +61,12 @@ abstract class Sitemap {
 	 * @since 5.4.5
 	 */
 	public function register_rewrites() {
-		global $wp_rewrite;
-
-		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() ) {
+		if ( empty( $this->rewrite_rules ) || ! xmlsf()->using_permalinks() ) {
+			// Nothing to do.
 			return;
 		}
 
-		foreach ( $this->rewrite_rules as $regex => $query ) {
+		foreach ( (array) $this->rewrite_rules as $regex => $query ) {
 			\add_rewrite_rule( $regex, $query, 'top' );
 		}
 	}
@@ -71,15 +77,35 @@ abstract class Sitemap {
 	 * @since 5.5
 	 */
 	public function unregister_rewrites() {
-		global $wp_rewrite;
-
-		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() ) {
+		if ( empty( $this->rewrite_rules ) || ! xmlsf()->using_permalinks() ) {
+			// Nothing to do.
 			return;
 		}
 
 		foreach ( $this->rewrite_rules as $regex => $query ) {
 			\remove_rewrite_rule( $regex, $query, 'top' );
 		}
+	}
+
+	/**
+	 * Are we using the WP core server?
+	 * Returns whether the WordPress core sitemap server is used or not.
+	 *
+	 * @since 5.4
+	 *
+	 * @return bool
+	 */
+	public function uses_core_server() {
+		if ( null === $this->uses_core_server ) {
+			// Sitemap disabled, core server unavailable or user selected Plugin server.
+			if ( ! namespace\sitemaps_enabled( 'sitemap' ) || ! \function_exists( 'get_sitemap_url' ) || 'core' !== \get_option( 'xmlsf_server', xmlsf()->defaults( 'server' ) ) ) {
+				$this->uses_core_server = false;
+			} else {
+				$this->uses_core_server = true;
+			}
+		}
+
+		return $this->uses_core_server;
 	}
 
 	/**

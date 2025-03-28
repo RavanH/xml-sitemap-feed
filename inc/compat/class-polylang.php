@@ -50,7 +50,7 @@ class Polylang {
 	 * @return array
 	 */
 	public static function filter_request( $request ) {
-		if ( ! xmlsf()->uses_core_server() ) {
+		if ( ! xmlsf()->sitemap->uses_core_server() ) {
 			$request['lang'] = '';
 		}
 

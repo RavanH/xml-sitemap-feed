@@ -56,6 +56,60 @@ class Sitemap_Plugin extends Sitemap {
 	}
 
 	/**
+	 * Get the public XML sitemap url.
+	 *
+	 * @since 5.5
+	 *
+	 * @param string $sitemap Sitemap name.
+	 * @param array  $args    Arguments array:
+	 *                        $type - post_type or taxonomy, default false
+	 *                        $m    - YYYY, YYYYMM, YYYYMMDD
+	 *                        $w    - week of the year ($m must be YYYY format)
+	 *                        $gz   - bool for GZ extension (triggers compression verification).
+	 *
+	 * @return string|false The sitemap URL or false if the sitemap doesn't exist.
+	 */
+	public function get_sitemap_url( $sitemap = 'index', $args = array() ) {
+		$index = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
+
+		// Get our arguments.
+		$args = \apply_filters(
+			'xmlsf_index_url_args',
+			\wp_parse_args(
+				$args,
+				array(
+					'type' => false,
+					'm'    => false,
+					'w'    => false,
+				)
+			)
+		);
+
+		if ( xmlsf()->using_permalinks() ) {
+			// Construct file name.
+			$name = $this->slug();
+			if ( 'index' !== $sitemap ) {
+				$name .= '-' . $sitemap;
+				$name .= $args['type'] ? '-' . $args['type'] : '';
+				$name .= $args['m'] ? '.' . $args['m'] : '';
+				$name .= $args['w'] ? '.' . $args['w'] : '';
+			}
+			$name .= '.xml';
+		} else {
+			// Construct request string.
+			$name = '?feed=sitemap';
+			if ( 'index' !== $sitemap ) {
+				$name .= '-' . $sitemap;
+				$name .= $args['type'] ? '-' . $args['type'] : '';
+				$name .= $args['m'] ? '&m=' . $args['m'] : '';
+				$name .= $args['w'] ? '&w=' . $args['w'] : '';
+			}
+		}
+
+		return \esc_url( \trailingslashit( \home_url() ) . $index . $name );
+	}
+
+	/**
 	 * Filter request
 	 *
 	 * @param array $request Original request.
@@ -307,7 +361,7 @@ class Sitemap_Plugin extends Sitemap {
 	public function redirect() {
 		if ( ! empty( $_SERVER['REQUEST_URI'] ) && ( 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/wp-sitemap.xml' ) || 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?sitemap=' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
-			\wp_safe_redirect( namespace\sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
+			\wp_safe_redirect( $this->get_sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
 
 			exit();
 		}
@@ -346,7 +400,7 @@ class Sitemap_Plugin extends Sitemap {
 			$arcresults = $this->cache_get_archives( $query );
 
 			foreach ( (array) $arcresults as $arcresult ) {
-				$url            = namespace\sitemap_url(
+				$url            = $this->get_sitemap_url(
 					'posttype',
 					array(
 						'type' => $post_type,
@@ -363,7 +417,7 @@ class Sitemap_Plugin extends Sitemap {
 			$arcresults = $this->cache_get_archives( $query );
 
 			foreach ( (array) $arcresults as $arcresult ) {
-				$url            = namespace\sitemap_url(
+				$url            = $this->get_sitemap_url(
 					'posttype',
 					array(
 						'type' => $post_type,
@@ -379,7 +433,7 @@ class Sitemap_Plugin extends Sitemap {
 			$arcresults = $this->cache_get_archives( $query );
 
 			foreach ( (array) $arcresults as $arcresult ) {
-				$url            = namespace\sitemap_url(
+				$url            = $this->get_sitemap_url(
 					'posttype',
 					array(
 						'type' => $post_type,
@@ -395,7 +449,7 @@ class Sitemap_Plugin extends Sitemap {
 			$arcresults = $this->cache_get_archives( $query );
 
 			if ( is_object( $arcresults[0] ) && $arcresults[0]->posts > 0 ) {
-				$url            = namespace\sitemap_url( 'posttype', array( 'type' => $post_type ) );
+				$url            = $this->get_sitemap_url( 'posttype', array( 'type' => $post_type ) );
 				$return[ $url ] = \get_date_from_gmt( \get_lastmodified( 'GMT', $post_type ), DATE_W3C );
 			}
 
@@ -462,7 +516,7 @@ class Sitemap_Plugin extends Sitemap {
 			// Add public post taxonomies sitemaps.
 			$taxonomies = namespace\get_taxonomies();
 			foreach ( $taxonomies as $taxonomy ) {
-				$path = \wp_parse_url( namespace\sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
+				$path = \wp_parse_url( $this->get_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
 				if ( $path ) {
 					$urls[] = $path;
 				}

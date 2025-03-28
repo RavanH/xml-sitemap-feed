@@ -45,66 +45,6 @@ function sitemap_loaded() {
 }
 
 /**
- * Get the public XML sitemap url.
- *
- * @since 5.4
- *
- * @param string $sitemap Sitemap name.
- * @param array  $args    Arguments array:
- *                        $type - post_type or taxonomy, default false
- *                        $m    - YYYY, YYYYMM, YYYYMMDD
- *                        $w    - week of the year ($m must be YYYY format)
- *                        $gz   - bool for GZ extension (triggers compression verification).
- *
- * @return string|false The sitemap URL or false if the sitemap doesn't exist.
- */
-function sitemap_url( $sitemap = 'index', $args = array() ) {
-	global $wp_rewrite;
-
-	if ( 'news' === $sitemap ) {
-		return $wp_rewrite->using_permalinks() ? \esc_url( \trailingslashit( \home_url() ) . 'sitemap-news.xml' ) : \esc_url( \trailingslashit( \home_url() ) . '?feed=sitemap-news' );
-	}
-
-	// Use core function get_sitemap_url if using core sitemaps.
-	if ( xmlsf()->uses_core_server() ) {
-		return \get_sitemap_url( $sitemap );
-	}
-
-	if ( 'index' === $sitemap ) {
-		return $wp_rewrite->using_permalinks() ? \esc_url( \trailingslashit( \home_url() ) . 'sitemap.xml' ) : \esc_url( \trailingslashit( \home_url() ) . '?feed=sitemap' );
-	}
-
-	// Get our arguments.
-	$args = \apply_filters(
-		'xmlsf_index_url_args',
-		\wp_parse_args(
-			$args,
-			array(
-				'type' => false,
-				'm'    => false,
-				'w'    => false,
-			)
-		)
-	);
-
-	// Construct file name.
-	if ( $wp_rewrite->using_permalinks() ) {
-		$name  = 'sitemap-' . $sitemap;
-		$name .= $args['type'] ? '-' . $args['type'] : '';
-		$name .= $args['m'] ? '.' . $args['m'] : '';
-		$name .= $args['w'] ? '.' . $args['w'] : '';
-		$name .= '.xml';
-	} else {
-		$name  = '?feed=sitemap-' . $sitemap;
-		$name .= $args['type'] ? '-' . $args['type'] : '';
-		$name .= $args['m'] ? '&m=' . $args['m'] : '';
-		$name .= $args['w'] ? '&w=' . $args['w'] : '';
-	}
-
-	return \esc_url( \trailingslashit( \home_url() ) . $name );
-}
-
-/**
  * Print XML Stylesheet
  *
  * @param string|false $sitemap Optional sitemap name.
@@ -357,8 +297,12 @@ function robots_txt( $output ) {
 	} elseif ( ! namespace\sitemaps_enabled() ) {
 		$output .= '# No XML Sitemaps are enabled.' . PHP_EOL;
 	} else {
-		namespace\sitemaps_enabled( 'sitemap' ) && $output .= 'Sitemap: ' . namespace\sitemap_url() . PHP_EOL;
-		namespace\sitemaps_enabled( 'news' ) && $output    .= 'Sitemap: ' . namespace\sitemap_url( 'news' ) . PHP_EOL;
+		if ( namespace\sitemaps_enabled( 'sitemap' ) && ! xmlsf()->sitemap->uses_core_server() ) {
+			$output .= 'Sitemap: ' . xmlsf()->sitemap->get_sitemap_url() . PHP_EOL;
+		}
+		if ( namespace\sitemaps_enabled( 'news' ) ) {
+			$output .= 'Sitemap: ' . xmlsf()->sitemap_news->get_sitemap_url() . PHP_EOL;
+		}
 	}
 
 	return $output;

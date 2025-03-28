@@ -16,6 +16,12 @@ namespace XMLSF;
  * @since 5.4
  */
 class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
+	/**
+	 * Sitemap slug
+	 *
+	 * @var string
+	 */
+	private $slug = 'sitemap-news';
 
 	/**
 	 * External Custom Sitemap URLs.
@@ -27,7 +33,7 @@ class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 	private $urls = array();
 
 	/**
-	 * WP_Sitemaps_Posts constructor.
+	 * WP_Sitemaps_News constructor.
 	 *
 	 * @since 5.4
 	 */
@@ -35,8 +41,32 @@ class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 		$this->name        = 'news';
 		$this->object_type = 'news';
 
-		$urls       = (array) namespace\sitemap_url( 'news' );
+		$urls  = array();
+		$index = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
+		if ( xmlsf()->using_permalinks() ) {
+			$name = $this->slug() . '.xml';
+		} else {
+			$name = '?feed=sitemap-news';
+		}
+		$urls[] = \esc_url( \trailingslashit( \home_url() ) . $index . $name );
+
 		$this->urls = \array_filter( $urls, 'wp_http_validate_url' );
+	}
+
+	/**
+	 * Get sitemap slug.
+	 *
+	 * @since 5.5
+	 */
+	public function slug() {
+		$slug = (string) \apply_filters( 'xmlsf_sitemap_news_slug', $this->slug );
+
+		// Clean filename if altered.
+		if ( $this->slug !== $slug ) {
+			$slug = \sanitize_key( $slug );
+		}
+
+		return ! empty( $slug ) ? $slug : $this->slug;
 	}
 
 	/**
@@ -83,7 +113,7 @@ class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 
 		for ( $page = 1; $page <= $pages; $page++ ) {
 			$sitemap_entry = array(
-				'loc' => $this->get_sitemap_url( '', $page ),
+				'loc' => $this->get_sitemap_url( $page ),
 			);
 
 			/**
@@ -112,11 +142,10 @@ class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 	 *
 	 * @global WP_Rewrite $wp_rewrite WordPress rewrite component.
 	 *
-	 * @param string $name The name of the sitemap.
-	 * @param int    $page The page of the sitemap.
+	 * @param int $page The page of the sitemap.
 	 * @return string The composed URL for a sitemap entry.
 	 */
-	public function get_sitemap_url( $name, $page ) {
+	public function get_sitemap_url( $page ) {
 		$pos = (int) $page - 1;
 		return $this->urls[ $pos ];
 	}

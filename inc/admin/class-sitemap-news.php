@@ -246,7 +246,7 @@ class Sitemap_News {
 		\do_action( 'xmlsf_news_add_settings', $active_tab );
 
 		// prepare sitemap link url.
-		$sitemap_url = \XMLSF\sitemap_url( 'news' );
+		$sitemap_url = xmlsf()->sitemap_news->get_sitemap_url();
 
 		// Sidebar actions.
 		\add_action(

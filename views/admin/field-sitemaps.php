@@ -19,7 +19,7 @@
 	<span class="description">
 		&nbsp;&ndash;&nbsp;
 		<a href="<?php echo esc_attr( admin_url( 'options-general.php' ) ); ?>?page=xmlsf" id="xmlsf_link"><?php echo esc_html( translate( 'Settings' ) ); ?></a> |
-		<a href="<?php echo esc_attr( XMLSF\sitemap_url() ); ?>" target="_blank"><?php echo esc_html( translate( 'View' ) ); ?></a>
+		<a href="<?php echo esc_attr( xmlsf()->sitemap->get_sitemap_url() ); ?>" target="_blank"><?php echo esc_html( translate( 'View' ) ); ?></a>
 	</span>
 	<?php } ?>
 
@@ -36,7 +36,7 @@
 	<span class="description">
 		&nbsp;&ndash;&nbsp;
 		<a href="<?php echo esc_url( admin_url( 'options-general.php' ) ); ?>?page=xmlsf_news" id="xmlsf_news_link"><?php echo esc_html( translate( 'Settings' ) ); ?></a> |
-		<a href="<?php echo esc_url( XMLSF\sitemap_url( 'news' ) ); ?>" target="_blank"><?php echo esc_html( translate( 'View' ) ); ?></a>
+		<a href="<?php echo esc_url( xmlsf()->sitemap->get_sitemap_url( 'news' ) ); ?>" target="_blank"><?php echo esc_html( translate( 'View' ) ); ?></a>
 	</span>
 	<?php } ?>
 

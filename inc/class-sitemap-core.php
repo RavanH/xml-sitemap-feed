@@ -83,6 +83,20 @@ class Sitemap_Core extends Sitemap {
 	}
 
 	/**
+	 * Get the public XML sitemap url.
+	 *
+	 * @since 5.5
+	 *
+	 * @param string $sitemap Sitemap name.
+	 *
+	 * @return string|false The sitemap URL or false if the sitemap doesn't exist.
+	 */
+	public function get_sitemap_url( $sitemap = 'index' ) {
+		// Use core function get_sitemap_url if using core sitemaps.
+		return \get_sitemap_url( $sitemap );
+	}
+
+	/**
 	 * Filter request
 	 * Hooked into wp_sitemaps_init.
 	 */
@@ -613,7 +627,7 @@ class Sitemap_Core extends Sitemap {
 	public function redirect() {
 		if ( ! empty( $_SERVER['REQUEST_URI'] ) && ( 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/sitemap.xml' ) || 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?feed=sitemap' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
-			\wp_safe_redirect( namespace\sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
+			\wp_safe_redirect( $this->get_sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
 
 			exit();
 		}

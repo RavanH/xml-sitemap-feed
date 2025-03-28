@@ -143,7 +143,7 @@ class Admin {
 
 			// Switched on sitemap.
 			if ( ! empty( $value['sitemap'] ) && empty( $old['sitemap'] ) ) {
-				$slug    = \is_object( xmlsf()->sitemap ) ? xmlsf()->sitemap->slug() : ( xmlsf()->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+				$slug    = \is_object( xmlsf()->sitemap ) ? xmlsf()->sitemap->slug() : ( xmlsf()->sitemap->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
 				$files[] = $slug . '.xml';
 			}
 

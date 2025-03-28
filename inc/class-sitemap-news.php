@@ -62,7 +62,7 @@ class Sitemap_News {
 	/**
 	 * Get sitemap slug.
 	 *
-	 * @since 5.7
+	 * @since 5.5
 	 */
 	public function slug() {
 		$slug = (string) \apply_filters( 'xmlsf_sitemap_news_slug', $this->slug );
@@ -79,7 +79,7 @@ class Sitemap_News {
 	 * Add Google News sitemap to the plugin sitemap index
 	 */
 	public function news_in_plugin_index() {
-		$url        = namespace\sitemap_url( 'news' );
+		$url        = $this->get_sitemap_url();
 		$options    = \get_option( 'xmlsf_news_tags' );
 		$post_types = isset( $options['post_type'] ) && ! empty( $options['post_type'] ) ? (array) $options['post_type'] : array( 'post' );
 		foreach ( $post_types as $post_type ) {
@@ -94,6 +94,25 @@ class Sitemap_News {
 			echo '<lastmod>' . \esc_xml( $lastmod ) . '</lastmod>';
 		}
 		echo '</sitemap>' . PHP_EOL;
+	}
+
+	/**
+	 * Get the public XML sitemap url.
+	 *
+	 * @since 5.5
+	 *
+	 * @return string The sitemap URL.
+	 */
+	public function get_sitemap_url() {
+		$index = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
+
+		if ( xmlsf()->using_permalinks() ) {
+			$name = $this->slug() . '.xml';
+		} else {
+			$name = '?feed=sitemap-news';
+		}
+
+		return \esc_url( \trailingslashit( \home_url() ) . $index . $name );
 	}
 
 	/**

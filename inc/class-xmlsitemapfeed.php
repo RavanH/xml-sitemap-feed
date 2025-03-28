@@ -143,6 +143,13 @@ class XMLSitemapFeed {
 	public $blogpages = null;
 
 	/**
+	 * Using permalinks?
+	 *
+	 * @var null|bool
+	 */
+	protected $using_permalinks;
+
+	/**
 	 * Constructor
 	 *
 	 * @return void
@@ -180,7 +187,7 @@ class XMLSitemapFeed {
 
 			\add_action( 'xmlsf_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
 
-			if ( $this->uses_core_server() ) {
+			if ( \function_exists( 'get_sitemap_url' ) && 'core' === \get_option( 'xmlsf_server', $this->defaults( 'server' ) ) ) {
 				// Extend core sitemap.
 				$this->sitemap = new Sitemap_Core();
 			} else {
@@ -198,22 +205,20 @@ class XMLSitemapFeed {
 	}
 
 	/**
-	 * Are we using the WP core server?
-	 * Returns whether the WordPress core sitemap server is used or not.
+	 * Are we using permalinks?
 	 *
-	 * @since 5.4
+	 * Cannot use $wp_rewrite->using_permalinks() because that returns true if /index.php is in the permalink structure.
 	 *
-	 * @return bool
+	 * @since 5.5
 	 */
-	public function uses_core_server() {
-		// Sitemap disabled.
-		if ( ! namespace\sitemaps_enabled( 'sitemap' ) || ! \function_exists( 'get_sitemap_url' ) ) {
-			return false;
+	public function using_permalinks() {
+		global $wp_rewrite;
+
+		if ( null === $this->using_permalinks ) {
+			$this->using_permalinks = $wp_rewrite->using_permalinks() && 0 !== strpos( get_option( 'permalink_structure' ), '/index.php' );
 		}
 
-		// Check settings.
-		$server = \get_option( 'xmlsf_server', $this->defaults( 'server' ) );
-		return ! empty( $server ) && 'core' === $server;
+		return $this->using_permalinks;
 	}
 
 	/**
@@ -221,7 +226,7 @@ class XMLSitemapFeed {
 	 *
 	 * @param bool $key Which key to get.
 	 *
-	 * @return array
+	 * @return array|string|bool|null
 	 */
 	public function defaults( $key = false ) {
 		if ( empty( $this->defaults ) ) :
@@ -278,7 +283,7 @@ class XMLSitemapFeed {
 		endif;
 
 		if ( $key ) {
-			$return = ( isset( $this->defaults[ $key ] ) ) ? $this->defaults[ $key ] : '';
+			$return = ( isset( $this->defaults[ $key ] ) ) ? $this->defaults[ $key ] : null;
 		} else {
 			$return = $this->defaults;
 		}
