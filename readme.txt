@@ -154,6 +154,8 @@ Date:
 * NEW: Filter xmlsf_taxonomies_query_args
 * NEW: Filter xmlsf_news_hours_old
 * NEW: post types max number
+* NEW: custom urls sitemap for core server
+* NEW: external sitemaps for core server
 * Namespacing & autoloading
 * Admin notices for Slim SEO, Squirrly SEO, Jetpack Sitemaps & XML Sitemaps Manager
 * FIX: Polylang news sitemap category selection

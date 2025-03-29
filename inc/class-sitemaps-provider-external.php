@@ -1,6 +1,6 @@
 <?php
 /**
- * Sitemaps: Sitemaps_Provider_News class
+ * Sitemaps: Sitemaps_Provider_Custom class
  *
  * Builds the sitemaps for the External Suctom Sitemaps.
  *
@@ -15,38 +15,33 @@ namespace XMLSF;
  *
  * @since 5.4
  */
-class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
-	/**
-	 * Sitemap slug
-	 *
-	 * @var string
-	 */
-	private $slug = 'sitemap-news';
+class Sitemaps_Provider_External extends \WP_Sitemaps_Provider {
 
 	/**
-	 * WP_Sitemaps_News constructor.
+	 * External Custom Sitemap URLs.
+	 *
+	 * @since 5.4
+	 *
+	 * @var array
+	 */
+	private $urls = array();
+
+	/**
+	 * WP_Sitemaps_Posts constructor.
 	 *
 	 * @since 5.4
 	 */
 	public function __construct() {
-		$this->name        = 'news';
-		$this->object_type = 'post';
-	}
+		$this->name        = 'external';
+		$this->object_type = 'url';
 
-	/**
-	 * Get sitemap slug.
-	 *
-	 * @since 5.5
-	 */
-	public function slug() {
-		$slug = (string) \apply_filters( 'xmlsf_sitemap_news_slug', $this->slug );
+		// Fetch external sitemap URLs.
+		add_filter( 'http_request_host_is_external', '__return_true' ); // Allow external domains while validating URLs.
 
-		// Clean filename if altered.
-		if ( $this->slug !== $slug ) {
-			$slug = \sanitize_key( $slug );
-		}
+		$urls       = (array) \apply_filters( 'xmlsf_custom_sitemaps', (array) \get_option( 'xmlsf_custom_sitemaps', array() ) );
+		$this->urls = \array_filter( $urls, 'wp_http_validate_url' );
 
-		return ! empty( $slug ) ? $slug : $this->slug;
+		remove_filter( 'http_request_host_is_external', '__return_true' );
 	}
 
 	/**
@@ -74,7 +69,7 @@ class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 	 * @return int Total number of pages.
 	 */
 	public function get_max_num_pages( $object_subtype = '' ) {
-		return 1;
+		return \count( $this->urls );
 	}
 
 	/**
@@ -127,17 +122,8 @@ class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 	 * @return string The composed URL for a sitemap entry.
 	 */
 	public function get_sitemap_url( $name, $page ) {
-		global $wp_rewrite;
+		$pos = (int) $page - 1;
 
-		$slug  = $this->slug();
-		$index = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
-
-		if ( $wp_rewrite->using_permalinks() && ! $index ) {
-			$basename = '/' . $slug . '.xml';
-		} else {
-			$basename = '/' . $index . '?feed=' . $slug;
-		}
-
-		return \home_url( $basename );
+		return $this->urls[ $pos ];
 	}
 }

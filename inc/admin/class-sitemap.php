@@ -128,7 +128,7 @@ class Sitemap {
 
 			// When core sitemap server is used.
 			if ( \is_object( xmlsf()->sitemap ) ) {
-				\XMLSF\Admin\Admin::check_static_files( xmlsf()->sitemap->slug() . '.xml' );
+				\XMLSF\Admin\Admin::check_static_files( xmlsf()->sitemap->slug() . '.xml', 2 );
 			}
 		}
 

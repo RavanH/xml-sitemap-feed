@@ -197,9 +197,8 @@ function load_template( $is_comment_feed, $feed ) {
 	}
 	$templates[] = 'sitemap.php';
 
-	// Find and load theme template file or use plugin template.
+	// Locate and load theme template file or use plugin template.
 	if ( ! \locate_template( $templates, true ) ) {
-		// Still here? Then fall back on a matching plugin template file.
 		foreach ( $templates as $template ) {
 			$file = XMLSF_DIR . '/views/feed-' . $template;
 			if ( \file_exists( $file ) ) {
@@ -347,6 +346,10 @@ function plugin_compat() {
 	if ( in_array( 'bbpress/bbpress.php', $active_plugins, true ) ) {
 		\add_filter( 'xmlsf_request', array( __NAMESPACE__ . '\Compat\BBPress', 'filter_request' ) );
 		\add_filter( 'xmlsf_news_request', array( __NAMESPACE__ . '\Compat\BBPress', 'filter_request' ) );
+	}
+
+	if ( in_array( 'xml-sitemaps-manager/xml-sitemaps-manager.php', $active_plugins, true ) ) {
+		\add_filter( 'plugins_loaded', array( __NAMESPACE__ . '\Compat\XMLSM', 'disable' ), 11 );
 	}
 }
 

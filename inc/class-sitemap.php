@@ -61,7 +61,9 @@ abstract class Sitemap {
 	 * @since 5.4.5
 	 */
 	public function register_rewrites() {
-		if ( empty( $this->rewrite_rules ) || ! xmlsf()->using_permalinks() ) {
+		global $wp_rewrite;
+
+		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() || 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ) {
 			// Nothing to do.
 			return;
 		}
@@ -77,7 +79,9 @@ abstract class Sitemap {
 	 * @since 5.5
 	 */
 	public function unregister_rewrites() {
-		if ( empty( $this->rewrite_rules ) || ! xmlsf()->using_permalinks() ) {
+		global $wp_rewrite;
+
+		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() || 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ) {
 			// Nothing to do.
 			return;
 		}

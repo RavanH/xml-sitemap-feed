@@ -1,5 +1,5 @@
 FIX
-* ?
+* core index news lastmod
 
 ROADMAP
 * move sitemap fields (back) to Sitemap class?
@@ -7,19 +7,15 @@ ROADMAP
 * quick edit "exclude" option for news sitemap too...
 * drop dynamic priority?
 
-= 5.5 =
-
-
 TEST
-* XMLSF Advanced plugin compatibility
+* static files check after sitemap activation and tools
 * Nginx Helper purge wildcard not working?
 * theme template overrides
 * test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
-* test add-inserter old issue
-* test bbpress
 * test WPML
 
 = 5.6 =
+* switch naar unregister_rewrites en register_rewrites bij activeren/deactiveren sitemaps
 * Make Polylang lastmod dates per language
 * Make leaner still: only load sitemap class and functions on xmlsf_sitemap_loaded ... same for news.
 General settings for Home page:

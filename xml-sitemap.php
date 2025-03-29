@@ -3,7 +3,7 @@
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
  * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.5-alpha30
+ * Version: 5.5-alpha32
  * Text Domain: xml-sitemap-feed
  * Requires at least: 4.4
  * Requires PHP: 5.6
@@ -13,12 +13,12 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.5-alpha30' );
+define( 'XMLSF_VERSION', '5.5-alpha32' );
 define( 'XMLSF_ADV_MIN_VERSION', '0.1' );
 define( 'XMLSF_NEWS_ADV_MIN_VERSION', '1.3.5' );
 
 /**
- * Copyright 2024 RavanH
+ * Copyright 2025 RavanH
  * https://status301.net/
  * mailto: ravanhagen@gmail.com
 
@@ -64,7 +64,7 @@ require_once XMLSF_DIR . '/inc/functions.php';
 WP_DEBUG && require_once XMLSF_DIR . '/inc/functions-debugging.php';
 
 // Fire it up at plugins_loaded.
-add_action( 'plugins_loaded', 'xmlsf', 1 );
+add_action( 'plugins_loaded', 'xmlsf', 9 );
 
 if ( is_admin() ) {
 	add_action( 'plugins_loaded', array( 'XMLSF\Admin\Admin', 'init' ) );
@@ -101,6 +101,7 @@ function xmlsf_deactivate() {
 
 	// Remove old rules.
 	xmlsf()->sitemap->unregister_rewrites();
+	xmlsf()->sitemap_news->unregister_rewrites();
 
 	// Re-add core rules.
 	function_exists( 'wp_sitemaps_get_server' ) && wp_sitemaps_get_server();

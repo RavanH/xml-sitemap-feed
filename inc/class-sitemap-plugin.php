@@ -70,7 +70,7 @@ class Sitemap_Plugin extends Sitemap {
 	 * @return string|false The sitemap URL or false if the sitemap doesn't exist.
 	 */
 	public function get_sitemap_url( $sitemap = 'index', $args = array() ) {
-		$index = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
+		global $wp_rewrite;
 
 		// Get our arguments.
 		$args = \apply_filters(
@@ -85,7 +85,9 @@ class Sitemap_Plugin extends Sitemap {
 			)
 		);
 
-		if ( xmlsf()->using_permalinks() ) {
+		$index_php = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
+
+		if ( $wp_rewrite->using_permalinks() && ! $index_php ) {
 			// Construct file name.
 			$name = $this->slug();
 			if ( 'index' !== $sitemap ) {
@@ -97,7 +99,7 @@ class Sitemap_Plugin extends Sitemap {
 			$name .= '.xml';
 		} else {
 			// Construct request string.
-			$name = '?feed=sitemap';
+			$name = $index_php . '?feed=sitemap';
 			if ( 'index' !== $sitemap ) {
 				$name .= '-' . $sitemap;
 				$name .= $args['type'] ? '-' . $args['type'] : '';
@@ -106,7 +108,7 @@ class Sitemap_Plugin extends Sitemap {
 			}
 		}
 
-		return \esc_url( \trailingslashit( \home_url() ) . $index . $name );
+		return \esc_url( \trailingslashit( \home_url() ) . $name );
 	}
 
 	/**
@@ -359,12 +361,14 @@ class Sitemap_Plugin extends Sitemap {
 	 * @uses wp_redirect()
 	 */
 	public function redirect() {
-		if ( ! empty( $_SERVER['REQUEST_URI'] ) && ( 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/wp-sitemap.xml' ) || 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?sitemap=' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-
-			\wp_safe_redirect( $this->get_sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
-
-			exit();
+		// Sadly, we cannot get this info from $wp->request.
+		if ( ! isset( $_SERVER['REQUEST_URI'] ) || ( 0 !== \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/wp-sitemap.xml' ) && 0 !== \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?sitemap=' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			return;
 		}
+
+		\wp_safe_redirect( $this->get_sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
+
+		exit();
 	}
 
 	/**

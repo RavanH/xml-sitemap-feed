@@ -202,7 +202,6 @@ function xmlsf_upgrade( $db_version ) {
 	if ( version_compare( '5.5-alpha20', $db_version, '>' ) ) {
 		$post_type_settings = get_option( 'xmlsf_post_types' );
 		add_option( 'xmlsf_post_type_settings', $post_type_settings );
-		error_log( print_r( $post_type_settings, true ) );
 		$post_types = array();
 		foreach ( $post_type_settings as $post_type => $settings ) {
 			if ( ! empty( $settings['active'] ) ) {

@@ -205,23 +205,6 @@ class XMLSitemapFeed {
 	}
 
 	/**
-	 * Are we using permalinks?
-	 *
-	 * Cannot use $wp_rewrite->using_permalinks() because that returns true if /index.php is in the permalink structure.
-	 *
-	 * @since 5.5
-	 */
-	public function using_permalinks() {
-		global $wp_rewrite;
-
-		if ( null === $this->using_permalinks ) {
-			$this->using_permalinks = $wp_rewrite->using_permalinks() && 0 !== strpos( get_option( 'permalink_structure' ), '/index.php' );
-		}
-
-		return $this->using_permalinks;
-	}
-
-	/**
 	 * Default options
 	 *
 	 * @param bool $key Which key to get.
@@ -233,7 +216,7 @@ class XMLSitemapFeed {
 
 			// sitemaps.
 			$sitemaps = ( 1 !== (int) \get_option( 'blog_public' ) ) ? array() : array(
-				'sitemap' => 'sitemap.xml',
+				'sitemap' => \class_exists( 'SimpleXMLElement' ) && \function_exists( 'get_sitemap_url' ) ? 'wp-sitemap.xml' : 'sitemap-xml',
 			);
 
 			$this->defaults = array(

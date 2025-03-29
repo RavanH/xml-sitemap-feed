@@ -49,11 +49,30 @@ class Sitemap_News {
 			return;
 		}
 
-		$slug = $this->slug();
-
 		// Register news sitemap provider route.
 		\add_rewrite_rule(
-			'^' . $slug . '\.xml$',
+			'^' . $this->slug() . '\.xml$',
+			'index.php?feed=sitemap-news',
+			'top'
+		);
+	}
+
+	/**
+	 * Unregisters sitemap rewrite tags and routing rules.
+	 *
+	 * @since 5.5
+	 */
+	public function unregister_rewrites() {
+		global $wp_rewrite;
+
+		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() || 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ) {
+			// Nothing to do.
+			return;
+		}
+
+		// Unregister news sitemap provider route.
+		\remove_rewrite_rule(
+			'^' . $this->slug() . '\.xml$',
 			'index.php?feed=sitemap-news',
 			'top'
 		);
@@ -104,15 +123,18 @@ class Sitemap_News {
 	 * @return string The sitemap URL.
 	 */
 	public function get_sitemap_url() {
-		$index = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
+		global $wp_rewrite;
 
-		if ( xmlsf()->using_permalinks() ) {
-			$name = $this->slug() . '.xml';
+		$slug      = $this->slug();
+		$index_php = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
+
+		if ( $wp_rewrite->using_permalinks() && ! $index_php ) {
+			$basename = '/' . $slug . '.xml';
 		} else {
-			$name = '?feed=sitemap-news';
+			$basename = '/' . $index_php . '?feed=' . $slug;
 		}
 
-		return \esc_url( \trailingslashit( \home_url() ) . $index . $name );
+		return \esc_url( \home_url( $basename ) );
 	}
 
 	/**
@@ -144,7 +166,7 @@ class Sitemap_News {
 		}
 
 		// Short-circuit if request is not a feed or it does not start with 'sitemap-news'.
-		if ( empty( $request['feed'] ) || \strpos( $request['feed'], 'sitemap-news' ) !== 0 ) {
+		if ( empty( $request['feed'] ) || 'sitemap-news' !== $request['feed'] ) {
 			return $request;
 		}
 
@@ -161,7 +183,7 @@ class Sitemap_News {
 
 		/** PREPARE TO LOAD TEMPLATE */
 		\add_action(
-			'do_feed_' . $request['feed'],
+			'do_feed_sitemap-news',
 			'XMLSF\load_template',
 			10,
 			2

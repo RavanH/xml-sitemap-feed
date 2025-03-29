@@ -54,7 +54,7 @@ class Sitemap_News {
 			// Reset ignored warnings.
 			\delete_user_meta( \get_current_user_id(), 'xmlsf_dismissed' );
 
-			\XMLSF\Admin\Admin::check_static_files( 'sitemap-news.xml' );
+			\XMLSF\Admin\Admin::check_static_files( 'sitemap-news.xml', 2 );
 		}
 
 		if ( isset( $_POST['xmlsf-clear-settings-news'] ) ) {
@@ -112,25 +112,6 @@ class Sitemap_News {
 					include XMLSF_DIR . '/views/admin/notice-catchbox-feed-redirect.php';
 				}
 			);
-		}
-
-		// Ad Inserter XML setting incompatibility warning.
-		if ( \is_plugin_active( 'ad-inserter/ad-inserter.php' ) ) {
-			$adsettings = \get_option( 'ad_inserter' );
-			if ( \is_array( $adsettings ) && ! empty( $adsettings ) ) {
-				foreach ( $adsettings as $ad => $settings ) {
-					// Check rss feed setting.
-					if ( ! empty( $settings['code'] ) && empty( $settings['disable_insertion'] ) && ! empty( $settings['enable_feed'] ) ) {
-						\add_action(
-							'admin_notices',
-							function () {
-								include XMLSF_DIR . '/views/admin/notice-ad-insterter-feed.php';
-							}
-						);
-						break;
-					}
-				}
-			}
 		}
 
 		// Slim SEO conflict notices.

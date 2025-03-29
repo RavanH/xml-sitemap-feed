@@ -105,11 +105,11 @@ class Sitemap_Core extends Sitemap {
 
 		// Additional URLs sitemap provider.
 		if ( \get_option( 'xmlsf_urls' ) ) {
-			\wp_register_sitemap_provider( 'urls', new Sitemaps_Provider_URLs() );
+			\wp_register_sitemap_provider( 'custom', new Sitemaps_Provider_Custom() );
 		}
 		// External XML Sitemaps provider.
 		if ( \get_option( 'xmlsf_custom_sitemaps' ) ) {
-			\wp_register_sitemap_provider( 'custom', new Sitemaps_Provider_Custom() );
+			\wp_register_sitemap_provider( 'external', new Sitemaps_Provider_External() );
 		}
 
 		\do_action( 'xmlsf_register_sitemap_provider_after' );
@@ -191,15 +191,7 @@ class Sitemap_Core extends Sitemap {
 					\wp_raise_memory_limit( 'wp-sitemap-users' );
 					break;
 
-				case 'urls':
-					// Try to raise memory limit, context added for filters.
-					\wp_raise_memory_limit( 'wp-sitemap-urls' );
-					break;
-
-				case 'custom':
 				default:
-					// Try to raise memory limit, context added for filters.
-					\wp_raise_memory_limit( 'wp-sitemap-custom' );
 					// Do nothing.
 			}
 		}
@@ -625,11 +617,15 @@ class Sitemap_Core extends Sitemap {
 	 * @uses wp_redirect()
 	 */
 	public function redirect() {
-		if ( ! empty( $_SERVER['REQUEST_URI'] ) && ( 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/sitemap.xml' ) || 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?feed=sitemap' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$feed = get_query_var( 'feed' );
 
-			\wp_safe_redirect( $this->get_sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
-
-			exit();
+		// Don't redirect if not a sitemap feed.
+		if ( empty( $feed ) || \strpos( $feed, 'sitemap' ) !== 0 || 'sitemap-news' === $feed ) {
+			return;
 		}
+
+		\wp_safe_redirect( $this->get_sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
+
+		exit();
 	}
 }

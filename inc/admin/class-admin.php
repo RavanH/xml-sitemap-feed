@@ -139,24 +139,10 @@ class Admin {
 		$value = (array) $value;
 
 		if ( $old !== $value ) {
-			$files = array();
-
-			// Switched on sitemap.
-			if ( ! empty( $value['sitemap'] ) && empty( $old['sitemap'] ) ) {
-				$slug    = \is_object( xmlsf()->sitemap ) ? xmlsf()->sitemap->slug() : ( xmlsf()->sitemap->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
-				$files[] = $slug . '.xml';
-			}
-
-			// Switched on news sitemap.
-			if ( ! empty( $value['sitemap-news'] ) && empty( $old['sitemap-news'] ) ) {
-				$slug    = \is_object( xmlsf()->sitemap_news ) ? xmlsf()->sitemap_news->slug() : 'sitemap-news';
-				$files[] = $slug . '.xml';
-			}
-
 			// Check static files.
-			empty( $files ) || self::check_static_files( $files, 1 );
+			self::check_static_files();
 
-			// Flush rewrite rules on next init.
+			// Flush rewrite rules on upcoming init.
 			\delete_option( 'rewrite_rules' );
 		}
 	}
@@ -284,7 +270,14 @@ class Admin {
 	 *
 	 * @return array Found static files.
 	 */
-	public static function check_static_files( $files, $verbosity = 2 ) {
+	public static function check_static_files( $files = array(), $verbosity = 1 ) {
+		if ( empty( $files ) ) { // TODO a better way of getting file names.
+			$sitemaps = (array) \get_option( 'xmlsf_sitemaps', xmlsf()->defaults( 'sitemaps' ) );
+			foreach ( $sitemaps as $type => $file ) {
+				$files[] = $file;
+			}
+		}
+
 		$home_path = \trailingslashit( \get_home_path() );
 		$found     = array();
 
@@ -341,25 +334,6 @@ class Admin {
 					include XMLSF_DIR . '/views/admin/notice-catchbox-feed-redirect.php';
 				}
 			);
-		}
-
-		// Ad Inserter XML setting incompatibility warning.
-		if ( \is_plugin_active( 'ad-inserter/ad-inserter.php' ) ) {
-			$adsettings = \get_option( 'ad_inserter' );
-			if ( \is_array( $adsettings ) && ! empty( $adsettings ) ) {
-				foreach ( $adsettings as $ad => $settings ) {
-					// Check rss feed setting.
-					if ( ! empty( $settings['code'] ) && empty( $settings['disable_insertion'] ) && ! empty( $settings['enable_feed'] ) ) {
-						\add_action(
-							'admin_notices',
-							function () {
-								include XMLSF_DIR . '/views/admin/notice-ad-insterter-feed.php';
-							}
-						);
-						break;
-					}
-				}
-			}
 		}
 	}
 
