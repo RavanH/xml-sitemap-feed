@@ -30,7 +30,7 @@ class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 	 */
 	public function __construct() {
 		$this->name        = 'news';
-		$this->object_type = 'post';
+		$this->object_type = 'news';
 	}
 
 	/**
