@@ -22,6 +22,8 @@ class Sitemap_News {
 	public static function clear_settings() {
 		// Update to defaults.
 		\update_option( 'xmlsf_news_tags', xmlsf()->defaults( 'news_tags' ) );
+
+		\do_action( 'xmlsf_clear_news_settings' );
 	}
 
 	/**
