@@ -1,5 +1,4 @@
 FIX
-* core index news lastmod
 
 ROADMAP
 * move sitemap fields (back) to Sitemap class?
@@ -32,6 +31,7 @@ DOCUMENT
 * xmlsf_register_news_sitemap_provider_after
 * xmlsf_add_settings
 * xmlsf_news_add_settings
+* xmlsf_clear_news_settings
 * add inline comment blocks for hooks
 
 CONSIDER
