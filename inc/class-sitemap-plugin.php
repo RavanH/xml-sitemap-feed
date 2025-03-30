@@ -356,22 +356,6 @@ class Sitemap_Plugin extends Sitemap {
 	}
 
 	/**
-	 * Do WP core sitemap index redirect
-	 *
-	 * @uses wp_redirect()
-	 */
-	public function redirect() {
-		// Sadly, we cannot get this info from $wp->request.
-		if ( ! isset( $_SERVER['REQUEST_URI'] ) || ( 0 !== \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/wp-sitemap.xml' ) && 0 !== \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?sitemap=' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			return;
-		}
-
-		\wp_safe_redirect( $this->get_sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
-
-		exit();
-	}
-
-	/**
 	 * Post archives data
 	 *
 	 * @param array  $data         Data.
@@ -530,5 +514,21 @@ class Sitemap_Plugin extends Sitemap {
 		\do_action( 'xmlsf_nginx_helper_purge_urls', $urls );
 
 		return $urls;
+	}
+
+	/**
+	 * Do WP core sitemap index redirect
+	 *
+	 * @uses wp_redirect()
+	 */
+	public function redirect() {
+		// Sadly, we cannot get this info from $wp->request.
+		if ( ! isset( $_SERVER['REQUEST_URI'] ) || ( 0 !== \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/wp-sitemap.xml' ) && 0 !== \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?sitemap=' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			return;
+		}
+
+		\wp_safe_redirect( $this->get_sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
+
+		exit();
 	}
 }

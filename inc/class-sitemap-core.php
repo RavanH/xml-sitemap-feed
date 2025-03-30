@@ -617,10 +617,8 @@ class Sitemap_Core extends Sitemap {
 	 * @uses wp_redirect()
 	 */
 	public function redirect() {
-		$feed = get_query_var( 'feed' );
-
-		// Don't redirect if not a sitemap feed.
-		if ( empty( $feed ) || \strpos( $feed, 'sitemap' ) !== 0 || 'sitemap-news' === $feed ) {
+		// Sadly, we cannot get the full info from $wp->request or get_query_var().
+		if ( ! isset( $_SERVER['REQUEST_URI'] ) || ( 0 !== \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/sitemap.xml' ) && ( 0 !== \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?feed=sitemap' ) || 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?feed=sitemap-news' ) ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			return;
 		}
 
