@@ -223,38 +223,35 @@ class XMLSitemapFeed {
 				'sitemaps'           => $sitemaps,
 				'server'             => \class_exists( 'SimpleXMLElement' ) && \function_exists( 'get_sitemap_url' ) ? 'core' : 'plugin',
 				'disabled_providers' => array(),
-				'post_types'         => array(
+				'post_types'         => array(),
+				'post_type_settings' => array(
 					'post'  => array(
-						'active'           => '1',
 						'archive'          => 'yearly',
-						'priority'         => .7,
+						'priority'         => '',
 						'dynamic_priority' => '',
 						'tags'             => array(
 							'image' => 'featured',
-							/*'video' => ''*/
 						),
 					),
 					'page'  => array(
-						'active'           => '1',
-						'priority'         => .5,
+						'priority'         => '',
 						'dynamic_priority' => '',
 						'tags'             => array(
 							'image' => 'attached',
-							/*'video' => ''*/
 						),
 					),
 					'limit' => 2000,
 				),
 				'taxonomies'         => '',
 				'taxonomy_settings'  => array(
-					'priority'         => .3,
+					'priority'         => '',
 					'dynamic_priority' => '',
 					'include_empty'    => '',
 					'limit'            => 2000,
 				),
 				'authors'            => '',
 				'author_settings'    => array(
-					'priority' => .3,
+					'priority' => '',
 					'limit'    => 2000,
 				),
 				'robots'             => '',

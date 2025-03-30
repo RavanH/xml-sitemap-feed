@@ -127,7 +127,18 @@ class Sanitize {
 	 *
 	 * @return array
 	 */
-	public static function post_types( $save = array() ) {
+	public static function post_types( $save ) {
+		return $save;
+	}
+
+	/**
+	 * Sanitize post type settings
+	 *
+	 * @param array $save Settings array.
+	 *
+	 * @return array
+	 */
+	public static function post_type_settings( $save = array() ) {
 		$save = (array) $save;
 
 		// Sanitize limit.

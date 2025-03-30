@@ -30,6 +30,13 @@ abstract class Sitemap {
 	 *
 	 * @var array
 	 */
+	protected $post_type_settings = array();
+
+	/**
+	 * Post types included in sitemap index
+	 *
+	 * @var array
+	 */
 	protected $rewrite_rules = array();
 
 	/**
@@ -38,6 +45,22 @@ abstract class Sitemap {
 	 * @var null|bool
 	 */
 	protected $uses_core_server;
+
+	/**
+	 * Is post type active?
+	 *
+	 * @since 5.5
+	 *
+	 * @param int $post_type Post type.
+	 * @return bool
+	 */
+	public function active_post_type( $post_type ) {
+		if ( empty( $this->post_types ) || in_array( $post_type, $this->post_types, true ) ) {
+			return true;
+		}
+
+		return false;
+	}
 
 	/**
 	 * Get sitemap slug.
@@ -155,7 +178,7 @@ abstract class Sitemap {
 			// no status transition or not moving in or out of 'publish' status.
 			$old_status === $new_status || ( 'publish' !== $new_status && 'publish' !== $old_status ) ||
 			// inactive post type.
-			! \array_key_exists( $post->post_type, $this->post_types ) || empty( $this->post_types[ $post->post_type ]['active'] ) ||
+			! $this->active_post_type( $post->post_type ) ||
 			// no taxonomies activated.
 			\in_array( 'taxonomies', (array) \get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) ), true )
 		) {
@@ -220,14 +243,14 @@ abstract class Sitemap {
 			// not publishing or updating.
 			'publish' !== $new_status ||
 			// inactive post type.
-			! \array_key_exists( $post->post_type, $this->post_types ) || empty( $this->post_types[ $post->post_type ]['active'] ) ||
+			! $this->active_post_type( $post->post_type ) ||
 			// no image tags active.
-			empty( $this->post_types[ $post->post_type ]['tags']['image'] )
+			empty( $this->post_type_settings[ $post->post_type ] ) || empty( $this->post_type_settings[ $post->post_type ]['tags']['image'] )
 		) {
 			return;
 		}
 
-		$which = $this->post_types[ $post->post_type ]['tags']['image'];
+		$which = $this->post_type_settings[ $post->post_type ]['tags']['image'];
 
 		// delete old image meta data.
 		\delete_post_meta( $post->ID, '_xmlsf_image_' . $which );
@@ -255,9 +278,9 @@ abstract class Sitemap {
 		// Bail when...
 		if (
 			// inactive post type.
-			! \array_key_exists( $post_type, $this->post_types )
+			! $this->active_post_type( $post_type ) ||
 			// comments date irrelevant.
-			|| empty( $this->post_types[ $post_type ]['update_lastmod_on_comments'] )
+			empty( $this->post_type_settings[ $post_type ] ) || empty( $this->post_type_settings[ $post_type ]['update_lastmod_on_comments'] )
 		) {
 			return;
 		}
@@ -287,9 +310,9 @@ abstract class Sitemap {
 		// Bail when...
 		if (
 			// inactive post type.
-			! \array_key_exists( $post_type, $this->post_types )
+			! $this->active_post_type( $post_type ) ||
 			// comments date irrelevant.
-			|| empty( $this->post_types[ $post_type ]['update_lastmod_on_comments'] )
+			empty( $this->post_type_settings[ $post_type ] ) || empty( $this->post_type_settings[ $post_type ]['update_lastmod_on_comments'] )
 		) {
 			return;
 		}
@@ -310,7 +333,7 @@ abstract class Sitemap {
 		$post_type = $wp_query->get( 'post_type' );
 
 		// Bail if unexpected post type.
-		if ( empty( $post_type ) || ! \is_string( $post_type ) || ! isset( $this->post_types[ $post_type ] ) ) {
+		if ( empty( $post_type ) || ! \is_string( $post_type ) || ! $this->active_post_type( $post_type ) ) {
 			return;
 		}
 
@@ -322,9 +345,10 @@ abstract class Sitemap {
 
 		// If image tag active then prefetch images.
 		if (
-			isset( $this->post_types[ $post_type ]['tags'] ) &&
-			is_array( $this->post_types[ $post_type ]['tags'] ) &&
-			! empty( $this->post_types[ $post_type ]['tags']['image'] )
+			! empty( $this->post_type_settings[ $post_type ] ) &&
+			! empty( $this->post_type_settings[ $post_type ]['tags'] ) &&
+			is_array( $this->post_type_settings[ $post_type ]['tags'] ) &&
+			! empty( $this->post_type_settings[ $post_type ]['tags']['image'] )
 		) {
 			$primed = (array) \get_transient( 'xmlsf_images_meta_primed' );
 
@@ -339,7 +363,7 @@ abstract class Sitemap {
 			) {
 				// Prime images meta data.
 				foreach ( $wp_query->posts as $post ) {
-					$this->_add_images_meta( $post, $this->post_types[ $post_type ]['tags']['image'] );
+					$this->_add_images_meta( $post, $this->post_type_settings[ $post_type ]['tags']['image'] );
 				}
 
 				// Add query to primed array.
@@ -351,7 +375,7 @@ abstract class Sitemap {
 		}
 
 		// If update_lastmod_on_comments active then prefetch comments.
-		if ( ! empty( $this->post_types[ $post_type ]['update_lastmod_on_comments'] ) ) {
+		if ( ! empty( $this->post_type_settings[ $post_type ]['update_lastmod_on_comments'] ) ) {
 			$primed = (array) \get_transient( 'xmlsf_comments_meta_primed' );
 
 			if (

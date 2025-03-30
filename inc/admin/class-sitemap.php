@@ -699,6 +699,12 @@ class Sitemap {
 			'xmlsf_post_types',
 			array( __NAMESPACE__ . '\Sanitize', 'post_types' )
 		);
+		// post_type settings.
+		\register_setting(
+			'xmlsf_post_types',
+			'xmlsf_post_type_settings',
+			array( __NAMESPACE__ . '\Sanitize', 'post_type_settings' )
+		);
 		// taxonomies.
 		\register_setting(
 			'xmlsf_taxonomies',
@@ -840,7 +846,7 @@ class Sitemap {
 					)
 				);
 				// Taxonomies.
-				$content  = '<p><strong>' . \esc_html__( 'Limit to these taxonomies:', 'xml-sitemap-feed' ) . '</strong></p>';
+				$content  = '<p><strong>' . \esc_html__( 'Include these taxonomies', 'xml-sitemap-feed' ) . '</strong></p>';
 				$content .= '<p>' . \esc_html__( 'Select the taxonomies to include in the sitemap index. Select none to automatically include all public taxonomies.', 'xml-sitemap-feed' ) . '</p>';
 				$screen->add_help_tab(
 					array(
@@ -863,7 +869,7 @@ class Sitemap {
 					)
 				);
 				// Authors.
-				$content  = '<p><strong>' . \esc_html__( 'Limit to these authors:', 'xml-sitemap-feed' ) . '</strong></p>';
+				$content  = '<p><strong>' . \esc_html__( 'Include these authors', 'xml-sitemap-feed' ) . '</strong></p>';
 				$content .= '<p>' . \esc_html__( 'Select the authors to include in the author sitemap. Select none to automatically include all authors.', 'xml-sitemap-feed' ) . '</p>';
 				$screen->add_help_tab(
 					array(

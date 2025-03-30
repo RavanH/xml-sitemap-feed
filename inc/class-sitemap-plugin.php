@@ -17,9 +17,13 @@ class Sitemap_Plugin extends Sitemap {
 	 * Runs on init
 	 */
 	public function __construct() {
-		$this->slug          = 'sitemap';
-		$this->post_types    = (array) \get_option( 'xmlsf_post_types', array() );
-		$this->rewrite_rules = array(
+		$this->slug = 'sitemap';
+		$post_types = \get_option( 'xmlsf_post_types', array() );
+		if ( $post_types ) {
+			$this->post_types = (array) $post_types;
+		}
+		$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', xmlsf()->defaults( 'post_type_settings' ) );
+		$this->rewrite_rules      = array(
 			'^' . $this->slug . '\.xml$' => 'index.php?feed=sitemap',
 			'^' . $this->slug . '-([a-z]+?)?(-[a-z0-9\-_]+?)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml$' => 'index.php?feed=sitemap-$matches[1]$matches[2]&m=$matches[3]&w=$matches[4]',
 		);
@@ -145,7 +149,7 @@ class Sitemap_Plugin extends Sitemap {
 		switch ( $type ) {
 
 			case 'posttype':
-				if ( ! isset( $feed[2] ) || empty( $this->post_types[ $feed[2] ] ) || ! is_array( $this->post_types[ $feed[2] ] ) || empty( $this->post_types[ $feed[2] ]['active'] ) ) {
+				if ( ! isset( $feed[2] ) || ! $this->active_post_type( $feed[2] ) ) {
 					return $request;
 				}
 
@@ -153,7 +157,7 @@ class Sitemap_Plugin extends Sitemap {
 				\wp_raise_memory_limit( 'sitemap-posttype-' . $feed[2] );
 
 				// Prepare priority calculation.
-				if ( ! empty( $this->post_types[ $feed[2] ]['priority'] ) && ! empty( $this->post_types[ $feed[2] ]['dynamic_priority'] ) ) {
+				if ( ! empty( $this->post_type_settings[ $feed[2] ] ) && ! empty( $this->post_type_settings[ $feed[2] ]['priority'] ) && ! empty( $this->post_type_settings[ $feed[2] ]['dynamic_priority'] ) ) {
 					// Last of this post type modified date in Unix seconds.
 					xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $feed[2] ), DATE_W3C );
 					// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!

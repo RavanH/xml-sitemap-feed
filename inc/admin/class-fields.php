@@ -61,11 +61,13 @@ class Fields {
 	 * Limit field
 	 */
 	public static function post_types_general_fields() {
-		$settings = (array) \get_option( 'xmlsf_post_types' );
-		$defaults = xmlsf()->defaults( 'post_types' );
-		$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
+		$post_types       = (array) \get_option( 'xmlsf_post_types', xmlsf()->defaults( 'post_types' ) );
+		$default_settings = xmlsf()->defaults( 'post_type_settings' );
+		$settings         = (array) \get_option( 'xmlsf_post_type_settings', $default_settings );
+		$limit            = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 
 		// The actual fields for data entry.
+		include XMLSF_DIR . '/views/admin/field-sitemap-post-types.php';
 		include XMLSF_DIR . '/views/admin/field-sitemap-limit.php';
 	}
 
@@ -78,7 +80,7 @@ class Fields {
 		// post type slug passed as section name.
 		$obj     = \get_post_type_object( $post_type );
 		$count   = \wp_count_posts( $obj->name );
-		$options = (array) \get_option( 'xmlsf_post_types', array() );
+		$options = (array) \get_option( 'xmlsf_post_type_settings', array() );
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-post-type-settings.php';

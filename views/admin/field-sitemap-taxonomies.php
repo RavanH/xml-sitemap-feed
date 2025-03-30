@@ -11,7 +11,7 @@
 		<?php esc_html_e( 'Taxonomies', 'xml-sitemap-feed' ); ?>
 	</legend>
 	<p>
-		<?php esc_html_e( 'Limit to these taxonomies:', 'xml-sitemap-feed' ); ?>
+		<?php esc_html_e( 'Include these taxonomies, or select none to automaticly include all public taxonomies:', 'xml-sitemap-feed' ); ?>
 	</p>
 	<style>ul.cat-checklist{height:auto;max-height:48em}ul.children{padding-left:1em}</style>
 	<ul class="cat-checklist">

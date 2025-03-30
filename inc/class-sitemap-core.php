@@ -17,8 +17,12 @@ class Sitemap_Core extends Sitemap {
 	 * Runs on init
 	 */
 	public function __construct() {
-		$this->slug       = 'wp-sitemap';
-		$this->post_types = (array) \get_option( 'xmlsf_post_types', array() );
+		$this->slug = 'wp-sitemap';
+		$post_types = \get_option( 'xmlsf_post_types', array() );
+		if ( $post_types ) {
+			$this->post_types = (array) $post_types;
+		}
+		$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', array() );
 
 		// Redirect sitemap.xml requests.
 		\add_action( 'template_redirect', array( $this, 'redirect' ), 0 );
@@ -169,13 +173,13 @@ class Sitemap_Core extends Sitemap {
 					);
 
 					// Prepare dynamic priority calculation.
-					if ( $subtype && ! empty( $this->post_types[ $subtype ]['priority'] ) && ! empty( $this->post_types[ $subtype ]['dynamic_priority'] ) ) {
+					if ( $subtype && ! empty( $this->post_type_settings[ $subtype ]['priority'] ) && ! empty( $this->post_type_settings[ $subtype ]['dynamic_priority'] ) ) {
 						// Last of this post type modified date in Unix seconds.
-						xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $subtype ), 'U' );
+						\xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $subtype ), DATE_W3C );
 						// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
-						xmlsf()->timespan = xmlsf()->lastmodified - \get_date_from_gmt( \get_firstpostdate( 'GMT', $subtype ), 'U' );
+						\xmlsf()->timespan = \xmlsf()->lastmodified - \get_date_from_gmt( \get_firstpostdate( 'GMT', $subtype ), DATE_W3C );
 						// Total post type comment count.
-						xmlsf()->comment_count = \wp_count_comments()->approved;
+						\xmlsf()->comment_count = \wp_count_comments()->approved;
 						// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
 						// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/.
 					}
@@ -466,7 +470,7 @@ class Sitemap_Core extends Sitemap {
 
 			case 'post':
 			default:
-				$settings = (array) \get_option( 'xmlsf_post_types' );
+				$settings = (array) \get_option( 'xmlsf_post_type_settings' );
 				$defaults = xmlsf()->defaults( 'post_types' );
 				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 		}
@@ -507,11 +511,14 @@ class Sitemap_Core extends Sitemap {
 	 * @return array
 	 */
 	public function post_types( $post_types ) {
-		foreach ( $this->post_types as $post_type => $settings ) {
-			if ( empty( $settings['active'] ) ) {
-				unset( $post_types[ $post_type ] );
-			} elseif ( ! isset( $post_types[ $post_type ] ) ) {
-				$post_types[] = $post_type;
+		// No disabled post types.
+		if ( empty( $this->post_types ) ) {
+			return $post_types;
+		}
+
+		foreach ( $post_types as $name => $pt_obj ) {
+			if ( ! in_array( $name, $this->post_types ) ) {
+				unset( $post_types[ $name ] );
 			}
 		}
 
