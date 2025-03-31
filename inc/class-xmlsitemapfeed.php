@@ -268,7 +268,7 @@ class XMLSitemapFeed {
 			$return = $this->defaults;
 		}
 
-		return \apply_filters( 'xmlsf_defaults', $return, $key );
+		return \apply_filters( 'xmlsf_defaults', $return, $key, $this->defaults );
 	}
 
 	/**
