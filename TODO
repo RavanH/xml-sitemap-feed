@@ -42,6 +42,7 @@ DOCUMENT
 * add inline comment blocks for hooks
 
 CONSIDER
+* featured + attached images option
 * Reset button per settings tab
 * compatibility with https://wordpress.org/plugins/page-links-to/ ? option to automatically exclude linked posts... but not by default?
 * make sitemaps_enabled use static value for faster repsonse
