@@ -16,22 +16,24 @@ namespace XMLSF;
  * @return array
  */
 function get_post_types() {
-	$active_post_types = array();
-	$post_types        = (array) \get_option( 'xmlsf_post_types', array() );
+	$post_types = (array) \apply_filters( 'xmlsf_post_types', \get_post_types( array( 'public' => true ) ) );
+	// Make sure post types are allowed and publicly viewable.
+	$post_types = \array_diff( $post_types, \xmlsf()->disabled_post_types() );
+	$post_types = \array_filter( $post_types, 'is_post_type_viewable' );
+
+	$settings = (array) \get_option( 'xmlsf_post_type_settings', array() );
 
 	// Get active post types.
-	foreach ( $post_types as $post_type => $settings ) {
-		if ( ! empty( $settings['active'] ) ) {
-			$active_post_types[ $post_type ] = $settings;
+	$post_types_settings = array();
+	foreach ( $post_types as $post_type ) {
+		if ( ! \xmlsf()->sitemap->active_post_type( $post_type ) ) {
+			continue;
+		}
+
+		if ( ! empty( $settings[ $post_type ] ) ) {
+			$post_types_settings[ $post_type ] = $settings[ $post_type ];
 		}
 	}
-
-	$available = (array) \apply_filters( 'xmlsf_post_types', \get_post_types( array( 'public' => true ) ) );
-	// Make sure post types are allowed and publicly viewable.
-	$available = \array_diff( $available, \xmlsf()->disabled_post_types() );
-	$available = \array_filter( $available, 'is_post_type_viewable' );
-
-	$post_types_settings = \array_intersect_key( $active_post_types, \array_flip( $available ) );
 
 	return $post_types_settings;
 }

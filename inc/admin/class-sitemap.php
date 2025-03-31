@@ -807,19 +807,18 @@ class Sitemap {
 				break;
 
 			case 'post_types':
-				if ( \xmlsf()->sitemap->uses_core_server() ) {
-					\ob_start();
-					include XMLSF_DIR . '/views/admin/help-tab-post-types-general.php';
-					$content = \ob_get_clean();
-					// General Settings.
-					$screen->add_help_tab(
-						array(
-							'id'      => 'sitemap-settings-post-type-general',
-							'title'   => \translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-							'content' => $content,
-						)
-					);
-				}
+				\ob_start();
+				include XMLSF_DIR . '/views/admin/help-tab-post-types-general.php';
+				$content = \ob_get_clean();
+				// General Settings.
+				$screen->add_help_tab(
+					array(
+						'id'      => 'sitemap-settings-post-type-general',
+						'title'   => \translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
+						'content' => $content,
+					)
+				);
+
 				\ob_start();
 				include XMLSF_DIR . '/views/admin/help-tab-post-types.php';
 				$content = \ob_get_clean();
