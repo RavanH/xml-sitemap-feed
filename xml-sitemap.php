@@ -100,8 +100,12 @@ function xmlsf_deactivate() {
 	XMLSF\clear_metacache();
 
 	// Remove old rules.
-	xmlsf()->sitemap->unregister_rewrites();
-	xmlsf()->sitemap_news->unregister_rewrites();
+	if ( is_object( xmlsf()->sitemap ) && method_exists( xmlsf()->sitemap, 'unregister_rewrites' ) ) {
+		xmlsf()->sitemap->unregister_rewrites();
+	}
+	if ( is_object( xmlsf()->sitemap_news ) && method_exists( xmlsf()->sitemap_news, 'unregister_rewrites' ) ) {
+		xmlsf()->sitemap_news->unregister_rewrites();
+	}
 
 	// Re-add core rules.
 	function_exists( 'wp_sitemaps_get_server' ) && wp_sitemaps_get_server();
