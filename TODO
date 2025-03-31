@@ -9,6 +9,7 @@ ROADMAP
 * drop dynamic priority?
 
 TEST
+* google news advanced compat
 * static files check after sitemap activation and tools
 * Nginx Helper purge wildcard not working?
 * theme template overrides
