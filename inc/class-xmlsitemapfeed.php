@@ -207,11 +207,9 @@ class XMLSitemapFeed {
 	/**
 	 * Default options
 	 *
-	 * @param bool $key Which key to get.
-	 *
-	 * @return array|string|bool|null
+	 * @return array
 	 */
-	public function defaults( $key = false ) {
+	public function defaults() {
 		if ( empty( $this->defaults ) ) :
 
 			// sitemaps.
@@ -262,13 +260,7 @@ class XMLSitemapFeed {
 
 		endif;
 
-		if ( $key ) {
-			$return = ( isset( $this->defaults[ $key ] ) ) ? $this->defaults[ $key ] : null;
-		} else {
-			$return = $this->defaults;
-		}
-
-		return \apply_filters( 'xmlsf_defaults', $return, $key, $this->defaults );
+		return $this->defaults;
 	}
 
 	/**

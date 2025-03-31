@@ -125,7 +125,7 @@ abstract class Sitemap {
 	public function uses_core_server() {
 		if ( null === $this->uses_core_server ) {
 			// Sitemap disabled, core server unavailable or user selected Plugin server.
-			if ( ! namespace\sitemaps_enabled( 'sitemap' ) || ! \function_exists( 'get_sitemap_url' ) || 'core' !== \get_option( 'xmlsf_server', \xmlsf()->defaults( 'server' ) ) ) {
+			if ( ! namespace\sitemaps_enabled( 'sitemap' ) || ! \function_exists( 'get_sitemap_url' ) || 'core' !== \get_option( 'xmlsf_server', get_default_settings( 'server' ) ) ) {
 				$this->uses_core_server = false;
 			} else {
 				$this->uses_core_server = true;
@@ -180,7 +180,7 @@ abstract class Sitemap {
 			// inactive post type.
 			! $this->active_post_type( $post->post_type ) ||
 			// no taxonomies activated.
-			\in_array( 'taxonomies', (array) \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) ), true )
+			\in_array( 'taxonomies', (array) \get_option( 'xmlsf_disabled_providers', get_default_settings( 'disabled_providers' ) ), true )
 		) {
 			return;
 		}

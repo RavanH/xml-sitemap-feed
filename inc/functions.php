@@ -354,6 +354,25 @@ function plugin_compat() {
 }
 
 /**
+ * Default options
+ *
+ * @param bool $key Which key to get.
+ *
+ * @return array|string|bool|null
+ */
+function get_default_settings( $key = false ) {
+	$defaults = xmlsf()->defaults();
+
+	if ( $key ) {
+		$return = ( isset( $defaults[ $key ] ) ) ? $defaults[ $key ] : null;
+	} else {
+		$return = $defaults;
+	}
+
+	return \apply_filters( 'xmlsf_defaults', $return, $key, $defaults );
+}
+
+/**
  * Generator info
  */
 function generator() {

@@ -30,8 +30,9 @@ delete_option( 'rewrite_rules' );
 function xmlsf_update_from_defaults( $update = true ) {
 	// Options that need not be autoloaded.
 	$not_autoload = array( 'robots' );
+	$defaults     = (array) XMLSF\get_default_settings();
 
-	foreach ( xmlsf()->defaults() as $option => $default ) {
+	foreach ( $defaults as $option => $default ) {
 		if ( $update ) {
 			update_option( 'xmlsf_' . $option, $default, '', ! in_array( $option, $not_autoload, true ) );
 		} else {

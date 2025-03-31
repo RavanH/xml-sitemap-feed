@@ -226,7 +226,7 @@ class Admin {
 	 */
 	public static function sitemaps_settings_field() {
 		if ( 1 === (int) \get_option( 'blog_public' ) ) {
-			$sitemaps = (array) \get_option( 'xmlsf_sitemaps', \xmlsf()->defaults( 'sitemaps' ) );
+			$sitemaps = (array) \get_option( 'xmlsf_sitemaps', \XMLSF\get_default_settings( 'sitemaps' ) );
 			// The actual fields for data entry.
 			include XMLSF_DIR . '/views/admin/field-sitemaps.php';
 		} else {
@@ -272,7 +272,7 @@ class Admin {
 	 */
 	public static function check_static_files( $files = array(), $verbosity = 1 ) {
 		if ( empty( $files ) ) { // TODO a better way of getting file names.
-			$sitemaps = (array) \get_option( 'xmlsf_sitemaps', \xmlsf()->defaults( 'sitemaps' ) );
+			$sitemaps = (array) \get_option( 'xmlsf_sitemaps', \XMLSF\get_default_settings( 'sitemaps' ) );
 			foreach ( $sitemaps as $type => $file ) {
 				$files[] = $file;
 			}

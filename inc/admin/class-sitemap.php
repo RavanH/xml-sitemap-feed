@@ -105,7 +105,7 @@ class Sitemap {
 	 * Clear settings
 	 */
 	public static function clear_settings() {
-		$defaults = \xmlsf()->defaults();
+		$defaults = get_default_settings();
 
 		unset( $defaults['sitemaps'] );
 
@@ -514,7 +514,7 @@ class Sitemap {
 			9
 		);
 
-		$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
+		$disabled = \get_option( 'xmlsf_disabled_providers', \XMLSF\get_default_settings( 'disabled_providers' ) );
 
 		// The actual settings page.
 		include XMLSF_DIR . '/views/admin/page-sitemap.php';

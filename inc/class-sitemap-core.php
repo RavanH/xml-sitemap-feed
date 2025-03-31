@@ -458,20 +458,20 @@ class Sitemap_Core extends Sitemap {
 		switch ( $object_type ) {
 			case 'user':
 				$settings = (array) \get_option( 'xmlsf_author_settings' );
-				$defaults = \xmlsf()->defaults( 'author_settings' );
+				$defaults = get_default_settings( 'author_settings' );
 				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 				break;
 
 			case 'term':
 				$settings = (array) \get_option( 'xmlsf_taxonomy_settings' );
-				$defaults = \xmlsf()->defaults( 'taxonomy_settings' );
+				$defaults = get_default_settings( 'taxonomy_settings' );
 				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 				break;
 
 			case 'post':
 			default:
 				$settings = (array) \get_option( 'xmlsf_post_type_settings' );
-				$defaults = \xmlsf()->defaults( 'post_types' );
+				$defaults = get_default_settings( 'post_types' );
 				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 		}
 
@@ -491,7 +491,7 @@ class Sitemap_Core extends Sitemap {
 	 * @return false|obj Provider or false if disabled.
 	 */
 	public function add_provider( $provider, $name ) {
-		$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
+		$disabled = \get_option( 'xmlsf_disabled_providers', get_default_settings( 'disabled_providers' ) );
 
 		// Match disabled settings.
 		if ( ! empty( $disabled ) && \in_array( $name, (array) $disabled, true ) ) {

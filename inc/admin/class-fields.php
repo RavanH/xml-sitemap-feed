@@ -17,7 +17,7 @@ class Fields {
 	 */
 	public static function server_field() {
 		$server       = \get_option( 'xmlsf_server' );
-		$server       = ! \in_array( $server, array( 'core', 'plugin' ), true ) ? \xmlsf()->defaults( 'server' ) : $server;
+		$server       = ! \in_array( $server, array( 'core', 'plugin' ), true ) ? \XMLSF\get_default_settings( 'server' ) : $server;
 		$nosimplexml  = ! \class_exists( 'SimpleXMLElement' );
 		$nocoreserver = ! \function_exists( 'get_sitemap_url' );
 
@@ -46,7 +46,7 @@ class Fields {
 		 */
 		$post_types = \apply_filters( 'xmlsf_author_has_published_posts', $post_types );
 
-		$disabled   = (array) \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
+		$disabled   = (array) \get_option( 'xmlsf_disabled_providers', \XMLSF\get_default_settings( 'disabled_providers' ) );
 		$public_tax = \get_taxonomies( array( 'public' => true ) );
 		$users_args = array(
 			'fields'              => 'ID',
@@ -61,8 +61,8 @@ class Fields {
 	 * Limit field
 	 */
 	public static function post_types_general_fields() {
-		$post_types = (array) \get_option( 'xmlsf_post_types', \xmlsf()->defaults( 'post_types' ) );
-		$defaults   = \xmlsf()->defaults( 'post_type_settings' );
+		$post_types = (array) \get_option( 'xmlsf_post_types', \XMLSF\get_default_settings( 'post_types' ) );
+		$defaults   = \XMLSF\get_default_settings( 'post_type_settings' );
 		$settings   = (array) \get_option( 'xmlsf_post_type_settings', $defaults );
 		$limit      = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 

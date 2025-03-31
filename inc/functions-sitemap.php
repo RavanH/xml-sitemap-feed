@@ -47,7 +47,7 @@ function get_post_types() {
  * @return array
  */
 function get_taxonomies() {
-	$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
+	$disabled = \get_option( 'xmlsf_disabled_providers', get_default_settings( 'disabled_providers' ) );
 
 	if ( ! empty( $disabled ) && \in_array( 'taxonomies', (array) $disabled, true ) ) {
 		return array();

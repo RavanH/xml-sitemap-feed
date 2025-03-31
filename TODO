@@ -1,6 +1,5 @@
 FIX
-* plugin sitemap new settings
-* find out why xmlsf()->defaults( 'post_type_settings' ) causes out of memory
+* out of memory on xmlsf()->defaults( 'post_type_settings' ) ?????
 
 ROADMAP
 * move sitemap fields (back) to Sitemap class?
@@ -39,6 +38,7 @@ DOCUMENT
 * add inline comment blocks for hooks
 
 CONSIDER
+* Reset button per settings tab
 * make sitemaps_enabled use static value for faster repsonse
 * Get rid of the whole feed business...
 * Quick edit colums sortable
