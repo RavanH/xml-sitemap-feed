@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.4
 Requires PHP: 5.6
 Tested up to: 6.8
-Stable tag: 5.5
+Stable tag: 5.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -143,12 +143,12 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.5 =
+= 5.5.1 =
 New features: Exclude option in Quick Editor, Custom URLs and External sitemaps in WordPress server. Many fixes and compatibility updates.
 
 == Changelog ==
 
-= 5.5 =
+= 5.5.1 =
 Date: 20250331
 * NEW: Exclude option in Quick Editor
 * NEW: Filter xmlsf_taxonomies_query_args
