@@ -18,7 +18,7 @@ do_action( 'xmlsf_sitemap_index' );
 $disabled = get_option( 'xmlsf_disabled_providers', XMLSF\get_default_settings( 'disabled_providers' ) );
 
 // Public post types.
-$post_types = XMLSF\get_post_types();
+$post_types = XMLSF\get_post_types_settings();
 foreach ( $post_types as $the_post_type => $settings ) :
 	$archive_type = isset( $settings['archive'] ) ? $settings['archive'] : '';
 	$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $the_post_type, $archive_type );

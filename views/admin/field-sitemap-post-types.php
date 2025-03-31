@@ -18,7 +18,7 @@
 		<?php
 		$pt_objects = get_post_types( array( 'public' => true ), 'objects' );
 		foreach ( $pt_objects as $name => $pt_obj ) {
-			if ( in_array( $name, xmlsf()->disabled_post_types() ) || ! is_post_type_viewable( $pt_obj ) ) {
+			if ( in_array( $name, xmlsf()->disabled_post_types(), true ) || ! is_post_type_viewable( $pt_obj ) ) {
 				continue;
 			}
 			?>

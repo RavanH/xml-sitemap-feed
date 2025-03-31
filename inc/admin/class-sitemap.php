@@ -221,7 +221,7 @@ class Sitemap {
 			$wpseo_titles = \get_option( 'wpseo_titles' );
 			if ( ! empty( $wpseo_titles['disable-date'] ) && ! \xmlsf()->sitemap->uses_core_server() ) {
 				// check if Split by option is set anywhere.
-				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
+				foreach ( \XMLSF\get_post_types_settings() as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
 						\add_action(
 							'admin_notices',
@@ -257,7 +257,7 @@ class Sitemap {
 			$seopress_titles = \get_option( 'seopress_titles_option_name' );
 			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) && ! \xmlsf()->sitemap->uses_core_server() ) {
 				// check if Split by option is set anywhere.
-				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
+				foreach ( \XMLSF\get_post_types_settings() as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
 						\add_action(
 							'admin_notices',
@@ -291,7 +291,7 @@ class Sitemap {
 			$rankmath_titles = \get_option( 'rank-math-options-titles' );
 			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] && ! \xmlsf()->sitemap->uses_core_server() ) {
 				// check if Split by option is set anywhere.
-				foreach ( (array) \get_option( 'xmlsf_post_types', array() ) as $type => $settings ) {
+				foreach ( \XMLSF\get_post_types_settings() as $type => $settings ) {
 					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
 						\add_action(
 							'admin_notices',
@@ -417,23 +417,21 @@ class Sitemap {
 	 * Adds a XML Sitemap box to the side column
 	 */
 	public static function add_meta_box() {
-		$post_types = \get_option( 'xmlsf_post_types' );
-		if ( ! \is_array( $post_types ) ) {
+		$post_types = \XMLSF\get_post_types_settings();
+		if ( empty( $post_types ) ) {
 			return;
 		}
 
 		foreach ( $post_types as $post_type => $settings ) {
 			// Only include metaboxes on post types that are included.
-			if ( isset( $settings['active'] ) ) {
-				\add_meta_box(
-					'xmlsf_section',
-					__( 'XML Sitemap', 'xml-sitemap-feed' ),
-					array( __CLASS__, 'meta_box' ),
-					$post_type,
-					'side',
-					'low'
-				);
-			}
+			\add_meta_box(
+				'xmlsf_section',
+				__( 'XML Sitemap', 'xml-sitemap-feed' ),
+				array( __CLASS__, 'meta_box' ),
+				$post_type,
+				'side',
+				'low'
+			);
 		}
 	}
 
@@ -544,7 +542,7 @@ class Sitemap {
 					'xml_sitemap_post_types_section'
 				);
 
-				$post_types = (array) \apply_filters( 'xmlsf_post_types', \get_post_types( array( 'public' => true ) ) );
+				$post_types = \get_post_types( array( 'public' => true ) );
 				// Make sure post types are allowed and publicly viewable.
 				$post_types = \array_diff( $post_types, \xmlsf()->disabled_post_types() );
 				$post_types = \array_filter( $post_types, 'is_post_type_viewable' );
@@ -910,7 +908,7 @@ class Sitemap {
 	public static function add_columns() {
 		include_once \XMLSF_DIR . '/inc/functions-sitemap.php';
 
-		foreach ( \XMLSF\get_post_types() as $post_type => $settings ) {
+		foreach ( \XMLSF\get_post_types_settings() as $post_type => $settings ) {
 			\add_filter( "manage_{$post_type}_posts_columns", array( __CLASS__, 'quick_edit_columns' ) );
 			\add_action( "manage_{$post_type}_posts_custom_column", array( __CLASS__, 'populate_columns' ) );
 		}
