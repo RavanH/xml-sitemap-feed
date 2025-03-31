@@ -144,16 +144,15 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 == Upgrade Notice ==
 
 = 5.5 =
-
+New features: Exclude option in Quick Editor, Custom URLs and External sitemaps in WordPress server. Many fixes and compatibility updates.
 
 == Changelog ==
 
 = 5.5 =
-Date:
+Date: 20250331
 * NEW: Exclude option in Quick Editor
 * NEW: Filter xmlsf_taxonomies_query_args
 * NEW: Filter xmlsf_news_hours_old
-* NEW: post types max number
 * NEW: custom urls sitemap for core server
 * NEW: external sitemaps for core server
 * Namespacing & autoloading
@@ -166,6 +165,7 @@ Date:
 * FIX: Blog page lastmod date format
 * FIX: Noindex robots meta header for core sitemap, thanks @ukheather
 * FIX: possible empty static front page lastmod
+* FIX: Max posts per sitemap not saving
 
 = 5.4.9 =
 Date: 20240506
@@ -173,6 +173,7 @@ Date: 20240506
 
 = 5.4.8 =
 Date: 20240329
+* NEW: post types max number
 * FIX: blog_public can be integer when object cache is used
 * FIX: compatibility date redirect warning when using core server
 * FIX: rewrite rules conflict with Polylang
