@@ -1,5 +1,6 @@
 FIX
-* upgrade
+* plugin sitemap new settings
+* find out why xmlsf()->defaults( 'post_type_settings' ) causes out of memory
 
 ROADMAP
 * move sitemap fields (back) to Sitemap class?
