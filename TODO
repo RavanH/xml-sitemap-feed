@@ -1,5 +1,4 @@
 FIX
-* out of memory on xmlsf()->defaults( 'post_type_settings' ) ?????
 
 ROADMAP
 * move sitemap fields (back) to Sitemap class?
@@ -8,7 +7,6 @@ ROADMAP
 * drop dynamic priority?
 
 TEST
-* google news advanced compat
 * static files check after sitemap activation and tools
 * Nginx Helper purge wildcard not working?
 * theme template overrides
