@@ -17,7 +17,7 @@ class Fields {
 	 */
 	public static function server_field() {
 		$server       = \get_option( 'xmlsf_server' );
-		$server       = ! \in_array( $server, array( 'core', 'plugin' ), true ) ? xmlsf()->defaults( 'server' ) : $server;
+		$server       = ! \in_array( $server, array( 'core', 'plugin' ), true ) ? \xmlsf()->defaults( 'server' ) : $server;
 		$nosimplexml  = ! \class_exists( 'SimpleXMLElement' );
 		$nocoreserver = ! \function_exists( 'get_sitemap_url' );
 
@@ -46,7 +46,7 @@ class Fields {
 		 */
 		$post_types = \apply_filters( 'xmlsf_author_has_published_posts', $post_types );
 
-		$disabled   = (array) \get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
+		$disabled   = (array) \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
 		$public_tax = \get_taxonomies( array( 'public' => true ) );
 		$users_args = array(
 			'fields'              => 'ID',
@@ -61,14 +61,14 @@ class Fields {
 	 * Limit field
 	 */
 	public static function post_types_general_fields() {
-		$post_types       = (array) \get_option( 'xmlsf_post_types', xmlsf()->defaults( 'post_types' ) );
-		$default_settings = xmlsf()->defaults( 'post_type_settings' );
+		$post_types       = (array) \get_option( 'xmlsf_post_types', \xmlsf()->defaults( 'post_types' ) );
+		$default_settings = \xmlsf()->defaults( 'post_type_settings' );
 		$settings         = (array) \get_option( 'xmlsf_post_type_settings', $default_settings );
 		$limit            = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-post-types.php';
-		include XMLSF_DIR . '/views/admin/field-sitemap-limit.php';
+		\xmlsf()->sitemap->uses_core_server() && include XMLSF_DIR . '/views/admin/field-sitemap-limit.php';
 	}
 
 	/**
@@ -153,7 +153,7 @@ class Fields {
 	 */
 	public static function xmlsf_sitemap_name_field() {
 		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', array() );
-		$slug     = \is_object( xmlsf()->sitemap ) ? xmlsf()->sitemap->slug() : ( xmlsf()->sitemap->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+		$slug     = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : ( \xmlsf()->sitemap->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-name.php';

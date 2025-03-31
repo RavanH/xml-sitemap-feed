@@ -159,10 +159,10 @@ class Sitemap_News {
 		global $wp_rewrite;
 
 		// Short-circuit if request was already filtered by this plugin.
-		if ( xmlsf()->request_filtered_news ) {
+		if ( \xmlsf()->request_filtered_news ) {
 			return $request;
 		} else {
-			xmlsf()->request_filtered_news = true;
+			\xmlsf()->request_filtered_news = true;
 		}
 
 		// Short-circuit if request is not a feed or it does not start with 'sitemap-news'.
@@ -175,7 +175,7 @@ class Sitemap_News {
 		\do_action( 'xmlsf_news_sitemap_loaded' );
 
 		// Set the sitemap conditional flags.
-		xmlsf()->is_news = true;
+		\xmlsf()->is_news = true;
 
 		// Disable caching.
 		\defined( 'DONOTCACHEPAGE' ) || \define( 'DONOTCACHEPAGE', true );

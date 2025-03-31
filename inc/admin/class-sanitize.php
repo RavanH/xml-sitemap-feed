@@ -20,7 +20,7 @@ class Sanitize {
 	 * @return string
 	 */
 	public static function server( $save ) {
-		$sanitized = empty( $save ) || ! \in_array( $save, array( 'core', 'plugin' ), true ) ? xmlsf()->defaults( 'server' ) : $save;
+		$sanitized = empty( $save ) || ! \in_array( $save, array( 'core', 'plugin' ), true ) ? \xmlsf()->defaults( 'server' ) : $save;
 
 		return $sanitized;
 	}

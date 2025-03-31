@@ -21,7 +21,7 @@ class Sitemap_News {
 	 */
 	public static function clear_settings() {
 		// Update to defaults.
-		\update_option( 'xmlsf_news_tags', xmlsf()->defaults( 'news_tags' ) );
+		\update_option( 'xmlsf_news_tags', \xmlsf()->defaults( 'news_tags' ) );
 
 		\do_action( 'xmlsf_clear_news_settings' );
 	}
@@ -229,7 +229,7 @@ class Sitemap_News {
 		\do_action( 'xmlsf_news_add_settings', $active_tab );
 
 		// prepare sitemap link url.
-		$sitemap_url = xmlsf()->sitemap_news->get_sitemap_url();
+		$sitemap_url = \xmlsf()->sitemap_news->get_sitemap_url();
 
 		// Sidebar actions.
 		\add_action(
@@ -522,7 +522,7 @@ class Sitemap_News {
 		);
 
 		// Make sure post types are allowed and publicly viewable.
-		$post_types = \array_diff( $post_types, xmlsf()->disabled_post_types() );
+		$post_types = \array_diff( $post_types, \xmlsf()->disabled_post_types() );
 		$post_types = \array_filter( $post_types, 'is_post_type_viewable' );
 
 		if ( ! \is_array( $post_types ) || empty( $post_types ) ) {

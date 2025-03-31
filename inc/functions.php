@@ -18,7 +18,7 @@ function sitemap_loaded() {
 	\add_filter( 'wp_headers', __NAMESPACE__ . '\headers' );
 
 	// Set the sitemap conditional flag.
-	xmlsf()->is_sitemap = true;
+	\xmlsf()->is_sitemap = true;
 
 	// Make sure we have the proper locale setting for calculations.
 	\setlocale( LC_NUMERIC, 'C' );
@@ -296,11 +296,11 @@ function robots_txt( $output ) {
 	} elseif ( ! namespace\sitemaps_enabled() ) {
 		$output .= '# No XML Sitemaps are enabled.' . PHP_EOL;
 	} else {
-		if ( namespace\sitemaps_enabled( 'sitemap' ) && ! xmlsf()->sitemap->uses_core_server() ) {
-			$output .= 'Sitemap: ' . xmlsf()->sitemap->get_sitemap_url() . PHP_EOL;
+		if ( namespace\sitemaps_enabled( 'sitemap' ) && ! \xmlsf()->sitemap->uses_core_server() ) {
+			$output .= 'Sitemap: ' . \xmlsf()->sitemap->get_sitemap_url() . PHP_EOL;
 		}
 		if ( namespace\sitemaps_enabled( 'news' ) ) {
-			$output .= 'Sitemap: ' . xmlsf()->sitemap_news->get_sitemap_url() . PHP_EOL;
+			$output .= 'Sitemap: ' . \xmlsf()->sitemap_news->get_sitemap_url() . PHP_EOL;
 		}
 	}
 

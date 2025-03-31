@@ -19,8 +19,8 @@ class Sitemap_Core extends Sitemap {
 	public function __construct() {
 		$this->slug = 'wp-sitemap';
 		$post_types = \get_option( 'xmlsf_post_types', array() );
-		if ( $post_types ) {
-			$this->post_types = (array) $post_types;
+		if ( is_array( $post_types ) ) {
+			$this->post_types = $post_types;
 		}
 		$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', array() );
 
@@ -128,7 +128,7 @@ class Sitemap_Core extends Sitemap {
 	 * @return array $request filtered
 	 */
 	public function filter_request( $request ) {
-		xmlsf()->request_filtered = true;
+		\xmlsf()->request_filtered = true;
 
 		if ( ! empty( $request['sitemap'] ) ) {
 
@@ -458,20 +458,20 @@ class Sitemap_Core extends Sitemap {
 		switch ( $object_type ) {
 			case 'user':
 				$settings = (array) \get_option( 'xmlsf_author_settings' );
-				$defaults = xmlsf()->defaults( 'author_settings' );
+				$defaults = \xmlsf()->defaults( 'author_settings' );
 				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 				break;
 
 			case 'term':
 				$settings = (array) \get_option( 'xmlsf_taxonomy_settings' );
-				$defaults = xmlsf()->defaults( 'taxonomy_settings' );
+				$defaults = \xmlsf()->defaults( 'taxonomy_settings' );
 				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 				break;
 
 			case 'post':
 			default:
 				$settings = (array) \get_option( 'xmlsf_post_type_settings' );
-				$defaults = xmlsf()->defaults( 'post_types' );
+				$defaults = \xmlsf()->defaults( 'post_types' );
 				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 		}
 
@@ -491,7 +491,7 @@ class Sitemap_Core extends Sitemap {
 	 * @return false|obj Provider or false if disabled.
 	 */
 	public function add_provider( $provider, $name ) {
-		$disabled = \get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
+		$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
 
 		// Match disabled settings.
 		if ( ! empty( $disabled ) && \in_array( $name, (array) $disabled, true ) ) {

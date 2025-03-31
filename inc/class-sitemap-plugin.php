@@ -19,10 +19,10 @@ class Sitemap_Plugin extends Sitemap {
 	public function __construct() {
 		$this->slug = 'sitemap';
 		$post_types = \get_option( 'xmlsf_post_types', array() );
-		if ( $post_types ) {
-			$this->post_types = (array) $post_types;
+		if ( is_array( $post_types ) ) {
+			$this->post_types = $post_types;
 		}
-		$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', xmlsf()->defaults( 'post_type_settings' ) );
+		$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', array() /*, \xmlsf()->defaults( 'post_type_settings' ) */ );
 		$this->rewrite_rules      = array(
 			'^' . $this->slug . '\.xml$' => 'index.php?feed=sitemap',
 			'^' . $this->slug . '-([a-z]+?)?(-[a-z0-9\-_]+?)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml$' => 'index.php?feed=sitemap-$matches[1]$matches[2]&m=$matches[3]&w=$matches[4]',
@@ -126,10 +126,10 @@ class Sitemap_Plugin extends Sitemap {
 		global $wp_rewrite;
 
 		// Short-circuit if request was already filtered by this plugin.
-		if ( xmlsf()->request_filtered ) {
+		if ( \xmlsf()->request_filtered ) {
 			return $request;
 		} else {
-			xmlsf()->request_filtered = true;
+			\xmlsf()->request_filtered = true;
 		}
 
 		// Short-circuit if request is not a feed, does not start with 'sitemap' or is a news sitemap.
@@ -159,11 +159,11 @@ class Sitemap_Plugin extends Sitemap {
 				// Prepare priority calculation.
 				if ( ! empty( $this->post_type_settings[ $feed[2] ] ) && ! empty( $this->post_type_settings[ $feed[2] ]['priority'] ) && ! empty( $this->post_type_settings[ $feed[2] ]['dynamic_priority'] ) ) {
 					// Last of this post type modified date in Unix seconds.
-					xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $feed[2] ), DATE_W3C );
+					\xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $feed[2] ), DATE_W3C );
 					// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
-					xmlsf()->timespan = xmlsf()->lastmodified - \get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2] ), DATE_W3C );
+					\xmlsf()->timespan = \xmlsf()->lastmodified - \get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2] ), DATE_W3C );
 					// Total post type comment count.
-					xmlsf()->comment_count = \wp_count_comments()->approved;
+					\xmlsf()->comment_count = \wp_count_comments()->approved;
 					// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
 					// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/.
 				}
@@ -192,7 +192,7 @@ class Sitemap_Plugin extends Sitemap {
 				break;
 
 			case 'taxonomy':
-				$disabled = \get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
+				$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
 				if ( ! isset( $feed[2] ) || ( ! empty( $disabled ) && in_array( 'taxonomies', (array) $disabled, true ) ) ) {
 					return $request;
 				}
@@ -211,7 +211,7 @@ class Sitemap_Plugin extends Sitemap {
 				break;
 
 			case 'author':
-				$disabled = \get_option( 'xmlsf_disabled_providers', xmlsf()->defaults( 'disabled_providers' ) );
+				$disabled = \get_option( 'xmlsf_disabled_providers', \xmlsf()->defaults( 'disabled_providers' ) );
 				if ( ! empty( $disabled ) && \in_array( 'users', (array) $disabled, true ) ) {
 					return $request;
 				}
@@ -267,7 +267,7 @@ class Sitemap_Plugin extends Sitemap {
 	public function set_terms_args( $args ) {
 		// Read more on https://developer.wordpress.org/reference/classes/wp_term_query/__construct/.
 		$options  = \get_option( 'xmlsf_taxonomy_settings' );
-		$defaults = xmlsf()->defaults( 'taxonomy_settings' );
+		$defaults = \xmlsf()->defaults( 'taxonomy_settings' );
 
 		$args['number'] = isset( $options['limit'] ) && \is_numeric( $options['limit'] ) ? \intval( $options['limit'] ) : $defaults['limit'];
 
@@ -315,7 +315,7 @@ class Sitemap_Plugin extends Sitemap {
 		$post_types = \apply_filters( 'xmlsf_author_has_published_posts', $post_types );
 
 		$author_settings = \get_option( 'xmlsf_author_settings' );
-		$defaults        = xmlsf()->defaults( 'author_settings' );
+		$defaults        = \xmlsf()->defaults( 'author_settings' );
 
 		$args['has_published_posts'] = $post_types;
 		$args['number']              = ! empty( $author_settings['limit'] ) && \is_numeric( $author_settings['limit'] ) ? \intval( $author_settings['limit'] ) : $defaults['limit'];
