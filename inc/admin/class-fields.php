@@ -63,7 +63,7 @@ class Fields {
 	public static function post_types_general_fields() {
 		$post_types = (array) \get_option( 'xmlsf_post_types', \xmlsf()->defaults( 'post_types' ) );
 		$defaults   = \xmlsf()->defaults( 'post_type_settings' );
-		$settings   = (array) \get_option( 'xmlsf_post_type_settings', $default_settings );
+		$settings   = (array) \get_option( 'xmlsf_post_type_settings', $defaults );
 		$limit      = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
 
 		// The actual fields for data entry.
