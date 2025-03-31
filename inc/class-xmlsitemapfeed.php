@@ -5,10 +5,26 @@
  * @package XML Sitemap & Google News
  */
 
+namespace XMLSF;
+
 /**
  * XMLSitemapFeed CLASS
  */
 class XMLSitemapFeed {
+
+	/**
+	 * Sitemap object
+	 *
+	 * @var null|obj
+	 */
+	public $sitemap = null;
+
+	/**
+	 * News sitemap object
+	 *
+	 * @var null|obj
+	 */
+	public $sitemap_news = null;
 
 	/**
 	 * Defaults
@@ -19,6 +35,7 @@ class XMLSitemapFeed {
 
 	/**
 	 * News defaults
+	 * Keep for backward compatibility with XMLSF Advanced News 1.3.5 and earlier.
 	 *
 	 * @var array
 	 */
@@ -31,7 +48,7 @@ class XMLSitemapFeed {
 	/**
 	 * Front pages
 	 *
-	 * @var null/array $frontpages
+	 * @var null|array $frontpages
 	 */
 	public $frontpages = null;
 
@@ -126,63 +143,113 @@ class XMLSitemapFeed {
 	public $blogpages = null;
 
 	/**
+	 * Using permalinks?
+	 *
+	 * @var null|bool
+	 */
+	protected $using_permalinks;
+
+	/**
 	 * Constructor
 	 *
 	 * @return void
 	 */
-	public function __construct() {}
+	public function __construct() {
+
+		// Upgrade/install, maybe...
+		$db_version = \get_option( 'xmlsf_version', 0 );
+		if ( ! \version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
+			require_once \XMLSF_DIR . '/upgrade.php';
+		}
+
+		add_action( 'plugins_loaded', __NAMESPACE__ . '\plugin_compat' );
+		add_filter( 'robots_txt', __NAMESPACE__ . '\robots_txt' );
+
+		// Load sitemaps.
+		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
+
+		if ( empty( $sitemaps ) ) {
+			return;
+		}
+
+		// Google News sitemap?
+		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
+			require_once \XMLSF_DIR . '/inc/functions-sitemap-news.php';
+
+			\add_action( 'xmlsf_news_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
+
+			$this->sitemap_news = new Sitemap_News();
+		}
+
+		// XML Sitemap?
+		if ( ! empty( $sitemaps['sitemap'] ) ) {
+			require_once \XMLSF_DIR . '/inc/functions-sitemap.php';
+
+			\add_action( 'xmlsf_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
+
+			if ( \function_exists( 'get_sitemap_url' ) && 'core' === \get_option( 'xmlsf_server', $this->defaults( 'server' ) ) ) {
+				// Extend core sitemap.
+				$this->sitemap = new Sitemap_Core();
+			} else {
+				// Replace core sitemap.
+				\remove_action( 'init', 'wp_sitemaps_get_server' );
+
+				$this->sitemap = new Sitemap_Plugin();
+			}
+		} else {
+			// Disable core sitemap.
+			\add_filter( 'wp_sitemaps_enabled', '__return_false' );
+		}
+
+		\add_action( 'xmlsf_generator', __NAMESPACE__ . '\generator' );
+	}
 
 	/**
 	 * Default options
 	 *
-	 * @param bool $key Which key to get.
-	 *
 	 * @return array
 	 */
-	public function defaults( $key = false ) {
+	public function defaults() {
 		if ( empty( $this->defaults ) ) :
 
 			// sitemaps.
-			$sitemaps = ( 1 !== (int) get_option( 'blog_public' ) ) ? array() : array(
-				'sitemap' => 'sitemap.xml',
+			$sitemaps = ( 1 !== (int) \get_option( 'blog_public' ) ) ? array() : array(
+				'sitemap' => \class_exists( 'SimpleXMLElement' ) && \function_exists( 'get_sitemap_url' ) ? 'wp-sitemap.xml' : 'sitemap-xml',
 			);
 
 			$this->defaults = array(
 				'sitemaps'           => $sitemaps,
-				'server'             => class_exists( 'SimpleXMLElement' ) && function_exists( 'get_sitemap_url' ) ? 'core' : 'plugin',
+				'server'             => \class_exists( 'SimpleXMLElement' ) && \function_exists( 'get_sitemap_url' ) ? 'core' : 'plugin',
 				'disabled_providers' => array(),
-				'post_types'         => array(
+				'post_types'         => array(),
+				'post_type_settings' => array(
 					'post'  => array(
-						'active'           => '1',
 						'archive'          => 'yearly',
-						'priority'         => .7,
+						'priority'         => '',
 						'dynamic_priority' => '',
 						'tags'             => array(
 							'image' => 'featured',
-							/*'video' => ''*/
 						),
 					),
 					'page'  => array(
-						'active'           => '1',
-						'priority'         => .5,
+						'priority'         => '',
 						'dynamic_priority' => '',
 						'tags'             => array(
 							'image' => 'attached',
-							/*'video' => ''*/
 						),
 					),
 					'limit' => 2000,
 				),
 				'taxonomies'         => '',
 				'taxonomy_settings'  => array(
-					'priority'         => .3,
+					'priority'         => '',
 					'dynamic_priority' => '',
 					'include_empty'    => '',
 					'limit'            => 2000,
 				),
 				'authors'            => '',
 				'author_settings'    => array(
-					'priority' => .3,
+					'priority' => '',
 					'limit'    => 2000,
 				),
 				'robots'             => '',
@@ -193,13 +260,7 @@ class XMLSitemapFeed {
 
 		endif;
 
-		if ( $key ) {
-			$return = ( isset( $this->defaults[ $key ] ) ) ? $this->defaults[ $key ] : '';
-		} else {
-			$return = $this->defaults;
-		}
-
-		return apply_filters( 'xmlsf_defaults', $return, $key );
+		return $this->defaults;
 	}
 
 	/**
@@ -210,7 +271,7 @@ class XMLSitemapFeed {
 	public function scheme() {
 		// Scheme to use.
 		if ( empty( $this->scheme ) ) {
-			$scheme       = wp_parse_url( home_url(), PHP_URL_SCHEME );
+			$scheme       = \wp_parse_url( home_url(), PHP_URL_SCHEME );
 			$this->scheme = $scheme ? $scheme : 'http';
 		}
 
@@ -223,7 +284,7 @@ class XMLSitemapFeed {
 	 * @return array
 	 */
 	public function disabled_taxonomies() {
-		return apply_filters( 'xmlsf_disabled_taxonomies', $this->disabled_taxonomies );
+		return \apply_filters( 'xmlsf_disabled_taxonomies', $this->disabled_taxonomies );
 	}
 
 	/**
@@ -232,6 +293,6 @@ class XMLSitemapFeed {
 	 * @return array
 	 */
 	public function disabled_post_types() {
-		return (array) apply_filters( 'xmlsf_disabled_post_types', $this->disabled_post_types );
+		return (array) \apply_filters( 'xmlsf_disabled_post_types', $this->disabled_post_types );
 	}
 }

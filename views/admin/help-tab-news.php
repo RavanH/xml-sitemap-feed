@@ -8,7 +8,10 @@
 ?>
 <p>
 	<?php esc_html_e( 'The options on this page allow you to configure an XML Sitemap dedicated to keep Google News informed of your latest posts.', 'xml-sitemap-feed' ); ?>
-	<?php esc_html_e( 'Updates are instantly pinged to Google, who will then crawl your sitemap to find out more. The sitemap adheres to the Google News Sitemap standard and helps Google News to find your news content as quickly as possible. However, it is up to you to to produce high-quality content and comply with Google News content policies!', 'xml-sitemap-feed' ); ?>
+</p>
+<p>
+	<?php esc_html_e( 'The sitemap adheres to the Google News Sitemap standard and helps Google News to find your news content as quickly as possible. However, it is up to you to to produce high-quality content and comply with Google News content policies!', 'xml-sitemap-feed' ); ?>
+	<?php esc_html_e( 'Please note: The news sitemap only includes recent URLs for articles that were created in the last two days. If you have not published anything recently, you may see an Empty Sitemap warning in Search Console. It won\'t cause any problems with Google Search if the file is empty.', 'xml-sitemap-feed' ); ?>
 </p>
 <p>
 	<?php

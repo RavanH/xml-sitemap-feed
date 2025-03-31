@@ -49,6 +49,13 @@
 	</div>
 
 	<div class="sidebar">
+		<?php
+		if ( is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) && ! $this->compatible_with_advanced() ) {
+			$class = 'notice notice-error notice-alt';
+			include XMLSF_DIR . '/views/admin/section-advanced-compat-message.php';
+		}
+		?>
+
 		<h3><span class="dashicons dashicons-welcome-view-site"></span> <?php echo esc_html( translate( 'View' ) ); ?></h3>
 		<p>
 			<?php
@@ -74,7 +81,7 @@
 				<input type="submit" name="xmlsf-clear-user-meta" class="button button-small" value="<?php esc_attr_e( 'Clear user cache', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
-				<input type="submit" name="xmlsf-clear-settings-sitemap" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm('<?php echo esc_js( __( 'This will revert your sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); ?>')" />
+				<input type="submit" name="xmlsf-clear-settings-sitemap" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm('<?php echo esc_js( __( 'This will revert ALL your sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); ?>')" />
 			</p>
 		</form>
 

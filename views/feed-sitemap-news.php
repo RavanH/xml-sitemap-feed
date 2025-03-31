@@ -9,14 +9,21 @@ defined( 'WPINC' ) || die;
 
 $options = get_option( 'xmlsf_news_tags' );
 
+if ( XMLSF_GOOGLE_NEWS_NAME ) {
+	$options['name'] = XMLSF_GOOGLE_NEWS_NAME;
+}
+
 // Do xml tag via echo or SVN parser is going to freak out.
 echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charset' ) ) ) . '"?>
 '; ?>
-<?php xmlsf_xml_stylesheet( 'news' ); ?>
+<?php XMLSF\xml_stylesheet( 'news' ); ?>
 <?php do_action( 'xmlsf_generator' ); ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" <?php do_action( 'xmlsf_urlset', 'news' ); ?>>
 <?php
 global $wp_query, $post;
+
+setlocale( LC_TIME, 'C' );
+
 // Loop away!
 if ( have_posts() ) :
 	$wp_query->in_the_loop = true;
@@ -41,22 +48,27 @@ if ( have_posts() ) :
 
 		echo '<url><loc>' . esc_xml( esc_url( $url ) ) . '</loc>';
 
-		// The news tags.
-		echo '<news:news><news:publication><news:name>';
-		echo esc_xml( apply_filters( 'xmlsf_news_publication_name', ( ! empty( $options['name'] ) ? $options['name'] : get_bloginfo( 'name' ) ) ) );
-		echo '</news:name>';
-		echo '<news:language>' . esc_xml( apply_filters( 'xmlsf_news_language', get_bloginfo( 'language' ), $post->ID, $post->post_type ) ) . '</news:language>';
-		echo '</news:publication>';
-		echo '<news:publication_date>' . esc_xml( get_date_from_gmt( $post->post_date_gmt, DATE_W3C ) ) . '</news:publication_date>';
-		echo '<news:title>' . esc_xml( apply_filters( 'xmlsf_news_title', get_the_title() ) ) . '</news:title>';
-		echo '<news:keywords>' . esc_xml( implode( ', ', (array) apply_filters( 'xmlsf_news_keywords', array(), $post->ID ) ) ) . '</news:keywords>';
-		echo '<news:stock_tickers>' . esc_xml( implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ) ) . '</news:stock_tickers>';
+		// Make sure the post is not older than 2 days.
+		$post_age = strtotime( $post->post_date_gmt );
 
-		do_action( 'xmlsf_news_tags_inner', $post );
+		if ( $post_age && $post_age >= strtotime( '-48 hours' ) ) {
+			// The news tags.
+			echo '<news:news><news:publication><news:name>';
+			echo esc_xml( apply_filters( 'xmlsf_news_publication_name', ( ! empty( $options['name'] ) ? $options['name'] : get_bloginfo( 'name' ) ), $post->ID, $post->post_type ) );
+			echo '</news:name>';
+			echo '<news:language>' . esc_xml( apply_filters( 'xmlsf_news_language', get_bloginfo( 'language' ), $post->ID, $post->post_type ) ) . '</news:language>';
+			echo '</news:publication>';
+			echo '<news:publication_date>' . esc_xml( get_date_from_gmt( $post->post_date_gmt, DATE_W3C ) ) . '</news:publication_date>';
+			echo '<news:title>' . esc_xml( apply_filters( 'xmlsf_news_title', get_the_title() ) ) . '</news:title>';
+			echo '<news:keywords>' . esc_xml( implode( ', ', (array) apply_filters( 'xmlsf_news_keywords', array(), $post->ID ) ) ) . '</news:keywords>';
+			echo '<news:stock_tickers>' . esc_xml( implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ) ) . '</news:stock_tickers>';
 
-		echo '</news:news>';
+			do_action( 'xmlsf_news_tags_inner', $post );
 
-		do_action( 'xmlsf_news_tags_after', $post );
+			echo '</news:news>';
+
+			do_action( 'xmlsf_news_tags_after', $post );
+		}
 
 		echo '</url>';
 

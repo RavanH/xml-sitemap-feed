@@ -8,7 +8,7 @@
 ?>
 <fieldset id="xmlsf_disabled_providers">
 	<legend class="screen-reader-text">
-		<?php echo esc_html( translate( 'Deactivate' ) ); ?>
+		<?php esc_html_e( 'Exclude from XML Sitemap', 'xml-sitemap-feed' ); ?>
 	</legend>
 
 	<p>

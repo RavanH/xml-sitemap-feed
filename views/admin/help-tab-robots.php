@@ -17,7 +17,7 @@
 	<strong>
 	<?php
 	printf( /* translators: %1$s Google Search Console, %2$s Bing Webmaster Tools, %3$s Yandex Webmaster (all presented as buttons, opening in new tab) */
-		esc_html( 'Verify your robots.txt on %1$s %2$s %3$s' ),
+		esc_html__( 'Verify your robots.txt on %1$s %2$s %3$s', 'xml-sitemap-feed' ),
 		'<a href="https://search.google.com/search-console/settings/robots-txt" target="_blank" class="button">' . esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) . '</a>',
 		'<a href="https://www.bing.com/webmasters/robotstxttester" target="_blank" class="button">' . esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) . '</a>',
 		'<a href="https://webmaster.yandex.com/tools/robotstxt/" target="_blank" class="button">' . esc_html__( 'Yandex Webmaster', 'xml-sitemap-feed' ) . '</a>'

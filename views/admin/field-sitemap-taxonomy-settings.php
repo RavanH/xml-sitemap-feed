@@ -15,6 +15,9 @@
 			<?php esc_html_e( 'Priority', 'xml-sitemap-feed' ); ?>
 			<input type="number" step="0.1" min="0.1" max="0.9" name="xmlsf_taxonomy_settings[priority]" id="xmlsf_taxonomy_priority" value="<?php echo ( isset( $taxonomy_settings['priority'] ) ? esc_attr( $taxonomy_settings['priority'] ) : '' ); ?>" class="small-text" />
 		</label>
+		<span class="description">
+			<?php esc_html_e( 'The default priority value must be between 0 and 1. To disable priority, leave this field empty.', 'xml-sitemap-feed' ); ?>
+		</span>
 	</p>
 	<p>
 		<label>

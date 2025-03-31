@@ -1,6 +1,6 @@
 <?php
 /**
- * Sitemaps: XMLSF_Sitemaps_Provider_News class
+ * Sitemaps: Sitemaps_Provider_News class
  *
  * Builds the sitemaps for the External Suctom Sitemaps.
  *
@@ -8,33 +8,45 @@
  * @since 5.4
  */
 
+namespace XMLSF;
+
 /**
  * Posts XML sitemap provider.
  *
  * @since 5.4
  */
-class XMLSF_Sitemaps_Provider_News extends WP_Sitemaps_Provider {
-
+class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 	/**
-	 * External Custom Sitemap URLs.
+	 * Sitemap slug
 	 *
-	 * @since 5.4
-	 *
-	 * @var array
+	 * @var string
 	 */
-	private $urls = array();
+	private $slug = 'sitemap-news';
 
 	/**
-	 * WP_Sitemaps_Posts constructor.
+	 * WP_Sitemaps_News constructor.
 	 *
 	 * @since 5.4
 	 */
 	public function __construct() {
 		$this->name        = 'news';
 		$this->object_type = 'news';
+	}
 
-		$urls       = (array) xmlsf_sitemap_url( 'news' );
-		$this->urls = array_filter( $urls, 'wp_http_validate_url' );
+	/**
+	 * Get sitemap slug.
+	 *
+	 * @since 5.5
+	 */
+	public function slug() {
+		$slug = (string) \apply_filters( 'xmlsf_sitemap_news_slug', $this->slug );
+
+		// Clean filename if altered.
+		if ( $this->slug !== $slug ) {
+			$slug = \sanitize_key( $slug );
+		}
+
+		return ! empty( $slug ) ? $slug : $this->slug;
 	}
 
 	/**
@@ -62,7 +74,7 @@ class XMLSF_Sitemaps_Provider_News extends WP_Sitemaps_Provider {
 	 * @return int Total number of pages.
 	 */
 	public function get_max_num_pages( $object_subtype = '' ) {
-		return count( $this->urls );
+		return 1;
 	}
 
 	/**
@@ -81,7 +93,7 @@ class XMLSF_Sitemaps_Provider_News extends WP_Sitemaps_Provider {
 
 		for ( $page = 1; $page <= $pages; $page++ ) {
 			$sitemap_entry = array(
-				'loc' => $this->get_sitemap_url( '', $page ),
+				'loc' => $this->get_sitemap_url( $this->name, $page ),
 			);
 
 			/**
@@ -95,7 +107,7 @@ class XMLSF_Sitemaps_Provider_News extends WP_Sitemaps_Provider {
 			 *                               Empty string if the object type does not support subtypes.
 			 * @param int    $page           Page number of results.
 			 */
-			$sitemap_entry = apply_filters( 'wp_sitemaps_index_entry', $sitemap_entry, $this->object_type, '', $page );
+			$sitemap_entry = \apply_filters( 'wp_sitemaps_index_entry', $sitemap_entry, $this->object_type, '', $page );
 
 			$sitemaps[] = $sitemap_entry;
 		}
@@ -115,7 +127,17 @@ class XMLSF_Sitemaps_Provider_News extends WP_Sitemaps_Provider {
 	 * @return string The composed URL for a sitemap entry.
 	 */
 	public function get_sitemap_url( $name, $page ) {
-		$pos = (int) $page - 1;
-		return $this->urls[ $pos ];
+		global $wp_rewrite;
+
+		$slug  = $this->slug();
+		$index = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
+
+		if ( $wp_rewrite->using_permalinks() && ! $index ) {
+			$basename = '/' . $slug . '.xml';
+		} else {
+			$basename = '/' . $index . '?feed=' . $slug;
+		}
+
+		return \home_url( $basename );
 	}
 }

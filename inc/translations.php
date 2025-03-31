@@ -88,4 +88,3 @@ printf( /* Translators: Plugin name, correct this issue (linked) */
 	esc_html__( 'To receive plugin updates, please %s.', 'xml-sitemap-feed' ),
 	'<a href="' . esc_url( admin_url( 'options-general.php' ) ) . '?page=xmlsf_news&tab=license">' . esc_html__( 'correct this issue', 'xml-sitemap-feed' ) . '</a>'
 );
-

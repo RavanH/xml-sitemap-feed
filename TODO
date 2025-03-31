@@ -1,0 +1,56 @@
+FIX
+
+ROADMAP
+* move sitemap fields (back) to Sitemap class?
+* rethink xmlsf_post_types and optional xmlsf_post_type_settings
+* quick edit "exclude" option for news sitemap too...
+* drop dynamic priority?
+
+TEST
+* static files check after sitemap activation and tools
+* Nginx Helper purge wildcard not working?
+* theme template overrides
+* test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
+* test WPML
+
+= 5.6 =
+* switch naar unregister_rewrites en register_rewrites bij activeren/deactiveren sitemaps
+* Make Polylang lastmod dates per language
+* Make leaner still: only load sitemap class and functions on xmlsf_sitemap_loaded ... same for news.
+
+General settings for Home page:
+* get_home_priority() : allow editable priority >>> homepage priority
+* Consider: Option for lastmod date for (static) front and blog pages (PRO?):
+	- last publication date for post post type
+	- page modification date
+	++ advanced options
+
+DOCUMENT
+* xmlsf_blogpages
+* xmlsf_frontpages
+* xmlsf_register_news_sitemap_provider
+* xmlsf_register_news_sitemap_provider_after
+* xmlsf_add_settings
+* xmlsf_news_add_settings
+* xmlsf_clear_news_settings
+* add inline comment blocks for hooks
+
+CONSIDER
+* Reset button per settings tab
+* make sitemaps_enabled use static value for faster repsonse
+* Get rid of the whole feed business...
+* Quick edit colums sortable
+* Move automatic priority calc + update lastmod on comments to General section or drop automatic priority?
+* make prime meta caches (async crawler?)
+* Automatic priority calculation for authors or drop automatic priority?
+* drop all WP pre-5.5 and ClassicPress compatibility routines?
+* core sitemap stylesheets per sitemap type (is that possible?)
+* drop all publisher center links ? see https://support.google.com/news/publisher-center/answer/14859160
+* Polylang news name option in translation strings? Or fix news name to blog name?
+* move away from feed templates, adopt ?sitemap=... approach from core
+* dynamic stylesheets
+* revisit/regroup views
+
+CORE SITEMAP:
+* TODO Maybe add dedicated Media sitemap if image tags are (still) not possible OR completely replace the renderer?
+* add custom post type root pages... with a separate "root" sitemap?

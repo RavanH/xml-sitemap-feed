@@ -24,7 +24,7 @@
 	<?php
 	printf( /* translators: Github (linked to https://github.com/RavanH/xml-sitemap-feed) */
 		esc_html__( 'For feature requests, reporting issues or contributing code, you can find and fork this plugin on %s.', 'xml-sitemap-feed' ),
-		'<a href="https://github.com/RavanH/xml-sitemap-feed" target="_blank">' . esc_html__( 'Github', 'xml-sitemap-feed' ) . '</a>'
+		'<a href="https://github.com/RavanH/xml-sitemap-feed" target="_blank">' . esc_html__( 'GitHub', 'xml-sitemap-feed' ) . '</a>'
 	);
 	?>
 </p>

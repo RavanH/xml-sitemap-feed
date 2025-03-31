@@ -19,26 +19,8 @@ function xmlsf_debug_nginx_helper_purge_urls( $urls ) {
 	error_log( 'NGINX Helper purge urls array:' );
 	error_log( print_r( $urls, true ) );
 }
+
 add_action( 'xmlsf_nginx_helper_purge_urls', 'xmlsf_debug_nginx_helper_purge_urls' );
-
-/**
- * Error messages for output compression.
- */
-function xmlsf_debug_output_compression() {
-	if ( ! WP_DEBUG_LOG ) {
-		return;
-	}
-
-	// Zlib.
-	$zlib = ini_get( 'zlib.output_compression' ) ? 'ENABLED' : 'DISABLED';
-	error_log( 'Zlib output compression ' . $zlib );
-
-	// Ob_gzhandler.
-	$gz = in_array( 'ob_gzhandler', ob_list_handlers(), true ) ? 'ENABLED' : 'DISABLED';
-	error_log( 'GZhandler output buffer compression ' . $gz );
-}
-add_action( 'xmlsf_output_compression', 'xmlsf_debug_output_compression' );
-
 
 /**
  * Usage info for debugging

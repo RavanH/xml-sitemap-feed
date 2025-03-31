@@ -7,7 +7,7 @@
 
 ?>
 <p>
-	<strong><?php esc_html_e( 'General' ); ?></strong>
+	<strong><?php echo esc_html( translate( 'General' ) ); ?></strong>
 </p>
 <ul>
 	<li>

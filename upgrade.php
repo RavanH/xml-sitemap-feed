@@ -30,8 +30,9 @@ delete_option( 'rewrite_rules' );
 function xmlsf_update_from_defaults( $update = true ) {
 	// Options that need not be autoloaded.
 	$not_autoload = array( 'robots' );
+	$defaults     = (array) XMLSF\get_default_settings();
 
-	foreach ( xmlsf()->defaults() as $option => $default ) {
+	foreach ( $defaults as $option => $default ) {
 		if ( $update ) {
 			update_option( 'xmlsf_' . $option, $default, '', ! in_array( $option, $not_autoload, true ) );
 		} else {
@@ -197,6 +198,19 @@ function xmlsf_upgrade( $db_version ) {
 
 		// Remove deprecated transient.
 		delete_transient( 'xmlsf_static_files' );
+	}
+
+	if ( version_compare( '5.5', $db_version, '>' ) ) {
+		$post_type_settings = get_option( 'xmlsf_post_types' );
+		update_option( 'xmlsf_post_type_settings', $post_type_settings );
+
+		$post_types = array();
+		foreach ( $post_type_settings as $post_type => $settings ) {
+			if ( ! empty( $settings['active'] ) ) {
+				$post_types[] = $post_type;
+			}
+		}
+		update_option( 'xmlsf_post_types', $post_types );
 	}
 
 	// Add missing new defaults.

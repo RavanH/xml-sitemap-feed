@@ -18,6 +18,6 @@
 		<a href="https://www.xml-sitemaps.com/validate-xml-sitemap.html" target="_blank"><?php esc_html_e( /* Translators: Site title https://www.xml-sitemaps.com/validate-xml-sitemap.html */ 'Validate an XML Sitemap', 'xml-sitemap-feed' ); ?></a>
 	</li>
 	<li>
-		<a href="https://news.google.com/search?q=site:<?php echo rawurlencode( home_url() ); ?>+when:7d" target="_blank"><?php esc_html_e( /* Translators: Site title https://news.google.com/search?q=site:site.dom+when:7d */ 'Your news on Google News', 'xml-sitemap-feed' ); ?></a>
+		<a href="https://news.google.com/search?q=site:<?php echo rawurlencode( home_url() ); ?>" target="_blank"><?php esc_html_e( /* Translators: Site title https://news.google.com/search?q=site:site.dom */ 'Find your site on Google News', 'xml-sitemap-feed' ); ?></a>
 	</li>
 </ul>

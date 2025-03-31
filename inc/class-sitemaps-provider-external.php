@@ -1,6 +1,6 @@
 <?php
 /**
- * Sitemaps: XMLSF_Sitemaps_Provider_Custom class
+ * Sitemaps: Sitemaps_Provider_Custom class
  *
  * Builds the sitemaps for the External Suctom Sitemaps.
  *
@@ -8,12 +8,14 @@
  * @since 5.4
  */
 
+namespace XMLSF;
+
 /**
  * Posts XML sitemap provider.
  *
  * @since 5.4
  */
-class XMLSF_Sitemaps_Provider_Custom extends WP_Sitemaps_Provider {
+class Sitemaps_Provider_External extends \WP_Sitemaps_Provider {
 
 	/**
 	 * External Custom Sitemap URLs.
@@ -30,11 +32,16 @@ class XMLSF_Sitemaps_Provider_Custom extends WP_Sitemaps_Provider {
 	 * @since 5.4
 	 */
 	public function __construct() {
-		$this->name        = 'custom';
+		$this->name        = 'external';
 		$this->object_type = 'url';
 
-		$urls       = (array) apply_filters( 'xmlsf_custom_sitemaps', (array) get_option( 'xmlsf_custom_sitemaps', array() ) );
-		$this->urls = array_filter( $urls, 'wp_http_validate_url' );
+		// Fetch external sitemap URLs.
+		add_filter( 'http_request_host_is_external', '__return_true' ); // Allow external domains while validating URLs.
+
+		$urls       = (array) \apply_filters( 'xmlsf_custom_sitemaps', (array) \get_option( 'xmlsf_custom_sitemaps', array() ) );
+		$this->urls = \array_filter( $urls, 'wp_http_validate_url' );
+
+		remove_filter( 'http_request_host_is_external', '__return_true' );
 	}
 
 	/**
@@ -62,7 +69,7 @@ class XMLSF_Sitemaps_Provider_Custom extends WP_Sitemaps_Provider {
 	 * @return int Total number of pages.
 	 */
 	public function get_max_num_pages( $object_subtype = '' ) {
-		return count( $this->urls );
+		return \count( $this->urls );
 	}
 
 	/**
@@ -81,7 +88,7 @@ class XMLSF_Sitemaps_Provider_Custom extends WP_Sitemaps_Provider {
 
 		for ( $page = 1; $page <= $pages; $page++ ) {
 			$sitemap_entry = array(
-				'loc' => $this->get_sitemap_url( '', $page ),
+				'loc' => $this->get_sitemap_url( $this->name, $page ),
 			);
 
 			/**
@@ -95,7 +102,7 @@ class XMLSF_Sitemaps_Provider_Custom extends WP_Sitemaps_Provider {
 			 *                               Empty string if the object type does not support subtypes.
 			 * @param int    $page           Page number of results.
 			 */
-			$sitemap_entry = apply_filters( 'wp_sitemaps_index_entry', $sitemap_entry, $this->object_type, '', $page );
+			$sitemap_entry = \apply_filters( 'wp_sitemaps_index_entry', $sitemap_entry, $this->object_type, '', $page );
 
 			$sitemaps[] = $sitemap_entry;
 		}
@@ -116,6 +123,7 @@ class XMLSF_Sitemaps_Provider_Custom extends WP_Sitemaps_Provider {
 	 */
 	public function get_sitemap_url( $name, $page ) {
 		$pos = (int) $page - 1;
+
 		return $this->urls[ $pos ];
 	}
 }

@@ -8,9 +8,6 @@
 ?>
 <div class="notice notice-warning fade is-dismissible">
 	<p>
-		<strong><?php esc_html_e( 'XML Sitemap & Google News', 'xml-sitemap-feed' ); ?></strong>
-	</p>
-	<p>
 		<?php
 		printf( /* translators: Conflicting Plugn name, Plugin name */
 			esc_html__( 'The %1$s XML Sitemap is not compatible with %2$s.', 'xml-sitemap-feed' ),

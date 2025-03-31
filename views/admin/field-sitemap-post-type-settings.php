@@ -6,25 +6,18 @@
  */
 
 ?>
-<fieldset id="xmlsf_post_type_<?php echo esc_attr( $obj->name ); ?>">
+<fieldset id="xmlsf_post_type_<?php echo esc_attr( $obj->name ); ?>_settings">
 	<legend class="screen-reader-text">
 		<?php echo esc_html( $obj->label ); ?>
 	</legend>
 
-	<p>
-		<label>
-			<input type="checkbox" name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][active]" id="xmlsf_post_types_<?php echo esc_attr( $obj->name ); ?>" value="1"<?php checked( ! empty( $options[ $obj->name ]['active'] ), true ); ?> />
-			<?php printf( /* translators: Post type name and post count */ esc_html__( 'Include %s', 'xml-sitemap-feed' ), esc_html( $obj->label ) ); ?> (<?php echo esc_html( $count->publish ); ?>)
-		</label>
-	</p>
-
 	<?php
-	if ( empty( $obj->hierarchical ) && ! xmlsf_uses_core_server() ) {
+	if ( empty( $obj->hierarchical ) && ! xmlsf()->sitemap->uses_core_server() ) {
 		$archive = isset( $options[ $obj->name ]['archive'] ) ? $options[ $obj->name ]['archive'] : 'yearly';
 		?>
 	<p>
 		<label><?php esc_html_e( 'Split by', 'xml-sitemap-feed' ); ?>
-			<select name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][archive]" id="xmlsf_post_types_'<?php echo esc_attr( $obj->name ); ?>_archive">
+			<select name="xmlsf_post_type_settings[<?php echo esc_attr( $obj->name ); ?>][archive]" id="xmlsf_post_type_settings_'<?php echo esc_attr( $obj->name ); ?>_archive">
 				<option value="">
 					<?php esc_html_e( 'None' ); ?>
 				</option>
@@ -42,38 +35,41 @@
 		<?php
 	}
 
-	$priority_val = ! empty( $options[ $obj->name ]['priority'] ) ? $options[ $obj->name ]['priority'] : '0.5';
+	$priority_val = ! empty( $options[ $obj->name ]['priority'] ) ? $options[ $obj->name ]['priority'] : '';
 	$image        = isset( $options[ $obj->name ]['tags']['image'] ) ? $options[ $obj->name ]['tags']['image'] : 'attached';
 	$context      = ( 'page' === $obj->name ) ? 'page' : 'post';
 	?>
 
 	<p>
 		<label><?php esc_html_e( 'Priority', 'xml-sitemap-feed' ); ?>
-			<input type="number" step="0.1" min="0.1" max="0.9" name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][priority]" id="xmlsf_post_types_<?php echo esc_attr( $obj->name ); ?>_priority" value="<?php echo esc_attr( $priority_val ); ?>" class="small-text" />
+			<input type="number" step="0.1" min="0.1" max="0.9" name="xmlsf_post_type_settings[<?php echo esc_attr( $obj->name ); ?>][priority]" id="xmlsf_post_type_<?php echo esc_attr( $obj->name ); ?>_priority" value="<?php echo esc_attr( $priority_val ); ?>" class="small-text" />
 		</label>
+		<span class="description">
+			<?php esc_html_e( 'The default priority value must be between 0 and 1. To disable priority, leave this field empty.', 'xml-sitemap-feed' ); ?>
+		</span>
 	</p>
 
 	<p>
 		<label>
-			<input type="checkbox" name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][dynamic_priority]" id="xmlsf_post_types_<?php echo esc_attr( $obj->name ); ?>_dynamic_priority" value="1"<?php echo checked( ! empty( $options[ $obj->name ]['dynamic_priority'] ), true, false ); ?> />
+			<input type="checkbox" name="xmlsf_post_type_settings[<?php echo esc_attr( $obj->name ); ?>][dynamic_priority]" id="xmlsf_post_type_<?php echo esc_attr( $obj->name ); ?>_dynamic_priority" value="1"<?php echo checked( ! empty( $options[ $obj->name ]['dynamic_priority'] ), true, false ); ?> />
 			<?php esc_html_e( 'Automatic Priority calculation.', 'xml-sitemap-feed' ); ?>
 		</label>
 	</p>
 
 	<p>
 		<label>
-			<input type="checkbox" name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][update_lastmod_on_comments]" id="xmlsf_post_types_<?php echo esc_attr( $obj->name ); ?>_update_lastmod_on_comments" value="1"<?php echo checked( ! empty( $options[ $obj->name ]['update_lastmod_on_comments'] ), true, false ); ?> />
-			<?php esc_html_e( 'Update the Last Changed date on each new comment.', 'xml-sitemap-feed' ); ?>
+			<input type="checkbox" name="xmlsf_post_type_settings[<?php echo esc_attr( $obj->name ); ?>][update_lastmod_on_comments]" id="xmlsf_post_type_<?php echo esc_attr( $obj->name ); ?>_update_lastmod_on_comments" value="1"<?php echo checked( ! empty( $options[ $obj->name ]['update_lastmod_on_comments'] ), true, false ); ?> />
+			<?php esc_html_e( 'Update the Last Modified date on each new comment.', 'xml-sitemap-feed' ); ?>
 		</label>
 	</p>
 
 	<?php
-	if ( ! xmlsf_uses_core_server() ) {
+	if ( ! xmlsf()->sitemap->uses_core_server() ) {
 		?>
 	<p>
 		<label>
 			<?php esc_html_e( 'Add image tags for', 'xml-sitemap-feed' ); ?>
-			<select name="xmlsf_post_types[<?php echo esc_attr( $obj->name ); ?>][tags][image]" id="xmlsf_post_types_<?php echo esc_attr( $obj->name ); ?>_tags_image">
+			<select name="xmlsf_post_type_settings[<?php echo esc_attr( $obj->name ); ?>][tags][image]" id="xmlsf_post_type_<?php echo esc_attr( $obj->name ); ?>_tags_image">
 				<option value="">
 					<?php esc_html_e( 'None' ); ?>
 				</option>

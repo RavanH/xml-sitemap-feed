@@ -11,7 +11,7 @@
 		<?php esc_html_e( 'Authors', 'xml-sitemap-feed' ); ?>
 	</legend>
 	<p>
-		<?php esc_html_e( 'Limit to these authors:', 'xml-sitemap-feed' ); ?>
+		<?php esc_html_e( 'Include these authors, or select none to automaticly include all authors with published posts:', 'xml-sitemap-feed' ); ?>
 	</p>
 	<style>ul.cat-checklist{height:auto;max-height:48em}ul.children{padding-left:1em}</style>
 	<ul class="cat-checklist">

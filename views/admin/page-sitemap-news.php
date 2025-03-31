@@ -40,11 +40,10 @@
 	</div>
 
 	<div class="sidebar">
-
 		<?php
-		if ( is_plugin_active( 'xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php' ) && ! $this->compatible_with_advanced() ) {
+		if ( is_plugin_active( 'xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php' ) && ! self::compatible_with_advanced() ) {
 			$class = 'notice notice-error notice-alt';
-			include XMLSF_DIR . '/views/admin/section-advanced-compat-message.php';
+			include XMLSF_DIR . '/views/admin/section-advanced-news-compat-message.php';
 		}
 		?>
 
@@ -69,7 +68,7 @@
 				<input type="submit" name="xmlsf-check-conflicts-news" class="button button-small" value="<?php esc_html_e( 'Check for conflicts', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
-				<input type="submit" name="xmlsf-clear-settings-news" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm( '<?php echo esc_js( __( 'This will revert your sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); ?>' )" />
+				<input type="submit" name="xmlsf-clear-settings-news" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm( '<?php echo esc_js( __( 'This will revert ALL your Google News sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); ?>' )" />
 			</p>
 		</form>
 
