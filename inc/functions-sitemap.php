@@ -8,20 +8,21 @@
 namespace XMLSF;
 
 /**
- * Get post types.
- * Returns an array of post types to be included in the index.
+ * Get post types and their settings.
+ *
+ * TODO make static wariable for faster processing.
  *
  * @since 5.4
  *
  * @return array
  */
-function get_post_types() {
+function get_post_types_settings() {
 	$post_types = (array) \apply_filters( 'xmlsf_post_types', \get_post_types( array( 'public' => true ) ) );
 	// Make sure post types are allowed and publicly viewable.
 	$post_types = \array_diff( $post_types, \xmlsf()->disabled_post_types() );
 	$post_types = \array_filter( $post_types, 'is_post_type_viewable' );
 
-	$settings = (array) \get_option( 'xmlsf_post_type_settings', array() );
+	$settings = (array) \get_option( 'xmlsf_post_type_settings', get_default_settings( 'post_type_settings' ) );
 
 	// Get active post types.
 	$post_types_settings = array();
@@ -53,9 +54,8 @@ function get_taxonomies() {
 		return array();
 	}
 
-	$tax_array = array();
-
-	$taxonomies = \get_option( 'xmlsf_taxonomies' );
+	$tax_array  = array();
+	$taxonomies = \get_option( 'xmlsf_taxonomies', get_default_settings( 'taxonomies' ) );
 
 	if ( \is_array( $taxonomies ) ) {
 		foreach ( $taxonomies as $taxonomy ) {
@@ -140,14 +140,11 @@ function images_data( $post, $which ) {
  * @return array
  */
 function public_taxonomies() {
-	$tax_array = array();
-	$disabled  = (array) \xmlsf()->disabled_taxonomies();
+	$tax_array  = array();
+	$disabled   = (array) \xmlsf()->disabled_taxonomies();
+	$post_types = get_post_types_settings();
 
-	foreach ( (array) \get_option( 'xmlsf_post_types' ) as $post_type => $settings ) {
-		if ( empty( $settings['active'] ) ) {
-			continue;
-		}
-
+	foreach ( $post_types as $post_type => $settings ) {
 		// Check each tax public flag and term count and append name to array.
 		foreach ( \get_object_taxonomies( $post_type, 'objects' ) as $taxonomy ) {
 			if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, $disabled, true ) ) {
@@ -165,9 +162,9 @@ function public_taxonomies() {
  * @return array
  */
 function get_home_priority() {
-	$options = (array) \get_option( 'xmlsf_post_types', array() );
+	$settings = (array) \get_option( 'xmlsf_post_type_settings', get_default_settings( 'post_type_settings' ) );
 
-	if ( empty( $options['page']['priority'] ) ) {
+	if ( empty( $settings['page'] ) || empty( $settings['page']['priority'] ) ) {
 		return '';
 	}
 
@@ -187,7 +184,7 @@ function get_home_priority() {
  */
 function get_user_priority( $user ) {
 
-	$author_settings = \get_option( 'xmlsf_author_settings' );
+	$author_settings = (array) \get_option( 'xmlsf_author_settings', get_default_settings( 'author_settings' ) );
 
 	if ( empty( $author_settings['priority'] ) ) {
 		return '';
@@ -280,7 +277,7 @@ function image_tag( $type, $post = null ) {
 		return;
 	}
 
-	$post_types = (array) \get_option( 'xmlsf_post_types' );
+	$post_types = get_post_types_settings();
 
 	if (
 		isset( $post_types[ $post->post_type ] ) &&
@@ -325,7 +322,7 @@ function image_schema( $type ) {
 		return;
 	}
 
-	$post_types = (array) \get_option( 'xmlsf_post_types' );
+	$post_types = get_post_types_settings();
 
 	if (
 		isset( $post_types[ $wp_query->query_vars['post_type'] ] ) &&
@@ -404,7 +401,7 @@ function get_post_modified( $post ) {
 	}
 
 	// maybe update lastmod to latest comment.
-	$options = (array) \get_option( 'xmlsf_post_types', array() );
+	$options = (array) \get_option( 'xmlsf_post_type_settings', get_default_settings( 'post_type_settings' ) );
 
 	if ( ! empty( $options[ $post->post_type ]['update_lastmod_on_comments'] ) ) {
 		// assuming post meta data has been primed here.
@@ -503,7 +500,7 @@ function get_taxonomy_modified( $taxonomy ) {
  * @return float
  */
 function get_post_priority( $post ) {
-	$options = (array) \get_option( 'xmlsf_post_types', array() );
+	$options = (array) \get_option( 'xmlsf_post_type_settings', get_default_settings( 'post_type_settings' ) );
 
 	if ( empty( $options[ $post->post_type ]['priority'] ) ) {
 		return '';
