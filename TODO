@@ -1,12 +1,18 @@
+5.5.2
 FIX
 
+NEW
+* remove post types that are not activated from admin tab
+
 ROADMAP
+* add static variable to XMLSF\get_post_types_settings() for speed
 * move sitemap fields (back) to Sitemap class?
 * rethink xmlsf_post_types and optional xmlsf_post_type_settings
 * quick edit "exclude" option for news sitemap too...
 * drop dynamic priority?
 
 TEST
+* limit
 * static files check after sitemap activation and tools
 * Nginx Helper purge wildcard not working?
 * theme template overrides
@@ -37,6 +43,7 @@ DOCUMENT
 
 CONSIDER
 * Reset button per settings tab
+* compatibility with https://wordpress.org/plugins/page-links-to/ ? option to automatically exclude linked posts... but not by default?
 * make sitemaps_enabled use static value for faster repsonse
 * Get rid of the whole feed business...
 * Quick edit colums sortable
