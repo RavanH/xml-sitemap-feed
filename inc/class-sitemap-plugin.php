@@ -492,7 +492,7 @@ class Sitemap_Plugin extends Sitemap {
 			$urls[] = '/sitemap-custom.xml';
 
 			// Add public post types sitemaps.
-			$post_types = namespace\get_post_types();
+			$post_types = namespace\get_post_types_settings();
 			foreach ( $post_types as $post_type => $settings ) :
 				$archive      = isset( $settings['archive'] ) ? $settings['archive'] : '';
 				$archive_data = \apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
