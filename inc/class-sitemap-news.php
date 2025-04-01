@@ -104,7 +104,7 @@ class Sitemap_News {
 		foreach ( $post_types as $post_type ) {
 			$lastpostdate = \get_lastpostdate( 'GMT', $post_type );
 			if ( $lastpostdate ) {
-				$lastpostdate = \get_date_from_gmt( $lastpostdate, DATE_W3C );
+				$lastpostdate = \get_date_from_gmt( $lastpostdate, 'U' );
 				$lastmod      = isset( $lastmod ) && $lastmod > $lastpostdate ? $lastmod : $lastpostdate; // Absolute last post date.
 			}
 		}

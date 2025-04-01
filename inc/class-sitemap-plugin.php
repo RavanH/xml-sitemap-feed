@@ -159,9 +159,9 @@ class Sitemap_Plugin extends Sitemap {
 				// Prepare priority calculation.
 				if ( ! empty( $this->post_type_settings[ $feed[2] ] ) && ! empty( $this->post_type_settings[ $feed[2] ]['priority'] ) && ! empty( $this->post_type_settings[ $feed[2] ]['dynamic_priority'] ) ) {
 					// Last of this post type modified date in Unix seconds.
-					\xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $feed[2] ), DATE_W3C );
+					\xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $feed[2] ), 'U' );
 					// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
-					\xmlsf()->timespan = \xmlsf()->lastmodified - \get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2] ), DATE_W3C );
+					\xmlsf()->timespan = \xmlsf()->lastmodified - \get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2] ), 'U' );
 					// Total post type comment count.
 					\xmlsf()->comment_count = \wp_count_comments()->approved;
 					// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type

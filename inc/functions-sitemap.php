@@ -520,7 +520,7 @@ function get_post_priority( $post ) {
 	$priority = \is_numeric( $options[ $post->post_type ]['priority'] ) ? \floatval( $options[ $post->post_type ]['priority'] ) : 0.5;
 
 	if ( ! empty( $options[ $post->post_type ]['dynamic_priority'] ) ) {
-		$post_modified = \mysql2date( DATE_W3C, $post->post_modified );
+		$post_modified = \mysql2date( 'U', $post->post_modified );
 
 		// Reduce by age.
 		// NOTE : home/blog page gets same treatment as sticky post, i.e. no reduction by age.
