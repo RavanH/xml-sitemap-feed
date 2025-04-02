@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.4
 Requires PHP: 5.6
 Tested up to: 6.8
-Stable tag: 5.5.2
+Stable tag: 5.5.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -143,15 +143,17 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.5.2 =
-New features: Exclude option in Quick Editor, Custom URLs and External sitemaps in WordPress server. Many fixes and compatibility updates.
+= 5.5.3 =
+Bugfix release.
 
 == Changelog ==
 
-= 5.5.2 =
+= 5.5.3 =
 Date: 20250401
-* FIX: missing Exclude/priority meta box
+* FIX: missing exclude/priority meta box
 * FIX: error blocking deactivation
+* FIX: non-numeric value encountered in automatic priority calculations, thanks @i0n1ca
+* FIX: undefined function on Clear settings
 
 = 5.5 =
 Date: 20250331
