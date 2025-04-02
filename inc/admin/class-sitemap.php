@@ -105,7 +105,7 @@ class Sitemap {
 	 * Clear settings
 	 */
 	public static function clear_settings() {
-		$defaults = get_default_settings();
+		$defaults = \XMLSF\get_default_settings();
 
 		unset( $defaults['sitemaps'] );
 
