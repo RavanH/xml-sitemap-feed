@@ -149,7 +149,7 @@ Bugfix release.
 == Changelog ==
 
 = 5.5.3 =
-Date: 20250401
+Date: 20250402
 * FIX: missing exclude/priority meta box
 * FIX: error blocking deactivation
 * FIX: non-numeric value encountered in automatic priority calculations, thanks @i0n1ca
