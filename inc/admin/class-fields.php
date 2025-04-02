@@ -61,14 +61,14 @@ class Fields {
 	 * Limit field
 	 */
 	public static function post_types_general_fields() {
-		$post_types = (array) \get_option( 'xmlsf_post_types', \XMLSF\get_default_settings( 'post_types' ) );
-		$defaults   = \XMLSF\get_default_settings( 'post_type_settings' );
-		$settings   = (array) \get_option( 'xmlsf_post_type_settings', $defaults );
-		$limit      = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
+		$defaults   = \XMLSF\get_default_settings();
+		$post_types = (array) \get_option( 'xmlsf_post_types', $defaults['post_types'] );
+		$settings   = (array) \get_option( 'xmlsf_post_type_settings', $defaults['post_type_settings'] );
+		$limit      = ! empty( $settings['limit'] ) ? $settings['limit'] : '';
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-post-types.php';
-		\xmlsf()->sitemap->uses_core_server() && include XMLSF_DIR . '/views/admin/field-sitemap-limit.php';
+		\xmlsf()->sitemap->uses_core_server() && include XMLSF_DIR . '/views/admin/field-sitemap-post-types-limit.php';
 	}
 
 	/**

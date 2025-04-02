@@ -455,24 +455,23 @@ class Sitemap_Core extends Sitemap {
 	 * @return int
 	 */
 	public function max_urls( $max_urls, $object_type ) {
+		$defaults = get_default_settings();
+
 		switch ( $object_type ) {
 			case 'user':
 				$settings = (array) \get_option( 'xmlsf_author_settings' );
-				$defaults = get_default_settings( 'author_settings' );
-				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
+				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['author_settings']['limit'];
 				break;
 
 			case 'term':
 				$settings = (array) \get_option( 'xmlsf_taxonomy_settings' );
-				$defaults = get_default_settings( 'taxonomy_settings' );
-				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
+				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['taxonomy_settings']['limit'];
 				break;
 
 			case 'post':
 			default:
 				$settings = (array) \get_option( 'xmlsf_post_type_settings' );
-				$defaults = get_default_settings( 'post_types' );
-				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['limit'];
+				$limit    = ! empty( $settings['limit'] ) ? $settings['limit'] : $defaults['post_type_settings']['limit'];
 		}
 
 		$max_urls = \is_numeric( $limit ) ? \absint( $limit ) : $max_urls;
