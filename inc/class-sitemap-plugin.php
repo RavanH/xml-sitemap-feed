@@ -266,13 +266,12 @@ class Sitemap_Plugin extends Sitemap {
 	 */
 	public function set_terms_args( $args ) {
 		// Read more on https://developer.wordpress.org/reference/classes/wp_term_query/__construct/.
-		$options  = \get_option( 'xmlsf_taxonomy_settings' );
-		$defaults = get_default_settings( 'taxonomy_settings' );
+		$options = \get_option( 'xmlsf_taxonomy_settings', get_default_settings( 'taxonomy_settings' ) );
 
-		$args['number'] = isset( $options['limit'] ) && \is_numeric( $options['limit'] ) ? \intval( $options['limit'] ) : $defaults['limit'];
+		$args['number'] = isset( $options['limit'] ) && \is_numeric( $options['limit'] ) && $options['limit'] > 0 ? \intval( $options['limit'] ) : 2000;
 
-		if ( $args['number'] < 1 || $args['number'] > 50000 ) {
-			$args['number'] = $defaults['limit'];
+		if ( $args['number'] > 50000 ) {
+			$args['number'] = 50000;
 		}
 
 		$args['order']                  = 'DESC';
@@ -314,14 +313,13 @@ class Sitemap_Plugin extends Sitemap {
 		 */
 		$post_types = \apply_filters( 'xmlsf_author_has_published_posts', $post_types );
 
-		$author_settings = \get_option( 'xmlsf_author_settings' );
-		$defaults        = get_default_settings( 'author_settings' );
+		$options = \get_option( 'xmlsf_author_settings', get_default_settings( 'author_settings' ) );
 
 		$args['has_published_posts'] = $post_types;
-		$args['number']              = ! empty( $author_settings['limit'] ) && \is_numeric( $author_settings['limit'] ) ? \intval( $author_settings['limit'] ) : $defaults['limit'];
+		$args['number']              = ! empty( $options['limit'] ) && \is_numeric( $options['limit'] ) && $options['limit'] > 0 ? \intval( $options['limit'] ) : 2000;
 
-		if ( $args['number'] < 1 || $args['number'] > 50000 ) {
-			$args['number'] = $defaults['limit'];
+		if ( $args['number'] > 50000 ) {
+			$args['number'] = 50000;
 		}
 
 		$include = \get_option( 'xmlsf_authors' );

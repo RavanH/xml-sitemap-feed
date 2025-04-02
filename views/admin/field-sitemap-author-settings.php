@@ -29,7 +29,7 @@
 	<p>
 		<label>
 			<?php esc_html_e( 'Maximum authors per sitemap', 'xml-sitemap-feed' ); ?>
-			<input type="number" step="100" min="0" max="50000" name="xmlsf_author_settings[limit]" id="xmlsf_author_limit" value="<?php echo ( isset( $author_settings['limit'] ) ? esc_attr( $author_settings['limit'] ) : '' ); ?>" class="medium-text" />
+			<input type="number" step="100" min="0" max="50000" placeholder="2000" name="xmlsf_author_settings[limit]" id="xmlsf_author_limit" value="<?php echo ( isset( $author_settings['limit'] ) ? esc_attr( $author_settings['limit'] ) : '' ); ?>" class="medium-text" />
 		</label>
 	</p>
 </fieldset>

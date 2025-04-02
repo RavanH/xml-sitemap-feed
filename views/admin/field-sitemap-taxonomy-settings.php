@@ -35,7 +35,7 @@
 	<p>
 		<label>
 			<?php esc_html_e( 'Maximum terms per sitemap', 'xml-sitemap-feed' ); ?>
-			<input type="number" step="100" min="0" max="50000" name="xmlsf_taxonomy_settings[limit]" id="xmlsf_taxonomy_limit" value="<?php echo ( isset( $taxonomy_settings['limit'] ) ? esc_attr( $taxonomy_settings['limit'] ) : '' ); ?>" class="medium-text" />
+			<input type="number" step="100" min="0" max="50000" placeholder="2000" name="xmlsf_taxonomy_settings[limit]" id="xmlsf_taxonomy_limit" value="<?php echo ( isset( $taxonomy_settings['limit'] ) ? esc_attr( $taxonomy_settings['limit'] ) : '' ); ?>" class="medium-text" />
 		</label>
 	</p>
 </fieldset>
