@@ -50,7 +50,7 @@
 
 	<div class="sidebar">
 		<?php
-		if ( is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) && ! $this->compatible_with_advanced() ) {
+		if ( is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) && ! self::compatible_with_advanced() ) {
 			$class = 'notice notice-error notice-alt';
 			include XMLSF_DIR . '/views/admin/section-advanced-compat-message.php';
 		}
