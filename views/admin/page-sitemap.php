@@ -39,9 +39,13 @@
 	<div class="main">
 		<form id="xmlsf-settings-form" method="post" action="options.php">
 
+			<?php do_action( 'xmlsf_settings_before', $active_tab ); ?>
+
 			<?php settings_fields( 'xmlsf_' . $active_tab ); ?>
 
 			<?php do_settings_sections( 'xmlsf_' . $active_tab ); ?>
+
+			<?php do_action( 'xmlsf_settings_after', $active_tab ); ?>
 
 			<?php submit_button(); ?>
 

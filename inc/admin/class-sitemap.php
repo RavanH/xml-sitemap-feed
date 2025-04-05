@@ -892,6 +892,9 @@ class Sitemap {
 				break;
 		}
 
+		// Hook for additional/advanced help tab.
+		\do_action( 'xmlsf_sitemap_help_tabs', $screen, $active_tab );
+
 		\ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-sidebar.php';
 		$content = \ob_get_clean();
