@@ -123,12 +123,9 @@ class Sitemap_News {
 	 * @return string The sitemap URL.
 	 */
 	public function get_sitemap_url() {
-		global $wp_rewrite;
+		$slug = $this->slug();
 
-		$slug      = $this->slug();
-		$index_php = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
-
-		if ( $wp_rewrite->using_permalinks() && ! $index_php ) {
+		if ( xmlsf()->using_permalinks() ) {
 			$basename = '/' . $slug . '.xml';
 		} else {
 			$basename = '/' . $index_php . '?feed=' . $slug;

@@ -127,12 +127,9 @@ class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 	 * @return string The composed URL for a sitemap entry.
 	 */
 	public function get_sitemap_url( $name, $page ) {
-		global $wp_rewrite;
+		$slug = $this->slug();
 
-		$slug  = $this->slug();
-		$index = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
-
-		if ( $wp_rewrite->using_permalinks() && ! $index ) {
+		if ( xmlsf()->using_permalinks() ) {
 			$basename = '/' . $slug . '.xml';
 		} else {
 			$basename = '/' . $index . '?feed=' . $slug;

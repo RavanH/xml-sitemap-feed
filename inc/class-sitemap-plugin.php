@@ -74,8 +74,6 @@ class Sitemap_Plugin extends Sitemap {
 	 * @return string|false The sitemap URL or false if the sitemap doesn't exist.
 	 */
 	public function get_sitemap_url( $sitemap = 'index', $args = array() ) {
-		global $wp_rewrite;
-
 		// Get our arguments.
 		$args = \apply_filters(
 			'xmlsf_index_url_args',
@@ -89,9 +87,7 @@ class Sitemap_Plugin extends Sitemap {
 			)
 		);
 
-		$index_php = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
-
-		if ( $wp_rewrite->using_permalinks() && ! $index_php ) {
+		if ( xmlsf()->using_permalinks() ) {
 			// Construct file name.
 			$name = $this->slug();
 			if ( 'index' !== $sitemap ) {

@@ -147,7 +147,7 @@ class XMLSitemapFeed {
 	 *
 	 * @var null|bool
 	 */
-	protected $using_permalinks;
+	protected $using_permalinks = null;
 
 	/**
 	 * Constructor
@@ -202,6 +202,22 @@ class XMLSitemapFeed {
 		}
 
 		\add_action( 'xmlsf_generator', __NAMESPACE__ . '\generator' );
+	}
+
+	/**
+	 * Default options
+	 *
+	 * @return bool
+	 */
+	public function using_permalinks() {
+		if ( null === $this->using_permalinks ) {
+			global $wp_rewrite;
+
+			$index_php              = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
+			$this->using_permalinks = $wp_rewrite->using_permalinks() && ! $index_php;
+		}
+
+		return $this->using_permalinks;
 	}
 
 	/**
