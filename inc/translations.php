@@ -6,6 +6,8 @@
  */
 
 esc_html__( 'Advanced options', 'xml-sitemap-feed' );
+__( 'XML Sitemap Advanced', 'xml-sitemap-feed' );
+__( 'Google News Advanced', 'xml-sitemap-feed' );
 
 sprintf( /* translators: Plugin name (linked to plugin installation modal) */ esc_html__( 'To use the Google News Advanced options, please install and activate %s.', 'xml-sitemap-feed' ), '<a href="' . esc_url( network_admin_url( 'plugin-install.php?tab=plugin-information&plugin=xml-sitemap-feed&TB_iframe=true&width=600&height=550' ) ) . '" target="_blank" class="thickbox"><strong>' . esc_html__( 'XML Sitemap & Google News', 'xml-sitemap-feed' ) . '</strong></a>' );
 
@@ -34,6 +36,7 @@ sprintf( /* Translators: Premium account page (linked), Upload Plugin admin page
 );
 
 esc_html__( 'License key', 'xml-sitemap-feed' );
+__( 'Beta version', 'xml-sitemap-feed' );
 esc_html__( 'Enter your license key.', 'xml-sitemap-feed' );
 esc_html__( 'Your license is active for this site.', 'xml-sitemap-feed' );
 sprintf( /* translators: Expiration date */ esc_html__( 'It expires on %s.', 'xml-sitemap-feed' ), esc_html( $expires ) );
@@ -57,7 +60,6 @@ __( 'Your license key has expired.', 'xml-sitemap-feed' );
 __( 'Your license key has been disabled.', 'xml-sitemap-feed' );
 __( 'This appears to be an invalid license key.', 'xml-sitemap-feed' );
 __( 'Your license is not active for this site.', 'xml-sitemap-feed' );
-sprintf( /* Translators: Plugin name */ __( 'This appears to be an invalid license key for %s.', 'xml-sitemap-feed' ), __( 'Google News Advanced', 'xml-sitemap-feed' ) );
 sprintf( /* Translators: Plugin name */ __( 'This appears to be an invalid license key for %s.', 'xml-sitemap-feed' ), __( 'Google News Advanced', 'xml-sitemap-feed' ) );
 __( 'Your license key has reached its activation limit.', 'xml-sitemap-feed' );
 
