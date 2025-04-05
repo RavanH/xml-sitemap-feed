@@ -7,6 +7,11 @@
 
 ?>
 <p>
+	<strong><?php esc_html_e( 'XML Sitemap URL', 'xml-sitemap-feed' ); ?></strong>
+	<br />
+	<?php esc_html_e( 'This allows you to set an alternative name for the sitemap index. The option is only available when you have the Advanced plugin and your site uses a perlaminks tructure that does not start with /?p= or /index.php/.', 'xml-sitemap-feed' ); ?>
+</p>
+<p>
 	<strong><?php esc_html_e( 'External web pages', 'xml-sitemap-feed' ); ?></strong>
 	<br />
 	<?php esc_html_e( 'Add the full URL, including protocol (http/https) and domain.', 'xml-sitemap-feed' ); ?>
