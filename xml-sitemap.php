@@ -128,7 +128,6 @@ function xmlsf_activate() {
 
 register_activation_hook( __FILE__, 'xmlsf_activate' );
 
-
 /**
  * Register XMLSF autoloader
  * http://justintadlock.com/archives/2018/12/14/php-namespaces-for-wordpress-developers
