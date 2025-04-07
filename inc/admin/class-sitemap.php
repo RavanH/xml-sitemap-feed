@@ -18,21 +18,16 @@ class Sitemap {
 
 	/**
 	 * Update actions for General Settings
-	 *
-	 * @param mixed $old   Old option value.
-	 * @param mixed $value Saved option value.
 	 */
-	public static function update_server( $old, $value ) {
-		if ( $old !== $value ) {
-			// Check static file.
-			$slug     = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : ( \xmlsf()->sitemap->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
-			$filename = $slug . '.xml';
+	public static function update_server() {
+		// Check static file.
+		$slug     = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : ( \xmlsf()->sitemap->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+		$filename = $slug . '.xml';
 
-			\XMLSF\Admin\Admin::check_static_files( $filename, 1 );
+		\XMLSF\Admin\Admin::check_static_files( $filename, 1 );
 
-			// Flush rewrite rules on next init.
-			\delete_option( 'rewrite_rules' );
-		}
+		// Flush rewrite rules on next init.
+		\delete_option( 'rewrite_rules' );
 	}
 
 	/**
@@ -739,7 +734,7 @@ class Sitemap {
 		);
 
 		// Settings ACTIONS & CHECKS.
-		\add_action( 'update_option_xmlsf_server', array( __CLASS__, 'update_server' ), 10, 2 );
+		\add_action( 'update_option_xmlsf_server', array( __CLASS__, 'update_server' ) );
 		\add_action( 'update_option_xmlsf_disabled_providers', array( __CLASS__, 'update_disabled_providers' ), 10, 2 );
 		\add_action( 'update_option_xmlsf_post_types', array( __CLASS__, 'update_post_types' ), 10, 2 );
 	}

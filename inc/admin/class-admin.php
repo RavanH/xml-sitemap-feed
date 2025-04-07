@@ -30,7 +30,7 @@ class Admin {
 		\add_action( 'admin_init', array( __CLASS__, 'maybe_flush_rewrite_rules' ), 11 );
 
 		\add_action( 'admin_notices', array( __CLASS__, 'check_conflicts' ), 0 );
-		\add_action( 'update_option_xmlsf_sitemaps', array( __CLASS__, 'update_sitemaps' ), 10, 2 );
+		\add_action( 'update_option_xmlsf_sitemaps', array( __CLASS__, 'update_sitemaps' ) );
 
 		// ACTION LINK.
 		\add_filter( 'plugin_action_links_' . XMLSF_BASENAME, array( __CLASS__, 'add_action_link' ) );
@@ -130,21 +130,12 @@ class Admin {
 
 	/**
 	 * Update actions for Sitemaps
-	 *
-	 * @param mixed $old   Old option value.
-	 * @param mixed $value Saved option value.
 	 */
-	public static function update_sitemaps( $old, $value ) {
-		$old   = (array) $old;
-		$value = (array) $value;
+	public static function update_sitemaps() {
+		self::check_static_files();
 
-		if ( $old !== $value ) {
-			// Check static files.
-			self::check_static_files();
-
-			// Flush rewrite rules on upcoming init.
-			\delete_option( 'rewrite_rules' );
-		}
+		// Flush rewrite rules on upcoming init.
+		\delete_option( 'rewrite_rules' );
 	}
 
 	/**
