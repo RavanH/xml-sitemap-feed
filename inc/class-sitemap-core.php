@@ -12,6 +12,34 @@ namespace XMLSF;
  */
 class Sitemap_Core extends Sitemap {
 	/**
+	 * Sitemap slug
+	 *
+	 * @var string
+	 */
+	private $slug;
+
+	/**
+	 * Post types included in sitemap index
+	 *
+	 * @var array
+	 */
+	private $post_types = array();
+
+	/**
+	 * Post types included in sitemap index
+	 *
+	 * @var array
+	 */
+	private $post_type_settings = array();
+
+	/**
+	 * Post types included in sitemap index
+	 *
+	 * @var array
+	 */
+	private $rewrite_rules = array();
+
+	/**
 	 * CONSTRUCTOR
 	 *
 	 * Runs on init
