@@ -152,8 +152,9 @@ class Fields {
 	 * Sitemap name field
 	 */
 	public static function xmlsf_sitemap_name_field() {
-		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', array() );
-		$slug     = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : ( \xmlsf()->sitemap->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+		$sitemaps    = (array) \get_option( 'xmlsf_sitemaps', array() );
+		$placeholder = \is_object( \xmlsf()->sitemap ) && \xmlsf()->sitemap->uses_core_server() ? 'wp-sitemap' : 'sitemap';
+		$slug        = \get_option( 'xmlsf_sitemap_name', '' );
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-name.php';

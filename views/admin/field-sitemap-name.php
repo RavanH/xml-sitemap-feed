@@ -10,7 +10,7 @@ $using_permalinks = xmlsf()->using_permalinks();
 <fieldset>
 	<legend class="screen-reader-text"><?php esc_html_e( 'XML Sitemap URL', 'xml-sitemap-feed' ); ?></legend>
 
-	<?php echo esc_url( trailingslashit( get_home_url() ) ); ?><input type="text" name="xmlsf_sitemap_name" id="xmlsf_sitemap_name" placeholder="sitemap" value="<?php echo esc_attr( $slug ); ?>" <?php disabled( ! apply_filters( 'xmlsf_advanced_enabled', false ) || ! $using_permalinks, true ); ?>>.xml
+	<?php echo esc_url( trailingslashit( get_home_url() ) ); ?><input type="text" name="xmlsf_sitemap_name" id="xmlsf_sitemap_name" placeholder="<?php echo esc_attr( $placeholder ); ?>" value="<?php echo esc_attr( $slug ); ?>" <?php disabled( ! apply_filters( 'xmlsf_advanced_enabled', false ) || ! $using_permalinks, true ); ?>>.xml
 	<p class="description" id="xmlsf-sitemap-name-description">
 		<?php esc_html_e( 'Set an alternative name for the sitemap index.', 'xml-sitemap-feed' ); ?>
 		<?php if ( ! $using_permalinks ) { ?>

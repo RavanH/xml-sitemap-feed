@@ -230,7 +230,7 @@ class XMLSitemapFeed {
 
 			// sitemaps.
 			$sitemaps = ( 1 !== (int) \get_option( 'blog_public' ) ) ? array() : array(
-				'sitemap' => \class_exists( 'SimpleXMLElement' ) && \function_exists( 'get_sitemap_url' ) ? 'wp-sitemap.xml' : 'sitemap-xml',
+				'sitemap' => \class_exists( 'SimpleXMLElement' ) && \function_exists( 'get_sitemap_url' ) ? 'wp-sitemap.xml' : 'sitemap.xml',
 			);
 
 			$this->defaults = array(
