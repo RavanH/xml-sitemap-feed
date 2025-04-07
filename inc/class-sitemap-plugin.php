@@ -12,34 +12,6 @@ namespace XMLSF;
  */
 class Sitemap_Plugin extends Sitemap {
 	/**
-	 * Sitemap slug
-	 *
-	 * @var string
-	 */
-	private $slug;
-
-	/**
-	 * Post types included in sitemap index
-	 *
-	 * @var array
-	 */
-	private $post_types = array();
-
-	/**
-	 * Post types included in sitemap index
-	 *
-	 * @var array
-	 */
-	private $post_type_settings = array();
-
-	/**
-	 * Post types included in sitemap index
-	 *
-	 * @var array
-	 */
-	private $rewrite_rules = array();
-
-	/**
 	 * CONSTRUCTOR
 	 *
 	 * Runs on init
@@ -51,11 +23,12 @@ class Sitemap_Plugin extends Sitemap {
 			$this->post_types = $post_types;
 		}
 		$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', array() );
-		$this->rewrite_rules      = array(
-			'^' . $this->slug . '\.xml$' => 'index.php?feed=sitemap',
-			'^' . $this->slug . '-([a-z]+?)?(-[a-z0-9\-_]+?)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml$' => 'index.php?feed=sitemap-$matches[1]$matches[2]&m=$matches[3]&w=$matches[4]',
-		);
 
+		// Rewrite rules.
+		$this->rewrite_rules = array(
+			'^' . $this->slug() . '\.xml$' => 'index.php?feed=sitemap',
+			'^' . $this->slug() . '-([a-z]+?)?(-[a-z0-9\-_]+?)?(?:\.([0-9]{4,8}))?(?:\.([0-9]{1,2}))?\.xml$' => 'index.php?feed=sitemap-$matches[1]$matches[2]&m=$matches[3]&w=$matches[4]',
+		);
 		\add_action( 'init', array( $this, 'register_rewrites' ) );
 
 		// Redirect wp-sitemap.xml requests.
