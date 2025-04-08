@@ -313,6 +313,7 @@ function robots_txt( $output ) {
 function plugin_compat() {
 	$active_plugins = (array) get_option( 'active_plugins', array() );
 
+	// Polylang compatibility.
 	if ( in_array( 'polylang/polylang.php', $active_plugins, true ) ) {
 		\add_filter( 'xmlsf_blogpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
 		\add_filter( 'xmlsf_frontpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
@@ -329,6 +330,7 @@ function plugin_compat() {
 		\add_filter( 'xmlsf_sitemap_subtype', array( __NAMESPACE__ . '\Compat\Polylang', 'filter_sitemap_subtype' ) );
 	}
 
+	// WPML compatibility.
 	if ( in_array( 'sitepress-multilingual-cms/sitepress.php', $active_plugins, true ) ) {
 		\add_filter( 'xmlsf_blogpages', array( __NAMESPACE__ . '\Compat\WPML', 'get_translations' ) );
 		\add_filter( 'xmlsf_frontpages', array( __NAMESPACE__ . '\Compat\WPML', 'get_translations' ) );
@@ -343,13 +345,20 @@ function plugin_compat() {
 		\add_filter( 'xmlsf_root_data', array( __NAMESPACE__ . '\Compat\WPML', 'root_data' ) );
 	}
 
+	// bbPress compatibility.
 	if ( in_array( 'bbpress/bbpress.php', $active_plugins, true ) ) {
 		\add_filter( 'xmlsf_request', array( __NAMESPACE__ . '\Compat\BBPress', 'filter_request' ) );
 		\add_filter( 'xmlsf_news_request', array( __NAMESPACE__ . '\Compat\BBPress', 'filter_request' ) );
 	}
 
+	// XMLSM compatibility.
 	if ( in_array( 'xml-sitemaps-manager/xml-sitemaps-manager.php', $active_plugins, true ) ) {
 		\add_filter( 'plugins_loaded', array( __NAMESPACE__ . '\Compat\XMLSM', 'disable' ), 11 );
+	}
+
+	// Rankmath compatibility.
+	if ( in_array( 'seo-by-rank-math/rank-math.php', $active_plugins, true ) ) {
+		\add_filter( 'xmlsf_excluded', array( __NAMESPACE__ . '\Compat\Rank_Math', 'exclude_noindex' ), 10, 2 );
 	}
 }
 
