@@ -148,6 +148,11 @@ Bugfix release.
 
 == Changelog ==
 
+= 5.5.4 =
+Date:
+* NEW: Rank Math compatibility
+* FIX: dynamic property deprecated notices
+
 = 5.5.3 =
 Date: 20250402
 * FIX: missing exclude/priority meta box
