@@ -1,5 +1,11 @@
 5.5.2
 FIX
+* plugin server post sitemaps (broken rewrite rules?)
+* test exclude option on core server
+* add rankmath compat exclude for core server
+
+TODO
+* add more seo plugin compatibility: exclude noindex posts (like rank math)
 
 NEW
 * remove post types that are not activated from admin tab
