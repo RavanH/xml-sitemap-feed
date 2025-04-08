@@ -639,12 +639,14 @@ class Sitemap_Core extends Sitemap {
 	 */
 	public function redirect() {
 		// Sadly, we cannot get the full info from $wp->request or get_query_var().
-		if ( ! isset( $_SERVER['REQUEST_URI'] ) || ( 0 !== \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/sitemap.xml' ) && ( 0 !== \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?feed=sitemap' ) || 0 === \strpos( \wp_unslash( $_SERVER['REQUEST_URI'] ), '/?feed=sitemap-news' ) ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			return;
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? \wp_unslash( $_SERVER['REQUEST_URI'] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( $request_uri && ( 0 === \strpos( $request_uri, '/sitemap.xml' ) || 0 === \strpos( $request_uri, '/?feed=sitemap' ) ) ) {
+			$url = $this->get_sitemap_url();
+			// Make sure we're not redirecting to oneself.
+			if ( ! \strpos( $url, $request_uri ) ) {
+				\wp_safe_redirect( $url, 301, 'XML Sitemap & Google News for WordPress' );
+				exit();
+			}
 		}
-
-		\wp_safe_redirect( $this->get_sitemap_url(), 301, 'XML Sitemap & Google News for WordPress' );
-
-		exit();
 	}
 }
