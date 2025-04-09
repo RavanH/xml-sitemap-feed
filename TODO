@@ -1,6 +1,5 @@
 5.5.2
 FIX
-* plugin server post sitemaps (broken rewrite rules?)
 * test exclude option on core server
 * add rankmath compat exclude for core server
 
@@ -38,6 +37,7 @@ General settings for Home page:
 	++ advanced options
 
 DOCUMENT
+* Images in sitemaps, see https://wordpress.org/support/topic/how-to-include-featured-attached-images-in-xml-sitemap-not-one-or-the-other/
 * xmlsf_blogpages
 * xmlsf_frontpages
 * xmlsf_register_news_sitemap_provider
