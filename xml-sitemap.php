@@ -123,7 +123,10 @@ register_deactivation_hook( __FILE__, 'xmlsf_deactivate' );
  * @return void
  */
 function xmlsf_activate() {
-	flush_rewrite_rules( false );
+	// TODO: register rewrites here, then flush with flush_rewrite_rules.
+
+	// Flush rewrite rules on next init.
+	delete_option( 'rewrite_rules' );
 }
 
 register_activation_hook( __FILE__, 'xmlsf_activate' );
