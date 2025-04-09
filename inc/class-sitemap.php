@@ -55,7 +55,7 @@ abstract class Sitemap {
 	 * @return bool
 	 */
 	public function active_post_type( $post_type ) {
-		if ( empty( $this->post_types ) || in_array( $post_type, $this->post_types, true ) ) {
+		if ( empty( $this->post_types ) || \in_array( $post_type, $this->post_types, true ) ) {
 			return true;
 		}
 
@@ -86,7 +86,7 @@ abstract class Sitemap {
 	public function register_rewrites() {
 		global $wp_rewrite;
 
-		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() || 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ) {
+		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() || 0 === strpos( \get_option( 'permalink_structure' ), '/index.php' ) ) {
 			// Nothing to do.
 			return;
 		}
@@ -104,7 +104,7 @@ abstract class Sitemap {
 	public function unregister_rewrites() {
 		global $wp_rewrite;
 
-		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() || 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ) {
+		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() || 0 === strpos( \get_option( 'permalink_structure' ), '/index.php' ) ) {
 			// Nothing to do.
 			return;
 		}
@@ -193,7 +193,7 @@ abstract class Sitemap {
 		$term_ids = array();
 		foreach ( (array) $taxonomies as $slug => $name ) {
 			$terms = \wp_get_post_terms( $post->ID, $slug, array( 'fields' => 'ids' ) );
-			if ( ! is_wp_error( $terms ) ) {
+			if ( ! \is_wp_error( $terms ) ) {
 				$term_ids = \array_merge( $term_ids, $terms );
 			}
 		}
