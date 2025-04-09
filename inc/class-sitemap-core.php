@@ -93,6 +93,9 @@ class Sitemap_Core extends Sitemap {
 
 		// NGINX HELPER PURGE URLS.
 		\add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
+
+		// Render sitemaps early. Prevents costly extra DB query.
+		\add_action( 'parse_request', array( $this, 'render_sitemaps' ), 9 );
 	}
 
 	/**
@@ -132,6 +135,37 @@ class Sitemap_Core extends Sitemap {
 		}
 
 		\do_action( 'xmlsf_register_sitemap_provider_after' );
+	}
+
+	/**
+	 * Loads the WordPress XML Sitemap Server
+	 *
+	 * @see https://core.trac.wordpress.org/ticket/51912
+	 *
+	 * @since 5.6
+	 *
+	 * @param  WP $wp             Current WordPress environment instance.
+	 * @global WP_Query $wp_query WordPress Query.
+	 * @return void
+	 */
+	public static function render_sitemaps( $wp ) {
+		global $wp_query;
+
+		if ( empty( $wp->query_vars['sitemap'] ) && empty( $wp->query_vars['sitemap-stylesheet'] ) ) {
+			return;
+		}
+
+		// Prepare query variables.
+		$query_vars           = $wp_query->query_vars;
+		$wp_query->query_vars = $wp->query_vars;
+
+		// Render the sitemap.
+		\wp_sitemaps_get_server()->render_sitemaps();
+
+		// Still here? Then it was an invalid sitemap request after all. Undo everything and carry on...
+		$wp_query->is_sitemap            = false;
+		$wp_query->is_sitemap_stylesheet = false;
+		$wp_query->query_vars            = $query_vars;
 	}
 
 	/**
