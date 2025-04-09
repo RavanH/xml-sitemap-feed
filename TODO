@@ -1,10 +1,12 @@
-5.5.2
+5.5.4
 FIX
-* test exclude option on core server
-* add rankmath compat exclude for core server
 
 TODO
 * add more seo plugin compatibility: exclude noindex posts (like rank math)
+* SEO plugins compat: find meta query for post type with default noindex
+* move SEO noindex compatibility to google news advanced only? drop the rest and change incompatibility warning messages (advise to use the seo plugin sitemap or automatically disable this plugin's xml sitemap?)
+* revise get_lastmodified and/or _get_post_time: replace with core functions and some kind of caching...
+* revise expensive meta_query for _xmlsf_exclude: maybe collect all posts with _xmlsf_exclude (and noindex?) occasionally and store their IDs for faster exclusion in db query...
 
 NEW
 * remove post types that are not activated from admin tab
