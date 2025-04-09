@@ -1,6 +1,6 @@
 <?php
 /**
- * Rank Match compatibility
+ * Rank Math compatibility
  *
  * @package XML Sitemap & Google News
  *
@@ -10,7 +10,7 @@
 namespace XMLSF\Compat;
 
 /**
- * Rank Match compatibility class
+ * Rank Math compatibility class
  */
 class Rank_Math {
 	/**
@@ -22,8 +22,8 @@ class Rank_Math {
 	 * @return bool
 	 */
 	public static function exclude_noindex( $exclude, $post_id ) {
-		$rank_math_robots = (array) \get_post_meta( $post_id, 'rank_math_robots', true );
-		return \in_array( 'noindex', $rank_math_robots, true ) ? true : $exclude;
+		$robots = (array) \get_post_meta( $post_id, 'rank_math_robots', true );
+		return \in_array( 'noindex', $robots, true ) ? true : $exclude;
 	}
 
 	/**
