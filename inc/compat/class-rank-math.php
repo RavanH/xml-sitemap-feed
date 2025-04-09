@@ -39,9 +39,16 @@ class Rank_Math {
 			(array) $args['meta_query'],
 			array(
 				array(
-					'key'     => 'rank_math_robots',
-					'value'   => '%noindex%',
-					'compare' => 'NOT LIKE',
+					'relation' => 'OR',
+					array(
+						'key'     => 'rank_math_robots',
+						'compare' => 'NOT EXISTS',
+					),
+					array(
+						'key'     => 'rank_math_robots',
+						'value'   => 'noindex',
+						'compare' => 'NOT LIKE',
+					),
 				),
 			)
 		);
