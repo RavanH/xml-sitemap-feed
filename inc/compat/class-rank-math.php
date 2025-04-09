@@ -3,6 +3,8 @@
  * Rank Match compatibility
  *
  * @package XML Sitemap & Google News
+ *
+ * @since 5.5.4
  */
 
 namespace XMLSF\Compat;
@@ -12,7 +14,7 @@ namespace XMLSF\Compat;
  */
 class Rank_Math {
 	/**
-	 * Exclude posts marked as noindex.
+	 * Exclude posts marked as noindex in the plugin sitemaps.
 	 *
 	 * @param bool $exclude Exclude flag.
 	 * @param int  $post_id Post ID.
@@ -22,5 +24,27 @@ class Rank_Math {
 	public static function exclude_noindex( $exclude, $post_id ) {
 		$rank_math_robots = (array) \get_post_meta( $post_id, 'rank_math_robots', true );
 		return \in_array( 'noindex', $rank_math_robots, true ) ? true : $exclude;
+	}
+
+	/**
+	 * Filter post query arguments. Hooked into wp_sitemaps_posts_query_args filter.
+	 *
+	 * @param array $args Arguments.
+	 *
+	 * @return array
+	 */
+	public static function posts_query_args( $args ) {
+		// Exclude posts.
+		$args['meta_query'] = \array_merge( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+			(array) $args['meta_query'],
+			array(
+				array(
+					'key'     => 'rank_math_robots',
+					'value'   => '%noindex%',
+					'compare' => 'NOT LIKE',
+				),
+			)
+		);
+		return $args;
 	}
 }

@@ -359,6 +359,8 @@ function plugin_compat() {
 	// Rankmath compatibility.
 	if ( in_array( 'seo-by-rank-math/rank-math.php', $active_plugins, true ) ) {
 		\add_filter( 'xmlsf_excluded', array( __NAMESPACE__ . '\Compat\Rank_Math', 'exclude_noindex' ), 10, 2 );
+		\add_filter( 'xmlsf_news_excluded', array( __NAMESPACE__ . '\Compat\Rank_Math', 'exclude_noindex' ), 10, 2 );
+		\add_filter( 'wp_sitemaps_posts_query_args', array( __NAMESPACE__ . '\Compat\Rank_Math', 'posts_query_args' ), 11 );
 	}
 }
 
