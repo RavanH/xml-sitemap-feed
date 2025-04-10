@@ -8,75 +8,6 @@
 namespace XMLSF;
 
 /**
- * Get post types and their settings.
- *
- * TODO make static wariable for faster processing.
- *
- * @since 5.4
- *
- * @return array
- */
-function get_post_types_settings() {
-	$post_types = (array) \apply_filters( 'xmlsf_post_types', \get_post_types( array( 'public' => true ) ) );
-	// Make sure post types are allowed and publicly viewable.
-	$post_types = \array_diff( $post_types, \xmlsf()->disabled_post_types() );
-	$post_types = \array_filter( $post_types, 'is_post_type_viewable' );
-
-	$settings = (array) \get_option( 'xmlsf_post_type_settings', get_default_settings( 'post_type_settings' ) );
-
-	// Get active post types.
-	$post_types_settings = array();
-	foreach ( $post_types as $post_type ) {
-		if ( ! \xmlsf()->sitemap->active_post_type( $post_type ) ) {
-			continue;
-		}
-
-		if ( ! empty( $settings[ $post_type ] ) ) {
-			$post_types_settings[ $post_type ] = $settings[ $post_type ];
-		}
-	}
-
-	return $post_types_settings;
-}
-
-/**
- * Get taxonomies
- * Returns an array of taxonomy names to be included in the index
- *
- * @since 5.0
- *
- * @return array
- */
-function get_taxonomies() {
-	$disabled = \get_option( 'xmlsf_disabled_providers', get_default_settings( 'disabled_providers' ) );
-
-	if ( ! empty( $disabled ) && \in_array( 'taxonomies', (array) $disabled, true ) ) {
-		return array();
-	}
-
-	$tax_array  = array();
-	$taxonomies = \get_option( 'xmlsf_taxonomies', get_default_settings( 'taxonomies' ) );
-
-	if ( \is_array( $taxonomies ) ) {
-		foreach ( $taxonomies as $taxonomy ) {
-			$count = \wp_count_terms( $taxonomy );
-			if ( ! \is_wp_error( $count ) && $count > 0 ) {
-				$tax_array[] = $taxonomy;
-			}
-		}
-	} else {
-		foreach ( namespace\public_taxonomies() as $name => $label ) {
-			$count = \wp_count_terms( $name );
-			if ( ! \is_wp_error( $count ) && $count > 0 ) {
-				$tax_array[] = $name;
-			}
-		}
-	}
-
-	return $tax_array;
-}
-
-/**
  * Get post attached | featured image(s)
  *
  * @param object $post  Post object.
@@ -129,31 +60,6 @@ function images_data( $post, $which ) {
 	}
 
 	return $images_data;
-}
-
-/**
- * Get all public (and not empty) taxonomies
- * Returns an array associated taxonomy object names and labels.
- *
- * @since 5.0
- *
- * @return array
- */
-function public_taxonomies() {
-	$tax_array  = array();
-	$disabled   = (array) \xmlsf()->disabled_taxonomies();
-	$post_types = get_post_types_settings();
-
-	foreach ( $post_types as $post_type => $settings ) {
-		// Check each tax public flag and term count and append name to array.
-		foreach ( \get_object_taxonomies( $post_type, 'objects' ) as $taxonomy ) {
-			if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, $disabled, true ) ) {
-				$tax_array[ $taxonomy->name ] = $taxonomy->label;
-			}
-		}
-	}
-
-	return $tax_array;
 }
 
 /**
@@ -263,79 +169,6 @@ function get_user_modified( $user ) {
 
 	return ! empty( $lastmod ) ? \mysql2date( DATE_W3C, $lastmod, false ) : false;
 }
-
-/**
- * Do image tag
- *
- * @param string  $type Type.
- * @param WP_Post $post Post object.
- *
- * @return void
- */
-function image_tag( $type, $post = null ) {
-	if ( 'post_type' !== $type || null === $post ) {
-		return;
-	}
-
-	$post_types = get_post_types_settings();
-
-	if (
-		isset( $post_types[ $post->post_type ] ) &&
-		\is_array( $post_types[ $post->post_type ] ) &&
-		isset( $post_types[ $post->post_type ]['tags'] ) &&
-		\is_array( $post_types[ $post->post_type ]['tags'] ) &&
-		! empty( $post_types[ $post->post_type ]['tags']['image'] ) &&
-		\is_string( $post_types[ $post->post_type ]['tags']['image'] )
-	) {
-		$images = \get_post_meta( $post->ID, '_xmlsf_image_' . $post_types[ $post->post_type ]['tags']['image'] );
-		foreach ( $images as $img ) {
-			if ( empty( $img['loc'] ) ) {
-				continue;
-			}
-
-			echo '<image:image><image:loc>' . \esc_xml( \utf8_uri_encode( $img['loc'] ) ) . '</image:loc>';
-			if ( ! empty( $img['title'] ) ) {
-				echo '<image:title><![CDATA[' . \esc_xml( $img['title'] ) . ']]></image:title>';
-			}
-			if ( ! empty( $img['caption'] ) ) {
-				echo '<image:caption><![CDATA[' . \esc_xml( $img['caption'] ) . ']]></image:caption>';
-			}
-			\do_action( 'xmlsf_image_tags_inner', 'post_type' );
-			echo '</image:image>';
-		}
-	}
-}
-
-\add_action( 'xmlsf_tags_after', __NAMESPACE__ . '\image_tag', 10, 2 );
-
-/**
- * Image schema
- *
- * @param string $type Type.
- * @uses WP_Post $post
- * @return void
- */
-function image_schema( $type ) {
-	global $wp_query;
-
-	if ( 'post_type' !== $type || empty( $wp_query->query_vars['post_type'] ) ) {
-		return;
-	}
-
-	$post_types = get_post_types_settings();
-
-	if (
-		isset( $post_types[ $wp_query->query_vars['post_type'] ] ) &&
-		\is_array( $post_types[ $wp_query->query_vars['post_type'] ] ) &&
-		isset( $post_types[ $wp_query->query_vars['post_type'] ]['tags'] ) &&
-		\is_array( $post_types[ $wp_query->query_vars['post_type'] ]['tags'] ) &&
-		! empty( $post_types[ $wp_query->query_vars['post_type'] ]['tags']['image'] )
-	) {
-		echo 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"';
-	}
-}
-
-\add_action( 'xmlsf_urlset', __NAMESPACE__ . '\image_schema' );
 
 /**
  * Get front pages

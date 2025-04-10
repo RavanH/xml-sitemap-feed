@@ -214,19 +214,13 @@ class Sitemap {
 		if ( \is_plugin_active( 'wordpress-seo/wp-seo.php' ) ) {
 			// check date archive redirection.
 			$wpseo_titles = \get_option( 'wpseo_titles' );
-			if ( ! empty( $wpseo_titles['disable-date'] ) && ! \xmlsf()->sitemap->uses_core_server() ) {
-				// check if Split by option is set anywhere.
-				foreach ( \XMLSF\get_post_types_settings() as $type => $settings ) {
-					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
-						\add_action(
-							'admin_notices',
-							function () {
-								include XMLSF_DIR . '/views/admin/notice-wpseo-date-redirect.php';
-							}
-						);
-						break;
+			if ( ! empty( $wpseo_titles['disable-date'] ) && ! \xmlsf()->sitemap->uses_date_archives() ) {
+				\add_action(
+					'admin_notices',
+					function () {
+						include XMLSF_DIR . '/views/admin/notice-wpseo-date-redirect.php';
 					}
-				}
+				);
 			}
 
 			// check wpseo sitemap option.
@@ -250,19 +244,13 @@ class Sitemap {
 			$seopress_toggle = \get_option( 'seopress_toggle' );
 
 			$seopress_titles = \get_option( 'seopress_titles_option_name' );
-			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) && ! \xmlsf()->sitemap->uses_core_server() ) {
-				// check if Split by option is set anywhere.
-				foreach ( \XMLSF\get_post_types_settings() as $type => $settings ) {
-					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
-						\add_action(
-							'admin_notices',
-							function () {
-								include XMLSF_DIR . '/views/admin/notice-seopress-date-redirect.php';
-							}
-						);
-						break;
+			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) && ! \xmlsf()->sitemap->uses_date_archives() ) {
+				\add_action(
+					'admin_notices',
+					function () {
+						include XMLSF_DIR . '/views/admin/notice-seopress-date-redirect.php';
 					}
-				}
+				);
 			}
 
 			// check seopress sitemap option.
@@ -284,19 +272,13 @@ class Sitemap {
 
 			// check date archive redirection.
 			$rankmath_titles = \get_option( 'rank-math-options-titles' );
-			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] && ! \xmlsf()->sitemap->uses_core_server() ) {
-				// check if Split by option is set anywhere.
-				foreach ( \XMLSF\get_post_types_settings() as $type => $settings ) {
-					if ( ! empty( $settings['active'] ) && ! empty( $settings['archive'] ) ) {
-						\add_action(
-							'admin_notices',
-							function () {
-								include XMLSF_DIR . '/views/admin/notice-rankmath-date-redirect.php';
-							}
-						);
-						break;
+			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] && ! \xmlsf()->sitemap->uses_date_archives() ) {
+				\add_action(
+					'admin_notices',
+					function () {
+						include XMLSF_DIR . '/views/admin/notice-rankmath-date-redirect.php';
 					}
-				}
+				);
 			}
 
 			// check rank math sitemap option.
@@ -412,12 +394,12 @@ class Sitemap {
 	 * Adds a XML Sitemap box to the side column
 	 */
 	public static function add_meta_box() {
-		$post_types = \XMLSF\get_post_types_settings();
+		$post_types = \xmlsf()->sitemap->get_post_types();
 		if ( empty( $post_types ) ) {
 			return;
 		}
 
-		foreach ( $post_types as $post_type => $settings ) {
+		foreach ( $post_types as $post_type ) {
 			// Only include metaboxes on post types that are included.
 			\add_meta_box(
 				'xmlsf_section',
@@ -906,7 +888,7 @@ class Sitemap {
 	public static function add_columns() {
 		include_once \XMLSF_DIR . '/inc/functions-sitemap.php';
 
-		foreach ( \XMLSF\get_post_types_settings() as $post_type => $settings ) {
+		foreach ( \xmlsf()->sitemap->get_post_types() as $post_type ) {
 			\add_filter( "manage_{$post_type}_posts_columns", array( __CLASS__, 'quick_edit_columns' ) );
 			\add_action( "manage_{$post_type}_posts_custom_column", array( __CLASS__, 'populate_columns' ) );
 		}

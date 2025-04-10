@@ -18,10 +18,7 @@ class Sitemap_Plugin extends Sitemap {
 	 */
 	public function __construct() {
 		$this->slug = 'sitemap';
-		$post_types = \get_option( 'xmlsf_post_types', array() );
-		if ( is_array( $post_types ) ) {
-			$this->post_types = $post_types;
-		}
+
 		$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', array() );
 
 		// Rewrite rules.
@@ -58,6 +55,10 @@ class Sitemap_Plugin extends Sitemap {
 
 		// Add RT Camp Nginx Helper NGINX HELPER PURGE URLS filter.
 		\add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
+
+		// Add sitemap image tags.
+		\add_action( 'xmlsf_urlset', array( $this, 'image_schema' ) );
+		\add_action( 'xmlsf_tags_after', array( $this, 'image_tag' ), 10, 2 );
 	}
 
 	/**
@@ -468,6 +469,71 @@ class Sitemap_Plugin extends Sitemap {
 	}
 
 	/**
+	 * Do image tag
+	 *
+	 * @param string  $type Post type.
+	 * @param WP_Post $post Post object.
+	 *
+	 * @return void
+	 */
+	public function image_tag( $type, $post = null ) {
+		if ( 'post_type' !== $type || null === $post || ! $this->active_post_type( $post->post_type ) ) {
+			return;
+		}
+
+		$settings = $this->post_type_settings( $post->post_type );
+
+		if (
+			isset( $settings['tags'] ) &&
+			\is_array( $settings['tags'] ) &&
+			! empty( $settings['tags']['image'] ) &&
+			\is_string( $settings['tags']['image'] )
+		) {
+			$images = \get_post_meta( $post->ID, '_xmlsf_image_' . $settings['tags']['image'] );
+			foreach ( $images as $img ) {
+				if ( empty( $img['loc'] ) ) {
+					continue;
+				}
+
+				echo '<image:image><image:loc>' . \esc_xml( \utf8_uri_encode( $img['loc'] ) ) . '</image:loc>';
+				if ( ! empty( $img['title'] ) ) {
+					echo '<image:title><![CDATA[' . \esc_xml( $img['title'] ) . ']]></image:title>';
+				}
+				if ( ! empty( $img['caption'] ) ) {
+					echo '<image:caption><![CDATA[' . \esc_xml( $img['caption'] ) . ']]></image:caption>';
+				}
+				\do_action( 'xmlsf_image_tags_inner', 'post_type' );
+				echo '</image:image>';
+			}
+		}
+	}
+
+	/**
+	 * Image schema
+	 *
+	 * @param string $type Type.
+	 * @uses WP_Post $post
+	 * @return void
+	 */
+	public function image_schema( $type ) {
+		global $wp_query;
+
+		if ( 'post_type' !== $type || empty( $wp_query->query_vars['post_type'] ) || ! $this->active_post_type( $wp_query->query_vars['post_type'] ) ) {
+			return;
+		}
+
+		$settings = $this->post_type_settings( $wp_query->query_vars['post_type'] );
+
+		if (
+			isset( $settings['tags'] ) &&
+			\is_array( $settings['tags'] ) &&
+			! empty( $settings['tags']['image'] )
+		) {
+			echo 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"';
+		}
+	}
+
+	/**
 	 * Nginx helper purge urls
 	 * adds sitemap urls to the purge array.
 	 *
@@ -477,18 +543,21 @@ class Sitemap_Plugin extends Sitemap {
 	 * @return $urls array
 	 */
 	public function nginx_helper_purge_urls( $urls = array(), $wildcard = false ) {
+		$slug = $this->slug();
+
 		if ( $wildcard ) {
 			// Wildcard makes everything simple.
-			$urls[] = '/sitemap*.xml';
+			$urls[] = '/' . $slug . '*.xml';
 		} else {
 			// No wildcard, go through the motions.
-			$urls[] = '/sitemap.xml';
-			$urls[] = '/sitemap-author.xml';
-			$urls[] = '/sitemap-custom.xml';
+			$urls[] = '/' . $slug . '.xml';
+			$urls[] = '/' . $slug . '-author.xml';
+			$urls[] = '/' . $slug . '-custom.xml';
 
 			// Add public post types sitemaps.
-			$post_types = namespace\get_post_types_settings();
-			foreach ( $post_types as $post_type => $settings ) :
+			$post_types = $this->get_post_types();
+			foreach ( $post_types as $post_type ) :
+				$settings     = $this->post_type_settings( $post_type );
 				$archive      = isset( $settings['archive'] ) ? $settings['archive'] : '';
 				$archive_data = \apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
 
@@ -501,7 +570,7 @@ class Sitemap_Plugin extends Sitemap {
 			endforeach;
 
 			// Add public post taxonomies sitemaps.
-			$taxonomies = namespace\get_taxonomies();
+			$taxonomies = $this->get_taxonomies();
 			foreach ( $taxonomies as $taxonomy ) {
 				$path = \wp_parse_url( $this->get_sitemap_url( 'taxonomy', array( 'type' => $taxonomy ) ), PHP_URL_PATH );
 				if ( $path ) {

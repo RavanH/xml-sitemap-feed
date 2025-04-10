@@ -18,10 +18,7 @@ class Sitemap_Core extends Sitemap {
 	 */
 	public function __construct() {
 		$this->slug = 'wp-sitemap';
-		$post_types = \get_option( 'xmlsf_post_types', array() );
-		if ( is_array( $post_types ) ) {
-			$this->post_types = $post_types;
-		}
+
 		$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', array() );
 
 		// Additional rewrites only if $this->slug() is different from 'wp-sitemap'.
@@ -72,7 +69,7 @@ class Sitemap_Core extends Sitemap {
 		// Maybe disable taxonomy or author sitemaps.
 		\add_filter( 'wp_sitemaps_add_provider', array( $this, 'add_provider' ), 10, 2 );
 		// Maybe disable certain post type sitemaps.
-		\add_filter( 'wp_sitemaps_post_types', array( $this, 'post_types' ) );
+		\add_filter( 'wp_sitemaps_post_types', array( $this, 'filter_post_types' ) );
 		// Maybe exclude individual posts.
 		\add_filter( 'wp_sitemaps_posts_query_args', array( $this, 'posts_query_args' ) );
 
@@ -558,14 +555,16 @@ class Sitemap_Core extends Sitemap {
 	 *
 	 * @return array
 	 */
-	public function post_types( $post_types ) {
+	public function filter_post_types( $post_types ) {
+		$enabled_post_types = $this->get_post_types();
+
 		// No disabled post types.
-		if ( empty( $this->post_types ) ) {
+		if ( empty( $enabled_post_types ) ) {
 			return $post_types;
 		}
 
 		foreach ( $post_types as $name => $pt_obj ) {
-			if ( ! in_array( $name, $this->post_types ) ) {
+			if ( ! in_array( $name, $enabled_post_types ) ) {
 				unset( $post_types[ $name ] );
 			}
 		}
@@ -642,13 +641,15 @@ class Sitemap_Core extends Sitemap {
 	 * @return array $urls
 	 */
 	public function nginx_helper_purge_urls( $urls = array(), $wildcard = false ) {
+		$slug = $this->slug();
+
 		if ( $wildcard ) {
 			// Wildcard allowed, this makes everything simple.
-			$urls[] = '/wp-sitemap*.xml';
+			$urls[] = '/' . $slug . '*.xml';
 		} else {
 			// No wildcard, go through the motions.
-			$urls[] = '/wp-sitemap.xml';
-			$urls[] = '/wp-sitemap-custom.xml';
+			$urls[] = '/' . $slug . '.xml';
+			$urls[] = '/' . $slug . '-custom.xml';
 
 			// TODO use wp_get_sitemap_providers for array of provider names (where array key is provider name)
 			// then use $provider->get_sitemap_type_data() for nested arrays with max number of sitemaps for each subtype

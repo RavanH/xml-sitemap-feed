@@ -23,14 +23,14 @@ abstract class Sitemap {
 	 *
 	 * @var array
 	 */
-	protected $post_types = array();
+	protected $post_types;
 
 	/**
 	 * Post types included in sitemap index
 	 *
 	 * @var array
 	 */
-	protected $post_type_settings = array();
+	protected $post_type_settings;
 
 	/**
 	 * Post types included in sitemap index
@@ -47,6 +47,112 @@ abstract class Sitemap {
 	protected $uses_core_server;
 
 	/**
+	 * Get post types and their settings.
+	 *
+	 * @since 5.4
+	 *
+	 * @param string $post_type Post type.
+	 * @return array
+	 */
+	public function post_type_settings( $post_type = '' ) {
+		if ( null === $this->post_type_settings ) {
+			$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', get_default_settings( 'post_type_settings' ) );
+		}
+
+		if ( empty( $post_type ) ) {
+			return $this->post_type_settings;
+		}
+
+		return ! empty( $this->post_type_settings[ $post_type ] ) ? (array) $this->post_type_settings[ $post_type ] : array();
+	}
+
+	/**
+	 * Get post types.
+	 *
+	 * @since 5.6
+	 *
+	 * @return array
+	 */
+	public function get_post_types() {
+		if ( null === $this->post_types ) {
+			$public_post_types    = \get_post_types( array( 'public' => true ) );
+			$public_post_types    = \array_filter( $public_post_types, 'is_post_type_viewable' );
+			$disabled_post_types  = \xmlsf()->disabled_post_types();
+			$activated_post_types = \get_option( 'xmlsf_post_types' );
+
+			// Make sure post types are allowed and publicly viewable.
+			$post_types = ! empty( $activated_post_types ) ? \array_intersect( (array) $activated_post_types, $public_post_types ) : $public_post_types;
+			$post_types = \array_diff( $post_types, $disabled_post_types );
+		
+			$this->post_types = $post_types;
+		}
+
+		return (array) \apply_filters( 'xmlsf_post_types', $this->post_types );
+	}
+
+	/**
+	 * Get taxonomies
+	 * Returns an array of taxonomy names to be included in the index
+	 *
+	 * @since 5.0
+	 *
+	 * @return array
+	 */
+	public function get_taxonomies() {
+		$disabled = \get_option( 'xmlsf_disabled_providers', get_default_settings( 'disabled_providers' ) );
+
+		if ( ! empty( $disabled ) && \in_array( 'taxonomies', (array) $disabled, true ) ) {
+			return array();
+		}
+
+		$tax_array  = array();
+		$taxonomies = \get_option( 'xmlsf_taxonomies', get_default_settings( 'taxonomies' ) );
+
+		if ( \is_array( $taxonomies ) ) {
+			foreach ( $taxonomies as $taxonomy ) {
+				$count = \wp_count_terms( $taxonomy );
+				if ( ! \is_wp_error( $count ) && $count > 0 ) {
+					$tax_array[] = $taxonomy;
+				}
+			}
+		} else {
+			foreach ( $this->public_taxonomies() as $name => $label ) {
+				$count = \wp_count_terms( $name );
+				if ( ! \is_wp_error( $count ) && $count > 0 ) {
+					$tax_array[] = $name;
+				}
+			}
+		}
+
+		return $tax_array;
+	}
+
+	/**
+	 * Get all public (and not empty) taxonomies
+	 * Returns an array associated taxonomy object names and labels.
+	 *
+	 * @since 5.0
+	 *
+	 * @return array
+	 */
+	public function public_taxonomies() {
+		$tax_array  = array();
+		$disabled   = (array) \xmlsf()->disabled_taxonomies();
+		$post_types = $this->get_post_types();
+
+		foreach ( $post_types as $post_type ) {
+			// Check each tax public flag and term count and append name to array.
+			foreach ( \get_object_taxonomies( $post_type, 'objects' ) as $taxonomy ) {
+				if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, $disabled, true ) ) {
+					$tax_array[ $taxonomy->name ] = $taxonomy->label;
+				}
+			}
+		}
+
+		return $tax_array;
+	}
+
+	/**
 	 * Is post type active?
 	 *
 	 * @since 5.5
@@ -55,11 +161,9 @@ abstract class Sitemap {
 	 * @return bool
 	 */
 	public function active_post_type( $post_type ) {
-		if ( empty( $this->post_types ) || \in_array( $post_type, $this->post_types, true ) ) {
-			return true;
-		}
+		$active_post_types = $this->get_post_types();
 
-		return false;
+		return empty( $active_post_types ) || \in_array( $post_type, $active_post_types, true );
 	}
 
 	/**
@@ -135,6 +239,30 @@ abstract class Sitemap {
 		return $this->uses_core_server;
 	}
 
+
+	/**
+	 * Are we using date archives?
+	 * Returns whether the WordPress any date archives are used or not.
+	 *
+	 * @since 5.6
+	 *
+	 * @return bool
+	 */
+	public function uses_date_archives() {
+		if ( $this->uses_core_server() ) {
+			return false;
+		}
+
+		foreach ( $this->get_post_type_settings() as $type => $settings ) {
+
+			if ( $this->active_post_type( $type ) && is_array( $settings ) && ! empty( $settings['archive'] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Cache delete on clean_post_cache
 	 *
@@ -187,7 +315,7 @@ abstract class Sitemap {
 
 		$taxonomies = \get_option( 'xmlsf_taxonomies' );
 		if ( empty( $taxonomies ) ) {
-			$taxonomies = namespace\public_taxonomies();
+			$taxonomies = $this->public_taxonomies();
 		}
 
 		$term_ids = array();
