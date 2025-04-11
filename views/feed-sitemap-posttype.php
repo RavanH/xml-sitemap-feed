@@ -53,7 +53,7 @@ if ( have_posts() ) :
 
 			echo '<url><loc>' . esc_url( $url ) . '</loc>';
 
-			$priority = XMLSF\get_home_priority();
+			$priority = xmlsf()->sitemap->get_home_priority();
 			if ( ! empty( $priority ) ) {
 				echo '<priority>' . esc_xml( $priority ) . '</priority>';
 			}
@@ -97,12 +97,12 @@ if ( have_posts() ) :
 		echo '<url>';
 		echo '<loc>' . esc_xml( esc_url( $url ) ) . '</loc>';
 
-		$priority = XMLSF\get_post_priority( $post );
+		$priority =  xmlsf()->sitemap->get_post_priority( $post );
 		if ( $priority ) {
 			echo '<priority>' . esc_xml( $priority ) . '</priority>';
 		}
 
-		$lastmod = XMLSF\get_post_modified( $post );
+		$lastmod = xmlsf()->sitemap->get_post_modified( $post );
 		if ( $lastmod ) {
 			echo '<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';
 		}

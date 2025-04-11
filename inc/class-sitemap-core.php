@@ -188,7 +188,7 @@ class Sitemap_Core extends Sitemap {
 			 * Use add_filter( 'xmlsf_core_request', 'your_filter_function' );
 			 *
 			 * Filters hooked here already:
-			 * ! functions-sitemap.php
+			 * XMLSF\Compat\WPML::filter_request()
 			 */
 			$request = \apply_filters( 'xmlsf_core_request', $request );
 
@@ -314,7 +314,7 @@ class Sitemap_Core extends Sitemap {
 				break;
 
 			case 'term':
-				$lastmod = namespace\get_taxonomy_modified( \apply_filters( 'xmlsf_sitemap_subtype', $subtype ) );
+				$lastmod = $this->get_taxonomy_modified( \apply_filters( 'xmlsf_sitemap_subtype', $subtype ) );
 				if ( $lastmod ) {
 					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 				}
@@ -362,12 +362,12 @@ class Sitemap_Core extends Sitemap {
 	 */
 	public function users_entry( $entry, $user_object ) {
 		// Add priority.
-		$priority = namespace\get_user_priority( $user_object );
+		$priority = $this->get_user_priority( $user_object );
 		if ( $priority ) {
 			$entry['priority'] = $priority;
 		}
 		// Add lastmod.
-		$lastmod = namespace\get_user_modified( $user_object );
+		$lastmod = $this->get_user_modified( $user_object );
 		if ( $lastmod ) {
 			$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 		}
@@ -394,13 +394,13 @@ class Sitemap_Core extends Sitemap {
 		}
 
 		// Add priority.
-		$priority = namespace\get_term_priority( $term_object );
+		$priority = $this->get_term_priority( $term_object );
 		if ( $priority ) {
 			$entry['priority'] = $priority;
 		}
 
 		// Add lastmod.
-		$lastmod = namespace\get_term_modified( $term_object );
+		$lastmod = $this->get_term_modified( $term_object );
 		if ( $lastmod ) {
 			$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 		}
@@ -447,14 +447,14 @@ class Sitemap_Core extends Sitemap {
 	 */
 	public function posts_entry( $entry, $post_object, $post_type ) {
 		// Add priority.
-		$priority = namespace\get_post_priority( $post_object );
+		$priority = $this->get_post_priority( $post_object );
 		if ( ! empty( $priority ) ) {
 			$entry['priority'] = $priority;
 		}
 
 		// Add lastmod.
 		if ( empty( $entry['lastmod'] ) ) {
-			$lastmod = namespace\get_post_modified( $post_object );
+			$lastmod = $this->get_post_modified( $post_object );
 			if ( $lastmod ) {
 				$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 			}
@@ -474,7 +474,7 @@ class Sitemap_Core extends Sitemap {
 	 * @return array
 	 */
 	public function posts_show_on_front_entry( $entry ) {
-		$priority = namespace\get_home_priority();
+		$priority = $this->get_home_priority();
 		if ( $priority ) {
 			$entry['priority'] = $priority;
 		}
@@ -590,7 +590,7 @@ class Sitemap_Core extends Sitemap {
 			),
 		);
 
-		// Update meta cache in one query instead of many, coming from get_post_meta() in XMLSF\get_post_priority().
+		// Update meta cache in one query instead of many, coming from get_post_meta() in $this->get_post_priority().
 		$args['update_post_meta_cache'] = true;
 
 		return $args;

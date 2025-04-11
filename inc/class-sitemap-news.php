@@ -35,6 +35,10 @@ class Sitemap_News {
 		// Add news sitemap to the index.
 		\add_filter( 'xmlsf_sitemap_index_after', array( $this, 'news_in_plugin_index' ) );
 		\add_action( 'wp_sitemaps_init', array( $this, 'news_in_core_index' ), 11 );
+
+		\add_filter( 'nocache_headers', array( $this, 'news_nocache_headers' ) );
+
+		\add_filter( 'xmlsf_news_language', array( $this, 'parse_language_string' ), 99 );
 	}
 
 	/**
@@ -219,32 +223,94 @@ class Sitemap_News {
 		}
 
 		// Set up query filters.
-		$live = false;
-		foreach ( $post_types as $post_type ) {
-			$lastpostdate = \get_lastpostdate( 'gmt', $post_type );
-			if ( $lastpostdate && \strtotime( $lastpostdate ) > \strtotime( \gmdate( 'Y-m-d H:i:s', \strtotime( '-48 hours' ) ) ) ) {
-				$live = true;
-				break;
-			}
-		}
-		if ( $live ) {
+		//$live = false;
+		//foreach ( $post_types as $post_type ) {
+		//	$lastpostdate = \get_lastpostdate( 'gmt', $post_type );
+		//	if ( $lastpostdate && \strtotime( $lastpostdate ) > \strtotime( \gmdate( 'Y-m-d H:i:s', \strtotime( '-48 hours' ) ) ) ) {
+		//		$live = true;
+		//		break;
+		//	}
+		//}
+		//if ( $live ) {
 			\add_filter(
 				'post_limits',
 				function () {
 					return 'LIMIT 0, 1000';
 				}
 			);
-			\add_filter( 'posts_where', 'XMLSF\news_filter_where', 10, 1 );
-		} else {
-			\add_filter(
-				'post_limits',
-				function () {
-					return 'LIMIT 0, 1';
-				}
-			);
-		}
+			\add_filter( 'posts_where', array( $this, 'news_filter_where' ), 10, 1 );
+		//} else {
+		//	\add_filter(
+		//		'post_limits',
+		//		function () {
+		//			return 'LIMIT 0, 1';
+		//		}
+		//	);
+		//}
 
 		return $request;
+	}
+
+	/**
+	 * Response headers filter
+	 * Does not check if we are really in a sitemap feed.
+	 *
+	 * @param array $headers The headers array.
+	 *
+	 * @return array
+	 */
+	public function news_nocache_headers( $headers ) {
+		// Prevent proxy caches serving a cached news sitemap.
+		$headers['Cache-Control'] .= ', no-store';
+
+		return $headers;
+	}
+
+	/**
+	 * Filter news WHERE
+	 * only posts from the last 48 hours
+	 *
+	 * @param string $where DB Query where clause.
+	 *
+	 * @return string
+	 */
+	public function news_filter_where( $where = '' ) {
+		$hours  = (int) \apply_filters( 'xmlsf_news_hours_old', 48 );
+		$hours  = \XMLSF\sanitize_number( $hours, 1, 168, 0 );
+		$where .= ' AND post_date_gmt > \'' . \gmdate( 'Y-m-d H:i:s', \strtotime( '-' . $hours . ' hours' ) ) . '\'';
+
+		return $where;
+	}
+
+	/**
+	 * Parse language string into two or three letter ISO 639 code.
+	 *
+	 * @param string $lang Unformatted language string.
+	 *
+	 * @return string
+	 */
+	public function parse_language_string( $lang ) {
+		// Lower case, no tags.
+		$lang = \convert_chars( \strtolower( \wp_strip_all_tags( $lang ) ) );
+
+		// Convert underscores.
+		$lang = \str_replace( '_', '-', $lang );
+
+		// No hyphens except...
+		if ( \strpos( $lang, '-' ) ) :
+			if ( 0 === \strpos( $lang, 'zh' ) ) {
+				$lang = \strpos( $lang, 'hk' ) || \strpos( $lang, 'tw' ) || \strpos( $lang, 'hant' ) ? 'zh-tw' : 'zh-cn';
+			} else {
+				// Explode on hyphen and use only first part.
+				$expl = \explode( '-', $lang );
+				$lang = $expl[0];
+			}
+		endif;
+
+		// Make sure it's max 3 letters.
+		$lang = \substr( $lang, 0, 2 );
+
+		return $lang;
 	}
 
 	/**

@@ -886,8 +886,6 @@ class Sitemap {
 	 * @since 5.7
 	 */
 	public static function add_columns() {
-		include_once \XMLSF_DIR . '/inc/functions-sitemap.php';
-
 		foreach ( \xmlsf()->sitemap->get_post_types() as $post_type ) {
 			\add_filter( "manage_{$post_type}_posts_columns", array( __CLASS__, 'quick_edit_columns' ) );
 			\add_action( "manage_{$post_type}_posts_custom_column", array( __CLASS__, 'populate_columns' ) );

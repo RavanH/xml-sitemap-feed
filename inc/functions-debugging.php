@@ -77,6 +77,13 @@ add_action(
 );
 
 add_action(
+	'xmlsf_sitemap_news_loaded',
+	function () {
+		WP_DEBUG_LOG && add_action( 'shutdown', 'xmlsf_debug_usage' );
+	}
+);
+
+add_action(
 	'xmlsf_install',
 	function () {
 		// Kilroy was here.

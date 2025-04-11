@@ -53,7 +53,7 @@ if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) )
 		);
 		if ( wp_count_terms( $args ) ) {
 			$url     = xmlsf()->sitemap->get_sitemap_url( 'taxonomy', array( 'type' => $the_taxonomy ) );
-			$lastmod = XMLSF\get_taxonomy_modified( $the_taxonomy );
+			$lastmod = xmlsf()->sitemap->get_taxonomy_modified( $the_taxonomy );
 			echo '<sitemap><loc>' . esc_xml( $url ) . '</loc>';
 			if ( $lastmod ) {
 				echo '<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';

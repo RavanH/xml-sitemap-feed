@@ -46,13 +46,6 @@ class XMLSitemapFeed {
 	);
 
 	/**
-	 * Front pages
-	 *
-	 * @var null|array $frontpages
-	 */
-	public $frontpages = null;
-
-	/**
 	 * Signifies whether the request has been filtered.
 	 *
 	 * @var bool
@@ -136,13 +129,6 @@ class XMLSitemapFeed {
 	public $comment_count = 0;
 
 	/**
-	 * Blog pages
-	 *
-	 * @var null/array $blogpages
-	 */
-	public $blogpages = null;
-
-	/**
 	 * Using permalinks?
 	 *
 	 * @var null|bool
@@ -174,8 +160,6 @@ class XMLSitemapFeed {
 
 		// Google News sitemap?
 		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-			require_once \XMLSF_DIR . '/inc/functions-sitemap-news.php';
-
 			\add_action( 'xmlsf_news_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
 
 			$this->sitemap_news = new Sitemap_News();
@@ -183,8 +167,6 @@ class XMLSitemapFeed {
 
 		// XML Sitemap?
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
-			require_once \XMLSF_DIR . '/inc/functions-sitemap.php';
-
 			\add_action( 'xmlsf_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
 
 			if ( \function_exists( 'get_sitemap_url' ) && 'core' === \get_option( 'xmlsf_server', $this->defaults( 'server' ) ) ) {
@@ -244,7 +226,7 @@ class XMLSitemapFeed {
 						'priority'         => '',
 						'dynamic_priority' => '',
 						'tags'             => array(
-							'image' => 'featured',
+							'image' => 'attached',
 						),
 					),
 					'page'  => array(

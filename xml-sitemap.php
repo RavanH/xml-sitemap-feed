@@ -13,10 +13,6 @@
  * @package XML Sitemap & Google News
  */
 
-define( 'XMLSF_VERSION', '5.5.4-alpha1' );
-define( 'XMLSF_ADV_MIN_VERSION', '0.1' );
-define( 'XMLSF_NEWS_ADV_MIN_VERSION', '1.3.5' );
-
 /**
  * Copyright 2025 RavanH
  * https://status301.net/
@@ -49,9 +45,12 @@ define( 'XMLSF_NEWS_ADV_MIN_VERSION', '1.3.5' );
  */
 
 defined( 'WPINC' ) || die;
+defined( 'XMLSF_GOOGLE_NEWS_NAME' ) || define( 'XMLSF_GOOGLE_NEWS_NAME', false );
 
+define( 'XMLSF_VERSION', '5.5.4-alpha1' );
+define( 'XMLSF_ADV_MIN_VERSION', '0.1' );
+define( 'XMLSF_NEWS_ADV_MIN_VERSION', '1.3.5' );
 define( 'XMLSF_DIR', __DIR__ );
-
 define( 'XMLSF_BASENAME', plugin_basename( __FILE__ ) );
 
 // Pluggable functions.
