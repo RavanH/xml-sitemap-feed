@@ -253,7 +253,7 @@ abstract class Sitemap {
 			return false;
 		}
 
-		foreach ( $this->get_post_type_settings() as $type => $settings ) {
+		foreach ( $this->post_type_settings() as $type => $settings ) {
 
 			if ( $this->active_post_type( $type ) && is_array( $settings ) && ! empty( $settings['archive'] ) ) {
 				return true;

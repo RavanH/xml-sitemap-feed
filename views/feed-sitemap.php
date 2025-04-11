@@ -20,7 +20,7 @@ $disabled = get_option( 'xmlsf_disabled_providers', XMLSF\get_default_settings( 
 // Public post types.
 $post_types = xmlsf()->sitemap->get_post_types();
 foreach ( $post_types as $the_post_type ) :
-	$settings = xmlsf()->sitemap->get_post_type_settings( $the_post_type );
+	$settings = xmlsf()->sitemap->post_type_settings( $the_post_type );
 	$archive_type = isset( $settings['archive'] ) ? $settings['archive'] : '';
 	$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $the_post_type, $archive_type );
 
