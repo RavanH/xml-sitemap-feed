@@ -141,7 +141,6 @@ class XMLSitemapFeed {
 	 * @return void
 	 */
 	public function __construct() {
-
 		// Upgrade/install, maybe...
 		$db_version = \get_option( 'xmlsf_version', 0 );
 		if ( ! \version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
@@ -292,5 +291,26 @@ class XMLSitemapFeed {
 	 */
 	public function disabled_post_types() {
 		return (array) \apply_filters( 'xmlsf_disabled_post_types', $this->disabled_post_types );
+	}
+
+	/**
+	 * Register rewrites per sitemap
+	 *
+	 * @param string $sitemap Sitemap.
+	 */
+	public function register_rewrites( $sitemap ) {
+		switch ( $sitemap ) {
+			case 'sitemap':
+				null !== $this->sitemap && $this->sitemap->register_rewrites();
+				break;
+
+			case 'sitemap-news':
+				null !== $this->sitemap_news && $this->sitemap_news->register_rewrites();
+				break;
+
+			default:
+				null !== $this->sitemap_news && $this->sitemap_news->register_rewrites();
+				null !== $this->sitemap && $this->sitemap->register_rewrites();
+		}
 	}
 }

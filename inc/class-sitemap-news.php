@@ -222,31 +222,9 @@ class Sitemap_News {
 			$request['cat'] = \implode( ',', $options['categories'] );
 		}
 
-		// Set up query filters.
-		//$live = false;
-		//foreach ( $post_types as $post_type ) {
-		//	$lastpostdate = \get_lastpostdate( 'gmt', $post_type );
-		//	if ( $lastpostdate && \strtotime( $lastpostdate ) > \strtotime( \gmdate( 'Y-m-d H:i:s', \strtotime( '-48 hours' ) ) ) ) {
-		//		$live = true;
-		//		break;
-		//	}
-		//}
-		//if ( $live ) {
-			\add_filter(
-				'post_limits',
-				function () {
-					return 'LIMIT 0, 1000';
-				}
-			);
-			\add_filter( 'posts_where', array( $this, 'news_filter_where' ), 10, 1 );
-		//} else {
-		//	\add_filter(
-		//		'post_limits',
-		//		function () {
-		//			return 'LIMIT 0, 1';
-		//		}
-		//	);
-		//}
+		\add_filter( 'post_limits', array( $this, 'post_limits' ) );
+
+		\add_filter( 'posts_where', array( $this, 'posts_where' ), 10, 1 );
 
 		return $request;
 	}
@@ -267,6 +245,15 @@ class Sitemap_News {
 	}
 
 	/**
+	 * Filter post LIMIT
+	 *
+	 * Max 1000 posts
+	 */
+	public function post_limits() {
+		return 'LIMIT 0, 1000';
+	}
+
+	/**
 	 * Filter news WHERE
 	 * only posts from the last 48 hours
 	 *
@@ -274,7 +261,7 @@ class Sitemap_News {
 	 *
 	 * @return string
 	 */
-	public function news_filter_where( $where = '' ) {
+	public function posts_where( $where = '' ) {
 		$hours  = (int) \apply_filters( 'xmlsf_news_hours_old', 48 );
 		$hours  = \XMLSF\sanitize_number( $hours, 1, 168, 0 );
 		$where .= ' AND post_date_gmt > \'' . \gmdate( 'Y-m-d H:i:s', \strtotime( '-' . $hours . ' hours' ) ) . '\'';
