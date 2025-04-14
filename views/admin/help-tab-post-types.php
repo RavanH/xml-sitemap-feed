@@ -12,7 +12,7 @@
 	<?php esc_html_e( 'Activate this to include the post type in the sitemap index.', 'xml-sitemap-feed' ); ?>
 </p>
 <?php
-if ( ! xmlsf()->sitemap->uses_core_server() ) :
+if ( 'plugin' === \xmlsf()->sitemap->server_type ) :
 	?>
 <p>
 	<strong><?php esc_html_e( 'Split by', 'xml-sitemap-feed' ); ?> [&hellip;]</strong>
@@ -40,7 +40,7 @@ if ( ! xmlsf()->sitemap->uses_core_server() ) :
 	<?php esc_html_e( 'Please note: this option will make sitemap generation slower and more resource intensive.', 'xml-sitemap-feed' ); ?>
 </p>
 <?php
-if ( ! xmlsf()->sitemap->uses_core_server() ) :
+if ( 'plugin' === \xmlsf()->sitemap->server_type ) :
 	?>
 <p>
 	<strong><?php esc_html_e( 'Add image tags for', 'xml-sitemap-feed' ); ?> [&hellip;]</strong>
