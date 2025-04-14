@@ -13,7 +13,7 @@
 	<br />
 	<em><?php esc_html_e( 'Be aware: excluding the Pages sitemap, also means excluding the home aand blog pages!', 'xml-sitemap-feed' ); ?></em>
 </p>
-<?php if ( xmlsf()->sitemap->uses_core_server() ) : ?>
+<?php if ( 'core' === \xmlsf()->sitemap->server_type ) : ?>
 <p>
 	<strong><?php esc_html_e( 'Maximum posts per sitemap', 'xml-sitemap-feed' ); ?></strong>
 	<br />

@@ -12,7 +12,7 @@
 	</legend>
 
 	<?php
-	if ( empty( $obj->hierarchical ) && ! xmlsf()->sitemap->uses_core_server() ) {
+	if ( empty( $obj->hierarchical ) && 'plugin' === \xmlsf()->sitemap->server_type ) {
 		$archive = isset( $options[ $obj->name ]['archive'] ) ? $options[ $obj->name ]['archive'] : 'yearly';
 		?>
 	<p>
@@ -64,7 +64,7 @@
 	</p>
 
 	<?php
-	if ( ! xmlsf()->sitemap->uses_core_server() ) {
+	if ( 'plugin' === \xmlsf()->sitemap->server_type ) {
 		?>
 	<p>
 		<label>

@@ -19,6 +19,13 @@ abstract class Sitemap {
 	protected $slug;
 
 	/**
+	 * Uses core server?
+	 *
+	 * @var null|bool
+	 */
+	public $server_type;
+
+	/**
 	 * Post types included in sitemap index
 	 *
 	 * @var array
@@ -31,20 +38,6 @@ abstract class Sitemap {
 	 * @var array
 	 */
 	protected $post_type_settings;
-
-	/**
-	 * Post types included in sitemap index
-	 *
-	 * @var array
-	 */
-	protected $rewrite_rules = array();
-
-	/**
-	 * Uses core server?
-	 *
-	 * @var null|bool
-	 */
-	protected $uses_core_server;
 
 	/**
 	 * Front pages
@@ -201,57 +194,14 @@ abstract class Sitemap {
 	 *
 	 * @since 5.4.5
 	 */
-	public function register_rewrites() {
-		global $wp_rewrite;
-
-		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() || 0 === strpos( \get_option( 'permalink_structure' ), '/index.php' ) ) {
-			// Nothing to do.
-			return;
-		}
-
-		foreach ( (array) $this->rewrite_rules as $regex => $query ) {
-			\add_rewrite_rule( $regex, $query, 'top' );
-		}
-	}
+	public function register_rewrites() {}
 
 	/**
 	 * Unregisters sitemap rewrite tags and routing rules.
 	 *
 	 * @since 5.5
 	 */
-	public function unregister_rewrites() {
-		global $wp_rewrite;
-
-		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() || 0 === strpos( \get_option( 'permalink_structure' ), '/index.php' ) ) {
-			// Nothing to do.
-			return;
-		}
-
-		foreach ( $this->rewrite_rules as $regex => $query ) {
-			\remove_rewrite_rule( $regex, $query, 'top' );
-		}
-	}
-
-	/**
-	 * Are we using the WP core server?
-	 * Returns whether the WordPress core sitemap server is used or not.
-	 *
-	 * @since 5.4
-	 *
-	 * @return bool
-	 */
-	public function uses_core_server() {
-		if ( null === $this->uses_core_server ) {
-			// Sitemap disabled, core server unavailable or user selected Plugin server.
-			if ( ! namespace\sitemaps_enabled( 'sitemap' ) || ! \function_exists( 'get_sitemap_url' ) || 'core' !== \get_option( 'xmlsf_server', get_default_settings( 'server' ) ) ) {
-				$this->uses_core_server = false;
-			} else {
-				$this->uses_core_server = true;
-			}
-		}
-
-		return $this->uses_core_server;
-	}
+	public function unregister_rewrites() {}
 
 	/**
 	 * Are we using date archives?
@@ -262,7 +212,7 @@ abstract class Sitemap {
 	 * @return bool
 	 */
 	public function uses_date_archives() {
-		if ( $this->uses_core_server() ) {
+		if ( 'core' === $this->server_type ) {
 			return false;
 		}
 
