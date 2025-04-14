@@ -1,6 +1,6 @@
 <?php
 /**
- * Sitemap name field
+ * Sitemap slug field
  *
  * @package XML Sitemap & Google News
  */

@@ -16,7 +16,7 @@ class Sitemap_News {
 	 *
 	 * @var string
 	 */
-	private $slug = 'sitemap-news';
+	private $slug;
 
 	/**
 	 * CONSTRUCTOR
@@ -24,7 +24,7 @@ class Sitemap_News {
 	 * Runs on init
 	 */
 	public function __construct() {
-		\add_action( 'init', array( $this, 'register_rewrites' ) );
+		$this->slug = 'sitemap-news';
 
 		// MAIN REQUEST filter.
 		\add_filter( 'request', array( $this, 'filter_request' ), 0 );
@@ -49,16 +49,12 @@ class Sitemap_News {
 	public function register_rewrites() {
 		global $wp_rewrite;
 
-		if ( ! $wp_rewrite->using_permalinks() ) {
+		if ( ! $wp_rewrite->using_permalinks() || 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ) {
+			// Nothing to do.
 			return;
 		}
 
-		// Register news sitemap provider route.
-		\add_rewrite_rule(
-			'^' . $this->slug() . '\.xml$',
-			'index.php?feed=sitemap-news',
-			'top'
-		);
+		\add_rewrite_rule( '^' . $this->slug() . '\.xml$', 'index.php?feed=sitemap-news', 'top' );
 	}
 
 	/**
@@ -69,17 +65,12 @@ class Sitemap_News {
 	public function unregister_rewrites() {
 		global $wp_rewrite;
 
-		if ( empty( $this->rewrite_rules ) || ! $wp_rewrite->using_permalinks() || 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ) {
+		if ( ! $wp_rewrite->using_permalinks() || 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ) {
 			// Nothing to do.
 			return;
 		}
 
-		// Unregister news sitemap provider route.
-		\remove_rewrite_rule(
-			'^' . $this->slug() . '\.xml$',
-			'index.php?feed=sitemap-news',
-			'top'
-		);
+		unset( $wp_rewrite->extra_rules_top[ '^' . $this->slug() . '\.xml$' ] );
 	}
 
 	/**

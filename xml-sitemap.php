@@ -47,7 +47,7 @@
 defined( 'WPINC' ) || die;
 defined( 'XMLSF_GOOGLE_NEWS_NAME' ) || define( 'XMLSF_GOOGLE_NEWS_NAME', false );
 
-define( 'XMLSF_VERSION', '5.5.4-alpha1' );
+define( 'XMLSF_VERSION', '5.5.4-alpha2' );
 define( 'XMLSF_ADV_MIN_VERSION', '0.1' );
 define( 'XMLSF_NEWS_ADV_MIN_VERSION', '1.3.5' );
 define( 'XMLSF_DIR', __DIR__ );
@@ -99,15 +99,13 @@ function xmlsf_deactivate() {
 	XMLSF\clear_metacache();
 
 	// Remove old rules.
-	if ( is_object( xmlsf()->sitemap ) && method_exists( xmlsf()->sitemap, 'unregister_rewrites' ) ) {
-		xmlsf()->sitemap->unregister_rewrites();
-	}
-	if ( is_object( xmlsf()->sitemap_news ) && method_exists( xmlsf()->sitemap_news, 'unregister_rewrites' ) ) {
-		xmlsf()->sitemap_news->unregister_rewrites();
-	}
+	xmlsf()->unregister_rewrites();
 
 	// Re-add core rules.
-	function_exists( 'wp_sitemaps_get_server' ) && wp_sitemaps_get_server();
+	if ( function_exists( 'wp_sitemaps_get_server' ) ) {
+		$sitemaps = wp_sitemaps_get_server();
+		$sitemaps->register_rewrites();
+	}
 
 	// Then flush.
 	flush_rewrite_rules( false );
@@ -122,10 +120,20 @@ register_deactivation_hook( __FILE__, 'xmlsf_deactivate' );
  * @return void
  */
 function xmlsf_activate() {
-	// TODO: register rewrites here, then flush with flush_rewrite_rules.
+	// Load sitemap.
+	xmlsf()->get_server( 'sitemap' );
 
-	// Flush rewrite rules on next init.
-	delete_option( 'rewrite_rules' );
+	// Add core rules if needed.
+	if ( function_exists( 'wp_sitemaps_get_server' ) && 'core' === \xmlsf()->sitemap->server_type ) {
+		$sitemaps = wp_sitemaps_get_server();
+		$sitemaps->register_rewrites();
+	}
+
+	// Register new plugin rules.
+	xmlsf()->register_rewrites();
+
+	// Then flush.
+	flush_rewrite_rules( false );
 }
 
 register_activation_hook( __FILE__, 'xmlsf_activate' );

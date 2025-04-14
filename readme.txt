@@ -144,15 +144,15 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 == Upgrade Notice ==
 
 = 5.5.4 =
-Rank Math noindex compatibility, performance improvement and bugfix.
+Performance improvement and bugfix.
 
 == Changelog ==
 
 = 5.5.4 =
 Date:
-* NEW: Rank Math compatibility
-* IMPROVE: Load core sitemaps early to prevent unnecessary queries
+* Load core sitemaps early to prevent unnecessary queries
 * FIX: dynamic property deprecated notices
+* FIX: unregister GN sitemap rewite rules on deactivation
 
 = 5.5.3 =
 Date: 20250402

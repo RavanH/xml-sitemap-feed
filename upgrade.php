@@ -17,8 +17,23 @@ if ( $db_version ) {
 
 update_option( 'xmlsf_version', XMLSF_VERSION );
 
-// Flush rewrite rules on next init.
-delete_option( 'rewrite_rules' );
+// Remove old rules.
+xmlsf()->unregister_rewrites();
+
+// Reload with new settings and new rules.
+xmlsf()->get_server();
+
+// Re-add core rules if needed.
+if ( function_exists( 'wp_sitemaps_get_server' ) && 'core' === xmlsf()->sitemap->server_type ) {
+	$sitemaps = wp_sitemaps_get_server();
+	$sitemaps->register_rewrites();
+}
+
+// Register new plugin rules.
+xmlsf()->register_rewrites();
+
+// Then flush.
+flush_rewrite_rules( false );
 
 /**
  * Update from defaults.

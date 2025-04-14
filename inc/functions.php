@@ -244,7 +244,7 @@ function sanitize_number( $number, $min = .1, $max = 1, $decimals = 1 ) {
  *
  * @param string $type The metadata type to clear.
  */
-function clear_metacache( $type = 'all' ) {
+function clear_metacache( $type = '' ) {
 	switch ( $type ) {
 		case 'images':
 			// Clear all images meta caches...
@@ -266,7 +266,6 @@ function clear_metacache( $type = 'all' ) {
 			\delete_metadata( 'user', 0, 'user_modified', '', true );
 			break;
 
-		case 'all':
 		default:
 			$all_types = array( 'images', 'comments', 'terms', 'users' );
 			foreach ( $all_types as $_type ) {
@@ -388,14 +387,4 @@ function get_default_settings( $key = false ) {
 	}
 
 	return \apply_filters( 'xmlsf_defaults', $return, $key, $defaults );
-}
-
-/**
- * Generator info
- */
-function generator() {
-	echo '<!-- generated-on="' . \esc_xml( \gmdate( 'c' ) ) . '" -->' . PHP_EOL;
-	echo '<!-- generator="XML Sitemap & Google News for WordPress" -->' . PHP_EOL;
-	echo '<!-- generator-url="https://status301.net/wordpress-plugins/xml-sitemap-feed/" -->' . PHP_EOL;
-	echo '<!-- generator-version="' . \esc_xml( XMLSF_VERSION ) . '" -->' . PHP_EOL;
 }

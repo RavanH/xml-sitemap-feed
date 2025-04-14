@@ -20,14 +20,29 @@ class Sitemap {
 	 * Update actions for General Settings
 	 */
 	public static function update_server() {
-		// Check static file.
-		$slug     = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : ( \xmlsf()->sitemap->uses_core_server() ? 'wp-sitemap' : 'sitemap' );
+		// Remove old rules.
+		xmlsf()->unregister_rewrites( 'sitemap' );
+
+		// Reload with new settings and new rules.
+		xmlsf()->get_server( 'sitemap' );
+
+		// Re-add core rules if needed.
+		if ( function_exists( 'wp_sitemaps_get_server' ) && 'core' === \xmlsf()->sitemap->server_type ) {
+			$sitemaps = wp_sitemaps_get_server();
+			$sitemaps->register_rewrites();
+		}
+
+		// Register new plugin rules.
+		xmlsf()->register_rewrites();
+
+		// Then flush.
+		flush_rewrite_rules( false );
+
+		// Check new static file.
+		$slug     = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
 		$filename = $slug . '.xml';
 
 		\XMLSF\Admin\Admin::check_static_files( $filename, 1 );
-
-		// Flush rewrite rules on next init.
-		\delete_option( 'rewrite_rules' );
 	}
 
 	/**
@@ -603,7 +618,7 @@ class Sitemap {
 				\add_settings_field(
 					'xmlsf_sitemap_name',
 					'<label for="xmlsf_sitemap_name">' . __( 'XML Sitemap URL', 'xml-sitemap-feed' ) . '</label>',
-					array( __NAMESPACE__ . '\Fields', 'xmlsf_sitemap_name_field' ),
+					array( __NAMESPACE__ . '\Fields', 'xmlsf_sitemap_slug_field' ),
 					'xmlsf_advanced',
 					'xml_sitemap_advanced_section'
 				);

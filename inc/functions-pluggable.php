@@ -230,36 +230,3 @@ if ( ! function_exists( 'is_news' ) ) {
 		return xmlsf()->is_news;
 	}
 }
-
-if ( ! function_exists( 'remove_rewrite_rule' ) ) {
-	/**
-	 * Remove a rewrite rule. Can be used before a flush.
-	 *
-	 * @param string       $regex Regular expression to match request against.
-	 * @param string|array $query The corresponding query vars for this rewrite rule.
-	 * @param string       $after Optional. Priority of the new rule. Accepts 'top'
-	 *                            or 'bottom'. Default 'bottom'.
-	 */
-	function remove_rewrite_rule( $regex, $query, $after = 'bottom' ) {
-		global $wp_rewrite;
-
-		if ( is_array( $query ) ) {
-			$external = false;
-			$query    = add_query_arg( $query, 'index.php' );
-		} else {
-			$index = ! str_contains( $query, '?' ) ? strlen( $query ) : strpos( $query, '?' );
-			$front = substr( $query, 0, $index );
-
-			$external = $front !== $wp_rewrite->index;
-		}
-
-		// "external" = it doesn't correspond to index.php.
-		if ( $external ) {
-			$wp_rewrite->non_wp_rules = array_diff( $wp_rewrite->non_wp_rules, array( $regex => $query ) );
-		} elseif ( 'bottom' === $after ) {
-			$wp_rewrite->extra_rules = array_diff( $wp_rewrite->extra_rules, array( $regex => $query ) );
-		} else {
-			$wp_rewrite->extra_rules_top = array_diff( $wp_rewrite->extra_rules_top, array( $regex => $query ) );
-		}
-	}
-}

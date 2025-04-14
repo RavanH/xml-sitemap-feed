@@ -17,21 +17,12 @@ class Sitemap_Core extends Sitemap {
 	 * Runs on init
 	 */
 	public function __construct() {
-		$this->slug = 'wp-sitemap';
-
+		$this->slug               = 'wp-sitemap';
+		$this->server_type        = 'core';
 		$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', array() );
 
-		// Additional rewrites only if $this->slug() is different from 'wp-sitemap'.
-		$new_slug = $this->slug();
-		if ( $new_slug !== $this->slug ) {
-			$this->rewrite_rules      = array(
-				'^' . $this->slug() . '\.xml$' => 'index.php?sitemap=index',
-			);
-		}
-		\add_action( 'init', array( $this, 'register_rewrites' ) );
-
-		// Redirect sitemap.xml requests.
-		\add_action( 'template_redirect', array( $this, 'redirect' ), 0 );
+		// Render sitemaps early. Prevents costly extra DB query.
+		\add_action( 'parse_request', array( $this, 'render_sitemaps' ), 9 );
 
 		// Cache clearance.
 		\add_action( 'clean_post_cache', array( $this, 'clean_post_cache' ), 99, 2 );
@@ -90,9 +81,45 @@ class Sitemap_Core extends Sitemap {
 
 		// NGINX HELPER PURGE URLS.
 		\add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
+	}
 
-		// Render sitemaps early. Prevents costly extra DB query.
-		\add_action( 'parse_request', array( $this, 'render_sitemaps' ), 9 );
+	/**
+	 * Registers sitemap rewrite tags and routing rules.
+	 *
+	 * @since 5.4.5
+	 */
+	public function register_rewrites() {
+		global $wp_rewrite;
+
+		if ( ! $wp_rewrite->using_permalinks() || 0 === strpos( \get_option( 'permalink_structure' ), '/index.php' ) ) {
+			// Nothing to do.
+			return;
+		}
+
+		\add_rewrite_rule( '^' . $this->slug() . '\.xml$', 'index.php?sitemap=index', 'top' );
+	}
+
+	/**
+	 * Unregisters sitemap rewrite tags and routing rules.
+	 *
+	 * @since 5.5
+	 */
+	public function unregister_rewrites() {
+		global $wp_rewrite;
+
+		if ( ! $wp_rewrite->using_permalinks() || 0 === strpos( \get_option( 'permalink_structure' ), '/index.php' ) ) {
+			// Nothing to do.
+			return;
+		}
+
+		// Compose key.
+		$key = '^' . $this->slug() . '\.xml$';
+		unset( $wp_rewrite->extra_rules_top[ $key ] );
+		unset( $wp_rewrite->extra_rules_top['^wp-sitemap\.xml$'] );
+		unset( $wp_rewrite->extra_rules_top['^wp-sitemap\.xsl$'] );
+		unset( $wp_rewrite->extra_rules_top['^wp-sitemap-index\.xsl$'] );
+		unset( $wp_rewrite->extra_rules_top['^wp-sitemap-([a-z]+?)-([a-z\d_-]+?)-(\d+?)\.xml$'] );
+		unset( $wp_rewrite->extra_rules_top['^wp-sitemap-([a-z]+?)-(\d+?)\.xml$'] );
 	}
 
 	/**
@@ -665,23 +692,5 @@ class Sitemap_Core extends Sitemap {
 		\do_action( 'xmlsf_nginx_helper_purge_urls', $urls );
 
 		return $urls;
-	}
-
-	/**
-	 * Do WP plugin sitemap index redirect
-	 *
-	 * @uses wp_redirect()
-	 */
-	public function redirect() {
-		// Sadly, we cannot get the full info from $wp->request or get_query_var().
-		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? \wp_unslash( $_SERVER['REQUEST_URI'] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		if ( $request_uri && ( 0 === \strpos( $request_uri, '/sitemap.xml' ) || 0 === \strpos( $request_uri, '/?feed=sitemap' ) ) ) {
-			$url = $this->get_sitemap_url();
-			// Make sure we're not redirecting to oneself.
-			if ( ! \strpos( $url, $request_uri ) ) {
-				\wp_safe_redirect( $url, 301, 'XML Sitemap & Google News for WordPress' );
-				exit();
-			}
-		}
 	}
 }

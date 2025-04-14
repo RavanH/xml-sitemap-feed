@@ -150,26 +150,43 @@ class XMLSitemapFeed {
 		add_action( 'plugins_loaded', __NAMESPACE__ . '\plugin_compat' );
 		add_filter( 'robots_txt', __NAMESPACE__ . '\robots_txt' );
 
-		// Load sitemaps.
+		// Load sitemap servers.
 		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
-
-		if ( empty( $sitemaps ) ) {
-			return;
-		}
 
 		// Google News sitemap?
 		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-			\add_action( 'xmlsf_news_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
-
-			$this->sitemap_news = new Sitemap_News();
+			$this->get_server( 'sitemap-news' );
 		}
 
 		// XML Sitemap?
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
-			\add_action( 'xmlsf_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
+				$this->get_server( 'sitemap' );
+		} else {
+			// Disable core sitemap.
+			\add_filter( 'wp_sitemaps_enabled', '__return_false' );
+		}
 
+		// Resiter rewrites.
+		\add_action( 'init', array( $this, 'register_rewrites' ) );
+
+		// Sitemap hooks.
+		\add_action( 'xmlsf_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
+		\add_action( 'xmlsf_news_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
+		\add_action( 'xmlsf_generator', array( $this, 'generator' ) );
+	}
+
+	/**
+	 * Load sitemap servers
+	 *
+	 * @param string $sitemap Sitemap name.
+	 */
+	public function get_server( $sitemap = '' ) {
+		if ( empty( $sitemap ) || 'sitemap-news' === $sitemap ) {
+			$this->sitemap_news = new Sitemap_News();
+		}
+
+		if ( empty( $sitemap ) || 'sitemap' === $sitemap ) {
 			if ( \function_exists( 'get_sitemap_url' ) && 'core' === \get_option( 'xmlsf_server', $this->defaults( 'server' ) ) ) {
-				// Extend core sitemap.
 				$this->sitemap = new Sitemap_Core();
 			} else {
 				// Replace core sitemap.
@@ -177,12 +194,7 @@ class XMLSitemapFeed {
 
 				$this->sitemap = new Sitemap_Plugin();
 			}
-		} else {
-			// Disable core sitemap.
-			\add_filter( 'wp_sitemaps_enabled', '__return_false' );
 		}
-
-		\add_action( 'xmlsf_generator', __NAMESPACE__ . '\generator' );
 	}
 
 	/**
@@ -298,7 +310,7 @@ class XMLSitemapFeed {
 	 *
 	 * @param string $sitemap Sitemap.
 	 */
-	public function register_rewrites( $sitemap ) {
+	public function register_rewrites( $sitemap = '' ) {
 		switch ( $sitemap ) {
 			case 'sitemap':
 				null !== $this->sitemap && $this->sitemap->register_rewrites();
@@ -312,5 +324,36 @@ class XMLSitemapFeed {
 				null !== $this->sitemap_news && $this->sitemap_news->register_rewrites();
 				null !== $this->sitemap && $this->sitemap->register_rewrites();
 		}
+	}
+
+	/**
+	 * Unregister rewrites per sitemap
+	 *
+	 * @param string $sitemap Sitemap.
+	 */
+	public function unregister_rewrites( $sitemap = '' ) {
+		switch ( $sitemap ) {
+			case 'sitemap':
+				null !== $this->sitemap && $this->sitemap->unregister_rewrites();
+				break;
+
+			case 'sitemap-news':
+				null !== $this->sitemap_news && $this->sitemap_news->unregister_rewrites();
+				break;
+
+			default:
+				null !== $this->sitemap_news && $this->sitemap_news->unregister_rewrites();
+				null !== $this->sitemap && $this->sitemap->unregister_rewrites();
+		}
+	}
+
+	/**
+	 * Generator info
+	 */
+	public function generator() {
+		echo '<!-- generated-on="' . \esc_xml( \gmdate( 'c' ) ) . '" -->' . PHP_EOL;
+		echo '<!-- generator="XML Sitemap & Google News for WordPress" -->' . PHP_EOL;
+		echo '<!-- generator-url="https://status301.net/wordpress-plugins/xml-sitemap-feed/" -->' . PHP_EOL;
+		echo '<!-- generator-version="' . \esc_xml( XMLSF_VERSION ) . '" -->' . PHP_EOL;
 	}
 }

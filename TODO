@@ -1,16 +1,14 @@
 5.5.4
+
 FIX
+* prepare dynamic slug for google news advanced
 
 = 5.6 =
 * optimize plugin index:
   - can we prevent default queries? maybe do not update/prime meta caches etc?
   - can we cache lastmod data as transients? 
 * Make leaner still: only load sitemap class and functions on xmlsf_sitemap_loaded ... same for news.
-* rename "name" to "slug" for constistancy
-* prepare dynamic slug for google news advanced
 * Combined images option: featured + attached
-* move register_rewrites to parent class
-* switch naar unregister_rewrites en register_rewrites bij activeren/deactiveren sitemaps and plugin
 * Make Polylang lastmod dates per language
 * SEO plugins compat: find meta query for post type with default noindex
 * move SEO noindex compatibility to google news advanced only? drop the rest and change incompatibility warning messages (advise to use the seo plugin sitemap or automatically disable this plugin's xml sitemap?)

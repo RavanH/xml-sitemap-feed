@@ -132,10 +132,25 @@ class Admin {
 	 * Update actions for Sitemaps
 	 */
 	public static function update_sitemaps() {
-		self::check_static_files();
+		// Remove old rules.
+		xmlsf()->unregister_rewrites( 'sitemap' );
 
-		// Flush rewrite rules on upcoming init.
-		\delete_option( 'rewrite_rules' );
+		// Reload with new settings and new rules.
+		xmlsf()->get_server( 'sitemap' );
+
+		// Re-add core rules if needed.
+		if ( function_exists( 'wp_sitemaps_get_server' ) && 'core' === \xmlsf()->sitemap->server_type ) {
+			$sitemaps = wp_sitemaps_get_server();
+			$sitemaps->register_rewrites();
+		}
+
+		// Register new plugin rules.
+		xmlsf()->register_rewrites();
+
+		// Then flush.
+		flush_rewrite_rules( false );
+
+		self::check_static_files();
 	}
 
 	/**
@@ -264,8 +279,13 @@ class Admin {
 	public static function check_static_files( $files = array(), $verbosity = 1 ) {
 		if ( empty( $files ) ) { // TODO a better way of getting file names.
 			$sitemaps = (array) \get_option( 'xmlsf_sitemaps', \XMLSF\get_default_settings( 'sitemaps' ) );
-			foreach ( $sitemaps as $type => $file ) {
-				$files[] = $file;
+			if ( ! empty( $sitemaps['sitemap'] ) ) {
+				$slug    = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
+				$files[] = $slug . '.xml';
+			}
+			if ( ! empty( $sitemaps['sitemap-news'] ) ) {
+				$slug    = \is_object( \xmlsf()->sitemap_news ) ? \xmlsf()->sitemap_news->slug() : 'sitemap-news';
+				$files[] = $slug . '.xml';
 			}
 		}
 
