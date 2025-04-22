@@ -37,7 +37,6 @@
 
 	$priority_val = ! empty( $options[ $obj->name ]['priority'] ) ? $options[ $obj->name ]['priority'] : '';
 	$image        = isset( $options[ $obj->name ]['tags']['image'] ) ? $options[ $obj->name ]['tags']['image'] : 'attached';
-	$context      = ( 'page' === $obj->name ) ? 'page' : 'post';
 	?>
 
 	<p>
@@ -65,6 +64,7 @@
 
 	<?php
 	if ( 'plugin' === \xmlsf()->sitemap->server_type ) {
+		$context = ( 'page' === $obj->name ) ? 'page' : 'post';
 		?>
 	<p>
 		<label>
@@ -74,7 +74,7 @@
 					<?php esc_html_e( 'None' ); ?>
 				</option>
 				<option value="featured"<?php echo selected( 'featured' === $image, true, false ); ?>>
-					<?php esc_html_e( 'Featured Images' ); ?>
+					<?php echo esc_html_x( 'Featured image', $context ); ?>
 				</option>
 				<option value="attached"<?php echo selected( 'attached' === $image, true, false ); ?>>
 					<?php esc_html_e( 'Attached images', 'xml-sitemap-feed' ); ?>
