@@ -35,7 +35,7 @@ class WordPress_SEO {
 	 */
 	public static function posts_query_args( $args ) {
 		// Exclude posts.
-        // TODO construct query for post types with default exclude?
+		// TODO construct query for post types with default exclude?
 		$args['meta_query'] = \array_merge( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			(array) $args['meta_query'],
 			array(
