@@ -1,19 +1,22 @@
 5.5.4
 
 FIX
-* prepare dynamic slug for google news advanced
+* prepare and test dynamic slug for google news advanced
 
 = 5.6 =
+* switch to Exclude post types
+* include home page even if pages are excluded
+* move SEO noindex compatibility to advanced only? drop the rest and change incompatibility warning messages (advise to use the seo plugin sitemap or automatically disable this plugin's xml sitemap?)
+
 * optimize plugin index:
   - can we prevent default queries? maybe do not update/prime meta caches etc?
-  - can we cache lastmod data as transients? 
+  - can we cache lastmod data as transients?
 * Make leaner still: only load sitemap class and functions on xmlsf_sitemap_loaded ... same for news.
-* Combined images option: featured + attached
+* Combine images: attached includes featured
 * Make Polylang lastmod dates per language
-* SEO plugins compat: find meta query for post type with default noindex
-* move SEO noindex compatibility to google news advanced only? drop the rest and change incompatibility warning messages (advise to use the seo plugin sitemap or automatically disable this plugin's xml sitemap?)
-* revise get_lastmodified and/or _get_post_time: replace with core functions and some kind of caching...
-* revise expensive meta_query for _xmlsf_exclude: maybe collect all posts with _xmlsf_exclude (and noindex?) occasionally and store their IDs for faster exclusion in db query...
+
+* revisit get_lastmodified and/or _get_post_time: replace with core functions and some kind of caching...
+* revisit expensive meta_query for _xmlsf_exclude: maybe collect all posts with _xmlsf_exclude (and noindex?) occasionally and store their IDs for faster exclusion in db query... or or or better yet... store exclude IDs not as meta but in one DB option in the first place?
 
 NEW
 * remove post types that are not activated from admin tab
@@ -70,4 +73,4 @@ CONSIDER
 
 CORE SITEMAP:
 * TODO Maybe add dedicated Media sitemap if image tags are (still) not possible OR completely replace the renderer?
-* add custom post type root pages... with a separate "root" sitemap?
+* add custom post type root pages... with a separate "root" sitemap or in the main pages sitemap?
