@@ -295,7 +295,7 @@ function robots_txt( $output ) {
 	} elseif ( ! namespace\sitemaps_enabled() ) {
 		$output .= '# No XML Sitemaps are enabled.' . PHP_EOL;
 	} else {
-		if ( namespace\sitemaps_enabled( 'sitemap' ) ) {
+		if ( namespace\sitemaps_enabled( 'sitemap' ) && 'core' !== xmlsf()->sitemap->server_type() ) {
 			$output .= 'Sitemap: ' . \xmlsf()->sitemap->get_sitemap_url() . PHP_EOL;
 		}
 		if ( namespace\sitemaps_enabled( 'news' ) ) {
