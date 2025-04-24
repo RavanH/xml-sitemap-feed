@@ -9,17 +9,15 @@ Stable tag: 5.5.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-XML and Google News Sitemaps to feed the hungry spiders. Multisite, WP Super Cache, Polylang and WPML compatible.
+XML and Google News Sitemaps to feed the hungry spiders. Compatible with WordPress Multisite, most caching plugins, Polylang and WPML.
 
 == Description ==
 
-This plugin creates dynamic feeds that comply with the **XML Sitemap** and the **Google News Sitemap** protocol. **Multisite**, **Polylang** and **WPML** compatible and there are no static files created.
+This plugin allow you to control the WordPress core **XML Sitemap** with various options and allows you to add a **Google News Sitemap**. **Multisite**, **Polylang** and **WPML** compatible and there are no static files created.
 
-There are options to control which sitemaps are enabled, which Post Types and archive pages (like taxonomy terms and author pages) are included, how Priority and Lastmod are calculated and a possibility to set additional robots.txt rules from within the WordPress admin.
+There are options to select which sitemaps are enabled, which Post Types and archive pages (like taxonomy terms and author pages) are included, how Priority and Lastmod are calculated and a possibility to set additional robots.txt rules from within the WordPress admin.
 
-You, or site owners on your Multisite network, will not be bothered with overly complicated settings like most other XML Sitemap plugins. The default settings will suffice in most cases.
-
-An XML Sitemap Index becomes instantly available on **yourblog.url/sitemap.xml** (or yourblog.url/?feed=sitemap if you're not using a 'fancy' permalink structure) containing references to posts and pages by default, ready for indexing by search engines like Google, Bing, Yahoo, Yandex, Baidu, AOL and Ask. When the Google News Sitemap is activated, it will become available on **yourblog.url/sitemap-news.xml** (or yourblog.url/?feed=sitemap-news), ready for indexing by Google News. Both are automatically referenced in the dynamically created **robots.txt** on **yourblog.url/robots.txt** to tell search engines where to find your XML Sitemaps.
+When the Google News Sitemap is activated, it will become available on **yourblog.url/sitemap-news.xml** (or yourblog.url/?feed=sitemap-news), ready for indexing by Google News. It is automatically referenced in the dynamically created **robots.txt** along with the regular XML Sitemap index.
 
 Please read the FAQ's for info on how to get your articles listed on Google News.
 
@@ -33,8 +31,8 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 
 = Features =
 
-* Compatible with multi-lingual sites using **Polylang** or **WPML** to allow all languages to be indexed equally.
-* Option to add new robots.txt rules. These can be used to further control (read: limit) the indexation of various parts of your site and subsequent spread of pagerank across your sites pages.
+* Compatible with multi-lingual sites built with **Polylang** or **WPML** to allow all languages to be indexed equally.
+* Option to add new robots.txt rules. These can be used to further control the indexation of various parts of your site.
 * Includes XLS stylesheets for human readable sitemaps.
 * Sitemap templates and stylesheets can be overridden by theme template files.
 
@@ -56,7 +54,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 * Required news sitemap tags: Publication name, language, title and publication date.
 * Set a News Publication Name or uses site name.
 * Supports custom post types.
-* Limit inclusion to certain post categories.
+* Limit inclusion of certain post categories.
 
 = Pro Features =
 
@@ -150,6 +148,7 @@ Performance improvement and bugfix.
 
 = 5.5.4 =
 Date:
+* Improved WPML compatibility
 * Load core sitemaps early to prevent unnecessary queries
 * FIX: dynamic property deprecated notices
 * FIX: unregister GN sitemap rewite rules on deactivation
