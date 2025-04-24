@@ -39,6 +39,9 @@ class Sitemap_News {
 		\add_filter( 'nocache_headers', array( $this, 'news_nocache_headers' ) );
 
 		\add_filter( 'xmlsf_news_language', array( $this, 'parse_language_string' ), 99 );
+
+		// Add sitemap in Robots TXT.
+		add_filter( 'robots_txt', array( $this, 'robots_txt' ), 9 );
 	}
 
 	/**
@@ -126,7 +129,9 @@ class Sitemap_News {
 			$basename = '/' . $index_php . '?feed=' . $slug;
 		}
 
-		return \esc_url( \home_url( $basename ) );
+		$sitemap_url = \apply_filters( 'xmlsf_sitemap_news_url', \home_url( $basename ) );
+
+		return \esc_url( $sitemap_url );
 	}
 
 	/**
@@ -304,5 +309,17 @@ class Sitemap_News {
 	public function nginx_helper_purge_urls( $urls = array() ) {
 		$urls[] = '/sitemap-news.xml';
 		return $urls;
+	}
+
+	/**
+	 * Filter robots.txt rules
+	 *
+	 * @since 5.5
+	 *
+	 * @param string $output Output.
+	 * @return string
+	 */
+	public function robots_txt( $output ) {
+		return $output . PHP_EOL . 'Sitemap: ' . $this->get_sitemap_url() . PHP_EOL;
 	}
 }

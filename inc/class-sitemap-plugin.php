@@ -49,6 +49,9 @@ class Sitemap_Plugin extends Sitemap {
 		// Add sitemap image tags.
 		\add_action( 'xmlsf_urlset', array( $this, 'image_schema' ) );
 		\add_action( 'xmlsf_tags_after', array( $this, 'image_tag' ), 10, 2 );
+
+		// Add sitemap in Robots TXT.
+		add_filter( 'robots_txt', array( $this, 'robots_txt' ), 8 );
 	}
 
 	/**
@@ -121,26 +124,28 @@ class Sitemap_Plugin extends Sitemap {
 
 		if ( xmlsf()->using_permalinks() ) {
 			// Construct file name.
-			$name = $this->slug();
+			$basename = $this->slug();
 			if ( 'index' !== $sitemap ) {
-				$name .= '-' . $sitemap;
-				$name .= $args['type'] ? '-' . $args['type'] : '';
-				$name .= $args['m'] ? '.' . $args['m'] : '';
-				$name .= $args['w'] ? '.' . $args['w'] : '';
+				$basename .= '-' . $sitemap;
+				$basename .= $args['type'] ? '-' . $args['type'] : '';
+				$basename .= $args['m'] ? '.' . $args['m'] : '';
+				$basename .= $args['w'] ? '.' . $args['w'] : '';
 			}
-			$name .= '.xml';
+			$basename .= '.xml';
 		} else {
 			// Construct request string.
-			$name = $index_php . '?feed=sitemap';
+			$basename = $index_php . '?feed=sitemap';
 			if ( 'index' !== $sitemap ) {
-				$name .= '-' . $sitemap;
-				$name .= $args['type'] ? '-' . $args['type'] : '';
-				$name .= $args['m'] ? '&m=' . $args['m'] : '';
-				$name .= $args['w'] ? '&w=' . $args['w'] : '';
+				$basename .= '-' . $sitemap;
+				$basename .= $args['type'] ? '-' . $args['type'] : '';
+				$basename .= $args['m'] ? '&m=' . $args['m'] : '';
+				$basename .= $args['w'] ? '&w=' . $args['w'] : '';
 			}
 		}
 
-		return \esc_url( \trailingslashit( \home_url() ) . $name );
+		$sitemap_url = \apply_filters( 'xmlsf_sitemap_url', \home_url( $basename ), $sitemap, $args );
+
+		return \esc_url( $sitemap_url );
 	}
 
 	/**
@@ -612,5 +617,17 @@ class Sitemap_Plugin extends Sitemap {
 		\do_action( 'xmlsf_nginx_helper_purge_urls', $urls );
 
 		return $urls;
+	}
+
+	/**
+	 * Filter robots.txt rules
+	 *
+	 * @since 5.5
+	 *
+	 * @param string $output Output.
+	 * @return string
+	 */
+	public function robots_txt( $output ) {
+		return $output . PHP_EOL . 'Sitemap: ' . $this->get_sitemap_url() . PHP_EOL;
 	}
 }

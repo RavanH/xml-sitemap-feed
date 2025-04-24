@@ -135,11 +135,13 @@ class Sitemap_Core extends Sitemap {
 		$name = $this->slug();
 
 		if ( 'index' === $sitemap && $name !== $this->slug && xmlsf()->using_permalinks() ) {
-			return \esc_url( \trailingslashit( \home_url() ) . $name . '.xml' );
+			$sitemap_url = \apply_filters( 'xmlsf_sitemap_url', \trailingslashit( \home_url( $name . '.xml' ) ), $sitemap );
+		} else {
+			// Use core function get_sitemap_url if using core sitemaps.
+			$sitemap_url = \apply_filters( 'xmlsf_sitemap_url', \get_sitemap_url( $sitemap ), $sitemap );
 		}
 
-		// Use core function get_sitemap_url if using core sitemaps.
-		return \get_sitemap_url( $sitemap );
+		return \esc_url( $sitemap_url );
 	}
 
 	/**

@@ -148,15 +148,10 @@ class XMLSitemapFeed {
 		}
 
 		add_action( 'plugins_loaded', __NAMESPACE__ . '\plugin_compat' );
-		add_filter( 'robots_txt', __NAMESPACE__ . '\robots_txt' );
+		add_filter( 'robots_txt', __NAMESPACE__ . '\robots_txt', 11 );
 
 		// Load sitemap servers.
 		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
-
-		// Google News sitemap?
-		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-			$this->get_server( 'sitemap-news' );
-		}
 
 		// XML Sitemap?
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
@@ -164,6 +159,11 @@ class XMLSitemapFeed {
 		} else {
 			// Disable core sitemap.
 			\add_filter( 'wp_sitemaps_enabled', '__return_false' );
+		}
+
+		// Google News sitemap?
+		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
+			$this->get_server( 'sitemap-news' );
 		}
 
 		// Resiter rewrites.
