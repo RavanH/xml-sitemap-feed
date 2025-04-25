@@ -194,6 +194,11 @@ class Sitemap {
 	 * Compare versions to known compatibility.
 	 */
 	public static function compatible_with_advanced() {
+		// Return if plugin is not active.
+		if ( ! is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) ) {
+			return true;
+		}
+
 		// Check version.
 		\defined( 'XMLSF_ADV_VERSION' ) || \define( 'XMLSF_ADV_VERSION', XMLSF_ADV_MIN_VERSION );
 
@@ -210,9 +215,8 @@ class Sitemap {
 
 		// XML Sitemap Advanced incompatibility notice.
 		if (
-			is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) &&
-			! \in_array( 'xmlsf_advanced', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) &&
-			! self::compatible_with_advanced()
+			! self::compatible_with_advanced() &&
+			! \in_array( 'xmlsf_advanced', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true )
 		) {
 			\add_action(
 				'admin_notices',
@@ -340,7 +344,7 @@ class Sitemap {
 		if ( \is_plugin_active( 'slim-seo/slim-seo.php' ) && ! \in_array( 'slim_seo_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 			$slimseo = \get_option( 'slim_seo' );
 
-			if ( empty( $slimseo ) || isset( $slimseo['features'] ) && in_array( 'sitemaps', (array) $slimseo['features'], true ) ) {
+			if ( empty( $slimseo ) || ( isset( $slimseo['features'] ) && in_array( 'sitemaps', (array) $slimseo['features'], true ) ) ) {
 				\add_action(
 					'admin_notices',
 					function () {

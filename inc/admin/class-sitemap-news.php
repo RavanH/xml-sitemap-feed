@@ -30,25 +30,8 @@ class Sitemap_News {
 	 * Tools actions
 	 */
 	public static function tools_actions() {
-		// Skip if no advanced plugin or dismissed.
-		if (
-			\wp_doing_ajax() ||
-			! \is_plugin_active( 'xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php' ) ||
-			\in_array( 'xmlsf_advanced_news', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true )
-		) {
-			return;
-		}
-
-		if ( ! self::compatible_with_advanced() ) {
-			\add_action(
-				'admin_notices',
-				function () {
-					include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced-news.php';
-				}
-			);
-		}
-
-		if ( ! isset( $_POST['_xmlsf_help_nonce'] ) || ! \wp_verify_nonce( sanitize_key( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
+		// Skip if doing ajax or no valid nonce.
+		if ( \wp_doing_ajax() || ! isset( $_POST['_xmlsf_help_nonce'] ) || ! \wp_verify_nonce( sanitize_key( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
 			return;
 		}
 
@@ -78,6 +61,11 @@ class Sitemap_News {
 	 * Compare versions to known compatibility.
 	 */
 	public static function compatible_with_advanced() {
+		// Return true if plugin is not active.
+		if ( ! \is_plugin_active( 'xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php' ) ) {
+			return true;
+		}
+
 		// Check version.
 		\defined( 'XMLSF_NEWS_ADV_VERSION' ) || \define( 'XMLSF_NEWS_ADV_VERSION', '0' );
 
@@ -94,9 +82,8 @@ class Sitemap_News {
 
 		// Google News Advanced incompatibility notice.
 		if (
-			\is_plugin_active( 'xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php' ) &&
-			! \in_array( 'xmlsf_advanced_news', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) &&
-			! self::compatible_with_advanced()
+			! self::compatible_with_advanced() &&
+			! \in_array( 'xmlsf_advanced_news', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true )
 		) {
 			\add_action(
 				'admin_notices',
