@@ -1,17 +1,17 @@
 5.5.4
 
 FIX
-* prepare and test dynamic slug for google news advanced
-* include home page even if pages are excluded
+
 
 TEST
-* compatibility with GN advanced stable
-* static files check after sitemap activation and tools
 * Nginx Helper purge wildcard not working?
 * theme template overrides
 * test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 
 = 5.6 =
+* include home page even if pages are excluded
+* prepare and test dynamic slug for google news advanced
+* DROP automatic priority calculation
 * revisit Polylang compatibility
 * switch to Exclude post types
 * move SEO noindex compatibility to advanced only? drop the rest and change incompatibility warning messages (advise to use the seo plugin sitemap or automatically disable this plugin's xml sitemap?)
@@ -23,7 +23,7 @@ TEST
 * Combine images: attached includes featured
 * Make Polylang lastmod dates per language
 
-* revisit get_lastmodified and/or _get_post_time: replace with core functions and some kind of caching...
+* revisit get_lastmodified and/or _get_post_time: replace with core functions and some kind of caching maybe...
 * revisit expensive meta_query for _xmlsf_exclude: maybe collect all posts with _xmlsf_exclude (and noindex?) occasionally and store their IDs for faster exclusion in db query... or or or better yet... store exclude IDs not as meta but in one DB option in the first place?
 
 NEW
@@ -39,7 +39,6 @@ General settings for Home page:
 ROADMAP
 * move sitemap fields (back) to Sitemap class?
 * rethink xmlsf_post_types and optional xmlsf_post_type_settings
-* quick edit "exclude" option for news sitemap too...
 * drop dynamic priority?
 
 DOCUMENT
