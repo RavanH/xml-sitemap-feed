@@ -17,7 +17,7 @@ class Sitemap_Core extends Sitemap {
 	 * Runs on init
 	 */
 	public function __construct() {
-		$this->slug               = 'wp-sitemap';
+		$this->slug               = \sanitize_key( (string) \apply_filters( 'xmlsf_sitemap_slug', 'wp-sitemap' ) );
 		$this->server_type        = 'core';
 		$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', array() );
 
@@ -132,14 +132,15 @@ class Sitemap_Core extends Sitemap {
 	 * @return string|false The sitemap URL or false if the sitemap doesn't exist.
 	 */
 	public function get_sitemap_url( $sitemap = 'index' ) {
-		$name = $this->slug();
+		$slug = $this->slug();
 
-		if ( 'index' === $sitemap && $name !== $this->slug && xmlsf()->using_permalinks() ) {
-			$sitemap_url = \apply_filters( 'xmlsf_sitemap_url', \trailingslashit( \home_url( $name . '.xml' ) ), $sitemap );
+		if ( 'index' === $sitemap && 'wp-sitemap' !== $slug && xmlsf()->using_permalinks() ) {
+			$sitemap_url = \home_url( $slug . '.xml' );
 		} else {
-			// Use core function get_sitemap_url if using core sitemaps.
-			$sitemap_url = \apply_filters( 'xmlsf_sitemap_url', \get_sitemap_url( $sitemap ), $sitemap );
+			$sitemap_url = \get_sitemap_url( $sitemap );
 		}
+
+		$sitemap_url = \apply_filters( 'xmlsf_sitemap_url', $sitemap_url, $sitemap );
 
 		return \esc_url( $sitemap_url );
 	}

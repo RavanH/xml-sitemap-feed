@@ -90,7 +90,7 @@ abstract class Sitemap {
 			// Make sure post types are allowed and publicly viewable.
 			$post_types = ! empty( $activated_post_types ) ? \array_intersect( (array) $activated_post_types, $public_post_types ) : $public_post_types;
 			$post_types = \array_diff( $post_types, $disabled_post_types );
-		
+
 			$this->post_types = $post_types;
 		}
 
@@ -179,14 +179,7 @@ abstract class Sitemap {
 	 * @since 5.5
 	 */
 	public function slug() {
-		$slug = (string) \apply_filters( 'xmlsf_sitemap_slug', $this->slug );
-
-		// Clean filename if altered.
-		if ( $this->slug !== $slug ) {
-			$slug = \sanitize_key( $slug );
-		}
-
-		return ! empty( $slug ) ? $slug : $this->slug;
+		return $this->slug;
 	}
 
 	/**

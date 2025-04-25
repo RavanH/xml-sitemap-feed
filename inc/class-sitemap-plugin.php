@@ -17,7 +17,7 @@ class Sitemap_Plugin extends Sitemap {
 	 * Runs on init
 	 */
 	public function __construct() {
-		$this->slug               = 'sitemap';
+		$this->slug               = \sanitize_key( (string) \apply_filters( 'xmlsf_sitemap_slug', 'sitemap' ) );
 		$this->server_type        = 'plugin';
 		$this->post_type_settings = (array) \get_option( 'xmlsf_post_type_settings', array() );
 
@@ -134,7 +134,7 @@ class Sitemap_Plugin extends Sitemap {
 			$basename .= '.xml';
 		} else {
 			// Construct request string.
-			$basename = $index_php . '?feed=sitemap';
+			$basename = '?feed=sitemap';
 			if ( 'index' !== $sitemap ) {
 				$basename .= '-' . $sitemap;
 				$basename .= $args['type'] ? '-' . $args['type'] : '';

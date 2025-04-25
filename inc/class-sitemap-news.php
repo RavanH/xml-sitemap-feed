@@ -24,7 +24,7 @@ class Sitemap_News {
 	 * Runs on init
 	 */
 	public function __construct() {
-		$this->slug = 'sitemap-news';
+		$this->slug = \sanitize_key( (string) \apply_filters( 'xmlsf_sitemap_news_slug', 'sitemap-news' ) );
 
 		// MAIN REQUEST filter.
 		\add_filter( 'request', array( $this, 'filter_request' ), 0 );
@@ -82,14 +82,7 @@ class Sitemap_News {
 	 * @since 5.5
 	 */
 	public function slug() {
-		$slug = (string) \apply_filters( 'xmlsf_sitemap_news_slug', $this->slug );
-
-		// Clean filename if altered.
-		if ( $this->slug !== $slug ) {
-			$slug = \sanitize_key( $slug );
-		}
-
-		return ! empty( $slug ) ? $slug : $this->slug;
+		return $this->slug;
 	}
 
 	/**
@@ -124,9 +117,9 @@ class Sitemap_News {
 		$slug = $this->slug();
 
 		if ( xmlsf()->using_permalinks() ) {
-			$basename = '/' . $slug . '.xml';
+			$basename = $slug . '.xml';
 		} else {
-			$basename = '/' . $index_php . '?feed=' . $slug;
+			$basename = '?feed=' . $slug;
 		}
 
 		$sitemap_url = \apply_filters( 'xmlsf_sitemap_news_url', \home_url( $basename ) );
@@ -307,7 +300,10 @@ class Sitemap_News {
 	 * @return array
 	 */
 	public function nginx_helper_purge_urls( $urls = array() ) {
-		$urls[] = '/sitemap-news.xml';
+		$slug = $this->slug();
+
+		$urls[] = '/' . $slug . '.xml';
+
 		return $urls;
 	}
 
