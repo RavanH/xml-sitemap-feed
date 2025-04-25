@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.4
 Requires PHP: 5.6
 Tested up to: 6.8
-Stable tag: 5.5.3
+Stable tag: 5.5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,7 +21,7 @@ When the Google News Sitemap is activated, it will become available on **yourblo
 
 Please read the FAQ's for info on how to get your articles listed on Google News.
 
-**Compatible with caching solutions** like CloudFlare, WP Super Cache, W3 Total Cache and Quick Cache that cache feeds, allowing a faster serving to the impatient (when hungry) spider.
+**Compatible with caching solutions** like CloudFlare, WP Super Cache, Nginx Helper (both FastCGI Cache and Redis Cache), W3 Total Cache and Quick Cache that cache feeds, allowing a faster serving to the impatient (when hungry) spider.
 
 **NOTES:**
 
@@ -142,12 +142,12 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 == Upgrade Notice ==
 
 = 5.5.4 =
-Performance improvement and bugfix.
+Performance improvement and bugfixes.
 
 == Changelog ==
 
 = 5.5.4 =
-Date:
+Date: 20250426
 * Improved WPML compatibility
 * Load core sitemaps early to prevent unnecessary queries
 * FIX: dynamic property deprecated notices

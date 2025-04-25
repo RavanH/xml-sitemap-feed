@@ -1,17 +1,9 @@
-5.5.4
-
-FIX
-
-
-TEST
-* Nginx Helper purge wildcard not working?
-* theme template overrides
-* test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 
 = 5.6 =
 * include home page even if pages are excluded
-* prepare and test dynamic slug for google news advanced
+* dummy dynamic slug field for google news advanced
 * DROP automatic priority calculation
+* DROP theme template overrides
 * revisit Polylang compatibility
 * switch to Exclude post types
 * move SEO noindex compatibility to advanced only? drop the rest and change incompatibility warning messages (advise to use the seo plugin sitemap or automatically disable this plugin's xml sitemap?)
@@ -35,6 +27,10 @@ General settings for Home page:
 	- last publication date for post post type
 	- page modification date
 	++ advanced options
+
+TEST
+* Nginx Helper purge wildcard not working?
+* test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 
 ROADMAP
 * move sitemap fields (back) to Sitemap class?
