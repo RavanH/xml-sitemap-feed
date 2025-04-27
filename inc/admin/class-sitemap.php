@@ -23,7 +23,7 @@ class Sitemap {
 		if ( ! xmlsf()->using_permalinks() ) {
 			return;
 		}
-		
+
 		// Set transients for flushing.
 		set_transient( 'xmlsf_flush_rewrite_rules', true );
 
