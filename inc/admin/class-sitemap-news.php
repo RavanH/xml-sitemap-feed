@@ -171,7 +171,7 @@ class Sitemap_News {
 		\wp_nonce_field( XMLSF_BASENAME, '_xmlsf_news_nonce' );
 
 		// Use get_post_meta to retrieve an existing value from the database and use the value for the form.
-		$exclude  = 'private' === $post->post_status || get_post_meta( $post->ID, '_xmlsf_news_exclude', true );
+		$exclude  = 'private' === $post->post_status || \get_post_meta( $post->ID, '_xmlsf_news_exclude', true );
 		$disabled = 'private' === $post->post_status;
 
 		// The actual fields for data entry.
@@ -187,7 +187,7 @@ class Sitemap_News {
 		// Verify nonce and user privileges.
 		if (
 			! isset( $_POST['_xmlsf_news_nonce'] ) ||
-			! \wp_verify_nonce( wp_unslash( sanitize_key( $_POST['_xmlsf_news_nonce'] ) ), XMLSF_BASENAME ) ||
+			! \wp_verify_nonce( \wp_unslash( \sanitize_key( $_POST['_xmlsf_news_nonce'] ) ), XMLSF_BASENAME ) ||
 			! \current_user_can( 'edit_post', $post_id )
 		) {
 			return;
@@ -236,7 +236,6 @@ class Sitemap_News {
 	 * @param string $active_tab The active tab slug.
 	 */
 	public static function add_settings( $active_tab = '' ) {
-
 		switch ( $active_tab ) {
 			case 'advanced':
 				// ADVANCED SECTION.
@@ -343,36 +342,17 @@ class Sitemap_News {
 	 * Register settings
 	 */
 	public static function register_settings() {
-		register_setting(
+		\register_setting(
 			'xmlsf_news_general',
 			'xmlsf_news_tags',
 			array( __CLASS__, 'sanitize_news_tags' )
 		);
 
 		// Dummy register setting to prevent admin error on Save Settings from Advanced tab.
-		register_setting(
+		\register_setting(
 			'xmlsf_news_advanced',
 			''
 		);
-
-		// Maybe flush rewrite rules.
-		\add_action( 'load-settings_page_xmlsf_news', array( '\XMLSF\Admin\Admin', 'maybe_flush_rewrite_rules' ), 11 );
-
-		// Maybe check static file.
-		\add_action( 'load-settings_page_xmlsf_news', array( __CLASS__, 'maybe_check_static_file' ), 11 );
-	}
-
-	/**
-	 * Maybe check static file.
-	 *
-	 * Checks $_GET['settings-updated'] and transient 'xmlsf_check_static_file'. Hooked into settings page load actions.
-	 */
-	public static function maybe_check_static_file() {
-		if ( ! empty( $_GET['settings-updated'] ) && xmlsf()->using_permalinks() && get_transient( 'xmlsf_check_static_file' ) ) {
-			$slug = \is_object( \xmlsf()->sitemap_news ) ? \xmlsf()->sitemap_news->slug() : 'sitemap-news';
-			\XMLSF\Admin\Admin::check_static_file( $slug . '.xml' );
-			delete_transient( 'xmlsf_check_static_file' );
-		}
 	}
 
 	/**
@@ -390,7 +370,7 @@ class Sitemap_News {
 	 * Help tab
 	 */
 	public static function help_tab() {
-		$screen     = get_current_screen();
+		$screen     = \get_current_screen();
 		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		\ob_start();
