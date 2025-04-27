@@ -147,7 +147,7 @@ Performance improvement and bugfixes.
 == Changelog ==
 
 = 5.5.4 =
-Date: 20250426
+Date: 20250427
 * Improved WPML compatibility
 * Load core sitemaps early to prevent unnecessary queries
 * FIX: dynamic property deprecated notices
