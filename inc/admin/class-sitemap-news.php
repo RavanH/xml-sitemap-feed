@@ -39,7 +39,7 @@ class Sitemap_News {
 			// Reset ignored warnings.
 			\delete_user_meta( \get_current_user_id(), 'xmlsf_dismissed' );
 
-			\XMLSF\Admin\Admin::check_static_files( 'sitemap-news.xml', 2 );
+			\XMLSF\Admin\Admin::check_static_file( 'sitemap-news.xml', 2 );
 		}
 
 		if ( isset( $_POST['xmlsf-clear-settings-news'] ) ) {
@@ -354,6 +354,9 @@ class Sitemap_News {
 			'xmlsf_news_advanced',
 			''
 		);
+
+		// Maybe flush rewrite rules.
+		\add_action( 'load-settings_page_xmlsf_news', array( '\XMLSF\Admin\Admin', 'maybe_flush_rewrite_rules' ), 11 );
 	}
 
 	/**

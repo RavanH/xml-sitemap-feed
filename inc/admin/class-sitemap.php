@@ -20,29 +20,14 @@ class Sitemap {
 	 * Update actions for General Settings
 	 */
 	public static function update_server() {
-		// Remove old rules.
-		xmlsf()->unregister_rewrites( 'sitemap' );
-
-		// Reload with new settings and new rules.
-		xmlsf()->get_server( 'sitemap' );
-
-		// Re-add core rules if needed.
-		if ( function_exists( 'wp_sitemaps_get_server' ) && 'core' === \xmlsf()->sitemap->server_type ) {
-			$sitemaps = wp_sitemaps_get_server();
-			$sitemaps->register_rewrites();
-		}
-
-		// Register new plugin rules.
-		xmlsf()->register_rewrites();
-
-		// Then flush.
-		flush_rewrite_rules( false );
+		// Set transients for flushing.
+		set_transient( 'xmlsf_flush_rewrite_rules', '1' );
 
 		// Check new static file.
 		$slug     = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
 		$filename = $slug . '.xml';
 
-		\XMLSF\Admin\Admin::check_static_files( $filename, 1 );
+		\XMLSF\Admin\Admin::check_static_file( $filename, 1 );
 	}
 
 	/**
@@ -138,7 +123,7 @@ class Sitemap {
 
 			// When core sitemap server is used.
 			if ( \is_object( \xmlsf()->sitemap ) ) {
-				\XMLSF\Admin\Admin::check_static_files( \xmlsf()->sitemap->slug() . '.xml', 2 );
+				\XMLSF\Admin\Admin::check_static_file( \xmlsf()->sitemap->slug() . '.xml', 2 );
 			}
 		}
 
@@ -738,6 +723,9 @@ class Sitemap {
 		\add_action( 'update_option_xmlsf_server', array( __CLASS__, 'update_server' ) );
 		\add_action( 'update_option_xmlsf_disabled_providers', array( __CLASS__, 'update_disabled_providers' ), 10, 2 );
 		\add_action( 'update_option_xmlsf_post_types', array( __CLASS__, 'update_post_types' ), 10, 2 );
+
+		// Maybe flush rewrite rules.
+		\add_action( 'settings_page_xmlsf', array( '\XMLSF\Admin\Admin', 'maybe_flush_rewrite_rules' ), 11 );
 	}
 
 	/**
