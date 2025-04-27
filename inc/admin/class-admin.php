@@ -113,18 +113,6 @@ class Admin {
 	}
 
 	/**
-	 * Maybe flush rewrite rules.
-	 *
-	 * Checks $_GET['settings-updated'] and transient 'xmlsf_flush_rewrite_rules'. Hooked into settings page load actions.
-	 */
-	public static function maybe_flush_rewrite_rules() {
-		if ( ! empty( $_GET['settings-updated'] ) && get_transient( 'xmlsf_flush_rewrite_rules' ) ) {
-			\flush_rewrite_rules( false );
-			delete_transient( 'xmlsf_flush_rewrite_rules' );
-		}
-	}
-
-	/**
 	 * SETTINGS
 	 */
 
@@ -137,17 +125,31 @@ class Admin {
 		}
 
 		// Set transients for flushing.
-		set_transient( 'xmlsf_flush_rewrite_rules', '1' );
+		set_transient( 'xmlsf_sitemaps_updated', true );
+	}
 
-		// Check static files.
-		$sitemaps = (array) \get_option( 'xmlsf_sitemaps' );
-		if ( ! empty( $sitemaps['sitemap'] ) ) {
-			$slug = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
-			self::check_static_file( $slug . '.xml' );
-		}
-		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-			$slug = \is_object( \xmlsf()->sitemap_news ) ? \xmlsf()->sitemap_news->slug() : 'sitemap-news';
-			self::check_static_file( $slug . '.xml' );
+	/**
+	 * Maybe sitemaps opiotn was updated.
+	 *
+	 * Checks $_GET['settings-updated'] and transient 'xmlsf_sitemaps_updated'. Hooked into settings page load actions.
+	 */
+	public static function maybe_sitemaps_updated() {
+		if ( ! empty( $_GET['settings-updated'] ) && \get_transient( 'xmlsf_sitemaps_updated' ) ) {
+			// Flush rewrite rules.
+			\flush_rewrite_rules( false );
+
+			// Check static files.
+			$sitemaps = (array) \get_option( 'xmlsf_sitemaps' );
+			if ( ! empty( $sitemaps['sitemap'] ) ) {
+				$slug = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
+				self::check_static_file( $slug . '.xml' );
+			}
+			if ( ! empty( $sitemaps['sitemap-news'] ) ) {
+				$slug = \is_object( \xmlsf()->sitemap_news ) ? \xmlsf()->sitemap_news->slug() : 'sitemap-news';
+				self::check_static_file( $slug . '.xml' );
+			}
+
+			\delete_transient( 'xmlsf_sitemaps_updated' );
 		}
 	}
 
@@ -170,9 +172,6 @@ class Admin {
 		// Help tab.
 		\add_action( 'load-options-reading.php', array( __CLASS__, 'xml_sitemaps_help' ) );
 
-		// Maybe flush rewrite rules.
-		\add_action( 'load-options-reading.php', array( __CLASS__, 'maybe_flush_rewrite_rules' ), 11 );
-
 		// Robots rules.
 		\register_setting(
 			'reading',
@@ -185,6 +184,9 @@ class Admin {
 			array( __CLASS__, 'robots_settings_field' ),
 			'reading'
 		);
+
+		// Maybe flush rewrite rules.
+		\add_action( 'load-options-reading.php', array( __CLASS__, 'maybe_sitemaps_updated' ) );
 	}
 
 	/**

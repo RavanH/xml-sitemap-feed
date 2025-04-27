@@ -25,10 +25,24 @@ class Sitemap {
 		}
 
 		// Set transients for flushing.
-		set_transient( 'xmlsf_flush_rewrite_rules', true );
+		set_transient( 'xmlsf_server_updated', true );
+	}
 
-		// Set transients for flushing.
-		set_transient( 'xmlsf_check_static_file', true );
+	/**
+	 * Maybe server option was updated.
+	 *
+	 * Checks $_GET['settings-updated'] and transient 'xmlsf_server_updated'. Hooked into settings page load actions.
+	 */
+	public static function maybe_server_updated() {
+		if ( ! empty( $_GET['settings-updated'] ) && \get_transient( 'xmlsf_server_updated' ) ) {
+			// Flush rewrite rules.
+			\flush_rewrite_rules( false );
+
+			// Check static file.
+			$slug = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
+			\XMLSF\Admin\Admin::check_static_file( $slug . '.xml' );
+			\delete_transient( 'xmlsf_server_updated' );
+		}
 	}
 
 	/**
@@ -724,24 +738,8 @@ class Sitemap {
 		\add_action( 'update_option_xmlsf_disabled_providers', array( __CLASS__, 'update_disabled_providers' ), 10, 2 );
 		\add_action( 'update_option_xmlsf_post_types', array( __CLASS__, 'update_post_types' ), 10, 2 );
 
-		// Maybe flush rewrite rules.
-		\add_action( 'settings_page_xmlsf', array( '\XMLSF\Admin\Admin', 'maybe_flush_rewrite_rules' ), 11 );
-
-		// Maybe check static file.
-		\add_action( 'load-settings_page_xmlsf', array( __CLASS__, 'maybe_check_static_file' ), 11 );
-	}
-
-	/**
-	 * Maybe check static file.
-	 *
-	 * Checks $_GET['settings-updated'] and transient 'xmlsf_check_static_file'. Hooked into settings page load actions.
-	 */
-	public static function maybe_check_static_file() {
-		if ( ! empty( $_GET['settings-updated'] ) && xmlsf()->using_permalinks() && get_transient( 'xmlsf_check_static_file' ) ) {
-			$slug = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
-			\XMLSF\Admin\Admin::check_static_file( $slug . '.xml' );
-			delete_transient( 'xmlsf_check_static_file' );
-		}
+		// Check server updated.
+		\add_action( 'load-settings_page_xmlsf', array( __CLASS__, 'maybe_server_updated' ) );
 	}
 
 	/**
