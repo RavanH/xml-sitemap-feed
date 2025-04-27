@@ -357,6 +357,22 @@ class Sitemap_News {
 
 		// Maybe flush rewrite rules.
 		\add_action( 'load-settings_page_xmlsf_news', array( '\XMLSF\Admin\Admin', 'maybe_flush_rewrite_rules' ), 11 );
+
+		// Maybe check static file.
+		\add_action( 'load-settings_page_xmlsf_news', array( __CLASS__, 'maybe_check_static_file' ), 11 );
+	}
+
+	/**
+	 * Maybe check static file.
+	 *
+	 * Checks $_GET['settings-updated'] and transient 'xmlsf_check_static_file'. Hooked into settings page load actions.
+	 */
+	public static function maybe_check_static_file() {
+		if ( ! empty( $_GET['settings-updated'] ) && xmlsf()->using_permalinks() && get_transient( 'xmlsf_check_static_file' ) ) {
+			$slug = \is_object( \xmlsf()->sitemap_news ) ? \xmlsf()->sitemap_news->slug() : 'sitemap-news';
+			\XMLSF\Admin\Admin::check_static_file( $slug . '.xml' );
+			delete_transient( 'xmlsf_check_static_file' );
+		}
 	}
 
 	/**

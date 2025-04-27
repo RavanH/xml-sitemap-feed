@@ -77,7 +77,6 @@ class Admin {
 	 * Add options page
 	 */
 	public static function add_settings_pages() {
-
 		if ( \XMLSF\sitemaps_enabled( 'sitemap' ) ) {
 			// This page will be under "Settings".
 			$screen_id = \add_options_page(
@@ -133,18 +132,21 @@ class Admin {
 	 * Update actions for Sitemaps
 	 */
 	public static function update_sitemaps() {
+		if ( ! xmlsf()->using_permalinks() ) {
+			return;
+		}
+
 		// Set transients for flushing.
 		set_transient( 'xmlsf_flush_rewrite_rules', '1' );
 
 		// Check static files.
-		// TODO a better way of getting file names.
 		$sitemaps = (array) \get_option( 'xmlsf_sitemaps' );
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
-			$slug    = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
+			$slug = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
 			self::check_static_file( $slug . '.xml' );
 		}
 		if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-			$slug    = \is_object( \xmlsf()->sitemap_news ) ? \xmlsf()->sitemap_news->slug() : 'sitemap-news';
+			$slug = \is_object( \xmlsf()->sitemap_news ) ? \xmlsf()->sitemap_news->slug() : 'sitemap-news';
 			self::check_static_file( $slug . '.xml' );
 		}
 	}
@@ -153,7 +155,6 @@ class Admin {
 	 * Register settings and add settings fields
 	 */
 	public static function register_settings() {
-
 		// Sitemaps.
 		\register_setting(
 			'reading',
@@ -185,10 +186,6 @@ class Admin {
 			'reading'
 		);
 	}
-
-	/**
-	 * SITEMAPS
-	 */
 
 	/**
 	 * Sitemaps help tabs
@@ -278,17 +275,17 @@ class Admin {
 		// Tell me if anything was found.
 		$verbosity && $found && \add_settings_error(
 			'static_files_notice',
-			'static_files',
+			'static_file_' . $file,
 			\sprintf( /* translators: %1$s file name, %2$s is XML Sitemap (linked to options-reading.php) */
 				\esc_html__( 'A conflicting static file has been found: %1$s. Either delete it or disable the corresponding %2$s.', 'xml-sitemap-feed' ),
-				\esc_html( $pretty ),
+				\esc_html( $file ),
 				'<a href="' . \esc_url( \admin_url( 'options-reading.php' ) ) . '#xmlsf_sitemaps">' . \esc_html__( 'XML Sitemap', 'xml-sitemap-feed' ) . '</a>'
 			),
 			'warning'
 		);
 
 		// Tell me if all is OK.
-		$verbosity > 1 && $found && \add_settings_error(
+		$verbosity > 1 && ! $found && \add_settings_error(
 			'static_files_notice',
 			'static_files',
 			__( 'No conflicting static files found.', 'xml-sitemap-feed' ),

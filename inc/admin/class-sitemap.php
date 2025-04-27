@@ -20,14 +20,15 @@ class Sitemap {
 	 * Update actions for General Settings
 	 */
 	public static function update_server() {
+		if ( ! xmlsf()->using_permalinks() ) {
+			return;
+		}
+		
 		// Set transients for flushing.
-		set_transient( 'xmlsf_flush_rewrite_rules', '1' );
+		set_transient( 'xmlsf_flush_rewrite_rules', true );
 
-		// Check new static file.
-		$slug     = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
-		$filename = $slug . '.xml';
-
-		\XMLSF\Admin\Admin::check_static_file( $filename, 1 );
+		// Set transients for flushing.
+		set_transient( 'xmlsf_check_static_file', true );
 	}
 
 	/**
@@ -121,10 +122,9 @@ class Sitemap {
 			// Reset ignored warnings.
 			\delete_user_meta( \get_current_user_id(), 'xmlsf_dismissed' );
 
-			// When core sitemap server is used.
-			if ( \is_object( \xmlsf()->sitemap ) ) {
-				\XMLSF\Admin\Admin::check_static_file( \xmlsf()->sitemap->slug() . '.xml', 2 );
-			}
+			// Check static file.
+			$slug = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
+			\XMLSF\Admin\Admin::check_static_file( $slug . '.xml', 2 );
 		}
 
 		if ( isset( $_POST['xmlsf-clear-settings-sitemap'] ) ) {
@@ -726,11 +726,23 @@ class Sitemap {
 
 		// Maybe flush rewrite rules.
 		\add_action( 'settings_page_xmlsf', array( '\XMLSF\Admin\Admin', 'maybe_flush_rewrite_rules' ), 11 );
+
+		// Maybe check static file.
+		\add_action( 'load-settings_page_xmlsf', array( __CLASS__, 'maybe_check_static_file' ), 11 );
 	}
 
 	/**
-	 * XML SITEMAP SECTION
+	 * Maybe check static file.
+	 *
+	 * Checks $_GET['settings-updated'] and transient 'xmlsf_check_static_file'. Hooked into settings page load actions.
 	 */
+	public static function maybe_check_static_file() {
+		if ( ! empty( $_GET['settings-updated'] ) && xmlsf()->using_permalinks() && get_transient( 'xmlsf_check_static_file' ) ) {
+			$slug = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
+			\XMLSF\Admin\Admin::check_static_file( $slug . '.xml' );
+			delete_transient( 'xmlsf_check_static_file' );
+		}
+	}
 
 	/**
 	 * Help tabs
