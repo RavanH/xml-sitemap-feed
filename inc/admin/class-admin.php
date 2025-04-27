@@ -242,8 +242,7 @@ class Admin {
 		global $wp_rewrite;
 
 		$rules  = (array) \get_option( 'rewrite_rules' );
-		$found  = self::check_static_file( 'robots.txt', 0 );
-		$static = ! empty( $found ) && \in_array( 'robots.txt', $found, true );
+		$static = self::check_static_file( 'robots.txt', 0 );
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-robots.php';
