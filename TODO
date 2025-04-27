@@ -1,12 +1,12 @@
 
 = 5.6 =
-* include home page even if pages are excluded
+* include home page even if pages are excluded, but HOW ???
 * dummy dynamic slug field for google news advanced
 * DROP automatic priority calculation
 * DROP theme template overrides
 * revisit Polylang compatibility
 * switch to Exclude post types
-* move SEO noindex compatibility to advanced only? drop the rest and change incompatibility warning messages (advise to use the seo plugin sitemap or automatically disable this plugin's xml sitemap?)
+* change SEO compatibility warning messages (advise to use the seo plugin sitemap or upgrade to Advanced plugin?)
 
 * optimize plugin index:
   - can we prevent default queries? maybe do not update/prime meta caches etc?
