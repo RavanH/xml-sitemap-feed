@@ -191,9 +191,9 @@ class Sitemap_News {
 		 * Add your actions that should run when a news sitemap request is found with: add_filter( 'xmlsf_news_request', 'your_filter_function' );
 		 *
 		 * Possible filters hooked here:
-		 * XMLSF\Compat/Polylang->filter_request - Polylang compatibility
+		 * XMLSF\Compat\Polylang->filter_request - Polylang compatibility
 		 * XMLSF\Compat\WPML->filter_request - WPML compatibility
-		 * XMLSF\Compat/BBPress->filter_request - bbPress compatibility
+		 * XMLSF\Compat\BBPress->filter_request - bbPress compatibility
 		 */
 		$request = \apply_filters( 'xmlsf_news_request', $request );
 
