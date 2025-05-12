@@ -34,14 +34,25 @@ class Sitemap {
 	 * Checks $_GET['settings-updated'] and transient 'xmlsf_server_updated'. Hooked into settings page load actions.
 	 */
 	public static function maybe_server_updated() {
-		if ( ! empty( $_GET['settings-updated'] ) && \get_transient( 'xmlsf_server_updated' ) ) {
+		if ( ! empty( $_GET['settings-updated'] ) && \delete_transient( 'xmlsf_server_updated' ) ) {
 			// Flush rewrite rules.
 			\flush_rewrite_rules( false );
 
 			// Check static file.
 			$slug = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
-			\XMLSF\Admin\Admin::check_static_file( $slug . '.xml' );
-			\delete_transient( 'xmlsf_server_updated' );
+
+			if ( \file_exists( \trailingslashit( \get_home_path() ) . $slug . '.xml' ) ) {
+				\add_settings_error(
+					'static_files_notice',
+					'static_file_' . $slug,
+					\sprintf( /* translators: %1$s file name, %2$s is XML Sitemap (linked to options-reading.php) */
+						\esc_html__( 'A conflicting static file has been found: %1$s. Either delete it or disable the corresponding %2$s.', 'xml-sitemap-feed' ),
+						\esc_html( $slug . '.xml' ),
+						'<a href="' . \esc_url( \admin_url( 'options-reading.php' ) ) . '#xmlsf_sitemaps">' . \esc_html__( 'XML Sitemap', 'xml-sitemap-feed' ) . '</a>'
+					),
+					'warning'
+				);
+			}
 		}
 	}
 
@@ -138,7 +149,26 @@ class Sitemap {
 
 			// Check static file.
 			$slug = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
-			\XMLSF\Admin\Admin::check_static_file( $slug . '.xml', 2 );
+
+			if ( \file_exists( \trailingslashit( \get_home_path() ) . $slug . '.xml' ) ) {
+				\add_settings_error(
+					'static_files_notice',
+					'static_file_' . $slug,
+					\sprintf( /* translators: %1$s file name, %2$s is XML Sitemap (linked to options-reading.php) */
+						\esc_html__( 'A conflicting static file has been found: %1$s. Either delete it or disable the corresponding %2$s.', 'xml-sitemap-feed' ),
+						\esc_html( $slug . '.xml' ),
+						'<a href="' . \esc_url( \admin_url( 'options-reading.php' ) ) . '#xmlsf_sitemaps">' . \esc_html__( 'XML Sitemap', 'xml-sitemap-feed' ) . '</a>'
+					),
+					'warning'
+				);
+			} else {
+				\add_settings_error(
+					'static_files_notice',
+					'static_files',
+					\esc_html__( 'No conflicting static files found.', 'xml-sitemap-feed' ),
+					'success'
+				);
+			}
 		}
 
 		if ( isset( $_POST['xmlsf-clear-settings-sitemap'] ) ) {
@@ -146,7 +176,7 @@ class Sitemap {
 			\add_settings_error(
 				'notice_clear_settings',
 				'notice_clear_settings',
-				__( 'Settings reset to the plugin defaults.', 'xml-sitemap-feed' ),
+				\esc_html__( 'Settings reset to the plugin defaults.', 'xml-sitemap-feed' ),
 				'updated'
 			);
 		}
@@ -158,7 +188,7 @@ class Sitemap {
 			\add_settings_error(
 				'clear_meta_notice',
 				'clear_meta_notice',
-				__( 'Sitemap term meta cache has been cleared.', 'xml-sitemap-feed' ),
+				\esc_html__( 'Sitemap term meta cache has been cleared.', 'xml-sitemap-feed' ),
 				'success'
 			);
 		}
@@ -170,7 +200,7 @@ class Sitemap {
 			\add_settings_error(
 				'clear_meta_notice',
 				'clear_meta_notice',
-				__( 'Sitemap author meta cache has been cleared.', 'xml-sitemap-feed' ),
+				\esc_html__( 'Sitemap author meta cache has been cleared.', 'xml-sitemap-feed' ),
 				'success'
 			);
 		}
@@ -183,7 +213,7 @@ class Sitemap {
 			\add_settings_error(
 				'clear_meta_notice',
 				'clear_meta_notice',
-				__( 'Sitemap post meta caches have been cleared.', 'xml-sitemap-feed' ),
+				\esc_html__( 'Sitemap post meta caches have been cleared.', 'xml-sitemap-feed' ),
 				'updated'
 			);
 		}
@@ -207,200 +237,14 @@ class Sitemap {
 	/**
 	 * Check for conflicting plugins and their settings
 	 */
-	public static function check_conflicts() {
-		if ( \wp_doing_ajax() || ! \current_user_can( 'manage_options' ) ) {
+	public static function check_advanced() {
+		if ( ! \current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
 		// XML Sitemap Advanced incompatibility notice.
-		if (
-			! self::compatible_with_advanced() &&
-			! \in_array( 'xmlsf_advanced', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true )
-		) {
-			\add_action(
-				'admin_notices',
-				function () {
-					include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced.php';
-				}
-			);
-		}
-
-		// TODO:
-		// Google (XML) Sitemaps Generator Plugin for WordPress and Google News Sitemap incompatibility.
-
-		// WP SEO conflict notices.
-		if ( \is_plugin_active( 'wordpress-seo/wp-seo.php' ) ) {
-			// check date archive redirection.
-			$wpseo_titles = \get_option( 'wpseo_titles' );
-			if ( ! empty( $wpseo_titles['disable-date'] ) && ! \xmlsf()->sitemap->uses_date_archives() ) {
-				\add_action(
-					'admin_notices',
-					function () {
-						include XMLSF_DIR . '/views/admin/notice-wpseo-date-redirect.php';
-					}
-				);
-			}
-
-			// check wpseo sitemap option.
-			if ( ! \in_array( 'wpseo_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
-				$wpseo = \get_option( 'wpseo' );
-				if ( ! empty( $wpseo['enable_xml_sitemap'] ) ) {
-					\add_action(
-						'admin_notices',
-						function () {
-							include XMLSF_DIR . '/views/admin/notice-wpseo-sitemap.php';
-						}
-					);
-				}
-			}
-		}
-
-		// SEOPress conflict notices.
-		if ( \is_plugin_active( 'wp-seopress/seopress.php' ) ) {
-
-			// check date archive redirection.
-			$seopress_toggle = \get_option( 'seopress_toggle' );
-
-			$seopress_titles = \get_option( 'seopress_titles_option_name' );
-			if ( ! empty( $seopress_toggle['toggle-titles'] ) && ! empty( $seopress_titles['seopress_titles_archives_date_disable'] ) && ! \xmlsf()->sitemap->uses_date_archives() ) {
-				\add_action(
-					'admin_notices',
-					function () {
-						include XMLSF_DIR . '/views/admin/notice-seopress-date-redirect.php';
-					}
-				);
-			}
-
-			// check seopress sitemap option.
-			if ( ! \in_array( 'seopress_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
-				$seopress_xml_sitemap = \get_option( 'seopress_xml_sitemap_option_name' );
-				if ( ! empty( $seopress_toggle['toggle-xml-sitemap'] ) && ! empty( $seopress_xml_sitemap['seopress_xml_sitemap_general_enable'] ) ) {
-					\add_action(
-						'admin_notices',
-						function () {
-							include XMLSF_DIR . '/views/admin/notice-seopress-sitemap.php';
-						}
-					);
-				}
-			}
-		}
-
-		// Rank Math conflict notices.
-		if ( \is_plugin_active( 'seo-by-rank-math/rank-math.php' ) ) {
-
-			// check date archive redirection.
-			$rankmath_titles = \get_option( 'rank-math-options-titles' );
-			if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] && ! \xmlsf()->sitemap->uses_date_archives() ) {
-				\add_action(
-					'admin_notices',
-					function () {
-						include XMLSF_DIR . '/views/admin/notice-rankmath-date-redirect.php';
-					}
-				);
-			}
-
-			// check rank math sitemap option.
-			if ( ! \in_array( 'rankmath_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
-				$rankmath_modules = (array) \get_option( 'rank_math_modules' );
-				if ( \in_array( 'sitemap', $rankmath_modules, true ) ) {
-					\add_action(
-						'admin_notices',
-						function () {
-							include XMLSF_DIR . '/views/admin/notice-rankmath-sitemap.php';
-						}
-					);
-				}
-			}
-		}
-
-		// All in One SEO Pack conflict notices.
-		if ( \is_plugin_active( 'all-in-one-seo-pack/all_in_one_seo_pack.php' ) && ! \in_array( 'aioseop_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
-			// check aioseop sitemap module.
-			$aioseop = json_decode( \get_option( 'aioseo_options', '' ) );
-
-			if ( is_object( $aioseop ) && true === $aioseop->sitemap->general->enable ) {
-				// sitemap module on.
-				\add_action(
-					'admin_notices',
-					function () {
-						include XMLSF_DIR . '/views/admin/notice-aioseop-sitemap.php';
-					}
-				);
-			}
-		}
-
-		// XML Sitemap Generator for Google conflict notices.
-		if ( \is_plugin_active( 'google-sitemap-generator/sitemap.php' ) && ! \in_array( 'gsgenerator_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
-			\add_action(
-				'admin_notices',
-				function () {
-					include XMLSF_DIR . '/views/admin/notice-google-sitemap-generator.php';
-				}
-			);
-		}
-
-		// Slim SEO conflict notices.
-		if ( \is_plugin_active( 'slim-seo/slim-seo.php' ) && ! \in_array( 'slim_seo_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
-			$slimseo = \get_option( 'slim_seo' );
-
-			if ( empty( $slimseo ) || ( isset( $slimseo['features'] ) && in_array( 'sitemaps', (array) $slimseo['features'], true ) ) ) {
-				\add_action(
-					'admin_notices',
-					function () {
-						include XMLSF_DIR . '/views/admin/notice-slim-seo-sitemap.php';
-					}
-				);
-			}
-		}
-
-		// Slim SEO conflict notices.
-		if ( \is_plugin_active( 'squirrly-seo/squirrly.php' ) && ! \in_array( 'squirrly_seo_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
-			// check aioseop sitemap module.
-			$squirrly = json_decode( \get_option( 'sq_options', '' ) );
-
-			if ( is_object( $squirrly ) && $squirrly->sq_auto_sitemap ) {
-				// sitemap module on.
-				\add_action(
-					'admin_notices',
-					function () {
-						include XMLSF_DIR . '/views/admin/notice-squirrly-seo-sitemap.php';
-					}
-				);
-			}
-		}
-
-		// Jetpack Sitemaps conflict notices.
-		if (
-			\is_plugin_active( 'jetpack/jetpack.php' ) &&
-			in_array( 'sitemaps', (array) \get_option( 'jetpack_active_modules' ), true ) &&
-			! \in_array( 'jetpack_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true )
-		) {
-			// sitemap module on.
-			\add_action(
-				'admin_notices',
-				function () {
-					include XMLSF_DIR . '/views/admin/notice-jetpack-sitemap.php';
-				}
-			);
-		}
-
-		// SEO Framework conflict notices
-		// autodescription-site-settings[sitemaps_output].
-		if ( \is_plugin_active( 'autodescription/autodescription.php' ) ) {
-			// check sfw sitemap module.
-			if ( ! \in_array( 'seoframework_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
-				$sfw_options = (array) \get_option( 'autodescription-site-settings' );
-
-				if ( ! empty( $sfw_options['sitemaps_output'] ) ) {
-					// sitemap module on.
-					\add_action(
-						'admin_notices',
-						function () {
-							include XMLSF_DIR . '/views/admin/notice-seoframework-sitemap.php';
-						}
-					);
-				}
-			}
+		if ( ! self::compatible_with_advanced() && ! \in_array( 'xmlsf_advanced', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
+			include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced.php';
 		}
 	}
 

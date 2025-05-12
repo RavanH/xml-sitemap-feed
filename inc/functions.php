@@ -331,6 +331,64 @@ function plugin_compat() {
 	if ( in_array( 'xml-sitemaps-manager/xml-sitemaps-manager.php', $active_plugins, true ) ) {
 		\add_filter( 'plugins_loaded', array( __NAMESPACE__ . '\Compat\XMLSM', 'disable' ), 11 );
 	}
+
+	// Admin incompatibility notices.
+	if ( is_admin() ) {
+		// Rank Math compatibility.
+		if ( in_array( 'seo-by-rank-math/rank-math.php', $active_plugins, true ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Rank_Math', 'admin_notices' ) );
+		}
+
+		// Yoast SEO compatibility.
+		if ( in_array( 'wordpress-seo/wp-seo.php', $active_plugins, true ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\WP_SEO', 'admin_notices' ) );
+		}
+
+		// SEOPress compatibility.
+		if ( in_array( 'seopress/seopress.php', $active_plugins, true ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\SEOPress', 'admin_notices' ) );
+		}
+
+		// All in One SEO compatibility.
+		if ( in_array( 'all-in-one-seo-pack/all_in_one_seo_pack.php', $active_plugins, true ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\AIOSEO', 'admin_notices' ) );
+		}
+
+		// Google Sitemap Generator compatibility.
+		if ( in_array( 'google-sitemap-generator/sitemap.php', $active_plugins, true ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\GS_Generator', 'admin_notices' ) );
+		}
+
+		// Slim SEO compatibility.
+		if ( in_array( 'slim-seo/slim-seo.php', $active_plugins, true ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Slim_SEO', 'admin_notices' ) );
+		}
+
+		// Squirrly SEO compatibility.
+		if ( in_array( 'squirrly-seo/squirrly.php', $active_plugins, true ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Squirrly_SEO', 'admin_notices' ) );
+		}
+
+		// Jetpack compatibility.
+		if ( in_array( 'jetpack/jetpack.php', $active_plugins, true ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Jetpack', 'admin_notices' ) );
+		}
+
+		// SEO Framework compatibility.
+		if ( in_array( 'autodescription/autodescription.php', $active_plugins, true ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\SEO_Framework', 'admin_notices' ) );
+		}
+
+		// XML Sitemaps Manager compatibility.
+		if ( in_array( 'xml-sitemaps-manager/xml-sitemaps-manager.php', $active_plugins, true ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\XMLSM', 'admin_notices' ) );
+		}
+
+		// Catch Box Pro compatibility.
+		if ( \function_exists( 'catchbox_is_feed_url_present' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Catch_Box_Pro', 'admin_notices' ) );
+		}
+	}
 }
 
 /**

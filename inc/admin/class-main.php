@@ -10,68 +10,11 @@ namespace XMLSF\Admin;
 /**
  * XMLSF Admin CLASS
  */
-class Admin {
+class Main {
 	/**
 	 * CONSTRUCTOR
 	 */
 	private function __construct() {}
-
-	/**
-	 * INIT
-	 */
-	public static function init() {
-
-		\add_action( 'admin_menu', array( __CLASS__, 'add_settings_pages' ) );
-
-		\add_action( 'admin_init', array( __CLASS__, 'register_settings' ), 7 );
-		\add_action( 'rest_api_init', array( __CLASS__, 'register_settings' ) );
-		\add_action( 'admin_init', array( __CLASS__, 'tools_actions' ), 9 );
-		\add_action( 'admin_init', array( __CLASS__, 'notices_actions' ), 9 );
-
-		\add_action( 'admin_notices', array( __CLASS__, 'check_conflicts' ), 0 );
-		\add_action( 'update_option_xmlsf_sitemaps', array( __CLASS__, 'update_sitemaps' ) );
-
-		// ACTION LINK.
-		\add_filter( 'plugin_action_links_' . XMLSF_BASENAME, array( __CLASS__, 'add_action_link' ) );
-		\add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_meta_links' ), 10, 2 );
-
-		// Shared Admin pages sidebar actions.
-		\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_help' ) );
-		\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_contribute' ), 20 );
-
-		if ( \XMLSF\sitemaps_enabled( 'sitemap' ) ) {
-			\add_action( 'admin_init', array( __NAMESPACE__ . '\Sitemap', 'register_settings' ), 7 );
-			\add_action( 'rest_api_init', array( __NAMESPACE__ . '\Sitemap', 'register_settings' ) );
-			\add_action( 'admin_init', array( __NAMESPACE__ . '\Sitemap', 'tools_actions' ), 9 );
-			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Sitemap', 'check_conflicts' ), 0 );
-
-			// META.
-			\add_action( 'add_meta_boxes', array( __NAMESPACE__ . '\Sitemap', 'add_meta_box' ) );
-			\add_action( 'save_post', array( __NAMESPACE__ . '\Sitemap', 'save_metadata' ) );
-
-			// Placeholders for advanced options.
-			\add_action( 'xmlsf_posttype_archive_field_options', array( __NAMESPACE__ . '\Fields', 'advanced_archive_field_options' ) );
-
-			// QUICK EDIT.
-			\add_action( 'admin_init', array( __NAMESPACE__ . '\Sitemap', 'add_columns' ) );
-			\add_action( 'quick_edit_custom_box', array( __NAMESPACE__ . '\Fields', 'quick_edit_fields' ) );
-			\add_action( 'save_post', array( __NAMESPACE__ . '\Sitemap', 'quick_edit_save' ) );
-			\add_action( 'admin_head', array( __NAMESPACE__ . '\Sitemap', 'quick_edit_script' ), 99 );
-			// BULK EDIT.
-			\add_action( 'bulk_edit_custom_box', array( __NAMESPACE__ . '\Fields', 'bulk_edit_fields' ), 0 );
-		}
-
-		if ( \XMLSF\sitemaps_enabled( 'news' ) ) {
-			\add_action( 'admin_init', array( __NAMESPACE__ . '\Sitemap_News', 'register_settings' ), 7 );
-			\add_action( 'rest_api_init', array( __NAMESPACE__ . '\Sitemap_News', 'register_settings' ) );
-			\add_action( 'admin_init', array( __NAMESPACE__ . '\Sitemap_News', 'tools_actions' ), 9 );
-			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Sitemap_News', 'check_conflicts' ), 0 );
-
-			// META.
-			\add_action( 'add_meta_boxes', array( __NAMESPACE__ . '\Sitemap_News', 'add_meta_box' ) );
-			\add_action( 'save_post', array( __NAMESPACE__ . '\Sitemap_News', 'save_metadata' ) );
-		}
-	}
 
 	/**
 	 * Add options page
@@ -129,27 +72,51 @@ class Admin {
 	}
 
 	/**
-	 * Maybe sitemaps opiotn was updated.
+	 * Maybe sitemaps option was updated.
 	 *
 	 * Checks $_GET['settings-updated'] and transient 'xmlsf_sitemaps_updated'. Hooked into settings page load actions.
 	 */
 	public static function maybe_sitemaps_updated() {
-		if ( ! empty( $_GET['settings-updated'] ) && \get_transient( 'xmlsf_sitemaps_updated' ) ) {
+		if ( ! empty( $_GET['settings-updated'] ) && \delete_transient( 'xmlsf_sitemaps_updated' ) ) {
 			// Flush rewrite rules.
 			\flush_rewrite_rules( false );
 
 			// Check static files.
 			$sitemaps = (array) \get_option( 'xmlsf_sitemaps' );
+
 			if ( ! empty( $sitemaps['sitemap'] ) ) {
 				$slug = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
-				self::check_static_file( $slug . '.xml' );
-			}
-			if ( ! empty( $sitemaps['sitemap-news'] ) ) {
-				$slug = \is_object( \xmlsf()->sitemap_news ) ? \xmlsf()->sitemap_news->slug() : 'sitemap-news';
-				self::check_static_file( $slug . '.xml' );
+
+				if ( \file_exists( \trailingslashit( \get_home_path() ) . $slug . '.xml' ) ) {
+					\add_settings_error(
+						'static_files_notice',
+						'static_file_' . $slug,
+						\sprintf( /* translators: %1$s file name, %2$s is XML Sitemap (linked to options-reading.php) */
+							\esc_html__( 'A conflicting static file has been found: %1$s. Either delete it or disable the corresponding %2$s.', 'xml-sitemap-feed' ),
+							\esc_html( $slug . '.xml' ),
+							'<a href="' . \esc_url( \admin_url( 'options-reading.php' ) ) . '#xmlsf_sitemaps">' . \esc_html__( 'XML Sitemap', 'xml-sitemap-feed' ) . '</a>'
+						),
+						'warning'
+					);
+				}
 			}
 
-			\delete_transient( 'xmlsf_sitemaps_updated' );
+			if ( ! empty( $sitemaps['sitemap-news'] ) ) {
+				$slug = \is_object( \xmlsf()->sitemap_news ) ? \xmlsf()->sitemap_news->slug() : 'sitemap-news';
+
+				if ( \file_exists( \trailingslashit( \get_home_path() ) . $slug . '.xml' ) ) {
+					\add_settings_error(
+						'static_files_notice',
+						'static_file_' . $slug,
+						\sprintf( /* translators: %1$s file name, %2$s is XML Sitemap (linked to options-reading.php) */
+							\esc_html__( 'A conflicting static file has been found: %1$s. Either delete it or disable the corresponding %2$s.', 'xml-sitemap-feed' ),
+							\esc_html( $slug . '.xml' ),
+							'<a href="' . \esc_url( \admin_url( 'options-reading.php' ) ) . '#xmlsf_sitemaps">' . \esc_html__( 'XML Sitemap', 'xml-sitemap-feed' ) . '</a>'
+						),
+						'warning'
+					);
+				}
+			}
 		}
 	}
 
@@ -242,7 +209,7 @@ class Admin {
 		global $wp_rewrite;
 
 		$rules  = (array) \get_option( 'rewrite_rules' );
-		$static = self::check_static_file( 'robots.txt', 0 );
+		$static = \file_exists( \trailingslashit( \get_home_path() ) . 'robots.txt' );
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-robots.php';
@@ -260,69 +227,6 @@ class Admin {
 			__( 'Settings reset to the plugin defaults.', 'xml-sitemap-feed' ),
 			'updated'
 		);
-	}
-
-	/**
-	 * Check for static file
-	 *
-	 * @param mixed $file      Filename to check for.
-	 * @param bool  $verbosity Verbosity level: 0|false (no messages), 1|true (warnings only) or 2 (warnings or success).
-	 *
-	 * @return bool Found static file.
-	 */
-	public static function check_static_file( $file, $verbosity = 1 ) {
-		$found = \file_exists( \trailingslashit( \get_home_path() ) . $file );
-
-		// Tell me if anything was found.
-		$verbosity && $found && \add_settings_error(
-			'static_files_notice',
-			'static_file_' . $file,
-			\sprintf( /* translators: %1$s file name, %2$s is XML Sitemap (linked to options-reading.php) */
-				\esc_html__( 'A conflicting static file has been found: %1$s. Either delete it or disable the corresponding %2$s.', 'xml-sitemap-feed' ),
-				\esc_html( $file ),
-				'<a href="' . \esc_url( \admin_url( 'options-reading.php' ) ) . '#xmlsf_sitemaps">' . \esc_html__( 'XML Sitemap', 'xml-sitemap-feed' ) . '</a>'
-			),
-			'warning'
-		);
-
-		// Tell me if all is OK.
-		$verbosity > 1 && ! $found && \add_settings_error(
-			'static_files_notice',
-			'static_files',
-			__( 'No conflicting static files found.', 'xml-sitemap-feed' ),
-			'success'
-		);
-
-		return $found;
-	}
-
-	/**
-	 * Check for conflicting themes and plugins
-	 */
-	public static function check_conflicts() {
-		if ( \wp_doing_ajax() || ! \current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		// If XML Sitemaps Manager is active, remove its init and admin_init hooks.
-		if ( \is_plugin_active( 'xml-sitemaps-manager/xml-sitemaps-manager.php' ) && ! \in_array( 'xml_sitemaps_manager', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
-			\add_action(
-				'admin_notices',
-				function () {
-					include XMLSF_DIR . '/views/admin/notice-xml-sitemaps-manager.php';
-				}
-			);
-		}
-
-		// Catch Box Pro feed redirect.
-		if ( \function_exists( 'catchbox_is_feed_url_present' ) && \catchbox_is_feed_url_present( null ) ) {
-			\add_action(
-				'admin_notices',
-				function () {
-					include XMLSF_DIR . '/views/admin/notice-catchbox-feed-redirect.php';
-				}
-			);
-		}
 	}
 
 	/**

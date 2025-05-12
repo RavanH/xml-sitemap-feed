@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin notice: WPSEO date redirect
+ * Admin notice: Yoast SEO xml sitemap
  *
  * @package XML Sitemap & Google News
  */
@@ -16,7 +16,7 @@
 		);
 		?>
 		<?php
-		printf( /* translators: Sitemap page name (linked to SEOPress plugin settings), XML Sitemap Index, Reading Settings admin page (linked to Reading settings) */
+		printf( /* translators: Sitemap page name (linked to Yoast SEO plugin settings), XML Sitemap Index, Reading Settings admin page (linked to Reading settings) */
 			esc_html__( 'Please either disable the XML Sitemap under %1$s in your SEO settings or disable the option %2$s on %3$s.', 'xml-sitemap-feed' ),
 			'<a href="' . esc_url( admin_url( 'admin.php' ) ) . '?page=wpseo_page_settings#/site-features">' . esc_html__( 'Site features', 'wordpress-seo' ) . '</a>',
 			esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ),

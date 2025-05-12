@@ -39,7 +39,28 @@ class Sitemap_News {
 			// Reset ignored warnings.
 			\delete_user_meta( \get_current_user_id(), 'xmlsf_dismissed' );
 
-			\XMLSF\Admin\Admin::check_static_file( 'sitemap-news.xml', 2 );
+			// Check static file.
+			$slug = \is_object( \xmlsf()->sitemap_news ) ? \xmlsf()->sitemap_news->slug() : 'sitemap-news';
+
+			if ( \file_exists( \trailingslashit( \get_home_path() ) . $slug . '.xml' ) ) {
+				\add_settings_error(
+					'static_files_notice',
+					'static_file_' . $slug,
+					\sprintf( /* translators: %1$s file name, %2$s is XML Sitemap (linked to options-reading.php) */
+						\esc_html__( 'A conflicting static file has been found: %1$s. Either delete it or disable the corresponding %2$s.', 'xml-sitemap-feed' ),
+						\esc_html( $slug . '.xml' ),
+						'<a href="' . \esc_url( \admin_url( 'options-reading.php' ) ) . '#xmlsf_sitemaps">' . \esc_html__( 'XML Sitemap', 'xml-sitemap-feed' ) . '</a>'
+					),
+					'warning'
+				);
+			} else {
+				\add_settings_error(
+					'static_files_notice',
+					'static_files',
+					\esc_html__( 'No conflicting static files found.', 'xml-sitemap-feed' ),
+					'success'
+				);
+			}
 		}
 
 		if ( isset( $_POST['xmlsf-clear-settings-news'] ) ) {
@@ -75,66 +96,14 @@ class Sitemap_News {
 	/**
 	 * Check for conflicting themes and plugins
 	 */
-	public static function check_conflicts() {
-		if ( \wp_doing_ajax() || ! \current_user_can( 'manage_options' ) ) {
+	public static function check_advanced() {
+		if ( ! \current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
 		// Google News Advanced incompatibility notice.
-		if (
-			! self::compatible_with_advanced() &&
-			! \in_array( 'xmlsf_advanced_news', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true )
-		) {
-			\add_action(
-				'admin_notices',
-				function () {
-					include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced-news.php';
-				}
-			);
-		}
-
-		// Catch Box Pro feed redirect.
-		if ( \function_exists( 'catchbox_is_feed_url_present' ) && \catchbox_is_feed_url_present( null ) ) {
-			\add_action(
-				'admin_notices',
-				function () {
-					include XMLSF_DIR . '/views/admin/notice-catchbox-feed-redirect.php';
-				}
-			);
-		}
-
-		// Slim SEO conflict notices.
-		if ( \is_plugin_active( 'squirrly-seo/squirrly.php' ) && ! \in_array( 'squirrly_seo_sitemap_news', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
-			// check aioseop sitemap module.
-			$squirrly = json_decode( \get_option( 'sq_options', '' ) );
-
-			if ( is_object( $squirrly ) && ! empty( $squirrly->sq_sitemap->{'sitemap-news'}[1] ) ) {
-				// sitemap module on.
-				\add_action(
-					'admin_notices',
-					function () {
-						include XMLSF_DIR . '/views/admin/notice-squirrly-seo-sitemap-news.php';
-					}
-				);
-			}
-		}
-
-		// WP SEO conflict notices.
-		if ( \is_plugin_active( 'wordpress-seo/wp-seo.php' ) ) {
-			// Check Remove category feeds option. TODO move to google news.
-			$wpseo = \get_option( 'wpseo' );
-			if ( ! empty( $wpseo['remove_feed_categories'] ) && \XMLSF\sitemaps_enabled( 'sitemap-news' ) ) {
-				// check if Google News sitemap is limited to categories.
-				$news_tags = \get_option( 'xmlsf_news_tags' );
-				if ( ! empty( $news_tags['categories'] ) ) {
-					\add_action(
-						'admin_notices',
-						function () {
-							include XMLSF_DIR . '/views/admin/notice-wpseo-category-feed-redirect.php';
-						}
-					);
-				}
-			}
+		if ( ! self::compatible_with_advanced() && ! \in_array( 'xmlsf_advanced_news', (array) get_user_meta( get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
+			include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced-news.php';
 		}
 	}
 
