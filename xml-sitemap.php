@@ -88,6 +88,7 @@ if ( is_admin() ) {
 		\add_action( 'rest_api_init', array( '\XMLSF\Admin\Sitemap', 'register_settings' ) );
 		\add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap', 'tools_actions' ), 9 );
 		\add_action( 'admin_notices', array( '\XMLSF\Admin\Sitemap', 'check_advanced' ), 0 );
+		\add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap', 'compat' ) );
 
 		// META.
 		\add_action( 'add_meta_boxes', array( '\XMLSF\Admin\Sitemap', 'add_meta_box' ) );
@@ -110,6 +111,7 @@ if ( is_admin() ) {
 		\add_action( 'rest_api_init', array( '\XMLSF\Admin\Sitemap_News', 'register_settings' ) );
 		\add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap_News', 'tools_actions' ), 9 );
 		\add_action( 'admin_notices', array( '\XMLSF\Admin\Sitemap_News', 'check_advanced' ), 0 );
+		\add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap_News', 'compat' ) );
 
 		// META.
 		\add_action( 'add_meta_boxes', array( '\XMLSF\Admin\Sitemap_News', 'add_meta_box' ) );

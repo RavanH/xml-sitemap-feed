@@ -15,7 +15,7 @@ class Rank_Math {
 	 * Admin notices.
 	 */
 	public static function admin_notices() {
-		if ( ! \current_user_can( 'manage_options' ) || ! \XMLSF\sitemaps_enabled( 'sitemap' ) ) {
+		if ( ! \current_user_can( 'manage_options' ) ) {
 			return;
 		}
 

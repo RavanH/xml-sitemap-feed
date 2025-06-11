@@ -17,6 +17,21 @@ class Sitemap_News {
 	private function __construct() {}
 
 	/**
+	 * Plugin compatibility hooks and filters.
+	 */
+	public static function compat() {
+		// Yoast SEO compatibility.
+		if ( \is_plugin_active( 'wordpress-seo/wp-seo.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\WP_SEO', 'news_admin_notice' ) );
+		}
+
+		// Squirrly SEO compatibility.
+		if ( \is_plugin_active( 'squirrly-seo/squirrly.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Squirrly_SEO', 'news_admin_notices' ) );
+		}
+	}
+
+	/**
 	 * Clear settings
 	 */
 	public static function clear_settings() {

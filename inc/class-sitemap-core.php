@@ -84,6 +84,36 @@ class Sitemap_Core extends Sitemap {
 	}
 
 	/**
+	 * Plugin compatibility hooks and filters.
+	 */
+	public static function compat() {
+		$active_plugins = (array) \get_option( 'active_plugins', array() );
+
+		// Polylang compatibility.
+		if ( in_array( 'polylang/polylang.php', $active_plugins, true ) ) {
+			\add_filter( 'xmlsf_blogpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
+			\add_filter( 'xmlsf_frontpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
+			\add_action( 'xmlsf_sitemap_loaded', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
+			\add_action( 'xmlsf_register_sitemap_provider', array( __NAMESPACE__ . '\Compat\Polylang', 'remove_replace_provider' ) );
+			\add_action( 'xmlsf_register_sitemap_provider_after', array( __NAMESPACE__ . '\Compat\Polylang', 'add_replace_provider' ) );
+			\add_filter( 'xmlsf_sitemap_subtype', array( __NAMESPACE__ . '\Compat\Polylang', 'filter_sitemap_subtype' ) );
+		}
+
+		// WPML compatibility.
+		if ( in_array( 'sitepress-multilingual-cms/sitepress.php', $active_plugins, true ) ) {
+			// Make sure we get the correct sitemap URL in language context.
+			\add_filter( 'xmlsf_sitemap_url', array( __NAMESPACE__ . '\Compat\WPML', 'convert_url' ), 10, 2 );
+			// Add sitemap in Robots TXT.
+			\add_filter( 'robots_txt', array( __NAMESPACE__ . '\Compat\WPML', 'robots_txt' ), 9 );
+		}
+
+		// XMLSM compatibility.
+		if ( in_array( 'xml-sitemaps-manager/xml-sitemaps-manager.php', $active_plugins, true ) ) {
+			\add_filter( 'plugins_loaded', array( __NAMESPACE__ . '\Compat\XMLSM', 'disable' ), 11 );
+		}
+	}
+
+	/**
 	 * Registers sitemap rewrite tags and routing rules.
 	 *
 	 * @since 5.4.5

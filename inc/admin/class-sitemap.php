@@ -17,6 +17,61 @@ class Sitemap {
 	private function __construct() {}
 
 	/**
+	 * Plugin compatibility hooks and filters.
+	 */
+	public static function compat() {
+		// Rank Math compatibility.
+		if ( \is_plugin_active( 'seo-by-rank-math/rank-math.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Rank_Math', 'admin_notices' ) );
+		}
+
+		// Yoast SEO compatibility.
+		if ( \is_plugin_active( 'wordpress-seo/wp-seo.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\WP_SEO', 'admin_notices' ) );
+		}
+
+		// SEOPress compatibility.
+		if ( \is_plugin_active( 'seopress/seopress.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\SEOPress', 'admin_notices' ) );
+		}
+
+		// All in One SEO compatibility.
+		if ( \is_plugin_active( 'all-in-one-seo-pack/all_in_one_seo_pack.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\AIOSEO', 'admin_notices' ) );
+		}
+
+		// Google Sitemap Generator compatibility.
+		if ( \is_plugin_active( 'google-sitemap-generator/sitemap.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\GS_Generator', 'admin_notices' ) );
+		}
+
+		// Slim SEO compatibility.
+		if ( \is_plugin_active( 'slim-seo/slim-seo.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Slim_SEO', 'admin_notices' ) );
+		}
+
+		// Squirrly SEO compatibility.
+		if ( \is_plugin_active( 'squirrly-seo/squirrly.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Squirrly_SEO', 'admin_notices' ) );
+		}
+
+		// Jetpack compatibility.
+		if ( \is_plugin_active( 'jetpack/jetpack.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Jetpack', 'admin_notices' ) );
+		}
+
+		// SEO Framework compatibility.
+		if ( \is_plugin_active( 'autodescription/autodescription.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\SEO_Framework', 'admin_notices' ) );
+		}
+
+		// XML Sitemaps Manager compatibility.
+		if ( \is_plugin_active( 'xml-sitemaps-manager/xml-sitemaps-manager.php' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\XMLSM', 'admin_notices' ) );
+		}
+	}
+
+	/**
 	 * Update actions for General Settings
 	 */
 	public static function update_server() {

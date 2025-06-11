@@ -2,7 +2,7 @@
 Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed
 Tags: sitemap, xml, news, robots, Google News
-Requires at least: 4.4
+Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 6.8
 Stable tag: 5.5.4

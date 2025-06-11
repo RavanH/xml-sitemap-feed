@@ -52,6 +52,44 @@ class Sitemap_Plugin extends Sitemap {
 
 		// Add sitemap in Robots TXT.
 		add_filter( 'robots_txt', array( $this, 'robots_txt' ), 8 );
+
+		// Compatibility hooks.
+		self::compat();
+	}
+
+	/**
+	 * Plugin compatibility hooks and filters.
+	 */
+	public static function compat() {
+		$active_plugins = (array) \get_option( 'active_plugins', array() );
+
+		// Polylang compatibility.
+		if ( in_array( 'polylang/polylang.php', $active_plugins, true ) ) {
+			\add_filter( 'xmlsf_blogpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
+			\add_filter( 'xmlsf_frontpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
+			\add_filter( 'xmlsf_request', array( __NAMESPACE__ . '\Compat\Polylang', 'filter_request' ) );
+			\add_action( 'xmlsf_sitemap_loaded', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
+			\add_filter( 'xmlsf_root_data', array( __NAMESPACE__ . '\Compat\Polylang', 'root_data' ) );
+			\add_filter( 'xmlsf_url_after', array( __NAMESPACE__ . '\Compat\Polylang', 'author_archive_translations' ), 10, 3 );
+		}
+
+		// WPML compatibility.
+		if ( in_array( 'sitepress-multilingual-cms/sitepress.php', $active_plugins, true ) ) {
+			// Make sure we get the correct sitemap URL in language context.
+			\add_filter( 'xmlsf_sitemap_url', array( __NAMESPACE__ . '\Compat\WPML', 'convert_url' ), 10, 2 );
+			// Add sitemap in Robots TXT.
+			\add_filter( 'robots_txt', array( __NAMESPACE__ . '\Compat\WPML', 'sitemap_robots' ), 9 );
+		}
+
+		// bbPress compatibility.
+		if ( in_array( 'bbpress/bbpress.php', $active_plugins, true ) ) {
+			\add_filter( 'xmlsf_request', array( __NAMESPACE__ . '\Compat\BBPress', 'filter_request' ) );
+		}
+
+		// XMLSM compatibility.
+		if ( in_array( 'xml-sitemaps-manager/xml-sitemaps-manager.php', $active_plugins, true ) ) {
+			\add_filter( 'plugins_loaded', array( __NAMESPACE__ . '\Compat\XMLSM', 'disable' ), 11 );
+		}
 	}
 
 	/**

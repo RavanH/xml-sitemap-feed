@@ -147,7 +147,6 @@ class XMLSitemapFeed {
 			require_once \XMLSF_DIR . '/upgrade.php';
 		}
 
-		\add_action( 'plugins_loaded', __NAMESPACE__ . '\plugin_compat' );
 		\add_filter( 'robots_txt', __NAMESPACE__ . '\robots_txt', 11 );
 
 		// Load sitemap servers.

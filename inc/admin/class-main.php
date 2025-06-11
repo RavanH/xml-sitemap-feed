@@ -17,6 +17,16 @@ class Main {
 	private function __construct() {}
 
 	/**
+	 * Plugin compatibility hooks and filters.
+	 */
+	public static function compat() {
+		// Catch Box Pro compatibility.
+		if ( \function_exists( 'catchbox_is_feed_url_present' ) ) {
+			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Catch_Box_Pro', 'admin_notices' ) );
+		}
+	}
+
+	/**
 	 * Add options page
 	 */
 	public static function add_settings_pages() {
