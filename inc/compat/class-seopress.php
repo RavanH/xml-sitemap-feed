@@ -28,7 +28,7 @@ class SEOPress {
 		}
 
 		// check seopress sitemap option.
-		if ( ! \in_array( 'seopress_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
+		if ( ! \in_array( 'seopress_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed', true ), true ) ) {
 			$seopress_xml_sitemap = \get_option( 'seopress_xml_sitemap_option_name' );
 			if ( ! empty( $seopress_toggle['toggle-xml-sitemap'] ) && ! empty( $seopress_xml_sitemap['seopress_xml_sitemap_general_enable'] ) ) {
 				include XMLSF_DIR . '/views/admin/notice-seopress-sitemap.php';
