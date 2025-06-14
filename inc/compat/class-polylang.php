@@ -191,13 +191,36 @@ class Polylang {
 	}
 
 	/**
-	 * Polylang sitemap subtype filter
+	 * Polylang get_lastpostmodified for related language
+	 * Hooked on pre_get_lastpostmodified.
 	 *
-	 * @param string $subtype The subtype.
+	 * @param string $modified The modified date.
+	 * @param string $timezone The timezone.
+	 * @param string $post_type The post type.
 	 *
 	 * @return string
 	 */
-	public static function filter_sitemap_subtype( $subtype ) {
-		return array_shift( explode( '-', $subtype ) );
+	public static function lastpostmodified( $modified, $timezone, $post_type ) {
+		if ( $modified || ! \xmlsf()->is_sitemap ) {
+			return $modified; // Return early if already set or not in a sitemap request.
+		}
+
+		$pos = strrpos( $post_type, '-' );
+		if ( ! $pos ) {
+			return $modified; // Return early if no hyphen found.
+		}
+
+		$lang      = substr( $post_type, $pos + 1 );
+		$post_type = substr( $post_type, 0, $pos );
+		$args      = array(
+			'post_type'   => $post_type,
+			'lang'        => $lang,
+			'numberposts' => 1,
+			'orderby'     => 'modified',
+		);
+		$posts     = \get_posts( $args );
+		$modified  = $posts ? \get_date_from_gmt( \get_post_modified_time( 'Y-m-d H:i:s', true, $posts[0], $timezone ), DATE_W3C ) : false;
+
+		return $modified;
 	}
 }

@@ -81,12 +81,15 @@ class Sitemap_Core extends Sitemap {
 
 		// NGINX HELPER PURGE URLS.
 		\add_filter( 'rt_nginx_helper_purge_urls', array( $this, 'nginx_helper_purge_urls' ) );
-	}
+
+		// Compatibility hooks.
+		$this->compat();    }
 
 	/**
 	 * Plugin compatibility hooks and filters.
+	 * Called from constructor.
 	 */
-	public static function compat() {
+	public function compat() {
 		$active_plugins = (array) \get_option( 'active_plugins', array() );
 
 		// Polylang compatibility.
@@ -96,7 +99,10 @@ class Sitemap_Core extends Sitemap {
 			\add_action( 'xmlsf_sitemap_loaded', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
 			\add_action( 'xmlsf_register_sitemap_provider', array( __NAMESPACE__ . '\Compat\Polylang', 'remove_replace_provider' ) );
 			\add_action( 'xmlsf_register_sitemap_provider_after', array( __NAMESPACE__ . '\Compat\Polylang', 'add_replace_provider' ) );
-			\add_filter( 'xmlsf_sitemap_subtype', array( __NAMESPACE__ . '\Compat\Polylang', 'filter_sitemap_subtype' ) );
+			\add_filter( 'pre_get_lastpostmodified', array( __NAMESPACE__ . '\Compat\Polylang', 'lastpostmodified' ), 10, 3 );
+
+			// Rendering the sitemap early causes issues with language home pages.
+			\remove_action( 'parse_request', array( $this, 'render_sitemaps' ), 9 );
 		}
 
 		// WPML compatibility.
@@ -234,76 +240,65 @@ class Sitemap_Core extends Sitemap {
 	 * @return array $request filtered
 	 */
 	public function filter_request( $request ) {
-		\xmlsf()->request_filtered = true;
+		// Short-circuit if request was already filtered by this plugin.
+		if ( \xmlsf()->request_filtered ) {
+			return $request;
+		} else {
+			\xmlsf()->request_filtered = true;
+		}
 
-		if ( ! empty( $request['sitemap'] ) ) {
+		// Short-circuit if request is not a feed, does not start with 'sitemap' or is a news sitemap.
+		if ( empty( $request['sitemap'] ) ) {
+			return $request;
+		}
 
-			/** IT'S A SITEMAP */
-			\do_action( 'xmlsf_sitemap_loaded', 'core', $request['sitemap'] );
+		/** IT'S A SITEMAP */
+		\do_action( 'xmlsf_sitemap_loaded', 'core', $request['sitemap'] );
 
-			/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
-			/**
-			 * Developers: add your actions that should run when a sitemap request is with:
-			 *
-			 * Use add_filter( 'xmlsf_core_request', 'your_filter_function' );
-			 *
-			 * Filters hooked here already:
-			 * XMLSF\Compat\WPML::filter_request()
-			 */
-			$request = \apply_filters( 'xmlsf_core_request', $request );
+		/** FILTER HOOK FOR PLUGIN COMPATIBILITIES */
+		/**
+		 * Developers: add your actions that should run when a sitemap request is with:
+		 *
+		 * Use add_filter( 'xmlsf_core_request', 'your_filter_function' );
+		 *
+		 * Filters hooked here already:
+		 * XMLSF\Compat\WPML::filter_request()
+		 */
+		$request = \apply_filters( 'xmlsf_core_request', $request );
 
-			$subtype = isset( $request['sitemap-subtype'] ) ? $request['sitemap-subtype'] : '';
+		$subtype = isset( $request['sitemap-subtype'] ) ? $request['sitemap-subtype'] : '';
 
-			switch ( $request['sitemap'] ) {
+		switch ( $request['sitemap'] ) {
 
-				case 'posts':
-					// Try to raise memory limit, context added for filters.
-					\wp_raise_memory_limit( 'wp-sitemap-posts-' . $subtype );
+			case 'posts':
+				// Try to raise memory limit, context added for filters.
+				\wp_raise_memory_limit( 'wp-sitemap-posts-' . $subtype );
 
-					// Alter main query request parameters to fit wp-sitemap.
-					$request['orderby']                = 'modified'; // Needed to get at least one correct lastmod for the first sitemap!
-					$request['order']                  = 'DESC';
-					$request['ignore_sticky_posts']    = true;
-					$request['post_type']              = $subtype;
-					$request['posts_per_page']         = \wp_sitemaps_get_max_urls( 'post' );
-					$request['post_status']            = array( 'publish' );
-					$request['no_found_rows']          = true;
-					$request['update_post_term_cache'] = false;
-					$request['update_post_meta_cache'] = false;
+				// Prepare dynamic priority calculation.
+				if ( $subtype && ! empty( $this->post_type_settings[ $subtype ]['priority'] ) && ! empty( $this->post_type_settings[ $subtype ]['dynamic_priority'] ) ) {
+					// Last of this post type modified date in Unix seconds.
+					\xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $subtype ), 'U' );
+					// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
+					\xmlsf()->timespan = \xmlsf()->lastmodified - \get_date_from_gmt( \get_firstpostdate( 'GMT', $subtype ), 'U' );
+					// Total post type comment count.
+					\xmlsf()->comment_count = \wp_count_comments()->approved;
+					// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
+					// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/.
+				}
+				break;
 
-					// Apply wp-sitemap filter.
-					$request = \apply_filters(
-						'wp_sitemaps_posts_query_args',
-						$request,
-						$subtype
-					);
+			case 'taxonomies':
+				// Try to raise memory limit, context added for filters.
+				\wp_raise_memory_limit( 'wp-sitemap-taxonomies-' . $subtype );
+				break;
 
-					// Prepare dynamic priority calculation.
-					if ( $subtype && ! empty( $this->post_type_settings[ $subtype ]['priority'] ) && ! empty( $this->post_type_settings[ $subtype ]['dynamic_priority'] ) ) {
-						// Last of this post type modified date in Unix seconds.
-						\xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $subtype ), 'U' );
-						// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
-						\xmlsf()->timespan = \xmlsf()->lastmodified - \get_date_from_gmt( \get_firstpostdate( 'GMT', $subtype ), 'U' );
-						// Total post type comment count.
-						\xmlsf()->comment_count = \wp_count_comments()->approved;
-						// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
-						// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/.
-					}
-					break;
+			case 'users':
+				// Try to raise memory limit, context added for filters.
+				\wp_raise_memory_limit( 'wp-sitemap-users' );
+				break;
 
-				case 'taxonomies':
-					// Try to raise memory limit, context added for filters.
-					\wp_raise_memory_limit( 'wp-sitemap-taxonomies-' . $subtype );
-					break;
-
-				case 'users':
-					// Try to raise memory limit, context added for filters.
-					\wp_raise_memory_limit( 'wp-sitemap-users' );
-					break;
-
-				default:
-					// Do nothing.
-			}
+			default:
+				// Do nothing.
 		}
 
 		return $request;
@@ -355,7 +350,7 @@ class Sitemap_Core extends Sitemap {
 	 */
 	public function index_entry( $entry, $type, $subtype, $page ) {
 		// Skip if we're not doing a sitemap request, can happen in Nginx cache purge for example.
-		if ( ! is_sitemap() ) {
+		if ( ! \xmlsf()->is_sitemap ) {
 			return $entry;
 		}
 
@@ -367,14 +362,14 @@ class Sitemap_Core extends Sitemap {
 		// Add lastmod.
 		switch ( $type ) {
 			case 'post':
-				$lastmod = \get_lastpostmodified( 'GMT', \apply_filters( 'xmlsf_sitemap_subtype', $subtype ) );
+				$lastmod = \get_lastpostmodified( 'GMT', $subtype );
 				if ( $lastmod ) {
 					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 				}
 				break;
 
 			case 'term':
-				$lastmod = $this->get_taxonomy_modified( \apply_filters( 'xmlsf_sitemap_subtype', $subtype ) );
+				$lastmod = $this->get_taxonomy_modified( $subtype );
 				if ( $lastmod ) {
 					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 				}
@@ -642,6 +637,9 @@ class Sitemap_Core extends Sitemap {
 	 * @return array
 	 */
 	public function posts_query_args( $args ) {
+		$args['orderby'] = 'modified';
+		$args['order']   = 'DESC';
+
 		// Exclude posts.
 		$args['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			array(
