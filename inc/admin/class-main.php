@@ -12,12 +12,8 @@ namespace XMLSF\Admin;
  */
 class Main {
 	/**
-	 * CONSTRUCTOR
-	 */
-	private function __construct() {}
-
-	/**
 	 * Plugin compatibility hooks and filters.
+	 * Hooked on admin_init.
 	 */
 	public static function compat() {
 		// Catch Box Pro compatibility.

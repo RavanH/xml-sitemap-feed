@@ -54,13 +54,14 @@ class Sitemap_Plugin extends Sitemap {
 		add_filter( 'robots_txt', array( $this, 'robots_txt' ), 8 );
 
 		// Compatibility hooks.
-		self::compat();
+		$this->compat();
 	}
 
 	/**
 	 * Plugin compatibility hooks and filters.
+	 * Called from constructor.
 	 */
-	public static function compat() {
+	public function compat() {
 		$active_plugins = (array) \get_option( 'active_plugins', array() );
 
 		// Polylang compatibility.

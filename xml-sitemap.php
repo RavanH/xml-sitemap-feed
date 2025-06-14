@@ -72,6 +72,7 @@ if ( is_admin() ) {
 	add_action( 'rest_api_init', array( '\XMLSF\Admin\Main', 'register_settings' ) );
 	add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'tools_actions' ), 9 );
 	add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'notices_actions' ), 9 );
+	add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'compat' ) );
 
 	add_action( 'update_option_xmlsf_sitemaps', array( '\XMLSF\Admin\Main', 'update_sitemaps' ) );
 

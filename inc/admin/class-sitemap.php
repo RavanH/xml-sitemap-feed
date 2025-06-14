@@ -12,12 +12,8 @@ namespace XMLSF\Admin;
  */
 class Sitemap {
 	/**
-	 * Constructor
-	 */
-	private function __construct() {}
-
-	/**
 	 * Plugin compatibility hooks and filters.
+	 * Hooked on admin_init.
 	 */
 	public static function compat() {
 		// Rank Math compatibility.
