@@ -208,7 +208,7 @@ class Sitemap_News {
 		/** PREPARE TO LOAD TEMPLATE */
 		\add_action(
 			'do_feed_sitemap-news',
-			'XMLSF\load_template',
+			array( __CLASS__, 'load_template' ),
 			10,
 			2
 		);
@@ -251,6 +251,33 @@ class Sitemap_News {
 
 		return $request;
 	}
+
+	/**
+	 * Load feed template
+	 *
+	 * Hooked into do_feed_{sitemap...}. First checks for a child/parent theme template file, then falls back to plugin template
+	 *
+	 * @since 5.5.5
+	 */
+	private function load_template() {
+		/**
+		 * GET TEMPLATE FILE
+		 *
+		 * DEVELOPERS: a custom template file in the active (parent or child) theme directory will be used when found there
+		 * Must be named sitemap-news.php
+		 */
+
+		$template = 'sitemap-news.php';
+
+		// Locate and load theme template file or use plugin template.
+		if ( ! \locate_template( $template, true ) ) {
+			$file = XMLSF_DIR . '/views/feed-' . $template;
+			if ( \file_exists( $file ) ) {
+				\load_template( $file );
+			}
+		}
+	}
+
 
 	/**
 	 * Response headers filter

@@ -125,7 +125,7 @@ class Sitemap {
 
 		// When taxonomies have been disabled...
 		if ( \in_array( 'taxonomies', (array) $value, true ) && ! \in_array( 'taxonomies', (array) $old, true ) ) {
-			\XMLSF\clear_metacache( 'terms' );
+			\delete_metadata( 'term', 0, 'term_modified', '', true );
 		}
 
 		// TODO Clear user meta cache if deactivating...
@@ -168,12 +168,15 @@ class Sitemap {
 
 		// Clear images meta caches...
 		if ( $clear_images ) {
-			\XMLSF\clear_metacache( 'images' );
+			\delete_metadata( 'post', 0, '_xmlsf_image_attached', '', true );
+			\delete_metadata( 'post', 0, '_xmlsf_image_featured', '', true );
+			\set_transient( 'xmlsf_images_meta_primed', array() );
 		}
 
 		// Clear comments meta caches...
 		if ( $clear_comments ) {
-			\XMLSF\clear_metacache( 'comments' );
+			\delete_metadata( 'post', 0, '_xmlsf_comment_date_gmt', '', true );
+			\set_transient( 'xmlsf_comments_meta_primed', array() );
 		}
 	}
 
@@ -238,7 +241,7 @@ class Sitemap {
 
 		if ( isset( $_POST['xmlsf-clear-term-meta'] ) ) {
 			// Remove terms metadata.
-			\XMLSF\clear_metacache( 'terms' );
+			\delete_metadata( 'term', 0, 'term_modified', '', true );
 
 			\add_settings_error(
 				'clear_meta_notice',
@@ -250,7 +253,7 @@ class Sitemap {
 
 		if ( isset( $_POST['xmlsf-clear-user-meta'] ) ) {
 			// Remove terms metadata.
-			\XMLSF\clear_metacache( 'users' );
+			\delete_metadata( 'user', 0, 'user_modified', '', true );
 
 			\add_settings_error(
 				'clear_meta_notice',
@@ -262,8 +265,12 @@ class Sitemap {
 
 		if ( isset( $_POST['xmlsf-clear-post-meta'] ) ) {
 			// Remove metadata.
-			\XMLSF\clear_metacache( 'images' );
-			\XMLSF\clear_metacache( 'comments' );
+			\delete_metadata( 'post', 0, '_xmlsf_image_attached', '', true );
+			\delete_metadata( 'post', 0, '_xmlsf_image_featured', '', true );
+			\set_transient( 'xmlsf_images_meta_primed', array() );
+
+			\delete_metadata( 'post', 0, '_xmlsf_comment_date_gmt', '', true );
+			\set_transient( 'xmlsf_comments_meta_primed', array() );
 
 			\add_settings_error(
 				'clear_meta_notice',

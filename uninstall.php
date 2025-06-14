@@ -54,8 +54,13 @@ if ( is_multisite() && defined( 'XMLSF_MULTISITE_UNINSTALL' ) && XMLSF_MULTISITE
 function xmlsf_uninstall() {
 	// Remove cache metadata.
 	// Should already have been done on plugin deactivation unless we're unstalling on multisite...
-	include_once __DIR__ . '/inc/functions.php';
-	XMLSF\clear_metacache();
+
+	// Clear all meta caches...
+	delete_metadata( 'post', 0, '_xmlsf_image_attached', '', true );
+	delete_metadata( 'post', 0, '_xmlsf_image_featured', '', true );
+	delete_metadata( 'post', 0, '_xmlsf_comment_date_gmt', '', true );
+	delete_metadata( 'term', 0, 'term_modified', '', true );
+	delete_metadata( 'user', 0, 'user_modified', '', true );
 
 	// Remove post meta data.
 	delete_metadata( 'post', 0, '_xmlsf_priority', '', true );

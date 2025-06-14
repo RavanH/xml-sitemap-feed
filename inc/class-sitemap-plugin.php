@@ -319,13 +319,72 @@ class Sitemap_Plugin extends Sitemap {
 		/** PREPARE TO LOAD TEMPLATE */
 		\add_action(
 			'do_feed_' . $request['feed'],
-			'XMLSF\load_template',
+			array( __CLASS__, 'load_template' ),
 			10,
 			2
 		);
 
 		return $request;
 	}
+
+	/**
+	 * Load feed template
+	 *
+	 * Hooked into do_feed_{sitemap...}. First checks for a child/parent theme template file, then falls back to plugin template
+	 *
+	 * @since 5.3
+	 *
+	 * @param bool   $is_comment_feed Unused.
+	 * @param string $feed            Feed type.
+	 */
+	private function load_template( $is_comment_feed, $feed ) {
+		/**
+		 * GET TEMPLATE FILE
+		 *
+		 * DEVELOPERS: a custom template file in the active (parent or child) theme directory will be used when found there
+		 *
+		 * Must start with 'sitemap', optionally folowed by other designators, serperated by hyphens.
+		 * It should always end with the php extension.
+		 *
+		 * Examples:
+		 * sitemap.php
+		 * sitemap-posttype.php
+		 * * sitemap-posttype-post.php
+		 * * sitemap-posttype-page.php
+		 * * sitemap-posttype-[custom_post_type].php
+		 * sitemap-taxonomy.php
+		 * * sitemap-taxonomy-category.php
+		 * * sitemap-taxonomy-post_tag.php
+		 * * sitemap-taxonomy-[custom_taxonomy].php
+		 * sitemap-authors.php
+		 * sitemap-custom.php
+		 */
+
+		$parts     = \explode( '-', $feed, 3 );
+		$templates = array();
+		$found     = false;
+
+		// Possible theme template file names.
+		if ( ! empty( $parts[1] ) && \in_array( $parts[1], array( 'posttype', 'taxonomy', 'author', 'custom' ), true ) ) {
+			if ( ! empty( $parts[2] ) ) {
+				$templates[] = "sitemap-{$parts[1]}-{$parts[2]}.php";
+			}
+			$templates[] = "sitemap-{$parts[1]}.php";
+		}
+		$templates[] = 'sitemap.php';
+
+		// Locate and load theme template file or use plugin template.
+		if ( ! \locate_template( $templates, true ) ) {
+			foreach ( $templates as $template ) {
+				$file = XMLSF_DIR . '/views/feed-' . $template;
+				if ( \file_exists( $file ) ) {
+					\load_template( $file );
+					break;
+				}
+			}
+		}
+	}
+
 
 	/**
 	 * Terms arguments filter
