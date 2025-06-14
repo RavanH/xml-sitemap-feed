@@ -148,6 +148,7 @@ Fix Polylang Pro compatibility.
 
 = 5.5.5 =
 Date: 20250614
+* Resturcture admin notices 
 * FIX: Polylang Pro compatibility, thanks @followalter
 
 = 5.5.4 =
