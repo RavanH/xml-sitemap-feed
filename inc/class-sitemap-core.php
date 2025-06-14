@@ -90,7 +90,7 @@ class Sitemap_Core extends Sitemap {
 		$active_plugins = (array) \get_option( 'active_plugins', array() );
 
 		// Polylang compatibility.
-		if ( in_array( 'polylang/polylang.php', $active_plugins, true ) ) {
+		if ( in_array( 'polylang/polylang.php', $active_plugins, true ) || in_array( 'polylang-pro/polylang.php', $active_plugins, true ) ) {
 			\add_filter( 'xmlsf_blogpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
 			\add_filter( 'xmlsf_frontpages', array( __NAMESPACE__ . '\Compat\Polylang', 'get_translations' ) );
 			\add_action( 'xmlsf_sitemap_loaded', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );

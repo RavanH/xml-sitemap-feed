@@ -141,10 +141,14 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.5.4 =
-Performance improvement and bugfixes.
+= 5.5.5 =
+Fix Polylang Pro compatibility.
 
 == Changelog ==
+
+= 5.5.5 =
+Date: 20250614
+* FIX: Polylang Pro compatibility, thanks @followalter
 
 = 5.5.4 =
 Date: 20250427

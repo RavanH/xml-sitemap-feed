@@ -1,9 +1,7 @@
 5.5.5
 
-* FIX polylang pro incompatibility https://wordpress.org/support/topic/sitemap-doesnt-show-other-language-pages-from-polylang/
-
-
 = 5.6 =
+* consider leaving out empty news sitemap tags (keywords, stocks) when not used... (what about stylesheet?)
 * revise SEO plugin compatibilty and conflict notices: maybe just recommend using SEO plugin sitemap, or completely ignore unless real conflict?
 * include home page even if pages are excluded, but HOW ???
 * dummy dynamic slug field for google news advanced

@@ -54,7 +54,7 @@ class Sitemap_News {
 		$active_plugins = (array) \get_option( 'active_plugins', array() );
 
 		// Polylang compatibility.
-		if ( in_array( 'polylang/polylang.php', $active_plugins, true ) ) {
+		if ( in_array( 'polylang/polylang.php', $active_plugins, true ) || in_array( 'polylang-pro/polylang.php', $active_plugins, true ) ) {
 			\add_filter( 'xmlsf_news_request', array( __NAMESPACE__ . '\Compat\Polylang', 'filter_request' ) );
 			\add_action( 'xmlsf_sitemap_loaded', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
 			\add_filter( 'xmlsf_news_sitemap_loaded', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
