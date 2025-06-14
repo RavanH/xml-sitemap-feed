@@ -208,7 +208,7 @@ class Sitemap_News {
 		/** PREPARE TO LOAD TEMPLATE */
 		\add_action(
 			'do_feed_sitemap-news',
-			array( __CLASS__, 'load_template' ),
+			array( $this, 'load_template' ),
 			10,
 			2
 		);
@@ -259,7 +259,7 @@ class Sitemap_News {
 	 *
 	 * @since 5.5.5
 	 */
-	private function load_template() {
+	public function load_template() {
 		/**
 		 * GET TEMPLATE FILE
 		 *

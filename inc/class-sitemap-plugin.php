@@ -319,7 +319,7 @@ class Sitemap_Plugin extends Sitemap {
 		/** PREPARE TO LOAD TEMPLATE */
 		\add_action(
 			'do_feed_' . $request['feed'],
-			array( __CLASS__, 'load_template' ),
+			array( $this, 'load_template' ),
 			10,
 			2
 		);
@@ -337,7 +337,7 @@ class Sitemap_Plugin extends Sitemap {
 	 * @param bool   $is_comment_feed Unused.
 	 * @param string $feed            Feed type.
 	 */
-	private function load_template( $is_comment_feed, $feed ) {
+	public function load_template( $is_comment_feed, $feed ) {
 		/**
 		 * GET TEMPLATE FILE
 		 *
