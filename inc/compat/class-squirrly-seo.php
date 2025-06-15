@@ -19,7 +19,7 @@ class Squirrly_SEO {
 			return;
 		}
 
-		$squirrly = json_decode( \get_option( 'sq_options', '' ) );
+		$squirrly = \json_decode( \get_option( 'sq_options', '' ) );
 
 		// check squirrly sitemap module.
 		if ( is_object( $squirrly ) && $squirrly->sq_auto_sitemap ) {
@@ -63,7 +63,7 @@ class Squirrly_SEO {
 			return;
 		}
 
-		$squirrly = json_decode( \get_option( 'sq_options', '' ) );
+		$squirrly = \json_decode( \get_option( 'sq_options', '' ) );
 
 		// check aioseop sitemap module.
 		if ( is_object( $squirrly ) && ! empty( $squirrly->sq_sitemap->{'sitemap-news'}[1] ) ) {
