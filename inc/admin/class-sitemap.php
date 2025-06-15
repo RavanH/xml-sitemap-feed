@@ -682,12 +682,12 @@ class Sitemap {
 				// Disable.
 				$content  = '<p>' . \esc_html__( 'By default, all public content types, taxonomy archives and author archives are included in the XML Sitemap index. If you wish to exclude any content or archive types, you can disable them here.', 'xml-sitemap-feed' ) . '</p>';
 				$content .= '<p>' . sprintf( /* translators: %1$s Taxonomies, %2$s Taxonomies linked to the respective tab */
-					esc_html__( 'Select %1$s here to exclude then all taxonomy archives from the sitemap index. To exclude only a particular taxonomy, please go to the %2$s tab.', 'xml-sitemap-feed' ),
+					\esc_html__( 'Select %1$s here to exclude then all taxonomy archives from the sitemap index. To exclude only a particular taxonomy, please go to the %2$s tab.', 'xml-sitemap-feed' ),
 					'<strong>' . \esc_html__( 'Taxonomies', 'xml-sitemap-feed' ) . '</strong>',
 					'<a href="?page=xmlsf&tab=taxonomies">' . \esc_html__( 'Taxonomies', 'xml-sitemap-feed' ) . '</a>'
 				) . '</p>';
 				$content .= '<p>' . sprintf( /* translators: %1$s Authors, %2$s Authors linked to the respective tab  */
-					esc_html__( 'Select %1$s here to exclude all author archives from the sitemap index. To exclude only a particular author or user group, please go to the %2$s tab.', 'xml-sitemap-feed' ),
+					\esc_html__( 'Select %1$s here to exclude all author archives from the sitemap index. To exclude only a particular author or user group, please go to the %2$s tab.', 'xml-sitemap-feed' ),
 					'<strong>' . \esc_html__( 'Authors', 'xml-sitemap-feed' ) . '</strong>',
 					'<a href="?page=xmlsf&tab=authors">' . \esc_html__( 'Authors', 'xml-sitemap-feed' ) . '</a>'
 				) . '</p>';
