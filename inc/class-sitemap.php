@@ -558,10 +558,32 @@ abstract class Sitemap {
 	 * Taxonomy Modified
 	 *
 	 * @param string $taxonomy Taxonomy slug.
+	 * @param int    $page     Page number.
 	 *
 	 * @return string|false
 	 */
-	public function get_taxonomy_modified( $taxonomy ) {
+	public function get_taxonomy_modified( $taxonomy, $page = 1 ) {
+		if ( 1 < $page ) {
+			// No paged support for taxonomy modified yet.
+			return false;
+		}
+
+		/**
+		 * Pre-filter the return value of get_taxonomy_modified() before the query is run.
+		 *
+		 * @since 5.5.5
+		 *
+		 * @param string|false $taxonomymodified The most recent time that a post was modified,
+		 *                                       in GMT format, or false. Returning anything
+		 *                                       other than false will short-circuit the function.
+		 * @param string       $taxonomy         The taxonomy to check.
+		 * @param int          $page             The page number of the sitemap.
+		 */
+		$taxonomymodified = \apply_filters( 'xmlsf_pre_get_taxonomy_modified', false, $taxonomy, $page );
+
+		if ( false !== $taxonomymodified ) {
+			return $taxonomymodified; // Return early if already set.
+		}
 
 		$obj = \get_taxonomy( $taxonomy );
 
@@ -571,12 +593,12 @@ abstract class Sitemap {
 
 		foreach ( (array) $obj->object_type as $object_type ) {
 			$lastpostdate = \get_lastpostdate( 'GMT', $object_type );
-			if ( $lastpostdate ) {
-				$lastmod = ! empty( $lastmod ) && $lastmod > $lastpostdate ? $lastmod : $lastpostdate; // Absolute last post date.
+			if ( $lastpostdate && ( ! $taxonomymodified || $lastpostdate > $taxonomymodified ) ) {
+				$taxonomymodified = $lastpostdate; // Absolute last modified date.
 			}
 		}
 
-		return ! empty( $lastmod ) ? $lastmod : false;
+		return ! empty( $taxonomymodified ) ? $taxonomymodified : false;
 	}
 
 	/**

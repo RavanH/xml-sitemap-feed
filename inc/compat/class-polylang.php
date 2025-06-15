@@ -191,36 +191,106 @@ class Polylang {
 	}
 
 	/**
-	 * Polylang get_lastpostmodified for related language
-	 * Hooked on pre_get_lastpostmodified.
+	 * Polylang sitemap subtype filter
 	 *
-	 * @param string $modified The modified date.
-	 * @param string $timezone The timezone.
-	 * @param string $post_type The post type.
+	 * @param string $subtype The subtype.
 	 *
 	 * @return string
 	 */
-	public static function lastpostmodified( $modified, $timezone, $post_type ) {
-		if ( $modified || ! \xmlsf()->is_sitemap ) {
-			return $modified; // Return early if already set or not in a sitemap request.
+	public static function filter_sitemap_subtype( $subtype ) {
+		$pos = strrpos( $subtype, '-' );
+
+		return $pos ? substr( $subtype, 0, $pos ) : $subtype;
+	}
+
+	/**
+	 * Polylang get_lastpostmodified for related language
+	 * Hooked on xmlsf_pre_get_lastpostmodified.
+	 *
+	 * @param string $lastpostmodified The modified date.
+	 * @param string $post_type The post type.
+	 * @param int    $page The page number.
+	 *
+	 * @return string
+	 */
+	public static function lastpostmodified( $lastpostmodified, $post_type, $page ) {
+		if ( $lastpostmodified ) {
+			return $lastpostmodified; // Abort if already set.
 		}
 
 		$pos = strrpos( $post_type, '-' );
 		if ( ! $pos ) {
-			return $modified; // Return early if no hyphen found.
+			return $lastpostmodified; // Return early if no hyphen found.
 		}
 
-		$lang      = substr( $post_type, $pos + 1 );
-		$post_type = substr( $post_type, 0, $pos );
-		$args      = array(
+		$lang             = substr( $post_type, $pos + 1 );
+		$post_type        = substr( $post_type, 0, $pos );
+		$args             = array(
 			'post_type'   => $post_type,
 			'lang'        => $lang,
 			'numberposts' => 1,
 			'orderby'     => 'modified',
 		);
-		$posts     = \get_posts( $args );
-		$modified  = $posts ? \get_date_from_gmt( \get_post_modified_time( 'Y-m-d H:i:s', true, $posts[0], $timezone ), DATE_W3C ) : false;
+		$posts            = \get_posts( $args );
+		$lastpostmodified = ! empty( $posts ) ? \get_post_modified_time( 'Y-m-d H:i:s', true, $posts[0] ) : false;
 
-		return $modified;
+		if ( 1 === $page && 'page' === $post_type && 'posts' === \get_option( 'show_on_front' ) ) {
+			// Get last modified post date for the home page.
+			$args['post_type'] = 'post';
+			$posts_on_front    = \get_posts( $args );
+			$modified_front    = $posts_on_front ? \get_post_time( 'Y-m-d H:i:s', true, $posts_on_front[0] ) : false;
+
+			if ( $modified_front > $lastpostmodified ) {
+				$lastpostmodified = $modified_front;
+			}
+		}
+		// TODO similar for blog page.
+
+		return $lastpostmodified;
+	}
+
+	/**
+	 * Polylang get_taxonomy_modified for related language
+	 * Hooked on xmlsf_pre_get_taxonomy_modified.
+	 *
+	 * @param string $taxonomymodified The modified date.
+	 * @param string $taxonomy The taxonomy.
+	 * @param int    $page The page number.
+	 *
+	 * @return string
+	 */
+	public static function taxonomy_modified( $taxonomymodified, $taxonomy, $page ) {
+		if ( $taxonomymodified ) {
+			return $taxonomymodified; // Abort if already set.
+		}
+
+		$pos = strrpos( $taxonomy, '-' );
+		if ( ! $pos ) {
+			return $taxonomymodified; // Return early if no hyphen found.
+		}
+
+		$lang     = substr( $taxonomy, $pos + 1 );
+		$taxonomy = substr( $taxonomy, 0, $pos );
+		$obj      = \get_taxonomy( $taxonomy );
+		$args     = array(
+			'lang'        => $lang,
+			'numberposts' => 1,
+			'orderby'     => 'modified',
+		);
+
+		if ( false === $obj ) {
+			return false;
+		}
+
+		foreach ( (array) $obj->object_type as $object_type ) {
+			$args['post_type'] = $object_type;
+			$posts             = \get_posts( $args );
+			$lastpostdate      = ! empty( $posts ) ? \get_post_time( 'Y-m-d H:i:s', true, $posts[0] ) : false;
+			if ( $lastpostdate && ( ! $taxonomymodified || $lastpostdate > $taxonomymodified ) ) {
+				$taxonomymodified = $lastpostdate; // Absolute last modified date.
+			}
+		}
+
+		return $taxonomymodified;
 	}
 }

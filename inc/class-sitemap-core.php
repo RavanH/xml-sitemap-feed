@@ -99,7 +99,8 @@ class Sitemap_Core extends Sitemap {
 			\add_action( 'xmlsf_sitemap_loaded', array( __NAMESPACE__ . '\Compat\Polylang', 'request_actions' ) );
 			\add_action( 'xmlsf_register_sitemap_provider', array( __NAMESPACE__ . '\Compat\Polylang', 'remove_replace_provider' ) );
 			\add_action( 'xmlsf_register_sitemap_provider_after', array( __NAMESPACE__ . '\Compat\Polylang', 'add_replace_provider' ) );
-			\add_filter( 'pre_get_lastpostmodified', array( __NAMESPACE__ . '\Compat\Polylang', 'lastpostmodified' ), 10, 3 );
+			\add_filter( 'xmlsf_pre_get_lastpostmodified', array( __NAMESPACE__ . '\Compat\Polylang', 'lastpostmodified' ), 10, 3 );
+			\add_filter( 'xmlsf_pre_get_taxonomy_modified', array( __NAMESPACE__ . '\Compat\Polylang', 'taxonomy_modified' ), 10, 3 );
 
 			// Rendering the sitemap early causes issues with language home pages.
 			\remove_action( 'parse_request', array( $this, 'render_sitemaps' ), 9 );
@@ -336,6 +337,57 @@ class Sitemap_Core extends Sitemap {
 	}
 
 	/**
+	 * Get lastmod for index entries.
+	 * Hooked into wp_sitemaps_index_entry filter.
+	 *
+	 * @since 5.5.5
+	 *
+	 * @param string $subtype Subtype.
+	 * @param int    $page    Page number.
+	 *
+	 * @return mixed Lastmod in GMT or false if not found.
+	 */
+	public function get_lastpostmodified( $subtype, $page = 1 ) {
+		if ( 1 < $page ) {
+			// No paged support for past modified yet.
+			return false;
+		}
+
+		/**
+		 * Pre-filter the return value of get_lastpostmodified() before the query is run.
+		 *
+		 * @since 5.5.5
+		 *
+		 * @param string|false $lastpostmodified The most recent time that a post was modified,
+		 *                                       in GMT format, or false. Returning anything
+		 *                                       other than false will short-circuit the function.
+		 * @param string       $subtype          The post type to check.
+		 * @param int          $page             The page number of the sitemap.
+		 */
+		$lastmodified = \apply_filters( 'xmlsf_pre_get_lastpostmodified', false, $subtype, $page );
+
+		if ( false !== $lastmodified ) {
+			return $lastmodified; // Return early if already set.
+		}
+
+		$lastpostmodified = \get_lastpostmodified( 'GMT', $subtype );
+
+		if ( 1 === $page && 'page' === $subtype && 'posts' === \get_option( 'show_on_front' ) ) {
+				// Get last modified date of the home page.
+
+				$published_front = \get_lastpostdate( 'GMT', 'post' );
+				error_log( 'xmlsf: get_lastpostmodified() published_front: ' . $published_front . ' lastpostmodified: ' . $lastpostmodified );
+
+			if ( $published_front > $lastpostmodified ) {
+				$lastpostmodified = $published_front;
+			}
+		}
+
+		return $lastpostmodified;
+	}
+
+
+	/**
 	 * Add lastmod to index entries.
 	 * Hooked into wp_sitemaps_index_entry filter.
 	 *
@@ -354,34 +406,29 @@ class Sitemap_Core extends Sitemap {
 			return $entry;
 		}
 
-		// TODO account for $page 2 and up...
-		if ( $page > 1 ) {
-			return $entry;
-		}
-
 		// Add lastmod.
 		switch ( $type ) {
 			case 'post':
-				$lastmod = \get_lastpostmodified( 'GMT', $subtype );
+				$lastmod = $this->get_lastpostmodified( $subtype, $page );
 				if ( $lastmod ) {
 					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 				}
 				break;
 
 			case 'term':
-				$lastmod = $this->get_taxonomy_modified( $subtype );
+				$lastmod = $this->get_taxonomy_modified( $subtype, $page );
 				if ( $lastmod ) {
 					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 				}
 				break;
 
-			case 'user':
+			// $case 'user':
 				// TODO make this xmlsf_author_has_published_posts filter compatible.
-				$lastmod = \get_lastpostdate( 'GMT', 'post' ); // Absolute last post date.
-				if ( $lastmod ) {
-					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
-				}
-				break;
+			// $lastmod = \get_lastpostdate( 'GMT', 'post' ); // Absolute last post date.
+			// if ( $lastmod ) {
+			// $entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
+			// }
+			// break;
 
 			case 'news':
 				$options    = (array) \get_option( 'xmlsf_news_tags' );
@@ -642,10 +689,10 @@ class Sitemap_Core extends Sitemap {
 
 		// Exclude posts.
 		$args['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-			array(
-				'key'     => '_xmlsf_exclude',
-				'compare' => 'NOT EXISTS',
-			),
+		array(
+			'key'     => '_xmlsf_exclude',
+			'compare' => 'NOT EXISTS',
+		),
 		);
 
 		// Update meta cache in one query instead of many, coming from get_post_meta() in $this->get_post_priority().
