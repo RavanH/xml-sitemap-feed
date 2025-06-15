@@ -1,9 +1,9 @@
 5.5.5
 
-Fix Polylang missing lastmods in core index
 TODO move more admin notices to compat classes?
 
 = 5.6 =
+* lastmod for users
 * consider leaving out empty news sitemap tags (keywords, stocks) when not used... (what about stylesheet?)
 * revise SEO plugin compatibilty and conflict notices: maybe just recommend using SEO plugin sitemap, or completely ignore unless real conflict?
 * include home page even if pages are excluded, but HOW ???

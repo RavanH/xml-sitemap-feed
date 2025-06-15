@@ -148,7 +148,9 @@ Fix Polylang Pro compatibility.
 
 = 5.5.5 =
 Date: 20250614
+* Polylang index lastmods per language in core sitemap
 * Resturcture admin notices 
+* FIX: core sitemap posts order
 * FIX: Polylang Pro compatibility, thanks @followalter
 
 = 5.5.4 =
