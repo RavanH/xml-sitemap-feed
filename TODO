@@ -1,6 +1,6 @@
 5.5.5
 
-TODO move more admin notices to compat classes?
+TODO Yoast admin notice about possible conflict with "Remove category feeds" (news sitemap only? see https://wordpress.org/support/topic/incorrect-http-header-content-type/ )
 
 = 5.6 =
 * lastmod for users
