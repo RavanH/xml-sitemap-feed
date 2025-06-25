@@ -27,7 +27,7 @@ class Sitemap {
 		}
 
 		// SEOPress compatibility.
-		if ( \is_plugin_active( 'seopress/seopress.php' ) ) {
+		if ( \is_plugin_active( 'wp-seopress/seopress.php' ) ) {
 			\add_action( 'admin_notices', array( '\XMLSF\Compat\SEOPress', 'admin_notices' ) );
 		}
 
