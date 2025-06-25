@@ -142,15 +142,16 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 == Upgrade Notice ==
 
 = 5.5.5 =
-Fix Polylang Pro compatibility.
+Fix Polylang Pro compatibility. Fix core index lastmods.
 
 == Changelog ==
 
 = 5.5.5 =
-Date: 20250614
+Date: 20250615
 * Polylang index lastmods per language in core sitemap
-* Resturcture admin notices 
-* FIX: core sitemap posts order
+* Resturcture admin notices
+* FIX: SEOPress notices
+* FIX: core sitemap index lastmods (post order)
 * FIX: Polylang Pro compatibility, thanks @followalter
 
 = 5.5.4 =
