@@ -879,7 +879,7 @@ abstract class Sitemap {
 			return;
 		}
 
-		$stored = (array) \get_post_meta( $post->ID, '_xmlsf_image_' . $which );
+		$stored = (array) \get_post_meta( $post->ID, '_xmlsf_image_' . $which, false );
 
 		// Populate images and add as meta data.
 		foreach ( $this->images_data( $post, $which ) as $data ) {

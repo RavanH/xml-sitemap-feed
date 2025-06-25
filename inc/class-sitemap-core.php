@@ -373,10 +373,8 @@ class Sitemap_Core extends Sitemap {
 		$lastpostmodified = \get_lastpostmodified( 'GMT', $subtype );
 
 		if ( 1 === $page && 'page' === $subtype && 'posts' === \get_option( 'show_on_front' ) ) {
-				// Get last modified date of the home page.
-
-				$published_front = \get_lastpostdate( 'GMT', 'post' );
-				error_log( 'xmlsf: get_lastpostmodified() published_front: ' . $published_front . ' lastpostmodified: ' . $lastpostmodified );
+			// Get last modified date of the home page.
+			$published_front = \get_lastpostdate( 'GMT', 'post' );
 
 			if ( $published_front > $lastpostmodified ) {
 				$lastpostmodified = $published_front;
@@ -666,7 +664,7 @@ class Sitemap_Core extends Sitemap {
 		}
 
 		foreach ( $post_types as $name => $pt_obj ) {
-			if ( ! in_array( $name, $enabled_post_types ) ) {
+			if ( ! in_array( $name, $enabled_post_types, true ) ) {
 				unset( $post_types[ $name ] );
 			}
 		}
