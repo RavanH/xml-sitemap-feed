@@ -12,6 +12,64 @@ namespace XMLSF\Admin;
  */
 class Main {
 	/**
+	 * Initialize the admin class.
+	 */
+	public static function init() {
+		add_action( 'admin_menu', array( '\XMLSF\Admin\Main', 'add_settings_pages' ) );
+
+		add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'register_settings' ), 7 );
+		add_action( 'rest_api_init', array( '\XMLSF\Admin\Main', 'register_settings' ) );
+		add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'tools_actions' ), 9 );
+		add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'notices_actions' ), 9 );
+		add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'compat' ) );
+
+		add_action( 'update_option_xmlsf_sitemaps', array( '\XMLSF\Admin\Main', 'update_sitemaps' ) );
+
+		// ACTION LINK.
+		add_filter( 'plugin_action_links_' . XMLSF_BASENAME, array( '\XMLSF\Admin\Main', 'add_action_link' ) );
+		add_filter( 'plugin_row_meta', array( '\XMLSF\Admin\Main', 'plugin_meta_links' ), 10, 2 );
+
+		// Shared Admin pages sidebar actions.
+		add_action( 'xmlsf_admin_sidebar', array( '\XMLSF\Admin\Main', 'admin_sidebar_help' ) );
+		add_action( 'xmlsf_admin_sidebar', array( '\XMLSF\Admin\Main', 'admin_sidebar_contribute' ), 20 );
+
+		if ( XMLSF\sitemaps_enabled( 'sitemap' ) ) {
+			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap', 'register_settings' ), 7 );
+			add_action( 'rest_api_init', array( '\XMLSF\Admin\Sitemap', 'register_settings' ) );
+			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap', 'tools_actions' ), 9 );
+			add_action( 'admin_notices', array( '\XMLSF\Admin\Sitemap', 'check_advanced' ), 0 );
+			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap', 'compat' ) );
+
+			// META.
+			add_action( 'add_meta_boxes', array( '\XMLSF\Admin\Sitemap', 'add_meta_box' ) );
+			add_action( 'save_post', array( '\XMLSF\Admin\Sitemap', 'save_metadata' ) );
+
+			// Placeholders for advanced options.
+			add_action( 'xmlsf_posttype_archive_field_options', array( '\XMLSF\Admin\Fields', 'advanced_archive_field_options' ) );
+
+			// QUICK EDIT.
+			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap', 'add_columns' ) );
+			add_action( 'quick_edit_custom_box', array( '\XMLSF\Admin\Fields', 'quick_edit_fields' ) );
+			add_action( 'save_post', array( '\XMLSF\Admin\Sitemap', 'quick_edit_save' ) );
+			add_action( 'admin_head', array( '\XMLSF\Admin\Sitemap', 'quick_edit_script' ), 99 );
+			// BULK EDIT.
+			add_action( 'bulk_edit_custom_box', array( '\XMLSF\Admin\Fields', 'bulk_edit_fields' ), 0 );
+		}
+
+		if ( XMLSF\sitemaps_enabled( 'news' ) ) {
+			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap_News', 'register_settings' ), 7 );
+			add_action( 'rest_api_init', array( '\XMLSF\Admin\Sitemap_News', 'register_settings' ) );
+			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap_News', 'tools_actions' ), 9 );
+			add_action( 'admin_notices', array( '\XMLSF\Admin\Sitemap_News', 'check_advanced' ), 0 );
+			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap_News', 'compat' ) );
+
+			// META.
+			add_action( 'add_meta_boxes', array( '\XMLSF\Admin\Sitemap_News', 'add_meta_box' ) );
+			add_action( 'save_post', array( '\XMLSF\Admin\Sitemap_News', 'save_metadata' ) );
+		}
+	}
+
+	/**
 	 * Plugin compatibility hooks and filters.
 	 * Hooked on admin_init.
 	 */
@@ -317,5 +375,58 @@ class Main {
 			$links[] = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/?filter=5#new-post">' . __( 'Rate ★★★★★', 'xml-sitemap-feed' ) . '</a>';
 		}
 		return $links;
+	}
+
+	/**
+	 * Plugin activation
+	 *
+	 * @since 5.4
+	 * @return void
+	 */
+	public static function activate() {
+		// Load sitemap.
+		\xmlsf()->get_server( 'sitemap' );
+
+		// Add core rules if needed.
+		if ( \function_exists( 'wp_sitemaps_get_server' ) && 'core' === \xmlsf()->sitemap->server_type ) {
+			$sitemaps = \wp_sitemaps_get_server();
+			$sitemaps->register_rewrites();
+		}
+
+		// Register new plugin rules.
+		\xmlsf()->register_rewrites();
+
+		// Then flush.
+		\flush_rewrite_rules( false );
+	}
+
+	/**
+	 * Plugin de-activation
+	 *
+	 * @since 5.0
+	 * @return void
+	 */
+	public static function deactivate() {
+		// Clear all cache metadata.
+		// Clear all meta caches...
+		\delete_metadata( 'post', 0, '_xmlsf_image_attached', '', true );
+		\delete_metadata( 'post', 0, '_xmlsf_image_featured', '', true );
+		\delete_metadata( 'post', 0, '_xmlsf_comment_date_gmt', '', true );
+		\delete_metadata( 'term', 0, 'term_modified', '', true );
+		\delete_metadata( 'user', 0, 'user_modified', '', true );
+		\delete_transient( 'xmlsf_images_meta_primed' );
+		\delete_transient( 'xmlsf_comments_meta_primed' );
+
+		// Remove old rules.
+		\xmlsf()->unregister_rewrites();
+
+		// Re-add core rules.
+		if ( \function_exists( 'wp_sitemaps_get_server' ) ) {
+			$sitemaps = \wp_sitemaps_get_server();
+			$sitemaps->register_rewrites();
+		}
+
+		// Then flush.
+		\flush_rewrite_rules( false );
 	}
 }
