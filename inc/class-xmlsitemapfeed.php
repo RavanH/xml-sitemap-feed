@@ -147,8 +147,6 @@ class XMLSitemapFeed {
 			require_once \XMLSF_DIR . '/upgrade.php';
 		}
 
-		\add_filter( 'robots_txt', __NAMESPACE__ . '\robots_txt', 11 );
-
 		// Load sitemap servers.
 		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
 
@@ -165,12 +163,10 @@ class XMLSitemapFeed {
 			$this->get_server( 'sitemap-news' );
 		}
 
-		// Resiter rewrites.
+		// Register rewrites.
 		\add_action( 'init', array( $this, 'register_rewrites' ) );
 
-		// Sitemap hooks.
-		\add_action( 'xmlsf_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
-		\add_action( 'xmlsf_news_sitemap_loaded', __NAMESPACE__ . '\sitemap_loaded' );
+		// Sitemap generator msg output.
 		\add_action( 'xmlsf_generator', array( $this, 'generator' ) );
 	}
 
