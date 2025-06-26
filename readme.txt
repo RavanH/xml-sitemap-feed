@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 6.8
-Stable tag: 5.5.4
+Stable tag: 5.5.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -147,7 +147,7 @@ Fix Polylang Pro compatibility. Fix core index lastmods.
 == Changelog ==
 
 = 5.5.5 =
-Date: 20250615
+Date: 20250625
 * Polylang index lastmods per language in core sitemap
 * Resturcture admin notices
 * FIX: SEOPress notices
