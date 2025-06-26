@@ -55,14 +55,14 @@ class WP_SEO {
 						<?php
 						\printf( /* translators: Conflicting Plugn name, Plugin name */
 							\esc_html__( 'The %1$s XML Sitemap is not compatible with %2$s.', 'xml-sitemap-feed' ),
-							\esc_html__( 'WordPress SEO', 'wordpress-seo' ),
+							\esc_html__( 'Yoast SEO', 'xml-sitemap-feed' ),
 							\esc_html__( 'XML Sitemap & Google News', 'xml-sitemap-feed' )
 						);
 						?>
 						<?php
 						\printf( /* translators: Sitemap page name (linked to Yoast SEO plugin settings), XML Sitemap Index, Reading Settings admin page (linked to Reading settings) */
-							\esc_html__( 'Please either disable the XML Sitemap under %1$s in your SEO settings or disable the option %2$s on %3$s.', 'xml-sitemap-feed' ),
-							'<a href="' . \esc_url( \admin_url( 'admin.php' ) ) . '?page=wpseo_page_settings#/site-features">' . \esc_html__( 'Site features', 'wordpress-seo' ) . '</a>',
+							\esc_html__( 'Please either disable the XML Sitemap from %1$s or disable the option %2$s on %3$s.', 'xml-sitemap-feed' ),
+							'<a href="' . \esc_url( \admin_url( 'admin.php' ) ) . '?page=wpseo_page_settings#/site-features#card-wpseo-enable_xml_sitemap">' . \esc_html__( 'Yoast SEO', 'xml-sitemap-feed' ) . '</a>',
 							\esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ),
 							'<a href="' . \esc_url( \admin_url( 'options-reading.php' ) ) . '#xmlsf_sitemaps">' . \esc_html( \translate( 'Reading Settings' ) ) . '</a>'
 						);
@@ -89,7 +89,7 @@ class WP_SEO {
 			return;
 		}
 
-		// Check Remove category feeds option. TODO move to google news.
+		// Check Remove category feeds option.
 		$wpseo = \get_option( 'wpseo' );
 		if ( ! empty( $wpseo['remove_feed_categories'] ) ) {
 			// check if Google News sitemap is limited to categories.
@@ -101,13 +101,13 @@ class WP_SEO {
 						<?php
 						\printf( /* translators: conflicting plugin name */
 							\esc_html__( 'A setting in the %s plugin causes the Google News sitemap to redirect to a category archive page.', 'xml-sitemap-feed' ),
-							\esc_html__( 'WordPress SEO', 'wordpress-seo' )
+							\esc_html__( 'Yoast SEO', 'xml-sitemap-feed' )
 						);
 						?>
 						<?php
 						\printf( /* translators: Date archives (linked to WP SEO plugin settings), Split by, None, post types (linked to Sitemap settings) */
 							\esc_html__( 'Please either disable %1$s in your SEO settings or unselect all %2$s in your Google News sitemap settings.', 'xml-sitemap-feed' ),
-							'<strong><a href="' . \esc_url( \admin_url( 'admin.php' ) ) . '?page=wpseo_page_settings#/crawl-optimization">' . \esc_html__( 'Remove category feeds', 'wordpress-seo' ) . '</a></strong>',
+							'<a href="' . \esc_url( \admin_url( 'admin.php' ) ) . '?page=wpseo_page_settings#/crawl-optimization#headlessui-label-:r3k:">' . \esc_html__( 'Remove category feeds', 'xml-sitemap-feed' ) . '</a>',
 							'<a href="' . \esc_url( \admin_url( 'options-general.php' ) ) . '?page=xmlsf_news&tab=general">' . \esc_html( \translate( 'Categories' ) ) . '</a>'
 						);
 						?>
