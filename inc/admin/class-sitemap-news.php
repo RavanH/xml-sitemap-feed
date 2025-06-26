@@ -12,6 +12,17 @@ namespace XMLSF\Admin;
  */
 class Sitemap_News {
 	/**
+	 * Initialize hooks and filters.
+	 */
+	public static function init() {
+		\add_action( 'admin_notices', array( '\XMLSF\Admin\Sitemap_News', 'check_advanced' ), 0 );
+
+		// META.
+		\add_action( 'add_meta_boxes', array( '\XMLSF\Admin\Sitemap_News', 'add_meta_box' ) );
+		\add_action( 'save_post', array( '\XMLSF\Admin\Sitemap_News', 'save_metadata' ) );
+	}
+
+	/**
 	 * Plugin compatibility hooks and filters.
 	 * Hooked on admin_init.
 	 */
@@ -46,7 +57,18 @@ class Sitemap_News {
 			return;
 		}
 
-		if ( isset( $_POST['xmlsf-check-conflicts-news'] ) ) {
+		if ( isset( $_POST['xmlsf-flush-rewrite-rules'] ) ) {
+			// Flush rewrite rules.
+			\flush_rewrite_rules( false );
+			\add_settings_error(
+				'flush_admin_notice',
+				'flush_admin_notice',
+				__( 'WordPress rewrite rules have been flushed.', 'xml-sitemap-feed' ),
+				'success'
+			);
+		}
+
+		if ( isset( $_POST['xmlsf-check-conflicts'] ) ) {
 			// Reset ignored warnings.
 			\delete_user_meta( \get_current_user_id(), 'xmlsf_dismissed' );
 
@@ -74,7 +96,7 @@ class Sitemap_News {
 			}
 		}
 
-		if ( isset( $_POST['xmlsf-clear-settings-news'] ) ) {
+		if ( isset( $_POST['xmlsf-clear-settings'] ) ) {
 			self::clear_settings();
 			\add_settings_error(
 				'notice_clear_settings',
@@ -84,10 +106,6 @@ class Sitemap_News {
 			);
 		}
 	}
-
-	/**
-	 * CHECKS
-	 */
 
 	/**
 	 * Compare versions to known compatibility.
@@ -117,10 +135,6 @@ class Sitemap_News {
 			include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced-news.php';
 		}
 	}
-
-	/**
-	 * META BOXES
-	 */
 
 	/**
 	 * Add a News Sitemap meta box to the side column
@@ -182,8 +196,27 @@ class Sitemap_News {
 	}
 
 	/**
-	 * SETTINGS
+	 * Add options page
 	 */
+	public static function add_options_page() {
+		// This page will be under "Settings".
+		$screen_id = \add_options_page(
+			__( 'Google News Sitemap', 'xml-sitemap-feed' ),
+			__( 'Google News', 'xml-sitemap-feed' ),
+			'manage_options',
+			'xmlsf_news',
+			array( __CLASS__, 'settings_page' )
+		);
+
+		// Settings hooks.
+		\add_action( 'xmlsf_news_add_settings', array( __CLASS__, 'add_settings' ) );
+
+		// Tools actions.
+		\add_action( 'load-' . $screen_id, array( __CLASS__, 'tools_actions' ) );
+
+		// Help tab.
+		\add_action( 'load-' . $screen_id, array( __CLASS__, 'help_tab' ) );
+	}
 
 	/**
 	 * Options page callback

@@ -69,7 +69,10 @@ add_action( 'xmlsf_sitemap_loaded', '\XMLSF\sitemap_loaded' );
 add_action( 'xmlsf_news_sitemap_loaded', '\XMLSF\sitemap_loaded' );
 
 // Admin.
-add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'init' ), 1 );
+add_action( 'admin_menu', array( '\XMLSF\Admin\Main', 'add_options_pages' ) );
+add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'register_settings' ), 7 );
+add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'init' ), 9 );
+add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'compat' ) );
 
 register_deactivation_hook( __FILE__, array( '\XMLSF\Admin\Main', 'deactivate' ) );
 register_activation_hook( __FILE__, array( '\XMLSF\Admin\Main', 'activate' ) );

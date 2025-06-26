@@ -15,107 +15,55 @@ class Main {
 	 * Initialize the admin class.
 	 */
 	public static function init() {
-		add_action( 'admin_menu', array( '\XMLSF\Admin\Main', 'add_settings_pages' ) );
+		self::notices_actions();
 
-		add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'register_settings' ), 7 );
-		add_action( 'rest_api_init', array( '\XMLSF\Admin\Main', 'register_settings' ) );
-		add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'tools_actions' ), 9 );
-		add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'notices_actions' ), 9 );
-		add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'compat' ) );
-
-		add_action( 'update_option_xmlsf_sitemaps', array( '\XMLSF\Admin\Main', 'update_sitemaps' ) );
+		\add_action( 'update_option_xmlsf_sitemaps', array( __CLASS__, 'update_sitemaps' ) );
 
 		// ACTION LINK.
-		add_filter( 'plugin_action_links_' . XMLSF_BASENAME, array( '\XMLSF\Admin\Main', 'add_action_link' ) );
-		add_filter( 'plugin_row_meta', array( '\XMLSF\Admin\Main', 'plugin_meta_links' ), 10, 2 );
+		\add_filter( 'plugin_action_links_' . XMLSF_BASENAME, array( __CLASS__, 'add_action_link' ) );
+		\add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_meta_links' ), 10, 2 );
 
 		// Shared Admin pages sidebar actions.
-		add_action( 'xmlsf_admin_sidebar', array( '\XMLSF\Admin\Main', 'admin_sidebar_help' ) );
-		add_action( 'xmlsf_admin_sidebar', array( '\XMLSF\Admin\Main', 'admin_sidebar_contribute' ), 20 );
+		\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_help' ) );
+		\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_contribute' ), 20 );
 
-		if ( XMLSF\sitemaps_enabled( 'sitemap' ) ) {
-			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap', 'register_settings' ), 7 );
-			add_action( 'rest_api_init', array( '\XMLSF\Admin\Sitemap', 'register_settings' ) );
-			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap', 'tools_actions' ), 9 );
-			add_action( 'admin_notices', array( '\XMLSF\Admin\Sitemap', 'check_advanced' ), 0 );
-			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap', 'compat' ) );
-
-			// META.
-			add_action( 'add_meta_boxes', array( '\XMLSF\Admin\Sitemap', 'add_meta_box' ) );
-			add_action( 'save_post', array( '\XMLSF\Admin\Sitemap', 'save_metadata' ) );
-
-			// Placeholders for advanced options.
-			add_action( 'xmlsf_posttype_archive_field_options', array( '\XMLSF\Admin\Fields', 'advanced_archive_field_options' ) );
-
-			// QUICK EDIT.
-			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap', 'add_columns' ) );
-			add_action( 'quick_edit_custom_box', array( '\XMLSF\Admin\Fields', 'quick_edit_fields' ) );
-			add_action( 'save_post', array( '\XMLSF\Admin\Sitemap', 'quick_edit_save' ) );
-			add_action( 'admin_head', array( '\XMLSF\Admin\Sitemap', 'quick_edit_script' ), 99 );
-			// BULK EDIT.
-			add_action( 'bulk_edit_custom_box', array( '\XMLSF\Admin\Fields', 'bulk_edit_fields' ), 0 );
+		if ( \XMLSF\sitemaps_enabled( 'sitemap' ) ) {
+			namespace\Sitemap::init();
 		}
 
-		if ( XMLSF\sitemaps_enabled( 'news' ) ) {
-			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap_News', 'register_settings' ), 7 );
-			add_action( 'rest_api_init', array( '\XMLSF\Admin\Sitemap_News', 'register_settings' ) );
-			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap_News', 'tools_actions' ), 9 );
-			add_action( 'admin_notices', array( '\XMLSF\Admin\Sitemap_News', 'check_advanced' ), 0 );
-			add_action( 'admin_init', array( '\XMLSF\Admin\Sitemap_News', 'compat' ) );
-
-			// META.
-			add_action( 'add_meta_boxes', array( '\XMLSF\Admin\Sitemap_News', 'add_meta_box' ) );
-			add_action( 'save_post', array( '\XMLSF\Admin\Sitemap_News', 'save_metadata' ) );
+		if ( \XMLSF\sitemaps_enabled( 'news' ) ) {
+			namespace\Sitemap_News::init();
 		}
 	}
 
 	/**
 	 * Plugin compatibility hooks and filters.
-	 * Hooked on admin_init.
 	 */
 	public static function compat() {
 		// Catch Box Pro compatibility.
 		if ( \function_exists( 'catchbox_is_feed_url_present' ) ) {
-			\add_action( 'admin_notices', array( __NAMESPACE__ . '\Compat\Catch_Box_Pro', 'admin_notices' ) );
+			\add_action( 'admin_notices', array( '\XMLSF\Compat\Catch_Box_Pro', 'admin_notices' ) );
+		}
+
+		if ( \XMLSF\sitemaps_enabled( 'sitemap' ) ) {
+			namespace\Sitemap::compat();
+		}
+
+		if ( \XMLSF\sitemaps_enabled( 'news' ) ) {
+			namespace\Sitemap_News::compat();
 		}
 	}
 
 	/**
-	 * Add options page
+	 * Add options pages
 	 */
-	public static function add_settings_pages() {
+	public static function add_options_pages() {
 		if ( \XMLSF\sitemaps_enabled( 'sitemap' ) ) {
-			// This page will be under "Settings".
-			$screen_id = \add_options_page(
-				__( 'XML Sitemap', 'xml-sitemap-feed' ),
-				__( 'XML Sitemap', 'xml-sitemap-feed' ),
-				'manage_options',
-				'xmlsf',
-				array( __NAMESPACE__ . '\Sitemap', 'settings_page' )
-			);
-
-			// Settings hooks.
-			\add_action( 'xmlsf_add_settings', array( __NAMESPACE__ . '\Sitemap', 'add_settings' ) );
-
-			// Help tabs.
-			\add_action( 'load-' . $screen_id, array( __NAMESPACE__ . '\Sitemap', 'help_tabs' ) );
+			namespace\Sitemap::add_options_page();
 		}
 
 		if ( \XMLSF\sitemaps_enabled( 'news' ) ) {
-			// This page will be under "Settings".
-			$screen_id = \add_options_page(
-				__( 'Google News Sitemap', 'xml-sitemap-feed' ),
-				__( 'Google News', 'xml-sitemap-feed' ),
-				'manage_options',
-				'xmlsf_news',
-				array( __NAMESPACE__ . '\Sitemap_News', 'settings_page' )
-			);
-
-			// Settings hooks.
-			\add_action( 'xmlsf_news_add_settings', array( __NAMESPACE__ . '\Sitemap_News', 'add_settings' ) );
-
-			// Help tab.
-			\add_action( 'load-' . $screen_id, array( __NAMESPACE__ . '\Sitemap_News', 'help_tab' ) );
+			namespace\Sitemap_News::add_options_page();
 		}
 	}
 
@@ -218,6 +166,14 @@ class Main {
 
 		// Maybe flush rewrite rules.
 		\add_action( 'load-options-reading.php', array( __CLASS__, 'maybe_sitemaps_updated' ) );
+
+		if ( \XMLSF\sitemaps_enabled( 'sitemap' ) ) {
+			namespace\Sitemap::register_settings();
+		}
+
+		if ( \XMLSF\sitemaps_enabled( 'news' ) ) {
+			namespace\Sitemap_News::register_settings();
+		}
 	}
 
 	/**
@@ -305,31 +261,6 @@ class Main {
 	 */
 	public static function admin_sidebar_contribute() {
 		include XMLSF_DIR . '/views/admin/sidebar-contribute.php';
-	}
-
-	/**
-	 * Tools actions
-	 */
-	public static function tools_actions() {
-		if ( ! isset( $_POST['_xmlsf_help_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
-			return;
-		}
-
-		// TODO clear global settings.
-		if ( isset( $_POST['xmlsf-clear-settings-general'] ) ) {
-			self::clear_settings();
-		}
-
-		if ( isset( $_POST['xmlsf-flush-rewrite-rules'] ) ) {
-			// Flush rewrite rules.
-			\flush_rewrite_rules( false );
-			\add_settings_error(
-				'flush_admin_notice',
-				'flush_admin_notice',
-				__( 'WordPress rewrite rules have been flushed.', 'xml-sitemap-feed' ),
-				'success'
-			);
-		}
 	}
 
 	/**

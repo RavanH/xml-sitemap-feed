@@ -12,6 +12,28 @@ namespace XMLSF\Admin;
  */
 class Sitemap {
 	/**
+	 * Initialize hooks and filters.
+	 */
+	public static function init() {
+		\add_action( 'admin_notices', array( '\XMLSF\Admin\Sitemap', 'check_advanced' ), 0 );
+
+		// META.
+		\add_action( 'add_meta_boxes', array( '\XMLSF\Admin\Sitemap', 'add_meta_box' ) );
+		\add_action( 'save_post', array( '\XMLSF\Admin\Sitemap', 'save_metadata' ) );
+
+		// Placeholders for advanced options.
+		\add_action( 'xmlsf_posttype_archive_field_options', array( '\XMLSF\Admin\Fields', 'advanced_archive_field_options' ) );
+
+		// QUICK EDIT.
+		self::add_columns();
+		\add_action( 'quick_edit_custom_box', array( '\XMLSF\Admin\Fields', 'quick_edit_fields' ) );
+		\add_action( 'save_post', array( '\XMLSF\Admin\Sitemap', 'quick_edit_save' ) );
+		\add_action( 'admin_head', array( '\XMLSF\Admin\Sitemap', 'quick_edit_script' ), 99 );
+		// BULK EDIT.
+		\add_action( 'bulk_edit_custom_box', array( '\XMLSF\Admin\Fields', 'bulk_edit_fields' ), 0 );
+	}
+
+	/**
 	 * Plugin compatibility hooks and filters.
 	 * Hooked on admin_init.
 	 */
@@ -197,7 +219,18 @@ class Sitemap {
 			return;
 		}
 
-		if ( isset( $_POST['xmlsf-check-conflicts-sitemap'] ) ) {
+		if ( isset( $_POST['xmlsf-flush-rewrite-rules'] ) ) {
+			// Flush rewrite rules.
+			\flush_rewrite_rules( false );
+			\add_settings_error(
+				'flush_admin_notice',
+				'flush_admin_notice',
+				__( 'WordPress rewrite rules have been flushed.', 'xml-sitemap-feed' ),
+				'success'
+			);
+		}
+
+		if ( isset( $_POST['xmlsf-check-conflicts'] ) ) {
 			// Reset ignored warnings.
 			\delete_user_meta( \get_current_user_id(), 'xmlsf_dismissed' );
 
@@ -225,7 +258,7 @@ class Sitemap {
 			}
 		}
 
-		if ( isset( $_POST['xmlsf-clear-settings-sitemap'] ) ) {
+		if ( isset( $_POST['xmlsf-clear-settings'] ) ) {
 			self::clear_settings();
 			\add_settings_error(
 				'notice_clear_settings',
@@ -387,6 +420,29 @@ class Sitemap {
 		} else {
 			\update_post_meta( $post_id, '_xmlsf_exclude', \sanitize_key( $_POST['xmlsf_exclude'] ) );
 		}
+	}
+
+	/**
+	 * Add options page
+	 */
+	public static function add_options_page() {
+		// This page will be under "Settings".
+		$screen_id = \add_options_page(
+			__( 'XML Sitemap', 'xml-sitemap-feed' ),
+			__( 'XML Sitemap', 'xml-sitemap-feed' ),
+			'manage_options',
+			'xmlsf',
+			array( __CLASS__, 'settings_page' )
+		);
+
+		// Settings hooks.
+		\add_action( 'xmlsf_add_settings', array( __CLASS__, 'add_settings' ) );
+
+		// Tools actions.
+		\add_action( 'load-' . $screen_id, array( __CLASS__, 'tools_actions' ) );
+
+		// Help tabs.
+		\add_action( 'load-' . $screen_id, array( __CLASS__, 'help_tabs' ) );
 	}
 
 	/**
