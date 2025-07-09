@@ -11,7 +11,7 @@
 	<br />
 	<?php esc_html_e( 'Select the post types to include in the sitemap index. Select none to automatically include all public post types.', 'xml-sitemap-feed' ); ?>
 	<br />
-	<em><?php esc_html_e( 'Be aware: excluding the Pages sitemap, also means excluding the home aand blog pages!', 'xml-sitemap-feed' ); ?></em>
+	<em><?php esc_html_e( 'Be aware: excluding the Pages sitemap, also means excluding the home and blog pages!', 'xml-sitemap-feed' ); ?></em>
 </p>
 <?php if ( 'core' === \xmlsf()->sitemap->server_type ) : ?>
 <p>
