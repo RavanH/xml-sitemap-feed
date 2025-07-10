@@ -893,7 +893,7 @@ class Sitemap {
 		global $post;
 		if ( 'xmlsf_exclude' === $column_name ) {
 			$exclude_meta = \get_post_meta( $post->ID, '_xmlsf_exclude', true );
-
+			echo '<span class="_xmlsf_exclude" data-value="' . \esc_attr( $exclude_meta ) . '"></span>';
 			if ( $exclude_meta ) {
 				$title = \translate( 'No' );
 				echo '<span class="dashicons-before dashicons-no" style="color:red" title="' . \esc_attr( $title ) . '"><span class="screen-reader-text">' . \esc_attr( $title ) . '</span></span>';
@@ -904,7 +904,6 @@ class Sitemap {
 				$title = \translate( 'Yes' );
 				echo '<span class="dashicons-before dashicons-yes" style="color:green" title="' . \esc_attr( $title ) . '"><span class="screen-reader-text">' . \esc_attr( $title ) . '</span></span>';
 			}
-			echo '<input type="hidden" name="_xmlsf_exclude" class="_xmlsf_exclude" value="' . \esc_attr( $exclude_meta ) . '">';
 		}
 	}
 
@@ -920,7 +919,7 @@ class Sitemap {
 			return;
 		}
 
-		// check inlint edit nonce.
+		// check inline edit nonce.
 		if ( empty( $_POST['_inline_edit'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_inline_edit'] ), 'inlineeditnonce' ) ) {
 			return;
 		}
@@ -959,7 +958,7 @@ inlineEditPost.edit = function (post_id) {
 		const edit_row = $('#edit-' + post_id);
 		const post_row = $('#post-' + post_id);
 
-		const exclude = 1 == $('._xmlsf_exclude', post_row).val() ? true : false;
+		const exclude = 1 == $('._xmlsf_exclude', post_row).data( "value" ) ? true : false;
 		console.log( exclude );
 		$(':input[name="xmlsf_exclude"]', edit_row).prop('checked', exclude);
 	}
