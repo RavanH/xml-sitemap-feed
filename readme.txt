@@ -141,10 +141,15 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.5.5 =
-Fix Polylang Pro compatibility. Fix core index lastmods.
+= 5.5.6 =
+Fix 
 
 == Changelog ==
+
+= 5.5.6 =
+Date: 
+* FIX: Possible excessively long URL on admin post search, thanks @leedxw
+* FIX: Notice dismiss failing
 
 = 5.5.5 =
 Date: 20250625
