@@ -47,7 +47,7 @@ class Rank_Math {
 		}
 
 		// check rank math sitemap option.
-		if ( ! \in_array( 'rankmath_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed', true ), true ) ) {
+		if ( ! \in_array( 'rankmath_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 			$rankmath_modules = (array) \get_option( 'rank_math_modules' );
 			if ( \in_array( 'sitemap', $rankmath_modules, true ) ) {
 				?>
