@@ -142,7 +142,7 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 == Upgrade Notice ==
 
 = 5.5.6 =
-Fix 
+Fix admin notice dismissal and possible excessively long URL on admin post search.
 
 == Changelog ==
 
