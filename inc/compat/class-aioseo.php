@@ -15,7 +15,7 @@ class AIOSEO {
 	 * Admin notices.
 	 */
 	public static function admin_notices() {
-		if ( ! \current_user_can( 'manage_options' ) || \in_array( 'aioseop_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed', true ), true ) ) {
+		if ( ! \current_user_can( 'manage_options' ) || \in_array( 'aioseop_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 			return;
 		}
 

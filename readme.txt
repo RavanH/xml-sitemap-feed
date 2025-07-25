@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 6.8
-Stable tag: 5.5.5
+Stable tag: 5.5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -141,10 +141,15 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.5.5 =
-Fix Polylang Pro compatibility. Fix core index lastmods.
+= 5.5.6 =
+Fix admin notice dismissal and possible excessively long URL on admin post search.
 
 == Changelog ==
+
+= 5.5.6 =
+Date: 20250717
+* FIX: Possible excessively long URL on admin post search, thanks @leedxw
+* FIX: Notice dismiss failing
 
 = 5.5.5 =
 Date: 20250625

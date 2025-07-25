@@ -16,7 +16,7 @@ class SEO_Framework {
 	 */
 	public static function admin_notices() {
 		// check sfw sitemap module.
-		if ( ! \current_user_can( 'manage_options' ) || \in_array( 'seoframework_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed', true ), true ) ) {
+		if ( ! \current_user_can( 'manage_options' ) || \in_array( 'seoframework_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 			return;
 		}
 

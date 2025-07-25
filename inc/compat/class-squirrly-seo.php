@@ -15,7 +15,7 @@ class Squirrly_SEO {
 	 * Admin notices.
 	 */
 	public static function admin_notices() {
-		if ( ! \current_user_can( 'manage_options' ) || \in_array( 'squirrly_seo_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed', true ), true ) ) {
+		if ( ! \current_user_can( 'manage_options' ) || \in_array( 'squirrly_seo_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 			return;
 		}
 
@@ -59,7 +59,7 @@ class Squirrly_SEO {
 	 * Admin notices.
 	 */
 	public static function news_admin_notices() {
-		if ( ! \current_user_can( 'manage_options' ) || \in_array( 'squirrly_seo_sitemap_news', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed', true ), true ) ) {
+		if ( ! \current_user_can( 'manage_options' ) || \in_array( 'squirrly_seo_sitemap_news', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 			return;
 		}
 

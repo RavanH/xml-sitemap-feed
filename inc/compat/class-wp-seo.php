@@ -46,7 +46,7 @@ class WP_SEO {
 		}
 
 		// check wpseo sitemap option.
-		if ( ! \in_array( 'wpseo_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed', true ), true ) ) {
+		if ( ! \in_array( 'wpseo_sitemap', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
 			$wpseo = \get_option( 'wpseo' );
 			if ( ! empty( $wpseo['enable_xml_sitemap'] ) ) {
 				?>
