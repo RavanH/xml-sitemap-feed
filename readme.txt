@@ -142,7 +142,7 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 == Upgrade Notice ==
 
 = 5.5.7 =
-Fix admin notice dismissal and possible excessively long URL on admin post search.
+Fix WPML Compatibility missing valid callback.
 
 == Changelog ==
 
