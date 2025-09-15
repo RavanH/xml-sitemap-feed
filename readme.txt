@@ -148,7 +148,7 @@ Fix admin notice dismissal and possible excessively long URL on admin post searc
 
 = 5.5.7 =
 Date: 20250915
-* FIX: WPML Compatibility missing valid callback
+* FIX: WPML Compatibility missing valid callback, thanks @linusbenknerkk
 
 = 5.5.6 =
 Date: 20250717
