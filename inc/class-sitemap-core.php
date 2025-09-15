@@ -111,7 +111,7 @@ class Sitemap_Core extends Sitemap {
 			// Make sure we get the correct sitemap URL in language context.
 			\add_filter( 'xmlsf_sitemap_url', array( __NAMESPACE__ . '\Compat\WPML', 'convert_url' ), 10, 2 );
 			// Add sitemap in Robots TXT.
-			\add_filter( 'robots_txt', array( __NAMESPACE__ . '\Compat\WPML', 'robots_txt' ), 9 );
+			\add_filter( 'robots_txt', array( __NAMESPACE__ . '\Compat\WPML', 'sitemap_robots' ), 9 );
 		}
 
 		// XMLSM compatibility.
