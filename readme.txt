@@ -1,6 +1,6 @@
 === XML Sitemap & Google News ===
 Contributors: RavanH
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed
+Donate link: https://www.paypal.com/donate/?hosted_button_id=5UVXZVN5HDKBS
 Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
