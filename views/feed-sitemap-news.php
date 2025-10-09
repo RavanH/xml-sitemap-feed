@@ -60,8 +60,6 @@ if ( have_posts() ) :
 			echo '</news:publication>';
 			echo '<news:publication_date>' . esc_xml( get_date_from_gmt( $post->post_date_gmt, DATE_W3C ) ) . '</news:publication_date>';
 			echo '<news:title>' . esc_xml( apply_filters( 'xmlsf_news_title', get_the_title() ) ) . '</news:title>';
-			echo '<news:keywords>' . esc_xml( implode( ', ', (array) apply_filters( 'xmlsf_news_keywords', array(), $post->ID ) ) ) . '</news:keywords>';
-			echo '<news:stock_tickers>' . esc_xml( implode( ', ', apply_filters( 'xmlsf_news_stock_tickers', array() ) ) ) . '</news:stock_tickers>';
 
 			do_action( 'xmlsf_news_tags_inner', $post );
 
