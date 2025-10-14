@@ -637,58 +637,58 @@ class Sitemap {
 		\register_setting(
 			'xmlsf_general',
 			'xmlsf_server',
-			array( __NAMESPACE__ . '\Sanitize', 'server' )
+			array( 'sanitize_callback' => array( __NAMESPACE__ . '\Sanitize', 'server' ) )
 		);
 		\register_setting(
 			'xmlsf_general',
 			'xmlsf_disabled_providers',
-			array( __NAMESPACE__ . '\Sanitize', 'disabled_providers' )
+			array( 'sanitize_callback' => array( __NAMESPACE__ . '\Sanitize', 'disabled_providers' ) )
 		);
 		// post_types.
 		\register_setting(
 			'xmlsf_post_types',
 			'xmlsf_post_types',
-			array( __NAMESPACE__ . '\Sanitize', 'post_types' )
+			array( 'sanitize_callback' => array( __NAMESPACE__ . '\Sanitize', 'post_types' ) )
 		);
 		// post_type settings.
 		\register_setting(
 			'xmlsf_post_types',
 			'xmlsf_post_type_settings',
-			array( __NAMESPACE__ . '\Sanitize', 'post_type_settings' )
+			array( 'sanitize_callback' => array( __NAMESPACE__ . '\Sanitize', 'post_type_settings' ) )
 		);
 		// taxonomies.
 		\register_setting(
 			'xmlsf_taxonomies',
 			'xmlsf_taxonomy_settings',
-			array( __NAMESPACE__ . '\Sanitize', 'taxonomy_settings' )
+			array( 'sanitize_callback' => array( __NAMESPACE__ . '\Sanitize', 'taxonomy_settings' ) )
 		);
 		\register_setting(
 			'xmlsf_taxonomies',
 			'xmlsf_taxonomies',
-			array( __NAMESPACE__ . '\Sanitize', 'taxonomies' )
+			array( 'sanitize_callback' => array( __NAMESPACE__ . '\Sanitize', 'taxonomies' ) )
 		);
 		// authors.
 		\register_setting(
 			'xmlsf_authors',
 			'xmlsf_author_settings',
-			array( __NAMESPACE__ . '\Sanitize', 'author_settings' )
+			array( 'sanitize_callback' => array( __NAMESPACE__ . '\Sanitize', 'author_settings' ) )
 		);
 		\register_setting(
 			'xmlsf_authors',
 			'xmlsf_authors',
-			array( __NAMESPACE__ . '\Sanitize', 'authors' )
+			array( 'sanitize_callback' => array( __NAMESPACE__ . '\Sanitize', 'authors' ) )
 		);
 		// custom urls.
 		\register_setting(
 			'xmlsf_advanced',
 			'xmlsf_urls',
-			array( __NAMESPACE__ . '\Sanitize', 'custom_urls_settings' )
+			array( 'sanitize_callback' => array( __NAMESPACE__ . '\Sanitize', 'custom_urls_settings' ) )
 		);
 		// custom sitemaps.
 		\register_setting(
 			'xmlsf_advanced',
 			'xmlsf_custom_sitemaps',
-			array( __NAMESPACE__ . '\Sanitize', 'custom_sitemaps_settings' )
+			array( 'sanitize_callback' => array( __NAMESPACE__ . '\Sanitize', 'custom_sitemaps_settings' ) )
 		);
 
 		// Settings ACTIONS & CHECKS.

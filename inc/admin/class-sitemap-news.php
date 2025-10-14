@@ -358,7 +358,7 @@ class Sitemap_News {
 		\register_setting(
 			'xmlsf_news_general',
 			'xmlsf_news_tags',
-			array( __CLASS__, 'sanitize_news_tags' )
+			array( 'sanitize_callback' => array( __CLASS__, 'sanitize_news_tags' ) )
 		);
 
 		// Dummy register setting to prevent admin error on Save Settings from Advanced tab.
@@ -594,6 +594,13 @@ class Sitemap_News {
 		// At least one, default post type.
 		if ( empty( $sanitized['post_type'] ) || ! \is_array( $sanitized['post_type'] ) ) {
 			$sanitized['post_type'] = array( 'post' );
+			// Add settings error.
+			\add_settings_error(
+				'xmlsf_news_tags',
+				'xmlsf_news_post_type_error',
+				__( 'At least one post type must be selected. Defaulting to "Posts".', 'xml-sitemap-feed' ),
+				'error'
+			);
 		}
 
 		// If there are categories selected, then test.
