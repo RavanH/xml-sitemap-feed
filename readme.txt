@@ -141,8 +141,8 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.5.7 =
-Fix WPML Compatibility missing valid callback.
+= 5.5.8 =
+Fix sanitization callbacks.
 
 == Changelog ==
 
