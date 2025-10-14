@@ -9,10 +9,6 @@ defined( 'WPINC' ) || die;
 
 $options = get_option( 'xmlsf_news_tags' );
 
-if ( XMLSF_GOOGLE_NEWS_NAME ) {
-	$options['name'] = XMLSF_GOOGLE_NEWS_NAME;
-}
-
 // Do xml tag via echo or SVN parser is going to freak out.
 echo '<?xml version="1.0" encoding="' . esc_xml( esc_attr( get_bloginfo( 'charset' ) ) ) . '"?>' . PHP_EOL;
 echo '<?xml-stylesheet type="text/xsl" href="' . \esc_url( \wp_make_link_relative( XMLSF\get_stylesheet_url( 'news' ) ) ) . '?ver=' . \esc_xml( XMLSF_VERSION ) . '"?>' . PHP_EOL;
@@ -54,7 +50,7 @@ if ( have_posts() ) :
 		if ( $post_age && $post_age >= strtotime( '-48 hours' ) ) {
 			// The news tags.
 			echo '<news:news><news:publication><news:name>';
-			echo esc_xml( apply_filters( 'xmlsf_news_publication_name', ( ! empty( $options['name'] ) ? $options['name'] : get_bloginfo( 'name' ) ), $post->ID, $post->post_type ) );
+			echo esc_xml( apply_filters( 'xmlsf_news_publication_name', ( defined( 'XMLSF_GOOGLE_NEWS_NAME' ) && XMLSF_GOOGLE_NEWS_NAME ? XMLSF_GOOGLE_NEWS_NAME : get_bloginfo( 'name' ) ), $post->ID, $post->post_type ) );
 			echo '</news:name>';
 			echo '<news:language>' . esc_xml( apply_filters( 'xmlsf_news_language', get_bloginfo( 'language' ), $post->ID, $post->post_type ) ) . '</news:language>';
 			echo '</news:publication>';

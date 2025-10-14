@@ -45,7 +45,6 @@
  */
 
 defined( 'WPINC' ) || die;
-defined( 'XMLSF_GOOGLE_NEWS_NAME' ) || define( 'XMLSF_GOOGLE_NEWS_NAME', false );
 
 define( 'XMLSF_VERSION', '5.5.7' );
 define( 'XMLSF_ADV_MIN_VERSION', '0.1' );
