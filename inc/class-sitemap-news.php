@@ -41,7 +41,7 @@ class Sitemap_News {
 		\add_filter( 'xmlsf_news_language', array( $this, 'parse_language_string' ), 99 );
 
 		// Add sitemap in Robots TXT.
-		add_filter( 'robots_txt', array( $this, 'robots_txt' ), 9 );
+		\add_filter( 'robots_txt', array( $this, 'robots_txt' ), 9 );
 
 		// Compatibility hooks.
 		self::compat();

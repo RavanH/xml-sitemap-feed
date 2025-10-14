@@ -1,6 +1,6 @@
 === XML Sitemap & Google News ===
 Contributors: RavanH
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed
+Donate link: https://www.paypal.com/donate/?hosted_button_id=5UVXZVN5HDKBS
 Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
@@ -141,10 +141,15 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.5.7 =
-Fix WPML Compatibility missing valid callback.
+= 5.5.8 =
+Fix sanitization callbacks.
 
 == Changelog ==
+
+= 5.5.8 =
+Date: 20251014
+* Drop unused news tags & stylesheet columns
+* FIX: failing sanitize callbacks
 
 = 5.5.7 =
 Date: 20250915

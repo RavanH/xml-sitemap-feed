@@ -2,8 +2,8 @@
 /**
  * Plugin Name: XML Sitemap & Google News
  * Plugin URI: https://status301.net/wordpress-plugins/xml-sitemap-feed/
- * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols. Happy with the results? Please leave me a <strong><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=XML%20Sitemap%20Feed">tip</a></strong> for continued development and support. Thanks :)
- * Version: 5.5.7
+ * Description: Feed the hungry spiders in compliance with the XML Sitemap and Google News protocols.
+ * Version: 5.5.8
  * Text Domain: xml-sitemap-feed
  * Requires at least: 4.4
  * Requires PHP: 5.6
@@ -45,11 +45,10 @@
  */
 
 defined( 'WPINC' ) || die;
-defined( 'XMLSF_GOOGLE_NEWS_NAME' ) || define( 'XMLSF_GOOGLE_NEWS_NAME', false );
 
-define( 'XMLSF_VERSION', '5.5.7' );
+define( 'XMLSF_VERSION', '5.5.8' );
 define( 'XMLSF_ADV_MIN_VERSION', '0.1' );
-define( 'XMLSF_NEWS_ADV_MIN_VERSION', '1.3.5' );
+define( 'XMLSF_NEWS_ADV_MIN_VERSION', '1.3.6' );
 define( 'XMLSF_DIR', __DIR__ );
 define( 'XMLSF_BASENAME', plugin_basename( __FILE__ ) );
 
@@ -64,18 +63,18 @@ WP_DEBUG && require_once XMLSF_DIR . '/inc/functions-debugging.php';
 
 // Fire it up at plugins_loaded.
 add_action( 'plugins_loaded', 'xmlsf', 9 );
-add_filter( 'robots_txt', '\XMLSF\robots_txt', 11 );
-add_action( 'xmlsf_sitemap_loaded', '\XMLSF\sitemap_loaded' );
-add_action( 'xmlsf_news_sitemap_loaded', '\XMLSF\sitemap_loaded' );
+add_filter( 'robots_txt', 'XMLSF\robots_txt', 11 );
+add_action( 'xmlsf_sitemap_loaded', 'XMLSF\sitemap_loaded' );
+add_action( 'xmlsf_news_sitemap_loaded', 'XMLSF\sitemap_loaded' );
 
 // Admin.
-add_action( 'admin_menu', array( '\XMLSF\Admin\Main', 'add_options_pages' ) );
-add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'register_settings' ), 7 );
-add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'init' ), 9 );
-add_action( 'admin_init', array( '\XMLSF\Admin\Main', 'compat' ) );
+add_action( 'admin_menu', array( 'XMLSF\Admin\Main', 'add_options_pages' ) );
+add_action( 'admin_init', array( 'XMLSF\Admin\Main', 'register_settings' ), 7 );
+add_action( 'admin_init', array( 'XMLSF\Admin\Main', 'init' ), 9 );
+add_action( 'admin_init', array( 'XMLSF\Admin\Main', 'compat' ) );
 
-register_deactivation_hook( __FILE__, array( '\XMLSF\Admin\Main', 'deactivate' ) );
-register_activation_hook( __FILE__, array( '\XMLSF\Admin\Main', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'XMLSF\Admin\Main', 'deactivate' ) );
+register_activation_hook( __FILE__, array( 'XMLSF\Admin\Main', 'activate' ) );
 
 /**
  * Get sitemap object.

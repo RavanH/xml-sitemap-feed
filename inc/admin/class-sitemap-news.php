@@ -228,9 +228,6 @@ class Sitemap_News {
 
 		\do_action( 'xmlsf_news_add_settings', $active_tab );
 
-		// prepare sitemap link url.
-		$sitemap_url = \xmlsf()->sitemap_news->get_sitemap_url();
-
 		// Sidebar actions.
 		\add_action(
 			'xmlsf_admin_sidebar',
@@ -307,14 +304,18 @@ class Sitemap_News {
 				\add_settings_field(
 					'xmlsf_news_name',
 					'<label for="xmlsf_news_name">' . \__( 'Publication name', 'xml-sitemap-feed' ) . '</label>',
-					array( __CLASS__, 'name_field' ),
+					function () {
+						include XMLSF_DIR . '/views/admin/field-news-name.php';
+					},
 					'xmlsf_news_general',
 					'news_sitemap_general_section'
 				);
 				\add_settings_field(
 					'xmlsf_news_post_type',
 					__( 'Post types', 'xml-sitemap-feed' ),
-					array( __CLASS__, 'post_type_field' ),
+					function () {
+						include XMLSF_DIR . '/views/admin/field-news-post-type.php';
+					},
 					'xmlsf_news_general',
 					'news_sitemap_general_section'
 				);
@@ -330,7 +331,9 @@ class Sitemap_News {
 						\add_settings_field(
 							'xmlsf_news_categories',
 							\translate( 'Categories' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-							array( __CLASS__, 'categories_field' ),
+							function () {
+								include XMLSF_DIR . '/views/admin/field-news-categories.php';
+							},
 							'xmlsf_news_general',
 							'news_sitemap_general_section'
 						);
@@ -358,7 +361,7 @@ class Sitemap_News {
 		\register_setting(
 			'xmlsf_news_general',
 			'xmlsf_news_tags',
-			array( __CLASS__, 'sanitize_news_tags' )
+			array( 'sanitize_callback' => array( __CLASS__, 'sanitize_news_tags' ) )
 		);
 
 		// Dummy register setting to prevent admin error on Save Settings from Advanced tab.
@@ -489,99 +492,6 @@ class Sitemap_News {
 	}
 
 	/**
-	 * News source name field
-	 */
-	public static function name_field() {
-		$options = (array) \get_option( 'xmlsf_news_tags', array() );
-		$name    = ! empty( $options['name'] ) ? $options['name'] : '';
-
-		if ( XMLSF_GOOGLE_NEWS_NAME ) {
-			$name = XMLSF_GOOGLE_NEWS_NAME;
-		}
-
-		// The actual fields for data entry.
-		include XMLSF_DIR . '/views/admin/field-news-name.php';
-	}
-
-	/**
-	 * Post type field
-	 */
-	public static function post_type_field() {
-		global $wp_taxonomies;
-
-		$post_types = \apply_filters(
-			'xmlsf_news_post_types',
-			\get_post_types(
-				array(
-					'public'       => true,
-					'hierarchical' => false,
-				)
-				/*,'objects'*/
-			)
-		);
-
-		// Make sure post types are allowed and publicly viewable.
-		$post_types = \array_diff( $post_types, \xmlsf()->disabled_post_types() );
-		$post_types = \array_filter( $post_types, 'is_post_type_viewable' );
-
-		if ( ! \is_array( $post_types ) || empty( $post_types ) ) {
-			// This should never happen.
-			echo '<p class="description warning">' . \esc_html__( 'There appear to be no post types available.', 'xml-sitemap-feed' ) . '</p>';
-			return;
-		}
-
-		$options        = (array) \get_option( 'xmlsf_news_tags', array() );
-		$news_post_type = isset( $options['post_type'] ) && ! empty( $options['post_type'] ) ? (array) $options['post_type'] : array( 'post' );
-		$type           = \apply_filters( 'xmlsf_news_post_type_field_type', 1 === \count( $news_post_type ) ? 'radio' : 'checkbox' );
-		$allowed        = ( ! empty( $options['categories'] ) && isset( $wp_taxonomies['category'] ) ) ? $wp_taxonomies['category']->object_type : $post_types;
-		$do_warning     = ( ! empty( $options['categories'] ) && \count( $post_types ) > 1 ) ? true : false;
-
-		// The actual fields for data entry.
-		include XMLSF_DIR . '/views/admin/field-news-post-type.php';
-	}
-
-	/**
-	 * Categories field
-	 */
-	public static function categories_field() {
-		$options             = (array) \get_option( 'xmlsf_news_tags', array() );
-		$selected_categories = isset( $options['categories'] ) && \is_array( $options['categories'] ) ? $options['categories'] : array();
-
-		if ( \function_exists( '\pll_languages_list' ) ) {
-			\add_filter(
-				'get_terms_args',
-				function ( $args ) {
-					$args['lang'] = '';
-					return $args;
-				}
-			);
-		}
-
-		global $sitepress;
-		if ( $sitepress ) {
-			\remove_filter( 'get_terms_args', array( $sitepress, 'get_terms_args_filter' ) );
-			\remove_filter( 'get_term', array( $sitepress, 'get_term_adjust_id' ), 1 );
-			\remove_filter( 'terms_clauses', array( $sitepress, 'terms_clauses' ) );
-		}
-
-		$cat_list = \str_replace(
-			'name="post_category[]"',
-			'name="xmlsf_news_tags[categories][]"',
-			\wp_terms_checklist(
-				null,
-				array(
-					'taxonomy'      => 'category',
-					'selected_cats' => $selected_categories,
-					'echo'          => false,
-				)
-			)
-		);
-
-		// The actual fields for data entry.
-		include XMLSF_DIR . '/views/admin/field-news-categories.php';
-	}
-
-	/**
 	 * Sanitize news tag settings
 	 *
 	 * @param array $save Settings array.
@@ -594,6 +504,13 @@ class Sitemap_News {
 		// At least one, default post type.
 		if ( empty( $sanitized['post_type'] ) || ! \is_array( $sanitized['post_type'] ) ) {
 			$sanitized['post_type'] = array( 'post' );
+			// Add settings error.
+			\add_settings_error(
+				'xmlsf_news_tags',
+				'xmlsf_news_post_type_error',
+				__( 'At least one post type must be selected. Defaulting to "Posts".', 'xml-sitemap-feed' ),
+				'error'
+			);
 		}
 
 		// If there are categories selected, then test.
