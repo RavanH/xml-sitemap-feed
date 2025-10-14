@@ -146,6 +146,11 @@ Fix WPML Compatibility missing valid callback.
 
 == Changelog ==
 
+= 5.5.8 =
+Date: 20251014
+* Drop unused news tags & stylesheet columns
+* FIX: failing sanitize callbacks
+
 = 5.5.7 =
 Date: 20250915
 * FIX: WPML Compatibility missing valid callback, thanks @linusbenknerkk
