@@ -54,7 +54,7 @@
 			printf(
 				/* translators: Sitemap name with URL */
 				esc_html__( 'Open your %s', 'xml-sitemap-feed' ),
-				'<strong><a href="' . esc_url( $sitemap_url ) . '" target="_blank">' . esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ) . '</a></strong><span class="dashicons dashicons-external"></span>'
+				'<strong><a href="' . esc_url( xmlsf()->sitemap_news->get_sitemap_url() ) . '" target="_blank">' . esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ) . '</a></strong><span class="dashicons dashicons-external"></span>'
 			);
 			?>
 		</p>

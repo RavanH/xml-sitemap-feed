@@ -5,6 +5,35 @@
  * @package XML Sitemap & Google News
  */
 
+global $wp_taxonomies;
+
+$post_types = apply_filters(
+	'xmlsf_news_post_types',
+	get_post_types(
+		array(
+			'public'       => true,
+			'hierarchical' => false,
+		)
+		/*,'objects'*/
+	)
+);
+
+// Make sure post types are allowed and publicly viewable.
+$post_types = array_diff( $post_types, xmlsf()->disabled_post_types() );
+$post_types = array_filter( $post_types, 'is_post_type_viewable' );
+
+if ( ! is_array( $post_types ) || empty( $post_types ) ) {
+	// This should never happen.
+	echo '<p class="description warning">' . esc_html__( 'There appear to be no post types available.', 'xml-sitemap-feed' ) . '</p>';
+	return;
+}
+
+$options        = (array) \get_option( 'xmlsf_news_tags', array() );
+$news_post_type = isset( $options['post_type'] ) && ! empty( $options['post_type'] ) ? (array) $options['post_type'] : array( 'post' );
+$type           = apply_filters( 'xmlsf_news_post_type_field_type', 1 === count( $news_post_type ) ? 'radio' : 'checkbox' );
+$allowed        = ( ! empty( $options['categories'] ) && isset( $wp_taxonomies['category'] ) ) ? $wp_taxonomies['category']->object_type : $post_types;
+$do_warning     = ( ! empty( $options['categories'] ) && count( $post_types ) > 1 ) ? true : false;
+
 ?>
 <fieldset>
 	<legend class="screen-reader-text"><?php esc_html_e( 'Post types', 'xml-sitemap-feed' ); ?></legend>

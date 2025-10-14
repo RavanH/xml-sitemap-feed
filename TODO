@@ -1,5 +1,5 @@
 = 5.5.8 =
-TODO test sanitizations
+TODO test sanitizations; test settings fields
 
 = 5.6 =
 * RSS feeds: detect excerpt setting with admin warning or auto-change setting (?), suggest advanced plugin for improved compatibility
