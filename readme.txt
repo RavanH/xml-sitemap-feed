@@ -142,7 +142,7 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 == Upgrade Notice ==
 
 = 5.5.8 =
-Fix sanitization callbacks.
+Drop unused news tags and bugfixes.
 
 == Changelog ==
 
@@ -150,6 +150,7 @@ Fix sanitization callbacks.
 Date: 20251014
 * Drop unused news tags & stylesheet columns
 * FIX: failing sanitize callbacks
+* FIX: Squirrly SEO incompatibility warnings
 
 = 5.5.7 =
 Date: 20250915
