@@ -4,8 +4,8 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=5UVXZVN5HDKBS
 Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
-Tested up to: 6.8
-Stable tag: 5.5.8
+Tested up to: 6.9
+Stable tag: 5.5.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,7 @@ Please read the FAQ's for info on how to get your articles listed on Google News
 
 **[Google News Advanced](https://premium.status301.com/downloads/google-news-advanced/)**
 
+* Automatic sitemap update notification to Google Search Console. (Yes, Google Sitemap Ping is back!)
 * Multiple post types - Include more than one post type in the same News Sitemap.
 * Keywords - Add the keywords tag to your News Sitemap. Keywords can be created from Tags, Categories or a dedicated Keywords taxonomy.
 * Stock tickers - Add stock tickers tag to your News Sitemap. A dedicated Stock Tickers taxonomy will be available to manage them.
@@ -141,10 +142,14 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.5.8 =
-Drop unused news tags and bugfixes.
+= 5.5.9 =
+Prepare advanced sitemap notification feature.
 
 == Changelog ==
+
+= 5.5.9 =
+Date: 20251118
+* Prepare advanced sitemap notification feature.
 
 = 5.5.8 =
 Date: 20251014

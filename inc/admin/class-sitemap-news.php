@@ -265,7 +265,6 @@ class Sitemap_News {
 					'xmlsf_news_advanced',
 					'news_sitemap_advanced_section'
 				);
-
 				// Keywords.
 				\add_settings_field(
 					'xmlsf_news_keywords',
@@ -276,13 +275,22 @@ class Sitemap_News {
 					'xmlsf_news_advanced',
 					'news_sitemap_advanced_section'
 				);
-
 				// Stock tickers.
 				\add_settings_field(
 					'xmlsf_news_stock_tickers',
 					__( 'Stock tickers', 'xml-sitemap-feed' ),
 					function () {
 						include XMLSF_DIR . '/views/admin/field-news-stocktickers.php';
+					},
+					'xmlsf_news_advanced',
+					'news_sitemap_advanced_section'
+				);
+				// Sitemap notifier.
+				\add_settings_field(
+					'xmlsf_news_sitemap_notifier',
+					__( 'Sitemap notifier', 'xml-sitemap-feed' ),
+					function () {
+						include XMLSF_DIR . '/views/admin/field-news-notifier.php';
 					},
 					'xmlsf_news_advanced',
 					'news_sitemap_advanced_section'
@@ -476,6 +484,18 @@ class Sitemap_News {
 					array(
 						'id'      => 'sitemap-news-stocktickers',
 						'title'   => \__( 'Stock tickers', 'xml-sitemap-feed' ),
+						'content' => $content,
+					)
+				);
+				// Sitemap notifier.
+				\ob_start();
+				include XMLSF_DIR . '/views/admin/help-tab-news-notifier.php';
+				include XMLSF_DIR . '/views/admin/help-tab-support.php';
+				$content = \ob_get_clean();
+				$screen->add_help_tab(
+					array(
+						'id'      => 'sitemap-news-notifier',
+						'title'   => \__( 'Sitemap notifier', 'xml-sitemap-feed' ),
 						'content' => $content,
 					)
 				);

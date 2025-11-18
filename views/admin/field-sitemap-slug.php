@@ -15,10 +15,10 @@ $using_permalinks = xmlsf()->using_permalinks();
 		<?php esc_html_e( 'Set an alternative name for the sitemap index.', 'xml-sitemap-feed' ); ?>
 		<?php if ( ! $using_permalinks ) { ?>
 			<em>
-			<?php printf( /* Translators: Permalinks */ esc_html__( 'Not available because of this site\'s %s settings.', 'xml-sitemap-feed' ), '<a href="' . esc_url( admin_url( 'options-permalink.php' ) ) . '">' . esc_html( translate( 'Permalinks' ) ) . '</a>' ); ?>
+			<?php printf( /* Translators: Permalinks */ esc_html__( 'Not available because of this site\'s %s settings.', 'xml-sitemap-feed' ), '<a href="' . esc_url( admin_url( 'options-permalink.php' ) ) . '">' . esc_html( translate( 'Permalinks' ) ) . '</a>' ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?>
 			</em>
 		<?php } else { ?>
-			<?php apply_filters( 'xmlsf_advanced_enabled', false ) || printf( /* Translators: XML Sitemap Advanced */ esc_html__( 'Available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">' . esc_html__( 'XML Sitemap Advanced', 'xml-sitemap-feed' ) . '</a>' ); ?>
+			<?php apply_filters( 'xmlsf_advanced_enabled', false ) || printf( /* Translators: %s: XML Sitemap Advanced (with link) */ esc_html__( 'Available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">' . esc_html__( 'XML Sitemap Advanced', 'xml-sitemap-feed' ) . '</a>' ); ?>
 		<?php } ?>
 	</p>
 </fieldset>

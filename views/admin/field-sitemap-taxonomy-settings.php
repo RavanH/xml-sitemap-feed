@@ -8,7 +8,7 @@
 ?>
 <fieldset id="xmlsf_taxonomy_settings">
 	<legend class="screen-reader-text">
-		<?php echo esc_html( translate( 'General' ) ); ?>
+		<?php echo esc_html( translate( 'General' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?>
 	</legend>
 	<p>
 		<label>
@@ -29,7 +29,7 @@
 		<label>
 			<input type="checkbox" name="xmlsf_taxonomy_settings[include_empty]" id="xmlsf_taxonomy_include_empty" value="1"<?php checked( ! empty( $taxonomy_settings['include_empty'] ), true ); ?><?php disabled( apply_filters( 'xmlsf_advanced_enabled', false ), false ); ?> />
 			<?php esc_html_e( 'Include empty term archives.', 'xml-sitemap-feed' ); ?>
-			<?php apply_filters( 'xmlsf_advanced_enabled', false ) || printf( /* Translators: XML Sitemap Advanced */ esc_html__( 'Available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">' . esc_html__( 'XML Sitemap Advanced', 'xml-sitemap-feed' ) . '</a>' ); ?>
+			<?php apply_filters( 'xmlsf_advanced_enabled', false ) || printf( /* Translators: %s: XML Sitemap Advanced (with link) */ esc_html__( 'Available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">' . esc_html__( 'XML Sitemap Advanced', 'xml-sitemap-feed' ) . '</a>' ); ?>
 		</label>
 	</p>
 	<p>

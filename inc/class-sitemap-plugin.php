@@ -363,7 +363,6 @@ class Sitemap_Plugin extends Sitemap {
 
 		$parts     = \explode( '-', $feed, 3 );
 		$templates = array();
-		$found     = false;
 
 		// Possible theme template file names.
 		if ( ! empty( $parts[1] ) && \in_array( $parts[1], array( 'posttype', 'taxonomy', 'author', 'custom' ), true ) ) {
