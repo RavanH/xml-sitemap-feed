@@ -18,6 +18,13 @@
 	?>
 	<?php
 	printf(
+		/* translators: %s Knowledge Base (linked to https://premium.status301.com/knowledge-base/xml-sitemap-google-news/) */
+		esc_html__( 'Documentation on various related subjects can be found in our %s.', 'xml-sitemap-feed' ),
+		'<a href="https://premium.status301.com/knowledge-base/xml-sitemap-google-news/" target="_blank">' . esc_html__( 'Knowledge Base', 'xml-sitemap-feed' ) . '</a>'
+	);
+	?>
+	<?php
+	printf(
 		/* translators: Review page and Translation page on WordPress.org */
 		esc_html__( 'If you would like to contribute and share with the rest of the WordPress community, please consider writing a quick %1$s or help out with %2$s!', 'xml-sitemap-feed' ),
 		'<a href="https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/?filter=5#new-post" target="_blank">' . esc_html__( 'Review', 'xml-sitemap-feed' ) . '</a>',
