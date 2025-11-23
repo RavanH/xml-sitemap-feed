@@ -147,6 +147,11 @@ Prepare advanced sitemap notification feature.
 
 == Changelog ==
 
+= 5.6 =
+Date: 202511
+* Google Search Console sitemap reports
+* Knowledge base link in admin help sections
+
 = 5.5.9 =
 Date: 20251118
 * Prepare advanced sitemap notification feature.
