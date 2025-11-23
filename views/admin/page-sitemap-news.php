@@ -7,7 +7,7 @@
 
 ?>
 <style type="text/css">
-<?php include XMLSF_DIR . '/assets/admin.css'; ?>
+<?php require XMLSF_DIR . '/assets/admin.css'; ?>
 </style>
 <div class="wrap">
 
@@ -18,8 +18,9 @@
 	</p>
 
 	<nav class="nav-tab-wrapper">
-		<a href="?page=xmlsf_news&tab=general" class="nav-tab <?php echo 'general' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( translate( 'General' ) ); ?></a>
-		<a href="?page=xmlsf_news&tab=advanced" class="nav-tab <?php echo 'advanced' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( translate( 'Advanced' ) ); ?></a>
+		<a href="?page=xmlsf_news&tab=general" class="nav-tab <?php echo 'general' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( translate( 'General' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
+		<a href="?page=xmlsf_news&tab=advanced" class="nav-tab <?php echo 'advanced' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( translate( 'Advanced' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
+		<a href="?page=xmlsf_news&tab=gsc" class="nav-tab <?php echo 'gsc' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Google Search Console', 'xml-sitemap-feed' ); ?></a>
 		<?php do_action( 'xmlsf_news_nav_tabs', $active_tab ); ?>
 	</nav>
 
@@ -41,14 +42,14 @@
 
 	<div class="sidebar">
 		<?php
-		if ( ! self::compatible_with_advanced() ) {
+		if ( ! \XMLSF\Admin\Sitemap_News::compatible_with_advanced() ) {
 			echo '<div style="background:rgb(252, 229, 231); margin-left: -14px; padding: 5px 10px; border: 4px solid rgb(214, 73, 54); border-radius: 3px; margin-bottom: 20px; font-weight: bold;">';
 			include XMLSF_DIR . '/views/admin/section-advanced-news-compat-message.php';
 			echo '</div>';
 		}
 		?>
 
-		<h3><span class="dashicons dashicons-welcome-view-site"></span> <?php echo esc_html( translate( 'View' ) ); ?></h3>
+		<h3><span class="dashicons dashicons-welcome-view-site"></span> <?php echo esc_html( translate( 'View' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></h3>
 		<p>
 			<?php
 			printf(
@@ -59,7 +60,7 @@
 			?>
 		</p>
 
-		<h3><span class="dashicons dashicons-admin-tools"></span> <?php echo esc_html( translate( 'Tools' ) ); ?></h3>
+		<h3><span class="dashicons dashicons-admin-tools"></span> <?php echo esc_html( translate( 'Tools' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></h3>
 		<form action="" method="post">
 			<?php wp_nonce_field( XMLSF_BASENAME . '-help', '_xmlsf_help_nonce' ); ?>
 			<p>
@@ -69,7 +70,7 @@
 				<input type="submit" name="xmlsf-check-conflicts" class="button button-small" value="<?php esc_html_e( 'Check for conflicts', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
-				<input type="submit" name="xmlsf-clear-settings" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm( '<?php echo esc_js( __( 'This will revert ALL your Google News sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); ?>' )" />
+				<input type="submit" name="xmlsf-clear-settings" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm( '<?php echo esc_js( __( 'This will revert ALL your Google News sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?>' )" />
 			</p>
 		</form>
 
