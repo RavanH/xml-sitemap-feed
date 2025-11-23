@@ -236,20 +236,6 @@ class Main {
 	}
 
 	/**
-	 * Clear settings
-	 */
-	public static function clear_settings() {
-		// TODO reset Settings > Reading options here...
-
-		\add_settings_error(
-			'notice_clear_settings',
-			'notice_clear_settings',
-			__( 'Settings reset to the plugin defaults.', 'xml-sitemap-feed' ),
-			'updated'
-		);
-	}
-
-	/**
 	 * Admin sidbar help section
 	 */
 	public static function admin_sidebar_help() {
