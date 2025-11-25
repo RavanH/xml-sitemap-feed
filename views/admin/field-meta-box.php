@@ -5,6 +5,16 @@
  * @package XML Sitemap & Google News
  */
 
+// Use nonce for verification.
+\wp_nonce_field( XMLSF_BASENAME, '_xmlsf_nonce' );
+
+// Use get_post_meta to retrieve an existing value from the database and use the value for the form.
+$exclude  = \get_post_meta( $post_id, '_xmlsf_exclude', true );
+$priority = \get_post_meta( $post_id, '_xmlsf_priority', true );
+
+// value prechecks to prevent "invalid form control not focusable" when meta box is hidden.
+$priority = \is_numeric( $priority ) ? \XMLSF\sanitize_number( $priority ) : '';
+
 ?>
 <p>
 	<label>

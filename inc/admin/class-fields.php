@@ -47,7 +47,7 @@ class Fields {
 		$post_types = \apply_filters( 'xmlsf_author_has_published_posts', $post_types );
 
 		$disabled   = (array) \get_option( 'xmlsf_disabled_providers', \XMLSF\get_default_settings( 'disabled_providers' ) );
-		$public_tax = \get_taxonomies( array( 'public' => true ) );
+		$public_tax = \get_taxonomies( array( 'publicly_queryable' => true ) );
 		$users_args = array(
 			'fields'              => 'ID',
 			'has_published_posts' => $post_types,
@@ -101,7 +101,7 @@ class Fields {
 	 */
 	public static function taxonomies_field() {
 		$taxonomies = (array) \get_option( 'xmlsf_taxonomies', array() );
-		$public_tax = (array) \get_taxonomies( array( 'public' => true ) );
+		$public_tax = (array) \get_taxonomies( array( 'publicly_queryable' => true ), 'objects' );
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-taxonomies.php';
@@ -204,7 +204,7 @@ class Fields {
 	/**
 	 * Quick edit fields allows to add HTML in Quick Edit.
 	 *
-	 * @since 5.7
+	 * @since 5.5
 	 *
 	 * @param string $column_name Column name.
 	 */
@@ -218,7 +218,7 @@ class Fields {
 	/**
 	 * Bulk edit fields allows to add HTML in Quick Edit.
 	 *
-	 * @since 5.7
+	 * @since 5.5
 	 *
 	 * @param string $column_name Column name.
 	 */
@@ -228,5 +228,15 @@ class Fields {
 			// The actual fields for data entry.
 			include XMLSF_DIR . '/views/admin/field-bulk-edit.php';
 		}
+	}
+
+	/**
+	 * Sitemap notifier field.
+	 *
+	 * @since 5.6
+	 */
+	public static function sitemap_notifier_field() {
+		// The actual fields for data entry.
+		include XMLSF_DIR . '/views/admin/field-sitemap-notifier.php';
 	}
 }

@@ -13,7 +13,6 @@
 	<p>
 		<?php esc_html_e( 'Include these post types, or select none to automaticly include all public post types:', 'xml-sitemap-feed' ); ?>
 	</p>
-	<!--<style>ul.cat-checklist{height:auto;max-height:48em}ul.children{padding-left:1em}</style>-->
 	<ul>
 		<?php
 		$pt_objects = get_post_types( array( 'public' => true ), 'objects' );

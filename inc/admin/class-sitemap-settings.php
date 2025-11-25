@@ -7,6 +7,8 @@
 
 namespace XMLSF\Admin;
 
+use XMLSF\GSC_Connect;
+
 /**
  * Admin Sitemap Class
  */
@@ -15,6 +17,9 @@ class Sitemap_Settings {
 	 * Prepare admin page load.
 	 */
 	public static function load() {
+		// Run GSC actions.
+		self::gsc_actions();
+
 		// Run tools actions.
 		self::tools_actions();
 
@@ -66,6 +71,64 @@ class Sitemap_Settings {
 
 		foreach ( $defaults as $option => $settings ) {
 			\update_option( 'xmlsf_' . $option, $settings );
+		}
+	}
+
+	/**
+	 * Run admin actions.
+	 */
+	public static function gsc_actions() {
+		// Skip if doing ajax or no valid nonce.
+		if ( \wp_doing_ajax() || ! isset( $_POST['_xmlsf_gsc_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_xmlsf_gsc_nonce'] ), XMLSF_BASENAME . '-gsc' ) ) {
+			return;
+		}
+
+		// Handle disconnection if requested. Runs before anything else.
+		if ( isset( $_POST['xmlsf_gsc_disconnect'] ) ) {
+			// Clear the refresh token and any related options.
+			GSC_Connect::disconnect();
+
+			\add_settings_error(
+				'xmlsf_gsc_connect',
+				'gsc_disconnected',
+				__( 'Disconnected from Google Search Console successfully.', 'xml-sitemap-feed' ),
+				'success'
+			);
+		}
+
+		// Handle manual submit.
+		if ( isset( $_POST['xmlsf_gsc_manual_submit'] ) ) {
+			// Skip submission if within the grace period for Google News sitemap.
+			if ( \get_transient( 'sitemap_notifier_last_submission' ) ) {
+				$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_timeframe', 360 );
+				\add_settings_error(
+					'xmlsf_gsc_connect',
+					'gsc_manual_submit_news',
+					\sprintf( /* translators: %1$s: XML Sitemap Index, %2$d: number of seconds */ esc_html__( 'Your %1$s submission was skipped: Already sent within the last %2$d seconds.', 'xml-sitemap-feed' ), esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), $timeframe ),
+					'error'
+				);
+			} else {
+				$sitemap = xmlsf()->sitemap->get_sitemap_url();
+				$result  = GSC_Connect::submit( $sitemap );
+				if ( \is_wp_error( $result ) ) {
+					\add_settings_error(
+						'xmlsf_gsc_connect',
+						'gsc_manual_submit_news',
+						$result->get_error_message(),
+						'error'
+					);
+				} else {
+					\add_settings_error(
+						'xmlsf_gsc_connect',
+						'gsc_manual_submit_news',
+						\sprintf( /* translators: %s: XML Sitemap Index */ esc_html__( 'Your %s was submitted successfully.', 'xml-sitemap-feed' ), esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ) ),
+						'success'
+					);
+
+					$timeframe = \apply_filters( 'xmlsf_gsc_manual_submit_timeframe', 360 );
+					\set_transient( 'sitemap_notifier_last_submission', true, $timeframe );
+				}
+			}
 		}
 	}
 
@@ -180,6 +243,14 @@ class Sitemap_Settings {
 		$sitemap_url = \xmlsf()->sitemap->get_sitemap_url();
 
 		// Sidebar actions.
+		\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_gsc_connect' ), 5 );
+		\add_action(
+			'xmlsf_admin_sidebar',
+			function () {
+				include XMLSF_DIR . '/views/admin/sidebar-tools.php';
+			},
+			9
+		);
 		\add_action(
 			'xmlsf_admin_sidebar',
 			function () {
@@ -192,6 +263,15 @@ class Sitemap_Settings {
 
 		// The actual settings page.
 		include XMLSF_DIR . '/views/admin/page-sitemap.php';
+	}
+
+	/**
+	 * Admin sidbar GSC section
+	 */
+	public static function admin_sidebar_gsc_connect() {
+		$sitemap_desc = __( 'XML Sitemap Index', 'xml-sitemap-feed' );
+
+		include XMLSF_DIR . '/views/admin/sidebar-gsc-connect.php';
 	}
 
 	/**
@@ -322,6 +402,14 @@ class Sitemap_Settings {
 					'xmlsf_advanced',
 					'xml_sitemap_advanced_section'
 				);
+				// Sitemap notifier.
+				\add_settings_field(
+					'xmlsf_sitemap_notifier',
+					__( 'Sitemap notifier', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Fields', 'sitemap_notifier_field' ),
+					'xmlsf_advanced',
+					'xml_sitemap_advanced_section'
+				);
 				break;
 
 			case 'general':
@@ -329,7 +417,7 @@ class Sitemap_Settings {
 				/** GENERAL */
 				// Sections.
 				\add_settings_section(
-					'general', // Section ID.
+					'xml_sitemap_general_section', // Section ID.
 					'', // Title.
 					'', // Intro callback.
 					'xmlsf_general' // Page slug.
@@ -340,14 +428,24 @@ class Sitemap_Settings {
 					\translate( 'Server' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
 					array( __NAMESPACE__ . '\Fields', 'server_field' ),
 					'xmlsf_general',
-					'general'
+					'xml_sitemap_general_section'
 				);
 				\add_settings_field(
 					'disabled_providers',
 					\esc_html__( 'Disable sitemaps', 'xml-sitemap-feed' ),
 					array( __NAMESPACE__ . '\Fields', 'disable_fields' ),
 					'xmlsf_general',
-					'general'
+					'xml_sitemap_general_section'
+				);
+
+				// GSC Sitemap data.
+				\add_settings_section(
+					'xml_sitemap_gsc_data_section',
+					__( 'Google Search Console Report', 'xml-sitemap-feed' ),
+					function () {
+						include XMLSF_DIR . '/views/admin/section-gsc-data.php';
+					},
+					'xmlsf_general'
 				);
 		}
 	}

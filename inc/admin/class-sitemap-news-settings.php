@@ -7,6 +7,8 @@
 
 namespace XMLSF\Admin;
 
+use XMLSF\GSC_Connect;
+
 /**
  * XMLSF Admin Sitemap News Settings CLASS
  *
@@ -17,6 +19,9 @@ class Sitemap_News_Settings {
 	 * Prepare admin page load.
 	 */
 	public static function load() {
+		// Run GSC actions.
+		self::gsc_actions();
+
 		// Run tools actions.
 		self::tools_actions();
 
@@ -28,11 +33,69 @@ class Sitemap_News_Settings {
 	}
 
 	/**
+	 * Run admin actions.
+	 */
+	public static function gsc_actions() {
+		// Skip if doing ajax or no valid nonce.
+		if ( \wp_doing_ajax() || ! isset( $_POST['_xmlsf_gsc_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_xmlsf_gsc_nonce'] ), XMLSF_BASENAME . '-gsc' ) ) {
+			return;
+		}
+
+		// Handle disconnection if requested. Runs before anything else.
+		if ( isset( $_POST['xmlsf_gsc_disconnect'] ) ) {
+			// Clear the refresh token and any related options.
+			GSC_Connect::disconnect();
+
+			\add_settings_error(
+				'xmlsf_gsc_connect',
+				'gsc_disconnected',
+				__( 'Disconnected from Google Search Console successfully.', 'xml-sitemap-feed' ),
+				'success'
+			);
+		}
+
+		// Handle manual submit.
+		if ( isset( $_POST['xmlsf_gsc_manual_submit'] ) ) {
+			// Skip submission if within the grace period for Google News sitemap.
+			if ( \get_transient( 'sitemap_notifier_last_submission_news' ) ) {
+				$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_news_timeframe', 60 );
+				\add_settings_error(
+					'xmlsf_gsc_connect',
+					'gsc_manual_submit_news',
+					\sprintf( /* translators: %1$s: Google News Sitemap, %2$d: number of seconds */ esc_html__( 'Your %1$s submission was skipped: Already sent within the last %2$d seconds.', 'xml-sitemap-feed' ), esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), $timeframe ),
+					'error'
+				);
+			} else {
+				$sitemap = xmlsf()->sitemap_news->get_sitemap_url();
+				$result  = GSC_Connect::submit( $sitemap );
+				if ( \is_wp_error( $result ) ) {
+					\add_settings_error(
+						'xmlsf_gsc_connect',
+						'gsc_manual_submit_news',
+						$result->get_error_message(),
+						'error'
+					);
+				} else {
+					\add_settings_error(
+						'xmlsf_gsc_connect',
+						'gsc_manual_submit_news',
+						\sprintf( /* translators: %s: Google News Sitemap */ esc_html__( 'Your %s was submitted successfully.', 'xml-sitemap-feed' ), esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ) ),
+						'success'
+					);
+
+					$timeframe = \apply_filters( 'xmlsf_gsc_manual_submit_news_timeframe', 60 );
+					\set_transient( 'sitemap_notifier_last_submission_news', true, $timeframe );
+				}
+			}
+		}
+	}
+
+	/**
 	 * Tools actions
 	 */
 	public static function tools_actions() {
 		// Skip if doing ajax or no valid nonce.
-		if ( \wp_doing_ajax() || ! isset( $_POST['_xmlsf_help_nonce'] ) || ! \wp_verify_nonce( sanitize_key( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
+		if ( \wp_doing_ajax() || ! isset( $_POST['_xmlsf_help_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
 			return;
 		}
 
@@ -105,6 +168,14 @@ class Sitemap_News_Settings {
 		\do_action( 'xmlsf_news_add_settings', $active_tab );
 
 		// Sidebar actions.
+		\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_gsc_connect' ), 5 );
+		\add_action(
+			'xmlsf_admin_sidebar',
+			function () {
+				include XMLSF_DIR . '/views/admin/sidebar-news-tools.php';
+			},
+			9
+		);
 		\add_action(
 			'xmlsf_admin_sidebar',
 			function () {
@@ -114,6 +185,15 @@ class Sitemap_News_Settings {
 		);
 
 		include XMLSF_DIR . '/views/admin/page-sitemap-news.php';
+	}
+
+	/**
+	 * Admin sidbar GSC section
+	 */
+	public static function admin_sidebar_gsc_connect() {
+		$sitemap_desc = __( 'Google News Sitemap', 'xml-sitemap-feed' );
+
+		include XMLSF_DIR . '/views/admin/sidebar-gsc-connect.php';
 	}
 
 	/**

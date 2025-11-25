@@ -7,6 +7,8 @@
 
 namespace XMLSF;
 
+use WP_Error;
+
 /**
  * Helper class with public methods to set up a Google Search Console connection.
  *
@@ -106,7 +108,7 @@ class GSC_Connect {
 
 			\set_transient( 'settings_errors', array( $data['result'] ), 30 ); // Store notices for the next page load.
 
-			$redirect_url = \add_query_arg( 'settings-updated', 'true', \admin_url( 'options-general.php?page=xmlsf_news&tab=gsc' ) );
+			$redirect_url = \add_query_arg( 'settings-updated', 'true', \admin_url( 'options-general.php?page=xmlsf' ) );
 
 			\wp_safe_redirect( $redirect_url );
 			exit;
@@ -170,9 +172,8 @@ class GSC_Connect {
 		$property = ! empty( $options['property_url'] ) ? $options['property_url'] : false;
 
 		if ( ! $property ) {
-			$access_token = self::get_access_token();
 			// Get our property via API.
-			$property = GSC_API_Handler::get_property_url( $access_token );
+			$property = self::get_property_url();
 
 			if ( \is_wp_error( $property ) ) {
 				return $property;
@@ -204,9 +205,94 @@ class GSC_Connect {
 	}
 
 	/**
+	 * Get GSC Properties.
+	 *
+	 * @param string $min_level    The minimum required access level.
+	 *
+	 * @return string|WP_Error The siteUrl or error.
+	 */
+	public static function get_property_url( $min_level = 'siteFullUser' ) {
+		// Get access token.
+		$access_token = self::get_access_token();
+
+		if ( \is_wp_error( $access_token ) ) {
+			return $access_token;
+		}
+
+		// Parse URL.
+		$parsed_url = \wp_parse_url( \get_option( 'home' ) );
+
+		// Return WP_Error if no host found.
+		if ( ! $parsed_url || empty( $parsed_url['host'] ) ) {
+			return new WP_Error(
+				'invalid-site-url',
+				__( 'Could not determine a candidate property URL from the site URL.', 'xml-sitemap-feed' )
+			);
+		}
+
+		// Get the list of properties.
+		$properties = GSC_API_Handler::list_sites( $access_token );
+		// Return WP_Error if no host found.
+
+		// Return WP_Error if encountered.
+		if ( \is_wp_error( $properties ) ) {
+			return $properties;
+		}
+
+		// Construct candidate URL-prefix property with correct scheme (http or https).
+		$site_scheme   = isset( $parsed_url['scheme'] ) ? $parsed_url['scheme'] : 'https';
+		$site_host     = $parsed_url['host'];
+		$host_parts    = explode( '.', $site_host );
+		$site_port     = isset( $parsed_url['port'] ) ? ':' . $parsed_url['port'] : '';
+		$site_url_prop = $site_scheme . '://' . $site_host . $site_port . '/'; // Site property URL for API must end with /.
+
+		// Construct candidate Domain properties.
+		$site_url_candidates = array(
+			'sc-domain:' . $host_parts[ count( $host_parts ) - 2 ] . '.' . $host_parts[ count( $host_parts ) - 1 ], // e.g. sc-domain:example.com.
+			'sc-domain:' . $host_parts[ count( $host_parts ) - 3 ] . '.' . $host_parts[ count( $host_parts ) - 2 ] . '.' . $host_parts[ count( $host_parts ) - 1 ], // e.g. sc-domain:example.co.uk.
+			$site_url_prop, // e.g. https://www.example.com/.
+		);
+
+		$levels = array(
+			'siteOwner',
+		);
+		if ( 'siteFullUser' === $min_level ) {
+			$levels[] = 'siteFullUser';
+		} elseif ( 'siteRestrictedUser' === $min_level ) {
+			$levels[] = 'siteFullUser';
+			$levels[] = 'siteRestrictedUser';
+		}
+
+		$properties = array_filter(
+			$properties,
+			function ( $property ) use ( $site_url_candidates, $levels ) {
+				return in_array( $property['siteUrl'], $site_url_candidates, true ) && in_array( $property['permissionLevel'], $levels, true );
+			}
+		);
+
+		if ( empty( $properties ) ) {
+			return new WP_Error(
+				'no-valid-site-url',
+				\__( 'Could not get a valid property from Google Search Console. The connected user account may not have the correct permissions.', 'xml-sitemap-feed' )
+			);
+		}
+
+		// We'll have to choose from the remaining candidates.
+		foreach ( $properties as $property ) {
+			$property_url = $property['siteUrl'];
+			if ( strstr( $property['siteUrl'], 'sc-domain:' ) ) {
+				// Let's stick with the first Domain property, why not?
+				break;
+			}
+		}
+
+		return $property_url;
+	}
+
+	/**
 	 * Discconnect from Google Search Console.
 	 *
-	 *  @since 5.6
+	 * @since 5.6
 	 */
 	public static function disconnect() {
 		$options = (array) \get_option( self::$option_group, array() );
@@ -218,13 +304,70 @@ class GSC_Connect {
 
 		// Delete access token.
 		\delete_transient( 'sitemap_notifier_access_token' );
+	}
 
-		require_once ABSPATH . 'wp-admin/includes/template.php';
-		\add_settings_error(
-			'xmlsf_gsc_connect',
-			'disconnected',
-			__( 'Disconnected from Google Search Console successfully.', 'xml-sitemap-feed' ),
-			'success'
-		);
+	/**
+	 * Submitter. Hooked on xmlsf_advanced_news_notifier event.
+	 *
+	 * @since 5.6
+	 *
+	 * @uses class GSC_API_Handler
+	 *
+	 * @param string $sitemap_url The sitemap URL.
+
+	 * @return bool|WP_Error True on success, WP_Error on failure.
+	 */
+	public static function submit( $sitemap_url ) {
+		// Get access token.
+		$access_token = self::get_access_token();
+
+		if ( \is_wp_error( $access_token ) ) {
+			return $access_token;
+		}
+
+		// Get API Endpoint.
+		$api_endpoint = self::get_api_endpoint( $sitemap_url );
+
+		if ( \is_wp_error( $api_endpoint ) ) {
+			return $api_endpoint;
+		}
+
+		// Submit sitemap URL using the OAuth access token.
+		$result = GSC_API_Handler::submit( $api_endpoint, $access_token );
+
+		if ( ! $result['success'] ) {
+			return new WP_Error(
+				'xmlsf_gsc_submit_error',
+				$result['error'],
+				$result['data']
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Remote request to submit the sitemap to Google Search Console using an OAuth Access Token.
+	 *
+	 * @param string $sitemap_url The sitemap URL.
+	 *
+	 * @return array An array containing the success status and sitemap data or error message.
+	 */
+	public static function get( $sitemap_url ) {
+		// Get access token.
+		$access_token = self::get_access_token();
+
+		if ( \is_wp_error( $access_token ) ) {
+			return $access_token;
+		}
+
+		// Get API Endpoint.
+		$api_endpoint = self::get_api_endpoint( $sitemap_url );
+
+		if ( \is_wp_error( $api_endpoint ) ) {
+			return $api_endpoint;
+		}
+
+		return GSC_API_Handler::get( $api_endpoint, $access_token );
 	}
 }

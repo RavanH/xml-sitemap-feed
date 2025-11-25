@@ -92,12 +92,8 @@ class Sitemap_News {
 	 * @param obj $post The post object.
 	 */
 	public static function meta_box( $post ) {
-		// Use nonce for verification.
-		\wp_nonce_field( XMLSF_BASENAME, '_xmlsf_news_nonce' );
-
-		// Use get_post_meta to retrieve an existing value from the database and use the value for the form.
-		$exclude  = 'private' === $post->post_status || \get_post_meta( $post->ID, '_xmlsf_news_exclude', true );
-		$disabled = 'private' === $post->post_status;
+		$post_id     = $post->ID;
+		$post_status = $post->post_status;
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-meta-box-news.php';

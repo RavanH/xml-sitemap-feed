@@ -45,7 +45,7 @@ $cat_list = str_replace(
 	<p>
 		<?php esc_html_e( 'Include posts from these categories, or select none to automaticly include posts from all categories:', 'xml-sitemap-feed' ); ?>
 	</p>
-	<style>ul.cat-checklist{height:auto;max-height:48em}ul.children{padding-left:1em}</style>
+	<style>ul.cat-checklist{height:auto;max-height:24em}ul.children{padding-left:1em}</style>
 	<ul class="cat-checklist">
 		<?php echo $cat_list; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</ul>

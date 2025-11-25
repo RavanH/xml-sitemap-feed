@@ -142,14 +142,15 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.5.9 =
-Prepare advanced sitemap notification feature.
+= 5.6 =
+Google Search Console connection with sitemap reports and submission.
 
 == Changelog ==
 
 = 5.6 =
 Date: 202511
 * Google Search Console sitemap reports
+* Sitemap submission from admin
 * Knowledge base link in admin help sections
 
 = 5.5.9 =

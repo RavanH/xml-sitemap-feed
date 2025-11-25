@@ -184,105 +184,6 @@ class Sitemap {
 	}
 
 	/**
-	 * Tools actions
-	 */
-	public static function tools_actions() {
-		if ( ! isset( $_POST['_xmlsf_help_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( $_POST['_xmlsf_help_nonce'] ), XMLSF_BASENAME . '-help' ) ) {
-			return;
-		}
-
-		if ( isset( $_POST['xmlsf-flush-rewrite-rules'] ) ) {
-			// Flush rewrite rules.
-			\flush_rewrite_rules( false );
-			\add_settings_error(
-				'flush_admin_notice',
-				'flush_admin_notice',
-				__( 'WordPress rewrite rules have been flushed.', 'xml-sitemap-feed' ),
-				'success'
-			);
-		}
-
-		if ( isset( $_POST['xmlsf-check-conflicts'] ) ) {
-			// Reset ignored warnings.
-			\delete_user_meta( \get_current_user_id(), 'xmlsf_dismissed' );
-
-			// Check static file.
-			$slug = \is_object( \xmlsf()->sitemap ) ? \xmlsf()->sitemap->slug() : 'sitemap';
-
-			if ( \file_exists( \trailingslashit( \get_home_path() ) . $slug . '.xml' ) ) {
-				\add_settings_error(
-					'static_files_notice',
-					'static_file_' . $slug,
-					\sprintf( /* translators: %1$s file name, %2$s is XML Sitemap (linked to options-reading.php) */
-						\esc_html__( 'A conflicting static file has been found: %1$s. Either delete it or disable the corresponding %2$s.', 'xml-sitemap-feed' ),
-						\esc_html( $slug . '.xml' ),
-						'<a href="' . \esc_url( \admin_url( 'options-reading.php' ) ) . '#xmlsf_sitemaps">' . \esc_html__( 'XML Sitemap', 'xml-sitemap-feed' ) . '</a>'
-					),
-					'warning'
-				);
-			} else {
-				\add_settings_error(
-					'static_files_notice',
-					'static_files',
-					\esc_html__( 'No conflicting static files found.', 'xml-sitemap-feed' ),
-					'success'
-				);
-			}
-		}
-
-		if ( isset( $_POST['xmlsf-clear-settings'] ) ) {
-			self::clear_settings();
-			\add_settings_error(
-				'notice_clear_settings',
-				'notice_clear_settings',
-				\esc_html__( 'Settings reset to the plugin defaults.', 'xml-sitemap-feed' ),
-				'updated'
-			);
-		}
-
-		if ( isset( $_POST['xmlsf-clear-term-meta'] ) ) {
-			// Remove terms metadata.
-			\delete_metadata( 'term', 0, 'term_modified', '', true );
-
-			\add_settings_error(
-				'clear_meta_notice',
-				'clear_meta_notice',
-				\esc_html__( 'Sitemap term meta cache has been cleared.', 'xml-sitemap-feed' ),
-				'success'
-			);
-		}
-
-		if ( isset( $_POST['xmlsf-clear-user-meta'] ) ) {
-			// Remove terms metadata.
-			\delete_metadata( 'user', 0, 'user_modified', '', true );
-
-			\add_settings_error(
-				'clear_meta_notice',
-				'clear_meta_notice',
-				\esc_html__( 'Sitemap author meta cache has been cleared.', 'xml-sitemap-feed' ),
-				'success'
-			);
-		}
-
-		if ( isset( $_POST['xmlsf-clear-post-meta'] ) ) {
-			// Remove metadata.
-			\delete_metadata( 'post', 0, '_xmlsf_image_attached', '', true );
-			\delete_metadata( 'post', 0, '_xmlsf_image_featured', '', true );
-			\set_transient( 'xmlsf_images_meta_primed', array() );
-
-			\delete_metadata( 'post', 0, '_xmlsf_comment_date_gmt', '', true );
-			\set_transient( 'xmlsf_comments_meta_primed', array() );
-
-			\add_settings_error(
-				'clear_meta_notice',
-				'clear_meta_notice',
-				\esc_html__( 'Sitemap post meta caches have been cleared.', 'xml-sitemap-feed' ),
-				'updated'
-			);
-		}
-	}
-
-	/**
 	 * Compare versions to known compatibility.
 	 */
 	public static function compatible_with_advanced() {
@@ -306,7 +207,7 @@ class Sitemap {
 		}
 
 		// XML Sitemap Advanced incompatibility notice.
-		if ( ! self::compatible_with_advanced() && ! \in_array( 'xmlsf_advanced', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed' ), true ) ) {
+		if ( ! self::compatible_with_advanced() && ! \in_array( 'xmlsf_advanced', (array) \get_user_meta( \get_current_user_id(), 'xmlsf_dismissed', false ), true ) ) {
 			include XMLSF_DIR . '/views/admin/notice-xmlsf-advanced.php';
 		}
 	}
@@ -343,22 +244,7 @@ class Sitemap {
 	 * @param WP_Post $post Post object.
 	 */
 	public static function meta_box( $post ) {
-		// Use nonce for verification.
-		\wp_nonce_field( XMLSF_BASENAME, '_xmlsf_nonce' );
-
-		// Use get_post_meta to retrieve an existing value from the database and use the value for the form.
-		$exclude  = \get_post_meta( $post->ID, '_xmlsf_exclude', true );
-		$priority = \get_post_meta( $post->ID, '_xmlsf_priority', true );
-
-		// value prechecks to prevent "invalid form control not focusable" when meta box is hidden.
-		$priority = \is_numeric( $priority ) ? \XMLSF\sanitize_number( $priority ) : '';
-
-		$description = sprintf(
-			/* translators: Settings admin menu name, XML Sitemap admin page name */
-			\esc_html__( 'Leave empty for automatic Priority as configured on %1$s > %2$s.', 'xml-sitemap-feed' ),
-			\esc_html( \translate( 'Settings' ) ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-			'<a href="' . \admin_url( 'options-general.php' ) . '?page=xmlsf">' . \esc_html__( 'XML Sitemap', 'xml-sitemap-feed' ) . '</a>'
-		);
+		$post_id = $post->ID;
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-meta-box.php';
