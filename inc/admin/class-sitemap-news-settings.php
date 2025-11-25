@@ -225,15 +225,14 @@ class Sitemap_News_Settings {
 					}
 				}
 
-				// Source labels - deprecated.
-				\add_settings_field(
-					'xmlsf_news_labels',
-					__( 'Content labels', 'xml-sitemap-feed' ),
+				// GSC Sitemap data.
+				\add_settings_section(
+					'news_sitemap_gsc_data_section',
+					__( 'Google Search Console Report', 'xml-sitemap-feed' ),
 					function () {
-						include XMLSF_DIR . '/views/admin/field-news-labels.php';
+						include XMLSF_DIR . '/views/admin/section-gsc-data-news.php';
 					},
-					'xmlsf_news_general',
-					'news_sitemap_general_section'
+					'xmlsf_news_general'
 				);
 		}
 	}

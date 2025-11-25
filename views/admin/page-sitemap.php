@@ -7,7 +7,7 @@
 
 ?>
 <style type="text/css">
-<?php include XMLSF_DIR . '/assets/admin.css'; ?>
+<?php require XMLSF_DIR . '/assets/admin.css'; ?>
 </style>
 <div class="wrap">
 
@@ -18,7 +18,7 @@
 	</p>
 
 	<nav class="nav-tab-wrapper">
-		<a class="nav-tab<?php echo 'general' === $active_tab ? ' nav-tab-active' : '" href="?page=xmlsf&tab=general'; ?>"><?php echo esc_html( translate( 'General' ) ); ?></a>
+		<a class="nav-tab<?php echo 'general' === $active_tab ? ' nav-tab-active' : '" href="?page=xmlsf&tab=general'; ?>"><?php echo esc_html( translate( 'General' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
 		<a class="nav-tab<?php echo 'post_types' === $active_tab ? ' nav-tab-active' : '" href="?page=xmlsf&tab=post_types'; ?>"><?php esc_attr_e( 'Post types', 'xml-sitemap-feed' ); ?></a>
 		<?php
 		if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) ) {
@@ -32,7 +32,7 @@
 			<?php
 		}
 		?>
-		<a class="nav-tab<?php echo 'advanced' === $active_tab ? ' nav-tab-active' : '" href="?page=xmlsf&tab=advanced'; ?>"><?php echo esc_html( translate( 'Advanced' ) ); ?></a>
+		<a class="nav-tab<?php echo 'advanced' === $active_tab ? ' nav-tab-active' : '" href="?page=xmlsf&tab=advanced'; ?>"><?php echo esc_html( translate( 'Advanced' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
 		<?php do_action( 'xmlsf_sitemap_nav_tabs', $active_tab ); ?>
 	</nav>
 
@@ -54,14 +54,14 @@
 
 	<div class="sidebar">
 		<?php
-		if ( ! self::compatible_with_advanced() ) {
+		if ( ! \XMLSF\Admin\Sitemap::compatible_with_advanced() ) {
 			echo '<div style="background:rgb(252, 229, 231); margin-left: -14px; padding: 5px 10px; border: 4px solid rgb(214, 73, 54); border-radius: 3px; margin-bottom: 20px; font-weight: bold;">';
 			include XMLSF_DIR . '/views/admin/section-advanced-compat-message.php';
 			echo '</div>';
 		}
 		?>
 
-		<h3><span class="dashicons dashicons-welcome-view-site"></span> <?php echo esc_html( translate( 'View' ) ); ?></h3>
+		<h3><span class="dashicons dashicons-welcome-view-site"></span> <?php echo esc_html( translate( 'View' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></h3>
 		<p>
 			<?php
 			printf(
@@ -72,7 +72,7 @@
 			?>
 		</p>
 
-		<h3><span class="dashicons dashicons-admin-tools"></span> <?php echo esc_html( translate( 'Tools' ) ); ?></h3>
+		<h3><span class="dashicons dashicons-admin-tools"></span> <?php echo esc_html( translate( 'Tools' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></h3>
 		<form action="" method="post">
 			<?php wp_nonce_field( XMLSF_BASENAME . '-help', '_xmlsf_help_nonce' ); ?>
 			<p>
@@ -86,7 +86,7 @@
 				<input type="submit" name="xmlsf-clear-user-meta" class="button button-small" value="<?php esc_attr_e( 'Clear user cache', 'xml-sitemap-feed' ); ?>" />
 			</p>
 			<p>
-				<input type="submit" name="xmlsf-clear-settings" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm('<?php echo esc_js( __( 'This will revert ALL your sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); ?>')" />
+				<input type="submit" name="xmlsf-clear-settings" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm('<?php echo esc_js( __( 'This will revert ALL your sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?>')" />
 			</p>
 		</form>
 
@@ -96,20 +96,5 @@
 
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-	var mainform, isSubmitting = false;
-	jQuery(document).ready(function () {
-		mainform = jQuery('#xmlsf-settings-form');
-		mainform.submit(function(){
-			isSubmitting = true
-		})
-		mainform.data('initial-state', mainform.serialize());
-		jQuery(window).on('beforeunload', function(event) {
-			if (!isSubmitting && mainform.length && mainform.serialize() != mainform.data('initial-state')){
-				event.preventDefault();
-				return "<?php esc_html_e( 'The changes you made will be lost if you navigate away from this page.' ); ?>";
-			}
-		});
-	});
-}, false );
+<?php require XMLSF_DIR . '/assets/admin.js'; ?>
 </script>

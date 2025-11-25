@@ -20,7 +20,6 @@
 	<nav class="nav-tab-wrapper">
 		<a href="?page=xmlsf_news&tab=general" class="nav-tab <?php echo 'general' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( translate( 'General' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
 		<a href="?page=xmlsf_news&tab=advanced" class="nav-tab <?php echo 'advanced' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( translate( 'Advanced' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
-		<a href="?page=xmlsf_news&tab=gsc" class="nav-tab <?php echo 'gsc' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Google Search Console', 'xml-sitemap-feed' ); ?></a>
 		<?php do_action( 'xmlsf_news_nav_tabs', $active_tab ); ?>
 	</nav>
 
@@ -80,20 +79,5 @@
 
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-	var mainform, isSubmitting = false;
-	jQuery(document).ready(function () {
-		mainform = jQuery('#xmlsf-settings-form');
-		mainform.submit(function(){
-			isSubmitting = true
-		})
-		mainform.data('initial-state', mainform.serialize());
-		jQuery(window).on('beforeunload', function(event) {
-			if (!isSubmitting && mainform.length && mainform.serialize() != mainform.data('initial-state')){
-				event.preventDefault();
-				return "<?php esc_html_e( 'The changes you made will be lost if you navigate away from this page.' ); ?>";
-			}
-		});
-	});
-}, false );
+<?php require XMLSF_DIR . '/assets/admin.js'; ?>
 </script>

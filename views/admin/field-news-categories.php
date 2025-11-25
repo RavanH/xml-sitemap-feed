@@ -43,7 +43,7 @@ $cat_list = str_replace(
 		<?php esc_html_e( 'Categories' ); ?>
 	</legend>
 	<p>
-		<?php esc_html_e( 'Limit to posts in these post categories:', 'xml-sitemap-feed' ); ?>
+		<?php esc_html_e( 'Include posts from these categories, or select none to automaticly include posts from all categories:', 'xml-sitemap-feed' ); ?>
 	</p>
 	<style>ul.cat-checklist{height:auto;max-height:48em}ul.children{padding-left:1em}</style>
 	<ul class="cat-checklist">

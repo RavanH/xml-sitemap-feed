@@ -1,20 +1,25 @@
-= 5.5.9 =
-Add new translation strings to main/free plugin strings.php
-Add dummy advanced option Sitemap Notifier
-Update WP6.9 compatibility.
-
 = 5.6 =
+Add new translation strings to main/free plugin strings.php
+
+FIX: taxonomies options page shows non-public Formats type
 MOVE GSC Connect to main/free plugin
+Manual submit ?
+
+
+= 5.7 =
 * RSS feeds: detect excerpt setting with admin warning or auto-change setting (?), suggest advanced plugin for improved compatibility
 * lastmod for users
-* revise SEO plugin compatibilty and conflict notices: maybe just recommend using SEO plugin sitemap, or completely ignore unless real conflict?
-* include home page even if pages are excluded, but HOW ???
+
+* include home page even if pages are excluded, but HOW ? back to root sitemap ???
 * dummy dynamic slug field for google news advanced
 * DROP automatic priority calculation
 * DROP theme template overrides
 * revisit Polylang compatibility
 * switch to Exclude post types
+
+* Verify SEO framework compatibility (robots.txt, auto-deactivation seo fw sitemap...)
 * change SEO compatibility warning messages (advise to use the seo plugin sitemap or upgrade to Advanced plugin?)
+* revise SEO plugin compatibilty and conflict notices: maybe just recommend using SEO plugin sitemap, or completely ignore unless real conflict?
 
 * optimize plugin index:
   - can we prevent default queries? maybe do not update/prime meta caches etc?
