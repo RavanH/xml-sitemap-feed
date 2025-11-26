@@ -99,7 +99,7 @@ class Sitemap_Settings {
 		// Handle manual submit.
 		if ( isset( $_POST['xmlsf_gsc_manual_submit'] ) ) {
 			// Skip submission if within the grace period for Google News sitemap.
-			if ( \get_transient( 'sitemap_notifier_last_submission' ) ) {
+			if ( \get_transient( 'sitemap_notifier_submission' ) ) {
 				$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_timeframe', 360 );
 				\add_settings_error(
 					'xmlsf_gsc_connect',
@@ -114,7 +114,7 @@ class Sitemap_Settings {
 					\add_settings_error(
 						'xmlsf_gsc_connect',
 						'gsc_manual_submit_news',
-						$result->get_error_message(),
+						\sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Error message */ esc_html__( 'Your %1$s submission failed: %2$s', 'xml-sitemap-feed' ), esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), $result->get_error_message() ),
 						'error'
 					);
 				} else {
@@ -126,7 +126,7 @@ class Sitemap_Settings {
 					);
 
 					$timeframe = \apply_filters( 'xmlsf_gsc_manual_submit_timeframe', 360 );
-					\set_transient( 'sitemap_notifier_last_submission', true, $timeframe );
+					\set_transient( 'sitemap_notifier_submission', true, $timeframe );
 				}
 			}
 		}
@@ -235,7 +235,7 @@ class Sitemap_Settings {
 	 * Options page callback
 	 */
 	public static function settings_page() {
-		$active_tab = isset( $_GET['tab'] ) ? \sanitize_key( \wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$active_tab = isset( $_GET['tab'] ) ? \sanitize_key( $_GET['tab'] ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		\do_action( 'xmlsf_add_settings', $active_tab );
 
@@ -269,7 +269,8 @@ class Sitemap_Settings {
 	 * Admin sidbar GSC section
 	 */
 	public static function admin_sidebar_gsc_connect() {
-		$sitemap_desc = __( 'XML Sitemap Index', 'xml-sitemap-feed' );
+		$sitemap_desc      = __( 'XML Sitemap Index', 'xml-sitemap-feed' );
+		$settings_page_url = add_query_arg( 'ref', 'xmlsf', GSC_Connect::get_settings_url() );
 
 		include XMLSF_DIR . '/views/admin/sidebar-gsc-connect.php';
 	}

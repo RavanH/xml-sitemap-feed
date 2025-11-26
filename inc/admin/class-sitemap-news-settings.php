@@ -57,8 +57,8 @@ class Sitemap_News_Settings {
 		// Handle manual submit.
 		if ( isset( $_POST['xmlsf_gsc_manual_submit'] ) ) {
 			// Skip submission if within the grace period for Google News sitemap.
-			if ( \get_transient( 'sitemap_notifier_last_submission_news' ) ) {
-				$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_news_timeframe', 60 );
+			if ( \get_transient( 'sitemap_notifier_submission_news' ) ) {
+				$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_news_timeframe', MINUTE_IN_SECONDS );
 				\add_settings_error(
 					'xmlsf_gsc_connect',
 					'gsc_manual_submit_news',
@@ -72,7 +72,7 @@ class Sitemap_News_Settings {
 					\add_settings_error(
 						'xmlsf_gsc_connect',
 						'gsc_manual_submit_news',
-						$result->get_error_message(),
+						\sprintf( /* translators: %1$s: Google News Sitemap, %2$s: Error message */ esc_html__( 'Your %1$s submission failed: %2$s', 'xml-sitemap-feed' ), esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), $result->get_error_message() ),
 						'error'
 					);
 				} else {
@@ -84,7 +84,7 @@ class Sitemap_News_Settings {
 					);
 
 					$timeframe = \apply_filters( 'xmlsf_gsc_manual_submit_news_timeframe', 60 );
-					\set_transient( 'sitemap_notifier_last_submission_news', true, $timeframe );
+					\set_transient( 'sitemap_notifier_submission_news', true, $timeframe );
 				}
 			}
 		}
@@ -191,7 +191,8 @@ class Sitemap_News_Settings {
 	 * Admin sidbar GSC section
 	 */
 	public static function admin_sidebar_gsc_connect() {
-		$sitemap_desc = __( 'Google News Sitemap', 'xml-sitemap-feed' );
+		$sitemap_desc      = __( 'Google News Sitemap', 'xml-sitemap-feed' );
+		$settings_page_url = add_query_arg( 'ref', 'xmlsf_news', GSC_Connect::get_settings_url() );
 
 		include XMLSF_DIR . '/views/admin/sidebar-gsc-connect.php';
 	}
