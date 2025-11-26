@@ -47,7 +47,7 @@ printf( /* Translators: Plugin name */
 printf( /* Translators: Plugin name, renew your license (linked) */
 	esc_html__( 'To continue receiving updates for %1$s, please %2$s.', 'xml-sitemap-feed' ),
 	esc_html__( 'Google News Advanced', 'xml-sitemap-feed' ),
-	'<a href="' . esc_url( trailingslashit( XMLSF_NEWS_ADV_STORE_URL ) . 'checkout/?edd_license_key=' . $key . '&download_id=' . XMLSF_NEWS_ADV_ITEM_ID ) . '" target="_blank">' . esc_html__( 'renew your license', 'xml-sitemap-feed' ) . '</a>'
+	'<a href="' . esc_url( $url ) . 'checkout/?edd_license_key=' . $key . '&download_id=' . $_id . '" target="_blank">' . esc_html__( 'renew your license', 'xml-sitemap-feed' ) . '</a>'
 );
 printf( /* Translators: Account (linked), Plugin name */
 	esc_html__( 'Please check your %1$s for possibilities to upgrade your %2$s license.', 'xml-sitemap-feed' ),
