@@ -15,16 +15,22 @@
 	</p>
 	<style>ul.cat-checklist{height:auto;max-height:48em}ul.children{padding-left:1em}</style>
 	<ul class="cat-checklist">
-			<?php
-			foreach ( $public_tax as $name ) {
-				$label = get_taxonomy( $name )->label;
-				?>
+	<?php
+	foreach ( $public_tax as $obj ) {
+		$count = wp_count_terms( $obj->name );
+		// Adjust the count for Post Formats (to exclude the Standard type).
+		if ( 'post_format' === $obj->name ) {
+			--$count;
+		}
+		?>
 		<li>
 			<label>
-				<input type="checkbox" name="xmlsf_taxonomies[]" id="xmlsf_taxonomies_<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $name ); ?>" <?php checked( in_array( $name, (array) $taxonomies, true ) ); ?>/>
-				<?php echo esc_html( $label ); ?> (<?php echo esc_html( wp_count_terms( $name ) ); ?>)
+				<input type="checkbox" name="xmlsf_taxonomies[]" id="xmlsf_taxonomies_<?php echo esc_attr( $obj->name ); ?>" value="<?php echo esc_attr( $obj->name ); ?>" <?php checked( in_array( $obj->name, (array) $taxonomies, true ) ); ?>/>
+				<?php echo esc_html( $obj->label ); ?> (<?php echo esc_html( $count ); ?>)
 			</label>
 		</li>
-		<?php } ?>
+		<?php
+	}
+	?>
 	</ul>
 </fieldset>

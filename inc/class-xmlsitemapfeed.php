@@ -163,11 +163,32 @@ class XMLSitemapFeed {
 			$this->get_server( 'sitemap-news' );
 		}
 
+		// Prepare GSC Connector.
+		\add_action( 'init', array( $this, 'gsc_connect' ) );
+
 		// Register rewrites.
 		\add_action( 'init', array( $this, 'register_rewrites' ) );
 
 		// Sitemap generator msg output.
 		\add_action( 'xmlsf_generator', array( $this, 'generator' ) );
+	}
+
+	/**
+	 * Prepare GSC Connector.
+	 */
+	public function gsc_connect() {
+		$options = (array) get_option( 'xmlsf_gsc_connect', array() );
+
+		// Prepare onboarding if not connected.
+		if ( empty( $options['google_refresh_token'] ) ) {
+			// Prepare onboarding.
+			add_action( 'admin_menu', array( __NAMESPACE__ . '\GSC_Connect', 'add_options_page' ) );
+			add_action( 'admin_init', array( __NAMESPACE__ . '\GSC_Connect', 'register_settings' ) );
+
+			// Prepare for OAuth callback.
+			add_filter( 'query_vars', array( __NAMESPACE__ . '\GSC_Connect', 'query_vars' ) );
+			add_action( 'parse_request', array( __NAMESPACE__ . '\GSC_Connect', 'parse_request' ) );
+		}
 	}
 
 	/**

@@ -5,6 +5,12 @@
  * @package XML Sitemap & Google News
  */
 
+// Use nonce for verification.
+\wp_nonce_field( XMLSF_BASENAME, '_xmlsf_news_nonce' );
+
+// Use get_post_meta to retrieve an existing value from the database and use the value for the form.
+$exclude  = 'private' === $post_status || \get_post_meta( $post_id, '_xmlsf_news_exclude', true );
+$disabled = 'private' === $post_status;
 ?>
 <p>
 	<label>

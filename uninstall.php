@@ -84,11 +84,16 @@ function xmlsf_uninstall() {
 	delete_option( 'xmlsf_news_tags' );
 	delete_option( 'xmlsf_authors' );
 	delete_option( 'xmlsf_post_type_settings' );
+	delete_option( 'xmlsf_gsc_connect' );
 
 	// Remove old transient.
 	delete_transient( 'xmlsf_images_meta_primed' );
 	delete_transient( 'xmlsf_comments_meta_primed' );
 	delete_transient( 'xmlsf_static_files' );
+	delete_transient( 'gsc_connect_origin' );
+	delete_transient( 'sitemap_notifier_access_token' );
+	delete_transient( 'sitemap_notifier_submission' );
+	delete_transient( 'sitemap_notifier_submission_news' );
 
 	// Flush rules.
 	flush_rewrite_rules( false );
