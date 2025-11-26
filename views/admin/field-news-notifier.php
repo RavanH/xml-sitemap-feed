@@ -16,7 +16,7 @@
 	</label>
 
 	<p class="description">
-		<?php printf( /* translators: %s: Google New Sitemap */ esc_html__( 'Notify Google by automaticly resubmitting your %s sitemap index to Google Search Console upon each new publication.', 'xml-sitemap-feed' ), esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ) ); ?>
+		<?php printf( /* translators: %s: Google New Sitemap */ esc_html__( 'Notify Google by automaticly resubmitting your %s to Google Search Console upon each new publication.', 'xml-sitemap-feed' ), esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ) ); ?>
 		<?php printf( /* Translators: %s: Google News Advanced (with link) */ esc_html__( 'Available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/google-news-advanced/" target="_blank">' . esc_html__( 'Google News Advanced', 'xml-sitemap-feed' ) . '</a>' ); ?>
 	</p>
 </fieldset>

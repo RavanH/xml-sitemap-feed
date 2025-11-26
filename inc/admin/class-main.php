@@ -24,8 +24,19 @@ class Main {
 		\add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_meta_links' ), 10, 2 );
 
 		// Shared Admin pages sidebar actions.
-		\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_help' ) );
-		\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_contribute' ), 20 );
+		\add_action(
+			'xmlsf_admin_sidebar',
+			function () {
+				include XMLSF_DIR . '/views/admin/sidebar-help.php';
+			}
+		);
+		\add_action(
+			'xmlsf_admin_sidebar',
+			function () {
+				include XMLSF_DIR . '/views/admin/sidebar-contribute.php';
+			},
+			20
+		);
 
 		if ( \XMLSF\sitemaps_enabled( 'sitemap' ) ) {
 			namespace\Sitemap::init();
@@ -233,20 +244,6 @@ class Main {
 
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-robots.php';
-	}
-
-	/**
-	 * Admin sidbar help section
-	 */
-	public static function admin_sidebar_help() {
-		include XMLSF_DIR . '/views/admin/sidebar-help.php';
-	}
-
-	/**
-	 * Admin sidbar contribute section
-	 */
-	public static function admin_sidebar_contribute() {
-		include XMLSF_DIR . '/views/admin/sidebar-contribute.php';
 	}
 
 	/**

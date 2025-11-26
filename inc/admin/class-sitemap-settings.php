@@ -258,6 +258,11 @@ class Sitemap_Settings {
 			},
 			9
 		);
+		// Advanced plugin plug.
+		if ( ! \is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) ) {
+			\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_adv_plug' ), 6 );
+			\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_priority_support' ), 11 );
+		}
 
 		$disabled = \get_option( 'xmlsf_disabled_providers', \XMLSF\get_default_settings( 'disabled_providers' ) );
 
@@ -273,6 +278,27 @@ class Sitemap_Settings {
 		$settings_page_url = add_query_arg( 'ref', 'xmlsf', GSC_Connect::get_settings_url() );
 
 		include XMLSF_DIR . '/views/admin/sidebar-gsc-connect.php';
+	}
+
+	/**
+	 * Admin sidebar Priority Support section
+	 */
+	public static function admin_sidebar_priority_support() {
+		$adv_plugin_name = __( 'XML Sitemap Advanced', 'xml-sitemap-feed' );
+		$adv_plugin_url  = 'https://premium.status301.com/downloads/xml-sitemap-advanced/';
+
+		include XMLSF_DIR . '/views/admin/sidebar-priority-support.php';
+	}
+
+	/**
+	 * Admin sidebar Priority Support section
+	 */
+	public static function admin_sidebar_adv_plug() {
+		$adv_plugin_name = __( 'XML Sitemap Advanced', 'xml-sitemap-feed' );
+		$adv_plugin_url  = 'https://premium.status301.com/downloads/xml-sitemap-advanced/';
+		$sitemap_name    = __( 'XML Sitemap Index', 'xml-sitemap-feed' );
+
+		include XMLSF_DIR . '/views/admin/sidebar-advanced-plug.php';
 	}
 
 	/**
