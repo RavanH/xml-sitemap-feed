@@ -1,8 +1,6 @@
 = 5.6 =
 Add new translation strings to main/free plugin strings.php
 
-Prepare advanced plugin compatibility before release !!!
-
 Add advanced plugin promo in sidebar
 
 = 5.7 =
@@ -11,7 +9,6 @@ Add advanced plugin promo in sidebar
 * Unite settings under one admin page "XML Sitemaps"
 * One Reports tab for all sitemaps in GSC Reports
 * Sitemap index drildown in GSC report
-* Redirect to Reports page after GSC connection
 
 = 5.8 =
 * Bing Webmaster Tools Connect
