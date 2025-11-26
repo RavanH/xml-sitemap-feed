@@ -18,7 +18,7 @@ if ( empty( $gsc_options['google_refresh_token'] ) ) {
 	<p>
 		<?php esc_html_e( 'Connect to Google Search Console to get a sitemap report in your site admin.', 'xml-sitemap-feed' ); ?>
 	</p>
-	<a href="<?php echo esc_url( XMLSF\GSC_Connect::get_settings_url() ); ?>" class="button button-primary">
+	<a href="<?php echo esc_url( $settings_page_url ); ?>" class="button button-primary">
 		<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
 	</a>
 	<?php

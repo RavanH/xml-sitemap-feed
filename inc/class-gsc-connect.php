@@ -108,7 +108,13 @@ class GSC_Connect {
 
 			\set_transient( 'settings_errors', array( $data['result'] ), 30 ); // Store notices for the next page load.
 
-			$redirect_url = \add_query_arg( 'settings-updated', 'true', \admin_url( 'options-general.php?page=xmlsf' ) );
+			$origin = \get_transient( 'gsc_connect_origin' );
+			$slug   = $origin ? $origin : ( sitemaps_enabled( 'sitemap' ) ? 'xmlsf' : ( sitemaps_enabled( 'sitemap' ) ? 'xmlsf_news' : false ) );
+
+			$redirect_url = $slug ? \add_query_arg( 'page', $slug, \admin_url( 'options-general.php' ) ) : \admin_url( 'options-general.php' );
+			$redirect_url = \add_query_arg( 'settings-updated', 'true', $redirect_url );
+
+			\delete_transient( 'gsc_connect_origin' );
 
 			\wp_safe_redirect( $redirect_url );
 			exit;

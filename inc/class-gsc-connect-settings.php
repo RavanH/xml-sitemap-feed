@@ -56,6 +56,9 @@ class GSC_Connect_Settings extends GSC_Connect {
 	 * Callback function for the Google Search Console OAuth Settings section header.
 	 */
 	public static function oauth_section_callback() {
+		// Set referrer transient to redirect to after connection.
+		isset( $_GET['ref'] ) && in_array( $_GET['ref'], array( 'xmlsf', 'xmlsf_news' ), true ) && \set_transient( 'gsc_connect_origin', \sanitize_key( $_GET['ref'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
 		// Prepare the option if it does not already exist. Sets it as non-autoloaded option.
 		add_option( self::$option_group, '', '', false );
 
