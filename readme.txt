@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 6.9
-Stable tag: 5.6
+Stable tag: 5.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -142,14 +142,19 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.6 =
-Google Search Console connection with sitemap reports and submission.
+= 5.6.1 =
+Google Search Console connection with sitemap reports and submission, advanced plugin compatibility.
 
 == Changelog ==
 
+= 5.6.1 =
+
+Date: 20251126
+* FIX: XML Sitemap Advanced compatibility
+
 = 5.6 =
 
-Date: 202511
+Date: 20251126
 * Google Search Console sitemap reports
 * Sitemap submission from admin
 * Knowledge base link in admin help sections
