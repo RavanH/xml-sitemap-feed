@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 6.9
-Stable tag: 5.5.9
+Stable tag: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -148,31 +148,37 @@ Google Search Console connection with sitemap reports and submission.
 == Changelog ==
 
 = 5.6 =
+
 Date: 202511
 * Google Search Console sitemap reports
 * Sitemap submission from admin
 * Knowledge base link in admin help sections
 
 = 5.5.9 =
+
 Date: 20251118
 * Prepare advanced sitemap notification feature.
 
 = 5.5.8 =
+
 Date: 20251014
 * Drop unused news tags & stylesheet columns
 * FIX: failing sanitize callbacks
 * FIX: Squirrly SEO incompatibility warnings
 
 = 5.5.7 =
+
 Date: 20250915
 * FIX: WPML Compatibility missing valid callback, thanks @linusbenknerkk
 
 = 5.5.6 =
+
 Date: 20250717
 * FIX: Possible excessively long URL on admin post search, thanks @leedxw
 * FIX: Notice dismiss failing
 
 = 5.5.5 =
+
 Date: 20250625
 * Polylang index lastmods per language in core sitemap
 * Resturcture admin notices
@@ -181,6 +187,7 @@ Date: 20250625
 * FIX: Polylang Pro compatibility, thanks @followalter
 
 = 5.5.4 =
+
 Date: 20250427
 * Improved WPML compatibility
 * Load core sitemaps early to prevent unnecessary queries
@@ -188,6 +195,7 @@ Date: 20250427
 * FIX: unregister GN sitemap rewite rules on deactivation
 
 = 5.5.3 =
+
 Date: 20250402
 * FIX: missing exclude/priority meta box
 * FIX: error blocking deactivation
@@ -195,12 +203,13 @@ Date: 20250402
 * FIX: undefined function on Clear settings
 
 = 5.5 =
+
 Date: 20250331
-* NEW: Exclude option in Quick Editor
-* NEW: Filter xmlsf_taxonomies_query_args
-* NEW: Filter xmlsf_news_hours_old
-* NEW: custom urls sitemap for core server
-* NEW: external sitemaps for core server
+* Exclude option in Quick Editor
+* Filter xmlsf_taxonomies_query_args
+* Filter xmlsf_news_hours_old
+* custom urls sitemap for core server
+* external sitemaps for core server
 * Namespacing & autoloading
 * Admin notices for Slim SEO, Squirrly SEO, Jetpack Sitemaps & XML Sitemaps Manager
 * FIX: Polylang news sitemap category selection
@@ -214,18 +223,21 @@ Date: 20250331
 * FIX: Max posts per sitemap not saving
 
 = 5.4.9 =
+
 Date: 20240506
 * FIX: Unauthenticated file inclusion - CVE-2024-4441 reported by Foxyyy
 
 = 5.4.8 =
+
 Date: 20240329
-* NEW: post types max number
+* post types max number
 * FIX: blog_public can be integer when object cache is used
 * FIX: compatibility date redirect warning when using core server
 * FIX: rewrite rules conflict with Polylang
 * FIX: call to undefined function with Nginx Helper
 
 = 5.4.5 =
+
 Date: 20240221
 * FIX: wp-cli disable plugin incompatibility
 * FIX: trailing slash
@@ -236,11 +248,12 @@ Date: 20240221
 * FIX: admin compatibility message
 
 = 5.4 =
+
 Date: 20240219
-* NEW: Switch between Plugin or WP core sitemap server for sitemap generation
-* NEW: xmlsf_generator action hook
-* NEW: xmlsf_sitemap_index_pre and xmlsf_sitemap_index_post action hooks
-* NEW: xmlsf_author_has_published_posts filter
+* Switch between Plugin or WP core sitemap server for sitemap generation
+* xmlsf_generator action hook
+* xmlsf_sitemap_index_pre and xmlsf_sitemap_index_post action hooks
+* xmlsf_author_has_published_posts filter
 * Dropping all Ping Services (no longer supported)
 * Dropping allowed domains filtering
 * Exclude spammed or deleted authors on multisite
@@ -251,42 +264,49 @@ Date: 20240219
 * FIX: Conversion of false to array deprecated warning
 
 = 5.3.6 =
+
 Date: 20230810
 * FIX: Work around get_users() fatal error in WP 6.3
 * FIX: Wrong Nginx helper purge urls (backport from 5.4-beta)
 
 = 5.3.5 =
+
 Date: 20230629
 * FIX: Forced Status 200 response conflict with Etag/If-None-Match headers, thanks @revolutionnaire
 
 = 5.3.4 =
+
 Date: 20230530
 * FIX: File not found error on invalid sitemap requests
 * FIX: Lastmod date older than post date on scheduled posts
 
 = 5.3.3 =
+
 Date: 20230528
 * FIX: Undefined variable + Invalid argument supplied for foreach(), thanks @yankyaw09
 
 = 5.3.2 =
+
 * FIX: Bing ping 410 error response
 * FIX: Outdated help & forum links
 
 = 5.3.1 =
+
 * FIX: Restore wp-sitemap.xml rewrite rules after deactivation
 * FIX: Call to undefined function xmlsf_get_archives()
 * Use nocache_headers()
 
 = 5.3 =
-* NEW: Author sitemap
-* NEW: allow custom theme templates and stylesheets
-* NEW: request filters `xmlsf_request` and `xmlsf_news_request`
-* NEW: news template filters `xmlsf_news_publication_name` and `xmlsf_news_title`
-* NEW: sitemap template action hook `xmlsf_url`
-* NEW: sitemap template action hooks `xmlsf_news_url` and `xmlsf_news_tags_inner`
-* NEW: `xmlsf_index_url_args` filter
-* NEW: All in One SEO Pack incompatibility message and instructions
-* NEW: The SEO Framework incompatibility message and instructions
+
+* Author sitemap
+* allow custom theme templates and stylesheets
+* request filters `xmlsf_request` and `xmlsf_news_request`
+* news template filters `xmlsf_news_publication_name` and `xmlsf_news_title`
+* sitemap template action hook `xmlsf_url`
+* sitemap template action hooks `xmlsf_news_url` and `xmlsf_news_tags_inner`
+* `xmlsf_index_url_args` filter
+* All in One SEO Pack incompatibility message and instructions
+* The SEO Framework incompatibility message and instructions
 * Moved news template action hook `xmlsf_news_tags_after` to after closing </news:news> tag
 * Less DB queries, smaller memory footprint
 * Better debug info with SAVEQUERIES
@@ -299,36 +319,42 @@ Date: 20230528
 * FIX: Cache-Control header no-cache
 
 = 5.2.7 =
-20191111
-* NEW: Ad Inserter compatibility check
-* NEW: xmlsf_urlset and xmlsf_news_urlset action hooks, thanks to Stanislav Khromov (@khromov)
+
+Date: 20191111
+* Ad Inserter compatibility check
+* xmlsf_urlset and xmlsf_news_urlset action hooks, thanks to Stanislav Khromov (@khromov)
 * Exclude hierarchical post types from news sitemap
 
 = 5.2.6 =
-20191009
-* NEW: xmlsf_tags_after, xmlsf_url_after and xmlsf_news_url_after action hooks
+
+Date: 20191009
+* xmlsf_tags_after, xmlsf_url_after and xmlsf_news_url_after action hooks
 * Make stylesheet paths relative to prevent exclusion when using different language domains
 * FIX: Taxonomy selection not available to new installs
 
 = 5.2.4 =
-20190917
+
+Date: 20190917
 * NEW Rank Math incompatibility admin warnings
 * FIX undefined index
 * FIX invalid form control
 
 = 5.2.3 =
+
 * FIX Cannot use return value in write context
 * FIX issue #30 for sql_mode=ONLY_FULL_GROUP_BY, thanks @silvios
 * FIX invalid form control not focusable when meta box is hidden
 
 = 5.2.2 =
+
 * FIX invalid date format on some PHP versions
 * FIX Can't use function return value in write context
 * FIX non-cyrillic URLs stripped from External Web Pages field
 * FIX Call to undefined function xmlsf_cache_get_archives()
 
 = 5.2 =
-20190429
+
+Date: 20190429
 * Image query optimization and meta caching
 * Last comment date meta caching
 * Lastmod and publication dates in local time
@@ -345,16 +371,19 @@ Date: 20230528
 * FIX: rewrite rules on deactivate/uninstall
 
 = 5.1.2 =
+
 * FIX: admin notice dismiss button failing
 * FIX: date archive redirect notice showing for inactive post types
 * Plugin support and rate links on plugins page
 
 = 5.1.1 =
+
 * FIX options page not found
 * FIX news sitemap only ping
 
 = 5.1 =
-20190313
+
+Date: 20190313
 * SEOPress and Catch Box incompatibility admin messages
 * FIX bbPress incompatibility
 * FIX failing last modified date for taxonomy sitemaps
@@ -369,7 +398,8 @@ Date: 20230528
 * NEW Tools: Ping search engines and Flush rewrite rules
 
 = 5.0.7 =
-20181025
+
+Date: 20181025
 * Allowed domains back to Settings > Reading
 * FIX static files check on activation
 * NEW Admin warning on conflicting plugin settings
@@ -383,7 +413,8 @@ Date: 20230528
 * FIX PHP 5.4 compatibility issues
 
 = 5.0 =
-20180908
+
+Date: 20180908
 * Complete code restructure and cleanup: MVC and JIT inclusion
 * Fewer DB queries, much smaller memory footprint on normal queries
 * NEW Admin interface with dedicated options pages and help tabs
@@ -403,40 +434,47 @@ Date: 20230528
 * FIX Pings
 
 = 4.9.4 =
+
 * FIX: missing featured images, thanks @flyerua
 * FIX: double content type response header filtering
 
 = 4.9.3 =
+
 * Reinstate filter_no_news_limits, allowing post type array
 * Improved language handling and new language filter xmlsf_post_language
 * Force text/xml Content-Type response header
 
 = 4.9.2 =
+
 * FactCheck genre causes error in Search Console
 
 = 4.9.1 =
+
 * FIX: double genre terms on upgrade from 4.4,  thanks @mouhalves
 * FIX: wp_count_posts uncached and too heavy on large sites, thanks @carlalexander
 * Last-modified response header now linked to Update on comments setting
 * FIX: plugin_basename propagation
 
 = 4.9 =
-20180507
+
+Date: 20180507
 * Code cleanup
-* NEW: FactCheck genre
+* FactCheck genre
 * Changefreq tag dropped
-* NEW: translation strings for genres
+* translation strings for genres
 * FIX: zlib.output_compression compatibility, thanks @alicewondermiscreations
 * FIX: permalink issue with Woocommerce account page endpoints
 * FIX: undefined index in news post types
 
 = 4.8.3 =
+
 * fix get_lastpostdate array/string
 * restore pre PHP 5.4 compatibility (popular request)
 
 = 4.8 =
-20180316
-* NEW: Conditional functions is_sitemap() and is_news()
+
+Date: 20180316
+* Conditional functions is_sitemap() and is_news()
 * code cleanup and annotation
 * new google ping URL
 * revisit get first/last date/modified functions and cache key set/delete
@@ -444,60 +482,72 @@ Date: 20230528
 * FIX: wp_rewrite init before flush_rules
 
 = 4.7.6 =
+
 * FIX Open_BaseDir issue on IIS server
 
 = 4.7.5 =
-20161207
+
+Date: 20161207
 * FIX: On cache_flush purge also the respective time_key cache entry,
 props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-in-outdated-last-modified-values-on-index-sitemap/
 * FIX: Variable variable php 7 compat
 * Detect if headers are already sent and print warning in source
 
 = 4.7.4 =
+
 * Another WPML compat issue fixed, special thanks to hermes3por3
 
 = 4.7.3 =
-* NEW: xmlsf_excluded filter
+
+* xmlsf_excluded filter
 * IMPROVEMENT: Polylang and WPML compatibility issues
 * FIX: "Only variables should be passed by reference" strict warning
 * FIX: PHP 5.3 compatibility
 
 = 4.7 =
-20160506
+
+Date: 20160506
 * WPML compatibility
 * FIX: News Sitemap chinese language tag
 * FIX: flush rules on plugin re-activation
 
 = 4.6.3 =
-* NEW: filter xmlsf_custom_sitemaps
+
+* filter xmlsf_custom_sitemaps
 * BUGFIX: empty custom urls sitemap
 
 = 4.6.2 =
-* NEW: filter xmlsf_custom_urls
+
+* filter xmlsf_custom_urls
 * More cleanup
 * BUGFIX: broken Polylang compatibility reported by @zesseb
 
 = 4.6.1 =
-20160407
+
+Date: 20160407
 * Code cleanup
 * POT file update
 * Dutch translation update
 
 = 4.6 =
-* NEW: xmlsf_news_tags_after action hook
+
+* xmlsf_news_tags_after action hook
 * Attempt to remove static sitemap files left over by other sitemap plugins
 
 = 4.5.1 =
+
 * fix Persistent/Stored XSS vulnerability on admin page, thanks to Sneha Rajguru @Sneharajguru
 
 = 4.5 =
+
 * Set Google News access tag per post
 * Exclude posts from Google News sitemap
 * News Sitemap stylesheet text/links update
 * FIX: cache_delete cached key instead of cache_flush as suggested by Jeremy Clarke https://wordpress.org/support/topic/please-stop-running-wp_cache_flush-whenever-posts-are-edited
-* NEW: Nginx Helper compatibility to purge cache sitemap URLs from FastCGI Cache or Redis
+* Nginx Helper compatibility to purge cache sitemap URLs from FastCGI Cache or Redis
 
 = 4.4.1 =
+
 * BUGFIX contribution by alejandra.aranibar: multiple news post types makes get_lastdate return oldest instead of newest date
 * BUGFIX plugins_url filter not working, reported by Michael
 * Dropped GN Geolocation tag support
@@ -505,6 +555,7 @@ props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-i
 * Multiple default genres
 
 = 4.4 =
+
 * Pings max once per hour (5 minutes for news sitemap)
 * Seperate ping for Google News Sitemap
 * Append custom/static sitemaps to the index
@@ -519,12 +570,14 @@ props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-i
 * Force object cache flush on post publication
 
 = 4.3.2 =
+
 * Italian translation
 * BUGFIX: html esc / filter image title and caption tags
 * BUGFIX: empty terms counted causing empty taxonomy sitemap appearing in index
 * BUGFIX: custom taxonomies where lastmod cannot be determined show empty lastmod tag
 
 = 4.3 =
+
 * Google News sitemap settings section
 * Google News tags: access, genres, keywords, geo_locations
 * Improved Google News stylesheet
@@ -541,21 +594,25 @@ props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-i
 * BUGFIX: Split by month shows year
 
 = 4.2.4 =
-* NEW: Image tags
+
+* Image tags
 * Rearranged settings section
 * FIX: replace permalink, title and bloginfo rss filter hooks with own
 
 = 4.2.3 =
+
 * BUGFIX: Empty ping options after disabling the main sitemap
 * BUGFIX: Empty language tag for Google News tags in posts sitemap
 * Small back end changes
-* NEW: Custom post types split by year/month
+* Custom post types split by year/month
 
 = 4.2 =
-* NEW: Image & News tags
-* NEW: Exclude pages/posts
+
+* Image & News tags
+* Exclude pages/posts
 
 = 4.1.4 =
+
 * BUGFIX: Pass by reference fatal error in PHP 5.4
 * BUGFIX: issue with Polylang language code in pretty permalinks setting
 * BUGFIX: unselected post types in sitemap
@@ -563,10 +620,11 @@ props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-i
 * Dutch and French translations updated
 
 = 4.1 =
-* NEW: Ping Google and Bing on new publications
-* NEW: Set priority per post
-* NEW: Priority calculation options
-* NEW: Option to split posts by year or month for faster generation of each sitemap
+
+* Ping Google and Bing on new publications
+* Set priority per post
+* Priority calculation options
+* Option to split posts by year or month for faster generation of each sitemap
 * Reduced queries to increase performance
 * Improved Lastmod and Changefreq calculations
 * Core class improvements
@@ -575,55 +633,65 @@ props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-i
 * BUGFIX: removed several PHP notices
 
 = 4.0.1 =
-* NEW: Dutch and French translations
+
+* Dutch and French translations
 * BUGFIX: Non public sites still have sitemap by default
 * BUGFIX: Invalid argument supplied for foreach() when all post types are off
 * BUGFIX: Wrong translation dir
 
 = 4.0.0 =
+
 * Moved to sitemap index and seperated post/page sitemaps
-* NEW: options to dswitch off sitemap and news sitemap
-* NEW: select which post types to include
-* NEW: select which taxonomies to include
-* NEW: set additional robots.txt rules
-* NEW: Translation POT catalogue
+* options to dswitch off sitemap and news sitemap
+* select which post types to include
+* select which taxonomies to include
+* set additional robots.txt rules
+* Translation POT catalogue
 * Improved Polylang support
 * Dropped xLanguage support
 * qTranslate currently untested
 
 = 3.9.2 =
+
 * Basic Google News feed stylesheet
 * improvement on XSS vulnerability fix
 * Fixed trailing slash
 
 = 3.9.1 =
+
 * SECURITY: XSS vulnerability in sitemap.xsl.php
 
 = 3.9 =
+
 * Google News Sitemap
 * Memory limit error workaround (for most sites)
 
 = 3.8.8 =
+
 * BUGFIX: PHP4 compatibility
 * BUGFIX: stylesheet URL when installed in mu-plugins
 * core change to class
 * minified sitemap output by default
 
 = 3.8.5 =
+
 * **xLanguage support** based on code and testing by **Daniele Pelagatti**
 * new FILTER HOOK `robotstxt_sitemap_url` for any translate and url changing plugins.
 * BUGFIX: Decimal separator cannot be a comma!
 
 = 3.8.3 =
+
 * filter out external URLs inserted by plugins like Page Links To (thanks, Francois)
 * minify sitemap and stylesheet output
 * BUGFIX: qTranslate non-default language home URL
 
 = 3.8 =
+
 * **qTranslate support**
 * no more Sitemap reference in robots.txt on non-public blogs
 
 = 3.7.4 =
+
 * switch from `add_feed` (on init) to the `do_feed_$feed` hook
 * BUGFIX: `is_404()` condition TRUE and Response Header 404 on sites without posts
 * BUGFIX: `is_feed()` condition FALSE after custom query_posts
@@ -631,45 +699,57 @@ props @e2robert https://wordpress.org/support/topic/object-cache-issue-results-i
 * BUGFIX: stylesheet url wrong when WP installed in a subdir
 
 = 3.7 =
+
 * massive changefreq calculation improvement
 * further priority calulation improvement taking last comment date into account
 
 = 3.6.1 =
+
 * BUGFIX: wrong date calculation on blogs less than 1 year old
 
 = 3.6 =
+
 * massive priority calculation improvement
 
 = 3.5 =
+
 * complete rewrite of plugin internals
 * speed improvements
 * WP 3.0 (normal and MS mode) ready
 
 = 3.4 =
+
 * BUGFIX: use home instead of siteurl for blog url for sitemap reference in robots.txt
 * code streamline and cleanup
 
 = 3.3 =
+
 * automatic exclusion of tags blog in wpmu
 
 = 3.2 =
+
 * rewrite and add_feed calls improvements
 * BUGFIX: double entry when static page is frontpage
 
 = 3.0 =
+
 * added styling to the xml feed to make it human readable
 
 = 2.1 =
+
 * BUGFIX: lastmod timezone offset displayed wrong (extra space and missing double-colon)
 
 = 2.0 =
+
 * priority calculation based on comments and age
 * changefreq based on comments
 
 = 1.0 =
+
 * changed feed template location to avoid the need to relocate files outside the plugins folder
 * BUGFIX: `get_post_modified_time` instead of `get_post_time`
 
 = 0.1 =
+
 * rework from Patrick Chia's [Standard XML Sitemaps](http://wordpress.org/plugins/standard-xml-sitemap/)
 * increased post urls limit from 100 to 1000 (of max. 50,000 allowed by the Sitemap protocol)
