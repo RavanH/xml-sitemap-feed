@@ -3,6 +3,8 @@
 
 = 5.7 =
 
+* integrate sitemap updates via Bing Webmaster tools API https://learn.microsoft.com/en-us/dotnet/api/microsoft.bing.webmaster.api.interfaces.iwebmasterapi.submitfeed?view=bing-webmaster-dotnet#microsoft-bing-webmaster-api-interfaces-iwebmasterapi-submitfeed(system-string-system-string)
+
 * rethink gsc onboarding: if multiple property candidates, manually choose between them before final redirect?
 
 Consider: Keep GSC Connect tools page permanently visible? Room for advanced promo? Allow other sitemap reports?
