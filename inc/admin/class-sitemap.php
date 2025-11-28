@@ -171,19 +171,6 @@ class Sitemap {
 	}
 
 	/**
-	 * Clear settings
-	 */
-	public static function clear_settings() {
-		$defaults = \XMLSF\get_default_settings();
-
-		unset( $defaults['sitemaps'] );
-
-		foreach ( $defaults as $option => $settings ) {
-			\update_option( 'xmlsf_' . $option, $settings );
-		}
-	}
-
-	/**
 	 * Compare versions to known compatibility.
 	 */
 	public static function compatible_with_advanced() {
