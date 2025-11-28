@@ -40,14 +40,14 @@ class GSC_Connect {
 	/**
 	 * Register settings used by the plugin.
 	 */
-	public static function add_options_page() {
+	public static function add_tools_page() {
 		\add_submenu_page(
-			null, // Hides settings page but breaks stuff like admin_page_title().
-			__( 'Google Search Console Connection', 'xml-sitemap-feed' ), // Page title.
-			__( 'Google Search Console', 'xml-sitemap-feed' ), // Menu title.
-			'manage_options', // Capability required.
-			self::$page_slug, // Menu slug.
-			array( __NAMESPACE__ . '\GSC_Connect_Settings', 'options_page_render' ) // Function to display the page.
+			'tools.php',
+			__( 'Google Search Console Connection', 'xml-sitemap-feed' ),
+			__( 'Google Search Console', 'xml-sitemap-feed' ),
+			'manage_options',
+			self::$page_slug,
+			array( __NAMESPACE__ . '\GSC_Connect_Settings', 'options_page_render' )
 		);
 	}
 
@@ -111,7 +111,7 @@ class GSC_Connect {
 			$origin = \get_transient( 'gsc_connect_origin' );
 			$slug   = $origin ? $origin : ( sitemaps_enabled( 'sitemap' ) ? 'xmlsf' : ( sitemaps_enabled( 'sitemap-news' ) ? 'xmlsf_news' : false ) );
 
-			$redirect_url = $slug ? \add_query_arg( 'page', $slug, \admin_url( 'options-general.php' ) ) : \admin_url( 'options-general.php' );
+			$redirect_url = $slug ? \add_query_arg( 'page', $slug, \admin_url( 'options-general.php' ) ) : \admin_url( 'options-reading.php#xmlsf_sitemaps' );
 			$redirect_url = \add_query_arg( 'settings-updated', 'true', $redirect_url );
 
 			\delete_transient( 'gsc_connect_origin' );
@@ -207,7 +207,7 @@ class GSC_Connect {
 	 * @return string The Settings Page admin URL.
 	 */
 	public static function get_settings_url() {
-		return \admin_url( 'options-general.php?page=' . self::$page_slug );
+		return \admin_url( 'tools.php?page=' . self::$page_slug );
 	}
 
 	/**
