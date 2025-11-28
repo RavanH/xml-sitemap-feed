@@ -1,8 +1,11 @@
 = 5.6.X =
-Add new translation strings to main/free plugin strings.php
-Do not pass null to the add_sumenu_page (parent_slug argument) to avoid deprecated notices in php8.3
+* Add GSC Connect page help tab?
 
 = 5.7 =
+
+* rethink gsc onboarding: if multiple property candidates, manually choose between them before final redirect?
+
+Consider: Keep GSC Connect tools page permanently visible? Room for advanced promo? Allow other sitemap reports?
 
 * Reverse Disable sitemaps option in admin
 * Unite settings under one admin page "XML Sitemaps"
