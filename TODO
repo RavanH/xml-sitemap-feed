@@ -1,7 +1,6 @@
-= 5.6 =
+= 5.6.X =
 Add new translation strings to main/free plugin strings.php
-
-Add advanced plugin promo in sidebar
+Do not pass null to the add_sumenu_page (parent_slug argument) to avoid deprecated notices in php8.3
 
 = 5.7 =
 
