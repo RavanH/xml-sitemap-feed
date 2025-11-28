@@ -37,6 +37,7 @@ sprintf( /* Translators: Premium account page (linked), Upload Plugin admin page
 
 esc_html__( 'License key', 'xml-sitemap-feed' );
 __( 'Beta version', 'xml-sitemap-feed' );
+esc_html__( 'This option will allow you to update the plugin to the latest beta release.', 'xml-sitemap-feed' );
 esc_html__( 'Enter your license key.', 'xml-sitemap-feed' );
 esc_html__( 'Your license is active for this site.', 'xml-sitemap-feed' );
 sprintf( /* translators: Expiration date */ esc_html__( 'It expires on %s.', 'xml-sitemap-feed' ), esc_html( $expires ) );
@@ -90,3 +91,10 @@ printf( /* Translators: Plugin name, correct this issue (linked) */
 	esc_html__( 'To receive plugin updates, please %s.', 'xml-sitemap-feed' ),
 	'<a href="' . esc_url( admin_url( 'options-general.php' ) ) . '?page=xmlsf_news&tab=license">' . esc_html__( 'correct this issue', 'xml-sitemap-feed' ) . '</a>'
 );
+
+esc_html_e( 'No log entries found.', 'xml-sitemap-feed' );
+esc_html_e( 'The 20 most recent sitemap notification request and related messages are logged here.', 'xml-sitemap-feed' );
+esc_html_e( 'Message', 'xml-sitemap-feed' );
+__( 'Sitemap Notification Log', 'xml-sitemap-feed' );
+esc_html_e( 'Warning: The sitemap notifier depends on internal WordPress events but you seem to have WP Cron disabled. Make sure that you are using a reliable alternative to WP Cron, like a server cron job, to trigger events and that this is done on fairly short interval, e.g. once every minute. If the interval is longer, automatic notifications will suffer longer delays.', 'xml-sitemap-feed' );
+

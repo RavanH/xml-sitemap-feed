@@ -11,11 +11,13 @@ if ( empty( $options['google_refresh_token'] ) ) {
 	// Initiate button.
 	?>
 	<p>
-		<?php esc_html_e( 'Connect to Google Search Console to allow sitemap data retrieval.', 'xml-sitemap-feed' ); ?>
+		<?php printf( /* translators: %s: Google Search Console */ esc_html_x( 'Connect to %s for sitemap data retrieval and sitemap submissions.', 'Google Search Console connection', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) ); ?>
 	</p>
-	<a href="<?php echo esc_url( XMLSF\GSC_Connect::get_settings_url() ); ?>" class="button button-primary">
-		<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
-	</a>
+	<p>
+		<a href="<?php echo esc_url( add_query_arg( 'ref', 'xmlsf', XMLSF\GSC_Connect::get_settings_url() ) ); ?>" class="button button-primary">
+			<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
+		</a>
+	</p>
 	<?php
 	return;
 }
@@ -24,7 +26,7 @@ $sitemap = xmlsf()->sitemap->get_sitemap_url();
 $result  = XMLSF\GSC_Connect::get( $sitemap );
 
 ?>
-<p><?php esc_html_e( 'Your sitemap data as reported by Google Search Console.', 'xml-sitemap-google-news' ); ?></p>
+<p><?php esc_html_e( 'Your sitemap data as reported by Google Search Console.', 'xml-sitemap-feed' ); ?></p>
 <?php
 if ( isset( $result['success'] ) && $result['success'] && $result['data'] ) {
 	$data = $result['data'];

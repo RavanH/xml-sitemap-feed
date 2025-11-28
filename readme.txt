@@ -5,15 +5,15 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 6.9
-Stable tag: 5.6.1
+Stable tag: 5.6.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Take control of your WordPress core XML Sitemap add a Google News Sitemap. Compatible with WordPress Multisite, most caching plugins, Polylang and WPML.
+Take control of your WordPress core XML Sitemap and add a Google News Sitemap.
 
 == Description ==
 
-Take control of your WordPress core **XML Sitemap** add a **Google News Sitemap**. Compatible with WordPress **Multisite**, **Polylang** and **WPML** and most caching plugins. There are no static files created.
+Take control of your WordPress core **XML Sitemap** and add a **Google News Sitemap**. Compatible with WordPress **Multisite**, **Polylang** and **WPML** and most caching plugins. There are no static files created.
 
 NEW: Connect your site to your Google Search Console property to keep an eye on sitemap performance and possible errors. **Submit your sitemaps** right from the WordPress admin.
 
@@ -57,7 +57,7 @@ NEW: Connect your site to your Google Search Console property to keep an eye on 
 * Set a custom sitemap URL (slug)
 * Exclude posts and pages in the Bulk Editor.
 * Optionally include empty taxonomy term and empty author archives
-* Rank Math compatibility: exclude posts set to noindex
+* Yoast SEO and Rank Math compatibility: exclude posts set to noindex
 
 **[Google News Advanced](https://premium.status301.com/downloads/google-news-advanced/)**
 
