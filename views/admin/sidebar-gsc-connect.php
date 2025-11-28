@@ -16,11 +16,13 @@ if ( empty( $gsc_options['google_refresh_token'] ) ) {
 	// Initiate button.
 	?>
 	<p>
-		<?php esc_html_e( 'Connect to Google Search Console to get a sitemap report in your site admin.', 'xml-sitemap-feed' ); ?>
+		<?php printf( /* translators: %s: Google Search Console */ esc_html_x( 'Connect to %s for sitemap data retrieval and sitemap submissions.', 'Google Search Console connection', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) ); ?>
 	</p>
-	<a href="<?php echo esc_url( $settings_page_url ); ?>" class="button button-primary">
-		<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
-	</a>
+	<p>
+		<a href="<?php echo esc_url( $settings_page_url ); ?>" class="button button-primary">
+			<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
+		</a>
+	</p>
 	<?php
 	return;
 }
