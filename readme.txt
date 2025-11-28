@@ -9,11 +9,11 @@ Stable tag: 5.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Take control of your WordPress core XML Sitemap add a Google News Sitemap. Compatible with WordPress Multisite, most caching plugins, Polylang and WPML.
+Take control of your WordPress core XML Sitemap and add a Google News Sitemap.
 
 == Description ==
 
-Take control of your WordPress core **XML Sitemap** add a **Google News Sitemap**. Compatible with WordPress **Multisite**, **Polylang** and **WPML** and most caching plugins. There are no static files created.
+Take control of your WordPress core **XML Sitemap** and add a **Google News Sitemap**. Compatible with WordPress **Multisite**, **Polylang** and **WPML** and most caching plugins. There are no static files created.
 
 NEW: Connect your site to your Google Search Console property to keep an eye on sitemap performance and possible errors. **Submit your sitemaps** right from the WordPress admin.
 
