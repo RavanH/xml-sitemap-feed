@@ -101,27 +101,39 @@ class Sitemap_Settings {
 			// Skip submission if within the grace period for Google News sitemap.
 			if ( \get_transient( 'sitemap_notifier_submission' ) ) {
 				$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_timeframe', 360 );
+				$message   = \sprintf( /* translators: %1$s: Google News Sitemap, %2$d: number of seconds */ esc_html__( 'Your %1$s submission was skipped: Already sent within the last %2$d seconds.', 'xml-sitemap-feed' ), esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), $timeframe );
+
+				\do_action( 'sitemap_notifier_manual_submission', $message, 'warning' );
+
 				\add_settings_error(
 					'xmlsf_gsc_connect',
-					'gsc_manual_submit_news',
-					\sprintf( /* translators: %1$s: XML Sitemap Index, %2$d: number of seconds */ esc_html__( 'Your %1$s submission was skipped: Already sent within the last %2$d seconds.', 'xml-sitemap-feed' ), esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), $timeframe ),
+					'gsc_manual_submit',
+					$message,
 					'error'
 				);
 			} else {
 				$sitemap = xmlsf()->sitemap->get_sitemap_url();
 				$result  = GSC_Connect::submit( $sitemap );
 				if ( \is_wp_error( $result ) ) {
+					$message = \sprintf( /* translators: %1$s: Google News Sitemap, %2$s: Error message */ esc_html__( 'Your %1$s submission failed: %2$s', 'xml-sitemap-feed' ), esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), $result->get_error_message() );
+
+					\do_action( 'sitemap_notifier_manual_submission', $message, 'error' );
+
 					\add_settings_error(
 						'xmlsf_gsc_connect',
-						'gsc_manual_submit_news',
-						\sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Error message */ esc_html__( 'Your %1$s submission failed: %2$s', 'xml-sitemap-feed' ), esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), $result->get_error_message() ),
+						'gsc_manual_submit',
+						$message,
 						'error'
 					);
 				} else {
+					$message = \sprintf( /* translators: %s: Google News Sitemap */ esc_html__( 'Your %s was submitted successfully.', 'xml-sitemap-feed' ), esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ) );
+
+					\do_action( 'sitemap_notifier_manual_submission', $message, 'success' );
+
 					\add_settings_error(
 						'xmlsf_gsc_connect',
-						'gsc_manual_submit_news',
-						\sprintf( /* translators: %s: XML Sitemap Index */ esc_html__( 'Your %s was submitted successfully.', 'xml-sitemap-feed' ), esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ) ),
+						'gsc_manual_submit',
+						$message,
 						'success'
 					);
 
