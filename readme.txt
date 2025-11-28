@@ -9,58 +9,60 @@ Stable tag: 5.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-XML and Google News Sitemaps to feed the hungry spiders. Compatible with WordPress Multisite, most caching plugins, Polylang and WPML.
+Take control of your WordPress core XML Sitemap add a Google News Sitemap. Compatible with WordPress Multisite, most caching plugins, Polylang and WPML.
 
 == Description ==
 
-This plugin allow you to control the WordPress core **XML Sitemap** with various options and allows you to add a **Google News Sitemap**. **Multisite**, **Polylang** and **WPML** compatible and there are no static files created.
+Take control of your WordPress core **XML Sitemap** add a **Google News Sitemap**. Compatible with WordPress **Multisite**, **Polylang** and **WPML** and most caching plugins. There are no static files created.
 
-There are options to select which sitemaps are enabled, which Post Types and archive pages (like taxonomy terms and author pages) are included, how Priority and Lastmod are calculated and a possibility to set additional robots.txt rules from within the WordPress admin.
-
-When the Google News Sitemap is activated, it will become available on **yourblog.url/sitemap-news.xml** (or yourblog.url/?feed=sitemap-news), ready for indexing by Google News. It is automatically referenced in the dynamically created **robots.txt** along with the regular XML Sitemap index.
-
-Please read the FAQ's for info on how to get your articles listed on Google News.
-
-**Compatible with caching solutions** like CloudFlare, WP Super Cache, Nginx Helper (both FastCGI Cache and Redis Cache), W3 Total Cache and Quick Cache that cache feeds, allowing a faster serving to the impatient (when hungry) spider.
-
-**NOTES:**
-
-1. If you _do not use fancy URL's_ or you have WordPress installed in a _subdirectory_, a dynamic **robots.txt will NOT be generated**. You'll have to create your own and upload it to your site root! See FAQ's.
-
-2. On large sites, it is advised to use a good caching plugin like **WP Super Cache**, **Quick Cache**, **W3 Total Cache** or another to improve your site _and_ sitemap performance.
+NEW: Connect your site to your Google Search Console property to keep an eye on sitemap performance and possible errors. **Submit your sitemaps** right from the WordPress admin.
 
 = Features =
 
-* Compatible with multi-lingual sites built with **Polylang** or **WPML** to allow all languages to be indexed equally.
-* Option to add new robots.txt rules. These can be used to further control the indexation of various parts of your site.
-* Includes XLS stylesheets for human readable sitemaps.
-* Sitemap templates and stylesheets can be overridden by theme template files.
+* Control the WordPress core XML Sitemaps.
+* Add a Google News Sitemap.
+* Get sitemap reports from Google Search Console to keep an eye on sitemap performance and possible errors.
+* Submit sitemaps to Google Search Console to invite Google to revisit them.
+* Add new robots.txt rules.
 
 **XML Sitemap**
 
-* Sitemap Index includes **posts**, **pages** and **authors** by default.
-* Optionally include sitemaps for custom post types, categories and tags.
-* Sitemap with custom URLs optional.
-* Custom/static sitemaps can be added to the index.
-* Works out-of-the-box, even on **Multisite** installations.
-* Include featured images or attached images with title.
-* Options to define which post types and taxonomies get included in the sitemap.
-* Updates Lastmod on post modification or on comments.
+* Option to disable the main XML Sitemap Index.
+* Select sitemaps to include in the sitemap index: post types, taxonomies, authors and google news.
+* Select which (custom) post types, taxonomy archives and users to include in respective sitemaps.
+* Exclude specific posts, pages and custom post type posts from sitemaps.
+* Add a custom sitemap with external URLs.
+* Add external sitemaps.
+* Choose the sitemap server/generator: WordPress core or Plugin.
+* Plugin server: Include featured images or attached images with title.
+* Choose to update Last modification date only on post modification (default) or also on comments.
 * Set Priority per post type, per taxonomy and per individual post.
-* Exclude individual posts and pages.
+* Sitemap stylesheet templates can be overridden by theme template files.
 
 **Google News Sitemap**
 
-* Required news sitemap tags: Publication name, language, title and publication date.
-* Set a News Publication Name or uses site name.
+* Optionally activate the Google News Sitemap.
+* Includes the required news sitemap tags: Publication name, language, title and publication date.
+* Set a News Publication Name (site name by default).
 * Supports custom post types.
 * Limit inclusion of certain post categories.
+* Google News Sitemap stylesheet template can be overridden by theme template files.
 
-= Pro Features =
+= Pro Extensions =
+
+**[XML Sitemap Advanced](https://premium.status301.com/downloads/xml-sitemap-advanced/)**
+
+* Sitemap notifier: Automatic XML Sitemap Index update notification to Google Search Console. (Yes, Google Sitemap Ping is back!)
+* Sitemap notifier log
+* Set a custom sitemap URL (slug)
+* Exclude posts and pages in the Bulk Editor.
+* Optionally include empty taxonomy term and empty author archives
+* Rank Math compatibility: exclude posts set to noindex
 
 **[Google News Advanced](https://premium.status301.com/downloads/google-news-advanced/)**
 
-* Automatic sitemap update notification to Google Search Console. (Yes, Google Sitemap Ping is back!)
+* Sitemap norifier: Automatic Google News Sitemap update notification to Google Search Console. (Yes, Google Sitemap Ping is back!)
+* Sitemap notifier log
 * Multiple post types - Include more than one post type in the same News Sitemap.
 * Keywords - Add the keywords tag to your News Sitemap. Keywords can be created from Tags, Categories or a dedicated Keywords taxonomy.
 * Stock tickers - Add stock tickers tag to your News Sitemap. A dedicated Stock Tickers taxonomy will be available to manage them.
@@ -89,6 +91,12 @@ If you wish to help build this plugin, you're very welcome to [translate it into
 = Credits =
 
 XML Sitemap Feed was originally based on the discontinued plugin Standard XML Sitemap Generator by Patrick Chia. Since then, it has been completely rewritten and extended in many ways.
+
+**NOTES:**
+
+1. If you _do not use fancy URL's_ or you have WordPress site running in a _subdirectory_, a dynamic **robots.txt will NOT be generated**.
+
+2. On large sites, it is advised to use a good caching plugin to improve your site _and_ sitemap performance.
 
 
 == Installation ==
