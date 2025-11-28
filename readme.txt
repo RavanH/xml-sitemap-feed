@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 6.9
-Stable tag: 5.6.1
+Stable tag: 5.6.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,7 +57,7 @@ NEW: Connect your site to your Google Search Console property to keep an eye on 
 * Set a custom sitemap URL (slug)
 * Exclude posts and pages in the Bulk Editor.
 * Optionally include empty taxonomy term and empty author archives
-* Rank Math compatibility: exclude posts set to noindex
+* Yoast SEO and Rank Math compatibility: exclude posts set to noindex
 
 **[Google News Advanced](https://premium.status301.com/downloads/google-news-advanced/)**
 
