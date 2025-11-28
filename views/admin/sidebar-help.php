@@ -6,7 +6,7 @@
  */
 
 ?>
-<h3><span class="dashicons dashicons-sos"></span> <?php echo esc_html( translate( 'Help' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></h3>
+<h3><span class="dashicons dashicons-sos" style="color:#d63638"></span> <?php echo esc_html( translate( 'Help' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></h3>
 <p>
 	<?php
 	printf(
