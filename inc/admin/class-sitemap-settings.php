@@ -72,6 +72,8 @@ class Sitemap_Settings {
 		foreach ( $defaults as $option => $settings ) {
 			\update_option( 'xmlsf_' . $option, $settings );
 		}
+
+		\do_action( 'xmlsf_clear_settings' );
 	}
 
 	/**
