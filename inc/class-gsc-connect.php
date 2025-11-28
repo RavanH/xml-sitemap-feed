@@ -109,7 +109,7 @@ class GSC_Connect {
 			\set_transient( 'settings_errors', array( $data['result'] ), 30 ); // Store notices for the next page load.
 
 			$origin = \get_transient( 'gsc_connect_origin' );
-			$slug   = $origin ? $origin : ( sitemaps_enabled( 'sitemap' ) ? 'xmlsf' : ( sitemaps_enabled( 'sitemap' ) ? 'xmlsf_news' : false ) );
+			$slug   = $origin ? $origin : ( sitemaps_enabled( 'sitemap' ) ? 'xmlsf' : ( sitemaps_enabled( 'sitemap-news' ) ? 'xmlsf_news' : false ) );
 
 			$redirect_url = $slug ? \add_query_arg( 'page', $slug, \admin_url( 'options-general.php' ) ) : \admin_url( 'options-general.php' );
 			$redirect_url = \add_query_arg( 'settings-updated', 'true', $redirect_url );
