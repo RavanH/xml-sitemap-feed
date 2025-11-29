@@ -122,7 +122,7 @@ function xmlsf_upgrade( $db_version ) {
 				$taxonomies = get_object_taxonomies( $post_type, 'objects' );
 				// Check each tax public flag and term count and append name to array.
 				foreach ( $taxonomies as $taxonomy ) {
-					if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, xmlsf()->disabled_taxonomies() ) ) {
+					if ( ! empty( $taxonomy->public ) && ! in_array( $taxonomy->name, xmlsf()->disabled_taxonomies(), true ) ) {
 						++$available;
 					}
 				}
