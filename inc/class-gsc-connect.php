@@ -43,7 +43,7 @@ class GSC_Connect {
 	public static function add_tools_page() {
 		\add_submenu_page(
 			'tools.php',
-			__( 'Google Search Console Connection', 'xml-sitemap-feed' ),
+			__( 'Google Search Console', 'xml-sitemap-feed' ),
 			__( 'Google Search Console', 'xml-sitemap-feed' ),
 			'manage_options',
 			self::$page_slug,

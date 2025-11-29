@@ -71,7 +71,7 @@ class GSC_Connect_Settings extends GSC_Connect {
 		// Check if the Google Client ID and Secret are set.
 		if ( empty( $options['google_client_id'] ) || empty( $options['google_client_secret'] ) ) {
 			// Stage 1.
-			include XMLSF_DIR . '/views/admin/section-gsc-oauth-stage-1.php';
+			include XMLSF_DIR . '/views/admin/section-gsc-oauth-stage-1-2.php';
 		} else {
 			$redirect_uri = \site_url( 'index.php?' . self::$query_var );
 			$oauth_url    = \add_query_arg(
@@ -87,7 +87,7 @@ class GSC_Connect_Settings extends GSC_Connect {
 			);
 
 			// Stage 2.
-			include XMLSF_DIR . '/views/admin/section-gsc-oauth-stage-2.php';
+			include XMLSF_DIR . '/views/admin/section-gsc-oauth-stage-3.php';
 		}
 	}
 
