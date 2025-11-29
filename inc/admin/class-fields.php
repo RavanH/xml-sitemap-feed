@@ -195,7 +195,7 @@ class Fields {
 	 */
 	public static function advanced_archive_field_options() {
 		?>
-		<option value=""<?php echo \disabled( true ); ?>>
+		<option value="" disabled="disabled">
 			<?php \esc_html_e( 'Week', 'xml-sitemap-feed' ); ?>
 		</option>
 		<?php
