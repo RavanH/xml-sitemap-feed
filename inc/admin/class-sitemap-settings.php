@@ -272,8 +272,9 @@ class Sitemap_Settings {
 			},
 			9
 		);
+
 		// Advanced plugin plug.
-		if ( ! \is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) ) {
+		if ( ! \apply_filters( 'xmlsf_advanced_enabled', false ) ) {
 			\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_adv_plug' ), 6 );
 			\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_priority_support' ), 11 );
 		}

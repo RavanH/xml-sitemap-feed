@@ -175,7 +175,7 @@ class Sitemap {
 	 */
 	public static function compatible_with_advanced() {
 		// Return if plugin is not active.
-		if ( ! is_plugin_active( 'xml-sitemap-feed-advanced/xml-sitemap-advanced.php' ) ) {
+		if ( ! apply_filters( 'xmlsf_advanced_enabled', false ) ) {
 			return true;
 		}
 
