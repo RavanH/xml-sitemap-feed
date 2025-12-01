@@ -286,7 +286,7 @@ class Main {
 	public static function plugin_meta_links( $links, $file ) {
 		if ( XMLSF_BASENAME === $file ) {
 			$links[] = '<a target="_blank" href="https://premium.status301.com/support/"><span class="dashicons dashicons-sos" style="color:#d63638"></span>' . translate( 'Help' ) . '</a>'; // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-			$links[] = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/?filter=5#new-post">' . __( 'Rate ★★★★★', 'xml-sitemap-feed' ) . '</a>';
+			$links[] = '<a target="_blank" href="https://wordpress.org/support/plugin/xml-sitemap-feed/reviews/?filter=5#new-post">' . __( 'Rate', 'xml-sitemap-feed' ) . ' <span style="color:#dba617">★★★★★</span></a>';
 		}
 		return $links;
 	}
