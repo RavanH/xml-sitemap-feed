@@ -11,8 +11,8 @@
  * Set this constant in wp-config.php if you want to allow looping over each site
  * in the network to run xmlsf_uninstall() defined in uninstall.php
  *
- * There is NO batch-processing so it does not scale on large networks!
- * The constant is ignored on networks over 10k sites.
+ * There is batch-processing on non-large networks.
+ * The constant XMLSF_MULTISITE_UNINSTALL needs to be set explicitly on networks over 10k sites.
  *
  * Example:
  * define( 'XMLSF_MULTISITE_UNINSTALL', true);
@@ -25,7 +25,7 @@ global $wpdb;
 
 // Check if it is a multisite and if XMLSF_MULTISITE_UNINSTALL constant is defined
 // if so, run the uninstall function for each blog id.
-if ( is_multisite() && defined( 'XMLSF_MULTISITE_UNINSTALL' ) && XMLSF_MULTISITE_UNINSTALL && ! wp_is_large_network() ) {
+if ( is_multisite() && ( ! wp_is_large_network() || ( defined( 'XMLSF_MULTISITE_UNINSTALL' ) && XMLSF_MULTISITE_UNINSTALL ) ) ) {
 	// Logging.
 	WP_DEBUG && WP_DEBUG_LOG && error_log( 'Clearing XML Sitemap Feeds settings from each site before uninstall:' );
 

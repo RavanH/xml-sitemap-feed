@@ -135,7 +135,7 @@ Installed alongside [WordPress MU Sitewide Tags Pages](http://wordpress.org/plug
 
 Upon uninstalling the plugin from the Admin > Plugins page, plugin options and meta data will be cleared from the database. See notes in the uninstall.php file.
 
-On multisite, the uninstall.php *can* loop through all sites in the network to perform the uninstalltion process for each site. However, this does not scale for large networks so it *only* does a per-site uninstallation when `define('XMLSF_MULTISITE_UNINSTALL', true);` is explicitly set in wp-config.php.
+On multisite, the uninstall.php loops through all sites in the network to perform the uninstallation process for each site. However, on large networks it *only* does this when `define('XMLSF_MULTISITE_UNINSTALL', true);` is explicitly set in wp-config.php.
 
 
 == Frequently Asked Questions ==
@@ -158,7 +158,7 @@ Code cleanup and 2 bugfixes.
 
 = 5.6.3 =
 
-Date: 20251129
+Date: 20251201
 * Improved GSC connection instructions
 * Code and text strings cleanup
 * FIX: split by week DB query
