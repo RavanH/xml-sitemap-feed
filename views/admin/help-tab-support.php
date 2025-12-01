@@ -13,7 +13,7 @@
 		/* translators: Plugin name, Support linked to forum on WordPress.org */
 		esc_html__( 'These options are provided by %1$s. For help, please go to %2$s.', 'xml-sitemap-feed' ),
 		'<strong>' . esc_html__( 'XML Sitemap & Google News', 'xml-sitemap-feed' ) . '</strong>',
-		'<a href="https://wordpress.org/support/plugin/xml-sitemap-feed" target="_blank">' . esc_html__( 'Support', 'xml-sitemap-feed' ) . '</a>'
+		'<a href="https://wordpress.org/support/plugin/xml-sitemap-feed" target="_blank">' . esc_html( translate( 'Support' ) ) . '</a>' // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
 	);
 	?>
 	<?php

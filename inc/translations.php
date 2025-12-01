@@ -5,13 +5,12 @@
  * @package XML Sitemap & Google News
  */
 
+defined( 'WPINC' ) || die;
+
 esc_html__( 'Advanced options', 'xml-sitemap-feed' );
 __( 'XML Sitemap Advanced', 'xml-sitemap-feed' );
 __( 'Google News Advanced', 'xml-sitemap-feed' );
 
-sprintf( /* translators: Plugin name (linked to plugin installation modal) */ esc_html__( 'To use the Google News Advanced options, please install and activate %s.', 'xml-sitemap-feed' ), '<a href="' . esc_url( network_admin_url( 'plugin-install.php?tab=plugin-information&plugin=xml-sitemap-feed&TB_iframe=true&width=600&height=550' ) ) . '" target="_blank" class="thickbox"><strong>' . esc_html__( 'XML Sitemap & Google News', 'xml-sitemap-feed' ) . '</strong></a>' );
-
-sprintf( /* translators: Google News Sitemap option (linked to admin Reading page) */ esc_html__( 'To use the Google News Advanced options, please activate %s.', 'xml-sitemap-feed' ), '<a href="' . esc_url( admin_url( 'options-reading.php' ) ) . '#xmlsf_sitemaps">' . esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ) . '</a>' );
 
 sprintf( /* Translators: Plugin name, Premium account (linked) */
 	esc_html__( 'You can (de)activate your %1$s license from here or manage domains from your %2$s.', 'xml-sitemap-feed' ),
@@ -97,4 +96,10 @@ esc_html_e( 'The 20 most recent sitemap notification request and related message
 esc_html_e( 'Message', 'xml-sitemap-feed' );
 __( 'Sitemap Notification Log', 'xml-sitemap-feed' );
 esc_html_e( 'Warning: The sitemap notifier depends on internal WordPress events but you seem to have WP Cron disabled. Make sure that you are using a reliable alternative to WP Cron, like a server cron job, to trigger events and that this is done on fairly short interval, e.g. once every minute. If the interval is longer, automatic notifications will suffer longer delays.', 'xml-sitemap-feed' );
-
+printf(
+	/* translators: %1$s: Support ticket (linked to https://premium.status301.com/account/support/), %2$s: Contact us (linked to https://premium.status301.com/email-support/) */
+	esc_html__( 'As valued pro plugin user, you are eligible to priority support. For any questions, you can open a %1$s or %2$s.', 'xml-sitemap-feed' ),
+	'<a href="https://premium.status301.com/account/support/" target="_blank">' . esc_html__( 'Support ticket', 'xml-sitemap-feed' ) . '</a>',
+	'<a href="https://premium.status301.com/email-support/" target="_blank">' . esc_html__( 'Contact us', 'xml-sitemap-feed' ) . '</a>'
+);
+esc_html_e( 'Connect to Google Search Console to allow sitemap notifications.', 'xml-sitemap-feed' );

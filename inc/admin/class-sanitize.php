@@ -20,7 +20,7 @@ class Sanitize {
 	 * @return string
 	 */
 	public static function server( $save ) {
-		$sanitized = empty( $save ) || ! \in_array( $save, array( 'core', 'plugin' ), true ) ? \XMLSF\get_default_settings( 'server' ) : $save;
+		$sanitized = empty( $save ) || ! in_array( $save, array( 'core', 'plugin' ), true ) ? \XMLSF\get_default_settings( 'server' ) : $save;
 
 		return $sanitized;
 	}
@@ -64,14 +64,14 @@ class Sanitize {
 		$save = (array) $save;
 
 		// Sanitize priority.
-		if ( ! empty( $save['priority'] ) && \is_numeric( $save['priority'] ) ) {
+		if ( ! empty( $save['priority'] ) && is_numeric( $save['priority'] ) ) {
 			$save['priority'] = \XMLSF\sanitize_number( $save['priority'], .1, .9 );
 		} else {
 			$sanitized['priority'] = '';
 		}
 
 		// Sanitize limit.
-		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
+		if ( ! empty( $save['limit'] ) && is_numeric( $save['limit'] ) ) {
 			$save['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
@@ -106,14 +106,14 @@ class Sanitize {
 		$save['dynamic_priority'] = ! empty( $save['dynamic_priority'] ) ? '1' : '';
 
 		// Sanitize priority.
-		if ( ! empty( $save['priority'] ) && \is_numeric( $save['priority'] ) ) {
+		if ( ! empty( $save['priority'] ) && is_numeric( $save['priority'] ) ) {
 			$save['priority'] = \XMLSF\sanitize_number( $save['priority'], .1, .9 );
 		} else {
 			$save['priority'] = '';
 		}
 
 		// Sanitize limit.
-		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
+		if ( ! empty( $save['limit'] ) && is_numeric( $save['limit'] ) ) {
 			$save['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
@@ -142,7 +142,7 @@ class Sanitize {
 		$save = (array) $save;
 
 		// Sanitize limit.
-		if ( ! empty( $save['limit'] ) && \is_numeric( $save['limit'] ) ) {
+		if ( ! empty( $save['limit'] ) && is_numeric( $save['limit'] ) ) {
 			$save['limit'] = \XMLSF\sanitize_number( $save['limit'], 1, 50000, 0 );
 		}
 
@@ -152,7 +152,7 @@ class Sanitize {
 				continue;
 			}
 
-			if ( ! empty( $settings['priority'] ) && \is_numeric( $settings['priority'] ) ) {
+			if ( ! empty( $settings['priority'] ) && is_numeric( $settings['priority'] ) ) {
 				$save[ $post_type ]['priority'] = \XMLSF\sanitize_number( $settings['priority'], .1, .9 );
 			} else {
 				$save[ $post_type ]['priority'] = '';
@@ -175,11 +175,11 @@ class Sanitize {
 		}
 
 		// Build sanitized output.
-		$input     = \explode( PHP_EOL, sanitize_textarea_field( $save ) );
+		$input     = explode( PHP_EOL, sanitize_textarea_field( $save ) );
 		$sanitized = array();
 
 		foreach ( $input as $line ) {
-			$line = \filter_var( \esc_url( \trim( $line ) ), FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
+			$line = filter_var( esc_url( trim( $line ) ), FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
 			if ( ! empty( $line ) ) {
 				$sanitized[] = $line;
 			}
@@ -202,7 +202,7 @@ class Sanitize {
 			return '';
 		}
 
-		$input = \explode( PHP_EOL, wp_strip_all_tags( $save ) );
+		$input = explode( PHP_EOL, wp_strip_all_tags( $save ) );
 
 		// Build sanitized output.
 		$sanitized = array();
@@ -211,12 +211,12 @@ class Sanitize {
 				continue;
 			}
 
-			$arr = \explode( ' ', trim( $line ) );
+			$arr = explode( ' ', trim( $line ) );
 
-			$url = \filter_var( \esc_url( \trim( $arr[0] ) ), FILTER_VALIDATE_URL );
+			$url = filter_var( esc_url( trim( $arr[0] ) ), FILTER_VALIDATE_URL );
 
 			if ( ! empty( $url ) ) {
-				$priority    = isset( $arr[1] ) ? \XMLSF\sanitize_number( \str_replace( ',', '.', $arr[1] ) ) : '';
+				$priority    = isset( $arr[1] ) ? \XMLSF\sanitize_number( str_replace( ',', '.', $arr[1] ) ) : '';
 				$sanitized[] = array( $url, $priority );
 			}
 		}

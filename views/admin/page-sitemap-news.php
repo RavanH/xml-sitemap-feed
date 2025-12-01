@@ -18,8 +18,8 @@
 	</p>
 
 	<nav class="nav-tab-wrapper">
-		<a href="?page=xmlsf_news&tab=general" class="nav-tab <?php echo 'general' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( translate( 'General' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
-		<a href="?page=xmlsf_news&tab=advanced" class="nav-tab <?php echo 'advanced' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( translate( 'Advanced' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
+		<a class="nav-tab<?php echo 'general' === $active_tab ? ' nav-tab-active' : '" href="?page=xmlsf_news&tab=general'; ?>"><?php echo esc_html( translate( 'General' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
+		<a class="nav-tab <?php echo 'advanced' === $active_tab ? 'nav-tab-active' : '" href="?page=xmlsf_news&tab=advanced'; ?>"><?php echo esc_html( translate( 'Advanced' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
 		<?php do_action( 'xmlsf_news_nav_tabs', $active_tab ); ?>
 	</nav>
 

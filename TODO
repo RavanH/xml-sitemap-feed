@@ -3,17 +3,22 @@
 
 = 5.7 =
 
+* Quick edit field for Google News exclude
+* Post list column for Google News exclude
+
+* integrate sitemap updates via Bing Webmaster tools API https://learn.microsoft.com/en-us/dotnet/api/microsoft.bing.webmaster.api.interfaces.iwebmasterapi.submitfeed?view=bing-webmaster-dotnet#microsoft-bing-webmaster-api-interfaces-iwebmasterapi-submitfeed(system-string-system-string)
+
 * rethink gsc onboarding: if multiple property candidates, manually choose between them before final redirect?
 
 Consider: Keep GSC Connect tools page permanently visible? Room for advanced promo? Allow other sitemap reports?
 
 * Reverse Disable sitemaps option in admin
 * Unite settings under one admin page "XML Sitemaps"
-* One Reports tab for all sitemaps in GSC Reports
+* One Reports tab for all sitemaps in GSC Reports?
 * Sitemap index drildown in GSC report
 
 = 5.8 =
-* Bing Webmaster Tools Connect
+
 * RSS feeds: detect excerpt setting with admin warning or auto-change setting (?), suggest advanced plugin for improved compatibility
 * lastmod for users
 

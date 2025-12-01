@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 6.9
-Stable tag: 5.6.2
+Stable tag: 5.6.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,13 +74,13 @@ This plugin does not collect any user or visitor data nor set browser cookies. U
 **Data that is published**
 
 An XML Sitemap index, referencing other sitemaps containing your web site's public post URLs of selected post types that are already public, along with their last modification date and associated image URLs, and any selected public archive URLs.
+An author sitemap can be included, which will contain links to author archive pages. These urls contain author/user slugs, and the author archives can contain author bio information. If you wish to keep this out of public domain, then deactivate the author sitemap and use an SEO plugin to add noindex headers to the respective archive pages.
 
 A Google News Sitemap containing your web site's public and recent (last 48 hours) URLs of selected news post type, along with their publication time stamp and associated image URL.
-An author sitemap can be included, which will contain links to author archive pages. These urls contain author/user slugs, and the author archives can contain author bio information. If you wish to keep this out of public domain, then deactivate the author sitemap and use an SEO plugin to add noindex headers.
 
 **Data that is transmitted**
 
-No data actively transmitted.
+when a connection between your site and Google Search Console is configured in this plugin, the sitemap index and google news sitemap can be submitted to Google. No data is transmitted to any third party.
 
 = Contribute =
 
@@ -135,7 +135,7 @@ Installed alongside [WordPress MU Sitewide Tags Pages](http://wordpress.org/plug
 
 Upon uninstalling the plugin from the Admin > Plugins page, plugin options and meta data will be cleared from the database. See notes in the uninstall.php file.
 
-On multisite, the uninstall.php *can* loop through all sites in the network to perform the uninstalltion process for each site. However, this does not scale for large networks so it *only* does a per-site uninstallation when `define('XMLSF_MULTISITE_UNINSTALL', true);` is explicitly set in wp-config.php.
+On multisite, the uninstall.php loops through all sites in the network to perform the uninstallation process for each site. However, on large networks it *only* does this when `define('XMLSF_MULTISITE_UNINSTALL', true);` is explicitly set in wp-config.php.
 
 
 == Frequently Asked Questions ==
@@ -150,14 +150,18 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.6.1 =
-Google Search Console connection with sitemap reports and submission, advanced plugin compatibility.
+= 5.6.3 =
+
+Code cleanup and 2 bugfixes.
 
 == Changelog ==
 
-= 5.6.1 =
+= 5.6.3 =
 
-Date: 20251126
+Date: 20251201
+* Improved GSC connection instructions
+* Code and text strings cleanup
+* FIX: split by week DB query
 * FIX: XML Sitemap Advanced compatibility
 
 = 5.6 =

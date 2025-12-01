@@ -28,3 +28,11 @@
 		<?php esc_html_e( 'Only valid sitemaps are allowed in the Sitemap Index. Use your Webmaster Tools account to verify!', 'xml-sitemap-feed' ); ?>
 	</span>
 </p>
+<p>
+	<strong><?php esc_html_e( 'Sitemap notifier', 'xml-sitemap-feed' ); ?></strong>
+	<br />
+	<?php esc_html_e( 'The sitemap notifier automaticly resubmits your news sitemap upon each new publication. This replaces the abandoned Sitemap Ping feature.', 'xml-sitemap-feed' ); ?>
+	<?php apply_filters( 'xmlsf_advanced_enabled', false ) || printf( /* Translators: %s: XML Sitemap Advanced (with link) */ esc_html__( 'Available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">' . esc_html__( 'XML Sitemap Advanced', 'xml-sitemap-feed' ) . '</a>' ); ?>
+	<br>
+	<?php esc_html_e( 'Note: Sitemap notifications need a Google Cloud Platform project with the Google Search Console API enabled. Instructions will be provided during configuration.', 'xml-sitemap-feed' ); ?>
+</p>

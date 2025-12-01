@@ -143,7 +143,7 @@ class GSC_Oauth_Handler {
 			return array(
 				'result' => array(
 					'code'    => 'sitemap_notifier_oauth_no_access_token',
-					'message' => 'Failed to obtain access token from Google.',
+					'message' => \__( 'Failed to obtain access token from Google.', 'xml-sitemap-feed' ),
 					'type'    => 'error',
 				),
 			);
@@ -214,11 +214,7 @@ class GSC_Oauth_Handler {
 
 		// Check for WP_Error on the wp_remote_post response.
 		if ( \is_wp_error( $response ) ) {
-			WP_DEBUG && WP_DEBUG_LOG && \error_log( '[Sitemap Notifier] Error refreshing access token (remote error): ' . $response->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			return new WP_Error(
-				'sitemap_notifier_oauth_refresh_remote_error',
-				$response->get_error_message()
-			);
+			return $response;
 		}
 
 		$response_code = \wp_remote_retrieve_response_code( $response );
@@ -229,7 +225,6 @@ class GSC_Oauth_Handler {
 		if ( 200 !== \wp_remote_retrieve_response_code( $response ) || ! isset( $data['access_token'] ) ) {
 			$error         = isset( $data['error'] ) ? $data['error'] : 'Unknown refresh token error.';
 			$error_message = isset( $data['error_description'] ) ? $data['error_description'] : $error;
-			WP_DEBUG && WP_DEBUG_LOG && \error_log( '[Sitemap Notifier] Error refreshing access token (API error). Code: ' . $response_code . '. Message: ' . $error_message . '. Body: ' . $body ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
 			// If refresh token is invalid/expired, remove it and suggest re-connecting.
 			if ( 'invalid_grant' === $error ) {

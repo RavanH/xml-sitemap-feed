@@ -14,7 +14,7 @@ if ( empty( $options['google_refresh_token'] ) ) {
 		<?php printf( /* translators: %s: Google Search Console */ esc_html_x( 'Connect to %s for sitemap data retrieval and sitemap submissions.', 'Google Search Console connection', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) ); ?>
 	</p>
 	<p>
-		<a href="<?php echo esc_url( add_query_arg( 'ref', 'xmlsf_news', XMLSF\GSC_Connect::get_settings_url() ) ); ?>" class="button button-primary">
+		<a href="<?php echo esc_url( add_query_arg( 'ref', 'xmlsf_news', XMLSF\Admin\GSC_Connect::get_settings_url() ) ); ?>" class="button button-primary">
 			<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
 		</a>
 	</p>
@@ -23,21 +23,18 @@ if ( empty( $options['google_refresh_token'] ) ) {
 }
 
 $sitemap = xmlsf()->sitemap_news->get_sitemap_url();
-$result  = XMLSF\GSC_Connect::get( $sitemap );
+$data    = XMLSF\GSC_Connect::get( $sitemap );
 
 ?>
 <p><?php esc_html_e( 'Your sitemap data as reported by Google Search Console.', 'xml-sitemap-feed' ); ?></p>
 <?php
-if ( isset( $result['success'] ) && $result['success'] && $result['data'] ) {
-	$data = $result['data'];
-} else {
-	$message = ! empty( $result['message'] ) ? $result['message'] : __( 'Empty response.', 'xml-sitemap-feed' );
+if ( \is_wp_error( $data ) ) {
 	// Display error message.
 	?>
 	<p style="color:#d63638">
 		<?php esc_html_e( 'There was an error requesting sitemap data from Google Search Console.', 'xml-sitemap-feed' ); ?>
 		<br>
-		<?php echo esc_html( $message ); ?>
+		<?php echo esc_html( $data->get_error_message() ); ?>
 	</p>
 	<p>
 		<a href="" class="button button-primary"><?php echo esc_html( translate( 'Retry' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
@@ -53,7 +50,7 @@ $is_pending      = isset( $data['isPending'] ) ? $data['isPending'] : false;
 $last_downloaded = isset( $data['lastDownloaded'] ) ? wp_date( $format, strtotime( $data['lastDownloaded'] ) ) : __( 'Unknown', 'xml-sitemap-feed' );
 $_warnings       = isset( $data['warnings'] ) ? $data['warnings'] : 0;
 $_errors         = isset( $data['errors'] ) ? $data['errors'] : 0;
-$property        = XMLSF\GSC_Connect::get_property_url();
+$property        = XMLSF\Admin\GSC_Connect::get_property_url();
 $gsc_link        = add_query_arg(
 	array(
 		'resource_id' => $property,

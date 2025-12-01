@@ -20,12 +20,4 @@
 			?>
 		</strong>
 	</p>
-	<?php if ( time() < 1764676800 ) : ?>
-		<p style="padding: 5px 10px; border: red dashed;background-color: yellow;border-radius: 10px">
-			<strong>
-				<em>If you hurry, you might still catch our</em>
-				<a href="<?php echo esc_url( $adv_plugin_url ); ?>?discount=BFCM30">Black Friday to Cyber Monday deal!</a>
-			</strong>
-		</p>
-	<?php endif; ?>
 </div>

@@ -6,12 +6,12 @@
  */
 
 ?>
-<h3><span class="dashicons dashicons-sos"></span> <?php echo esc_html( translate( 'Help' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></h3>
+<h3><span class="dashicons dashicons-sos" style="color:#d63638"></span> <?php echo esc_html( translate( 'Help' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></h3>
 <p>
 	<?php
 	printf(
 		/* translators: %s: Help tab */
-		esc_html__( 'For help on the plugin options, open the %s above.', 'xml-sitemap-feed' ),
+		esc_html__( 'For help with these plugin options, open the %s above.', 'xml-sitemap-feed' ),
 		'<a href="#wpbody-content" onclick="javascript:jQuery(\'#contextual-help-link\').trigger(\'click\');">' . esc_html__( 'Help tab', 'xml-sitemap-feed' ) . '</a>'
 	);
 	?>

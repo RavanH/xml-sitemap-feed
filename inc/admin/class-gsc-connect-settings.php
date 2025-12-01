@@ -5,7 +5,9 @@
  * @package XML Sitemap & Google News - Google News Advanced
  */
 
-namespace XMLSF;
+namespace XMLSF\Admin;
+
+use XMLSF\GSC_Oauth_Handler;
 
 /**
  * Helper class with public methods to set up a Google Search Console connection.
@@ -65,13 +67,15 @@ class GSC_Connect_Settings extends GSC_Connect {
 		// Get existing data from DB.
 		$options = (array) \get_option( self::$option_group, array() );
 
+		settings_errors();
+
 		// Intro.
 		include XMLSF_DIR . '/views/admin/section-gsc-oauth-intro.php';
 
 		// Check if the Google Client ID and Secret are set.
 		if ( empty( $options['google_client_id'] ) || empty( $options['google_client_secret'] ) ) {
 			// Stage 1.
-			include XMLSF_DIR . '/views/admin/section-gsc-oauth-stage-1.php';
+			include XMLSF_DIR . '/views/admin/section-gsc-oauth-stage-1-2.php';
 		} else {
 			$redirect_uri = \site_url( 'index.php?' . self::$query_var );
 			$oauth_url    = \add_query_arg(
@@ -87,7 +91,7 @@ class GSC_Connect_Settings extends GSC_Connect {
 			);
 
 			// Stage 2.
-			include XMLSF_DIR . '/views/admin/section-gsc-oauth-stage-2.php';
+			include XMLSF_DIR . '/views/admin/section-gsc-oauth-stage-3.php';
 		}
 	}
 

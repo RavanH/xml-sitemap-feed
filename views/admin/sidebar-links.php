@@ -6,7 +6,7 @@
  */
 
 ?>
-<h3><span class="dashicons dashicons-admin-links"></span> <?php echo esc_html( translate( 'Links' ) ); ?></h3>
+<h3><span class="dashicons dashicons-admin-links"></span> <?php echo esc_html( translate( 'Links' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></h3>
 <ul>
 	<li>
 		<a href="https://search.google.com/search-console" target="_blank"><?php esc_html_e( /* Translators: Site title https://search.google.com/search-console */ 'Google Search Console', 'xml-sitemap-feed' ); ?></a>
