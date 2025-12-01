@@ -166,7 +166,7 @@ class Sitemap_News_Settings {
 		// Update to defaults.
 		\update_option( 'xmlsf_news_tags', \XMLSF\get_default_settings( 'news_tags' ) );
 
-		\do_action( 'xmlsf_clear_news_settings' );
+		\do_action( 'xmlsf_news_sclear_ettings' );
 	}
 
 	/**
