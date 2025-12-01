@@ -12,7 +12,7 @@
 	printf(
 		/* translators: %s: Link to detailed documentation */
 		esc_html__( 'For more detailed instructions, please refer to our %s.', 'xml-sitemap-feed' ),
-		'<a href="https://premium.status301.com/knowledge-base/xml-sitemap-google-news/automatically-notify-google-on-news-sitemap-updates/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Knowledge Base', 'xml-sitemap-feed' ) . '</a>'
+		'<a href="https://premium.status301.com/knowledge-base/xml-sitemap-google-news/connect-your-site-to-google-search-console/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Knowledge Base', 'xml-sitemap-feed' ) . '</a>'
 	);
 	?>
 </p>
