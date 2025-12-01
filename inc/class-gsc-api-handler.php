@@ -22,7 +22,7 @@ class GSC_API_Handler {
 	 * @param string $api_endpoint The API endpoint to use.
 	 * @param string $access_token The OAuth 2.0 access token.
 	 *
-	 * @return array An array containing the success status sitemap data.
+	 * @return array|WP_Error An array containing the sitemap data, WP_Error on failure.
 	 */
 	public static function get( $api_endpoint, $access_token ) {
 		$api_request_args = array(
@@ -37,27 +37,23 @@ class GSC_API_Handler {
 		$api_response = \wp_remote_request( $api_endpoint, $api_request_args );
 
 		if ( \is_wp_error( $api_response ) ) {
-			$error_message = $api_response->get_error_message();
-			return array(
-				'success' => false,
-				'message' => $error_message,
-			);
+			return $api_response;
 		}
 
 		$api_response_code = \wp_remote_retrieve_response_code( $api_response );
 		$api_response_body = \wp_remote_retrieve_body( $api_response );
 
-		// Google Search Console API returns 204 OK on successful submission request.
+		// Google Search Console API returns 200 OK on successful submission request.
 		if ( 200 === $api_response_code ) {
-			return array(
-				'success' => true,
-				'data'    => \json_decode( $api_response_body, true ),
-			);
+			return \json_decode( $api_response_body, true );
 		} else {
 			// Handle API errors.
-			return array(
-				'success' => false,
-				'message' => self::handle_api_errors( $api_response_code, $api_response_body ),
+			return new WP_Error(
+				'gsc_api_error',
+				self::handle_api_errors( $api_response_code, $api_response_body ),
+				array(
+					'status' => $api_response_code,
+				)
 			);
 		}
 	}

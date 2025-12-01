@@ -5,7 +5,9 @@
  * @package XML Sitemap & Google News - Google News Advanced
  */
 
-namespace XMLSF;
+namespace XMLSF\Admin;
+
+use XMLSF\GSC_Oauth_Handler;
 
 /**
  * Helper class with public methods to set up a Google Search Console connection.
@@ -64,6 +66,8 @@ class GSC_Connect_Settings extends GSC_Connect {
 
 		// Get existing data from DB.
 		$options = (array) \get_option( self::$option_group, array() );
+
+		settings_errors();
 
 		// Intro.
 		include XMLSF_DIR . '/views/admin/section-gsc-oauth-intro.php';
