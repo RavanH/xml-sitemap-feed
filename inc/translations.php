@@ -102,3 +102,4 @@ printf(
 	'<a href="https://premium.status301.com/account/support/" target="_blank">' . esc_html__( 'Support ticket', 'xml-sitemap-feed' ) . '</a>',
 	'<a href="https://premium.status301.com/email-support/" target="_blank">' . esc_html__( 'Contact us', 'xml-sitemap-feed' ) . '</a>'
 );
+esc_html_e( 'Connect to Google Search Console to allow sitemap notifications.', 'xml-sitemap-feed' );
