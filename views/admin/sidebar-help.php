@@ -11,7 +11,7 @@
 	<?php
 	printf(
 		/* translators: %s: Help tab */
-		esc_html__( 'For help on the plugin options, open the %s above.', 'xml-sitemap-feed' ),
+		esc_html__( 'For help with these plugin options, open the %s above.', 'xml-sitemap-feed' ),
 		'<a href="#wpbody-content" onclick="javascript:jQuery(\'#contextual-help-link\').trigger(\'click\');">' . esc_html__( 'Help tab', 'xml-sitemap-feed' ) . '</a>'
 	);
 	?>

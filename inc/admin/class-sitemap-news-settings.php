@@ -7,8 +7,6 @@
 
 namespace XMLSF\Admin;
 
-use XMLSF\GSC_Connect;
-
 /**
  * XMLSF Admin Sitemap News Settings CLASS
  *
@@ -71,7 +69,7 @@ class Sitemap_News_Settings {
 				);
 			} else {
 				$sitemap = xmlsf()->sitemap_news->get_sitemap_url();
-				$result  = GSC_Connect::submit( $sitemap );
+				$result  = \XMLSF\GSC_Connect::submit( $sitemap );
 				if ( \is_wp_error( $result ) ) {
 					$message = \sprintf( /* translators: %1$s: Google News Sitemap, %2$s: Error message */ esc_html__( 'Your %1$s submission failed: %2$s', 'xml-sitemap-feed' ), esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), $result->get_error_message() );
 
