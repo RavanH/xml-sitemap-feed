@@ -36,7 +36,7 @@ class GSC_Connect_Settings extends GSC_Connect {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+			<h1><?php echo \esc_html( get_admin_page_title() ); ?></h1>
 
 			<form action="options.php" method="post">
 				<?php
@@ -62,12 +62,12 @@ class GSC_Connect_Settings extends GSC_Connect {
 		isset( $_GET['ref'] ) && in_array( $_GET['ref'], array( 'xmlsf', 'xmlsf_news' ), true ) && \set_transient( 'gsc_connect_origin', \sanitize_key( $_GET['ref'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		// Prepare the option if it does not already exist. Sets it as non-autoloaded option.
-		add_option( self::$option_group, '', '', false );
+		\add_option( self::$option_group, '', '', false );
 
 		// Get existing data from DB.
 		$options = (array) \get_option( self::$option_group, array() );
 
-		settings_errors();
+		\settings_errors();
 
 		// Intro.
 		include XMLSF_DIR . '/views/admin/section-gsc-oauth-intro.php';
@@ -81,8 +81,8 @@ class GSC_Connect_Settings extends GSC_Connect {
 			$oauth_url    = \add_query_arg(
 				array(
 					'client_id'     => $options['google_client_id'],
-					'redirect_uri'  => rawurlencode( $redirect_uri ),
-					'scope'         => rawurlencode( 'https://www.googleapis.com/auth/webmasters' ),
+					'redirect_uri'  => \rawurlencode( $redirect_uri ),
+					'scope'         => \rawurlencode( 'https://www.googleapis.com/auth/webmasters' ),
 					'response_type' => 'code',
 					'access_type'   => 'offline', // Request a refresh token.
 					'prompt'        => 'consent', // Ensure consent screen is shown.

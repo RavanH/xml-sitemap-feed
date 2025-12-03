@@ -171,7 +171,7 @@ class Sitemap_Core extends Sitemap {
 	public function get_sitemap_url( $sitemap = 'index' ) {
 		$slug = $this->slug();
 
-		if ( 'index' === $sitemap && 'wp-sitemap' !== $slug && xmlsf()->using_permalinks() ) {
+		if ( 'index' === $sitemap && 'wp-sitemap' !== $slug && \xmlsf()->using_permalinks() ) {
 			$sitemap_url = \home_url( $slug . '.xml' );
 		} else {
 			$sitemap_url = \get_sitemap_url( $sitemap );
