@@ -248,6 +248,7 @@ class Sitemap_Settings {
 	 */
 	public static function settings_page() {
 		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$active_tab = in_array( $active_tab, array( 'general', 'post_types', 'taxonomies', 'authors', 'advanced', 'license' ), true ) ? $active_tab : 'general';
 
 		do_action( 'xmlsf_add_settings', $active_tab );
 
