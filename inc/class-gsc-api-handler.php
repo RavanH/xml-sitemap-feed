@@ -139,7 +139,7 @@ class GSC_API_Handler {
 		} elseif ( 403 === $api_response_code ) {
 			$detailed_error_message .= ' ' . \__( 'Please ensure the connected Google account has full access to the Search Console property.', 'xml-sitemap-feed' );
 		} elseif ( 404 === $api_response_code ) {
-			$detailed_error_message .= ' ' . \__( 'This usually means the site property URL used in the API call was not found or does not match the property verified in Search Console. Ensure the property exists and the URL matches exactly (including www/non-www and http/https).', 'xml-sitemap-feed' );
+			$detailed_error_message .= ' ' . \__( 'This usually means the site property URL used in the API call was not found or does not match the property verified in Search Console.', 'xml-sitemap-feed' );
 		}
 
 		return $detailed_error_message;
