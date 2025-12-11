@@ -166,6 +166,9 @@ class XMLSitemapFeed {
 		// Prepare GSC Connector.
 		\add_action( 'init', array( $this, 'gsc_connect' ) );
 
+		// Prepare BWT Connector.
+		\add_action( 'init', array( $this, 'bwt_connect' ) );
+
 		// Register rewrites.
 		\add_action( 'init', array( $this, 'register_rewrites' ) );
 
@@ -181,13 +184,31 @@ class XMLSitemapFeed {
 
 		// Prepare onboarding if not connected.
 		if ( empty( $options['google_refresh_token'] ) ) {
-			// Prepare onboarding.
-			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'add_tools_page' ) );
-			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'register_settings' ) );
-
 			// Prepare for OAuth callback.
 			\add_filter( 'query_vars', array( __NAMESPACE__ . '\GSC_Connect', 'query_vars' ) );
 			\add_action( 'parse_request', array( __NAMESPACE__ . '\GSC_Connect', 'parse_request' ) );
+
+			// Prepare onboarding admin pages.
+			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'add_tools_page' ) );
+			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'register_settings' ) );
+		}
+	}
+
+	/**
+	 * Prepare BWT Connector.
+	 */
+	public function bwt_connect() {
+		$options = (array) \get_option( 'xmlsf_bwt_connect', array() );
+
+		// Prepare onboarding if not connected.
+		if ( empty( $options['bing_refresh_token'] ) ) {
+			// Prepare for OAuth callback.
+			\add_filter( 'query_vars', array( __NAMESPACE__ . '\BWT_Connect', 'query_vars' ) );
+			\add_action( 'parse_request', array( __NAMESPACE__ . '\BWT_Connect', 'parse_request' ) );
+
+			// Prepare onboarding admin pages.
+			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\BWT_Connect', 'add_tools_page' ) );
+			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\BWT_Connect', 'register_settings' ) );
 		}
 	}
 
