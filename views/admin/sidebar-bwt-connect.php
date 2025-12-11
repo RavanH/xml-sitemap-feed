@@ -7,7 +7,7 @@
 
 ?>
 <h3>
-	<span class="dashicons dashicons-google"></span>
+	<span class="dashicons dashicons-admin-site-alt3"></span>
 	<?php esc_html_e( 'Bing Webmaster Tools', 'xml-sitemap-feed' ); ?>
 </h3>
 <?php

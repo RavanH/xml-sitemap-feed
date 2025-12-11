@@ -80,14 +80,14 @@ class BWT_Connect_Settings extends BWT_Connect {
 			$redirect_uri = \site_url( 'index.php?' . self::$query_var );
 			$oauth_url    = \add_query_arg(
 				array(
+					'response_type' => 'code',
 					'client_id'     => $options['bing_client_id'],
 					'redirect_uri'  => \rawurlencode( $redirect_uri ),
-					'scope'         => 'Webmaster.manage',
-					'response_type' => 'code',
+					'scope'         => 'webmaster.manage',
 					//'access_type'   => 'offline', // Request a refresh token. DO WE NEED THIS FOR BING???
 					//'prompt'        => 'consent', // Ensure consent screen is shown. DO WE NEED THIS FOR BING???
 				),
-				'https://www.bing.com/webmasters/OAuth/authorize'
+				'https://www.bing.com/webmasters/oauth/authorize'
 			);
 
 			// Stage 2.
@@ -98,13 +98,14 @@ class BWT_Connect_Settings extends BWT_Connect {
 	/**
 	 * Render the text field for the Google Client ID.
 	 */
-	public static function client_id_render() {
+	public static function bing_client_id_render() {
 		$options   = (array) \get_option( self::$option_group, array() );
 		$client_id = isset( $options['bing_client_id'] ) ? \sanitize_text_field( $options['bing_client_id'] ) : '';
 		?>
 		<input type="text" autocomplete="off" name="<?php echo \esc_attr( self::$option_group ); ?>[bing_client_id]" id="xmlsf_notifier_bing_client_id" value="<?php echo \esc_attr( $client_id ); ?>" class="regular-text">
 		<p class="description">
-			<?php \esc_html_e( 'Enter your Google Cloud Project Client ID. You can find this in the Google Cloud Console under APIs & Services > Credentials.', 'xml-sitemap-feed' ); ?>
+			<?php \esc_html_e( 'Enter your Bing Webmaster Tools Client ID.', 'xml-sitemap-feed' ); ?>
+			<?php \esc_html_e( 'You can find this in Bing Webmaster Tools under Settings > API Access > OAuth client.', 'xml-sitemap-feed' ); ?>
 		</p>
 		<?php
 	}
@@ -112,13 +113,14 @@ class BWT_Connect_Settings extends BWT_Connect {
 	/**
 	 * Render the text field for the Google Client Secret.
 	 */
-	public static function client_secret_render() {
+	public static function bing_client_secret_render() {
 		$options       = (array) \get_option( self::$option_group, array() );
 		$client_secret = ! empty( $options['bing_client_secret'] ) ? self::$pw_placeholder : '';
 		?>
 		<input type="password" autocomplete="new-password" name="<?php echo \esc_attr( self::$option_group ); ?>[bing_client_secret]" id="xmlsf_notifier_bing_client_secret" value="<?php echo \esc_attr( $client_secret ); ?>" class="regular-text">
 		<p class="description">
-			<?php \esc_html_e( 'Enter your Google Cloud Project Client Secret. Keep this secret confidential. If you loose it, you will need to create a new one in the Google Cloud Console under APIs & Services > Credentials.', 'xml-sitemap-feed' ); ?>
+			<?php \esc_html_e( 'Enter your Bing Webmaster Tools Client Secret.', 'xml-sitemap-feed' ); ?>
+			<?php \esc_html_e( 'You can find this in Bing Webmaster Tools under Settings > API Access > OAuth client.', 'xml-sitemap-feed' ); ?>
 		</p>
 		<?php
 	}

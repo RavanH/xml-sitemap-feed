@@ -24,30 +24,31 @@
 	<li>
 		<?php
 		printf(
-			/* translators: %1$s: API & Services, %2$s: Credentials, %3$s + Create credentials */
-			esc_html__( 'Go to %1$s > %2$s and click %3$s.', 'xml-sitemap-feed' ),
-			'<strong>' . esc_html__( 'APIs & Services', 'xml-sitemap-feed' ) . '</strong>',
-			'<strong>' . esc_html__( 'Credentials', 'xml-sitemap-feed' ) . '</strong>',
-			'<strong>' . esc_html__( '+ Create credentials', 'xml-sitemap-feed' ) . '</strong>'
+			/* translators: %1$s: Bing Webmaster Tools, %2$s: Settings */
+			esc_html__( 'Sign in to your account on %1$s and open %2$s via the gear icon on the top right.', 'xml-sitemap-feed' ),
+			'<strong><a href="https://www.bing.com/webmasters/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) . '</a></strong>',
+			'<strong>' . esc_html__( 'Settings', 'xml-sitemap-feed' ) . '</strong>'
 		);
 		?>
 	</li>
 	<li>
 		<?php
 		printf(
-			/* translators: %1$s: OAuth client ID, %2$s: Web application */
-			esc_html__( 'Select %1$s and choose %2$s as the Application type.', 'xml-sitemap-feed' ),
-			'<strong>' . esc_html__( 'OAuth client ID', 'xml-sitemap-feed' ) . '</strong>',
-			'<strong>' . esc_html__( 'Web application', 'xml-sitemap-feed' ) . '</strong>'
+			/* translators: %1$s: API Access, %2$s: OAuth client */
+			esc_html__( 'Select %1$s (read and accept the Terms and Conditions if displayed) and go to %2$s. If you already have OAuth clients, follow %3$s to create a new one.', 'xml-sitemap-feed' ),
+			'<strong>' . esc_html__( 'API Access', 'xml-sitemap-feed' ) . '</strong>',
+			'<strong>' . esc_html__( 'OAuth client', 'xml-sitemap-feed' ) . '</strong>',
+			'<strong>' . esc_html__( '+ Add', 'xml-sitemap-feed' ) . '</strong>'
 		);
 		?>
 	</li>
 	<li>
 		<?php
 		printf(
-			/* translators: %1$s: Authorized redirect URIs, %2$s: The redirect URI to be registered in Google Cloud Console */
-			esc_html__( 'In the %1$s field, add the following exact URI: %2$s', 'xml-sitemap-feed' ),
-			'<strong>' . esc_html__( 'Authorized redirect URIs', 'xml-sitemap-feed' ) . '</strong>',
+			/* translators: %1$s: Name, %2$s: The redirect URI to be registered in Bing Webmaster Tools */
+			esc_html__( 'Give your OAuth client a reconizable %1$s and in the %2$s field, add the following exact URI: %3$s', 'xml-sitemap-feed' ),
+			'<strong>' . esc_html__( 'Name', 'xml-sitemap-feed' ) . '</strong>',
+			'<strong>' . esc_html__( 'Redirect URI', 'xml-sitemap-feed' ) . '</strong>',
 			'<code>' . esc_url( site_url( 'index.php?' . self::$query_var ) ) . '</code>' // This is your plugin's custom endpoint URL.
 		);
 		?>
@@ -55,9 +56,8 @@
 	<li>
 		<?php
 		printf(
-			/* translators: %1$s: Create, %2$s: Client ID, %3$s: Client secret */
-			esc_html__( 'Click %1$s button and a popup dialog will then display your %2$s and %3$s. Copy each of these and paste them into their respective fields below.', 'xml-sitemap-feed' ),
-			'<strong>' . esc_html__( 'Create', 'xml-sitemap-feed' ) . '</strong>',
+			/* translators: %1$s: Client ID, %2$s: Client secret */
+			esc_html__( 'Select the created OAuth client name, then copy the %1$s and %2$s into their respective fields below.', 'xml-sitemap-feed' ),
 			'<strong>' . esc_html__( 'Client ID', 'xml-sitemap-feed' ) . '</strong>',
 			'<strong>' . esc_html__( 'Client secret', 'xml-sitemap-feed' ) . '</strong>'
 		);
