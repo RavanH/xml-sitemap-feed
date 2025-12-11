@@ -2,7 +2,7 @@
 /**
  * Status301 Premium Google Search Console Connection Manager
  *
- * @package Sitemap Notifier
+ * @package XML Sitemap & Google News
  */
 
 namespace XMLSF\Admin;
@@ -13,7 +13,7 @@ use WP_Error;
  * Helper class with public methods to set up a Google Search Console connection.
  *
  * @author RavanH
- * @version 1.0
+ * @version 5.6
  */
 class GSC_Connect {
 	/**
@@ -201,6 +201,6 @@ class GSC_Connect {
 		\update_option( self::$option_group, $options );
 
 		// Delete access token.
-		\delete_transient( 'sitemap_notifier_access_token' );
+		\delete_transient( 'sitemap_notifier_google_access_token' );
 	}
 }

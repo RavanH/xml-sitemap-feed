@@ -2,7 +2,7 @@
 /**
  * Status301 Premium Google Search Console Connection Manager
  *
- * @package Sitemap Notifier
+ * @package XML Sitemap & Google News
  */
 
 namespace XMLSF;
@@ -11,9 +11,8 @@ use WP_Error;
 
 /**
  * Helper class with public methods to set up a Google Search Console connection.
- *
- * @author RavanH
- * @version 1.0
+ * 
+ * @since 5.6
  */
 class GSC_Connect {
 	/**
@@ -32,8 +31,6 @@ class GSC_Connect {
 
 	/**
 	 * Handles the OAuth callback request.
-	 *
-	 *  @since 5.6
 	 *
 	 * @param WP $wp The WP object.
 	 */
@@ -69,8 +66,6 @@ class GSC_Connect {
 	/**
 	 * Define the query variable for the OAuth callback.
 	 *
-	 *  @since 5.6
-	 *
 	 * @param array $vars The query variables.
 	 *
 	 * @return array The query variables.
@@ -83,13 +78,11 @@ class GSC_Connect {
 	/**
 	 * Retrieves a valid Google OAuth access token, refreshing it if necessary.
 	 *
-	 *  @since 5.6
-	 *
 	 * @return string|WP_Error The valid access token or a WP_Error object on failure.
 	 */
 	public static function get_access_token() {
 		// Try to get the access token from the transient first.
-		$access_token = \get_transient( 'sitemap_notifier_access_token' );
+		$access_token = \get_transient( 'sitemap_notifier_google_access_token' );
 
 		// If access token was retrieved from transient, it's valid.
 		if ( false !== $access_token ) {
@@ -108,8 +101,6 @@ class GSC_Connect {
 
 	/**
 	 * Remote request to submit the sitemap to Google Search Console using an OAuth Access Token.
-	 *
-	 * @since 5.6
 	 *
 	 * @uses class GSC_API_Handler
 	 *
@@ -132,7 +123,7 @@ class GSC_Connect {
 
 			// Save property URL.
 			$options['property_url'] = $property;
-			update_option( 'xmlsf_gsc_connect', $options, false );
+			\update_option( 'xmlsf_gsc_connect', $options, false );
 		}
 
 		// The API endpoint: https://www.googleapis.com/webmasters/v3/sites/siteUrl/sitemaps/feedPath
@@ -146,8 +137,6 @@ class GSC_Connect {
 
 	/**
 	 * Submitter. Hooked on xmlsf_advanced_news_notifier event.
-	 *
-	 * @since 5.6
 	 *
 	 * @uses class GSC_API_Handler
 	 *
@@ -171,17 +160,7 @@ class GSC_Connect {
 		}
 
 		// Submit sitemap URL using the OAuth access token.
-		$result = GSC_API_Handler::submit( $api_endpoint, $access_token );
-
-		if ( ! $result['success'] ) {
-			return new WP_Error(
-				'xmlsf_gsc_submit_error',
-				$result['error'],
-				$result['data']
-			);
-		}
-
-		return true;
+		return GSC_API_Handler::submit( $api_endpoint, $access_token );
 	}
 
 	/**

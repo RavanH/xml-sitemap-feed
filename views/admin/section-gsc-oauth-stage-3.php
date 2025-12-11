@@ -2,7 +2,7 @@
 /**
  * GSC Oauth section stage 2
  *
- * @package XML Sitemap & Google News - Google News Advanced
+ * @package XML Sitemap & Google News
  */
 
 ?>
@@ -13,7 +13,7 @@
 	</a>
 </p>
 <p class="description">
-	<?php esc_html_e( 'You will be redirected to Google to authorize your site.', 'xml-sitemap-feed' ); ?> <?php esc_html_e( 'Please use a Google account that has FULL access to the site property in Google Search Console.', 'xml-sitemap-feed' ); ?>
+	<?php esc_html_e( 'You will be redirected to Google to authorize your site.', 'xml-sitemap-feed' ); ?> <?php esc_html_e( 'Please use a Google account that has at least Full access to the site property in Google Search Console.', 'xml-sitemap-feed' ); ?>
 	<br>
 	<?php
 	printf(
@@ -22,9 +22,6 @@
 		'<code>' . esc_url( site_url( 'index.php?' . self::$query_var ) ) . '</code>'
 	);
 	?>
-</p>
-<p>
-	<?php esc_html_e( 'After successful authorization, you will be able to configure the plugin settings and start submitting your sitemap to Google Search Console manually or automatically on content updates.', 'xml-sitemap-feed' ); ?>
 </p>
 <hr>
 <p>

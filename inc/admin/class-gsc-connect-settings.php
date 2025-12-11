@@ -2,18 +2,18 @@
 /**
  * Status301 Premium Google Search Console Connection Onboarding
  *
- * @package XML Sitemap & Google News - Google News Advanced
+ * @package XML Sitemap & Google News
  */
 
 namespace XMLSF\Admin;
 
-use XMLSF\GSC_Oauth_Handler;
+use XMLSF\Secret;
 
 /**
  * Helper class with public methods to set up a Google Search Console connection.
  *
  * @author RavanH
- * @version 1.0
+ * @version 5.6
  */
 class GSC_Connect_Settings extends GSC_Connect {
 
@@ -143,7 +143,7 @@ class GSC_Connect_Settings extends GSC_Connect {
 
 		// Sanitize Google Client Secret.
 		if ( isset( $input['google_client_secret'] ) && self::$pw_placeholder !== $input['google_client_secret'] ) {
-			$sanitized['google_client_secret'] = ! empty( $input['google_client_secret'] ) ? GSC_Oauth_Handler::encrypt( \sanitize_text_field( $input['google_client_secret'] ) ) : '';
+			$sanitized['google_client_secret'] = ! empty( $input['google_client_secret'] ) ? Secret::encrypt( \sanitize_text_field( $input['google_client_secret'] ) ) : '';
 		} else {
 			$sanitized['google_client_secret'] = isset( $options['google_client_secret'] ) ? $options['google_client_secret'] : '';
 		}

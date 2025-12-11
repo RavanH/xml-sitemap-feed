@@ -2,7 +2,7 @@
 /**
  * GSC Oauth section stage 1
  *
- * @package XML Sitemap & Google News - Google News Advanced
+ * @package XML Sitemap & Google News
  */
 
 ?>
@@ -27,7 +27,7 @@
 		?>
 	</li>
 </ol>
-<p><?php esc_html_e( 'Follow the steps below to create a Google Cloud Console project and obtain your credentials.', 'xml-sitemap-feed' ); ?> <?php esc_html_e( 'Please use a Google account that has Full access to the site property in Google Search Console.', 'xml-sitemap-feed' ); ?></p>
+<p><?php esc_html_e( 'Follow the steps below to create a Google Cloud Console project and obtain your credentials.', 'xml-sitemap-feed' ); ?> <?php esc_html_e( 'Please use a Google account that has at least Full access to the site property in Google Search Console.', 'xml-sitemap-feed' ); ?></p>
 <h3><?php esc_html_e( 'Stage I. Create a Google Cloud Console project', 'xml-sitemap-feed' ); ?></h3>
 <ol>
 	<li>

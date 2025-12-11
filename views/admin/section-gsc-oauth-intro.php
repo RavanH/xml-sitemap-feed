@@ -2,7 +2,7 @@
 /**
  * GSC Oauth section intro
  *
- * @package XML Sitemap & Google News - Google News Advanced
+ * @package XML Sitemap & Google News
  */
 
 ?>

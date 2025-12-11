@@ -2,7 +2,7 @@
 /**
  * GSC data section
  *
- * @package XML Sitemap & Google News - Google News Advanced
+ * @package XML Sitemap & Google News
  */
 
 // Get connect data.
