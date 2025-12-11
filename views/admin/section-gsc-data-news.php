@@ -53,8 +53,8 @@ $_errors         = isset( $data['errors'] ) ? $data['errors'] : 0;
 $property        = XMLSF\Admin\GSC_Connect::get_property_url();
 $gsc_link        = add_query_arg(
 	array(
-		'resource_id' => $property,
-		'sitemap'     => $sitemap,
+		'resource_id' => rawurlencode( $property ),
+		'sitemap'     => rawurlencode( $sitemap ),
 	),
 	'https://search.google.com/search-console/sitemaps/info-drilldown'
 );
@@ -85,7 +85,7 @@ if ( isset( $data['contents'] ) && is_array( $data['contents'] ) ) {
 	<tbody>
 		<tr>
 			<th>
-				<a href="<?php echo esc_url( $gsc_link ); ?>" target="_blank">
+				<a href="<?php echo esc_url( $gsc_link ); ?>" target="_blank" title="<?php esc_html_e( 'View this sitemap in Google Search Console', 'xml-sitemap-feed' ); ?>">
 					<?php echo esc_html( $data['path'] ); ?>
 					<span class="dashicons dashicons-external"></span>
 				</a>
@@ -99,7 +99,7 @@ if ( isset( $data['contents'] ) && is_array( $data['contents'] ) ) {
 			<td><?php echo esc_html( $last_submitted ); ?></td>
 			<td><?php echo esc_html( $last_downloaded ); ?></td>
 			<td><?php echo esc_html__( 'Found:', 'xml-sitemap-feed' ) . ' ' . esc_html( $links_submitted ) . '<br>' . esc_html__( 'Indexed:', 'xml-sitemap-feed' ) . ' ' . esc_html( $links_indexed ); ?></td>
-			<td style="color:<?php $_warnings ? '#dba617' : ( $_errors ? '#d63638' : 'inherit' ); ?>"><?php echo esc_html__( 'Warnings:', 'xml-sitemap-feed' ) . ' ' . esc_html( $_warnings ) . '<br>' . esc_html__( 'Errors:', 'xml-sitemap-feed' ) . ' ' . esc_html( $_errors ); ?></td>
+			<td style="color:<?php echo $_errors ? '#d63638' : ( $_warnings ? '#dba617' : 'inherit' ); ?>"><?php echo esc_html__( 'Warnings:', 'xml-sitemap-feed' ) . ' ' . esc_html( $_warnings ) . '<br>' . esc_html__( 'Errors:', 'xml-sitemap-feed' ) . ' ' . esc_html( $_errors ); ?></td>
 		</tr>
 	</tbody>
 </table>
