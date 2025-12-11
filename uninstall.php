@@ -92,6 +92,8 @@ function xmlsf_uninstall() {
 	delete_transient( 'xmlsf_static_files' );
 	delete_transient( 'gsc_connect_origin' );
 	delete_transient( 'sitemap_notifier_access_token' );
+	delete_transient( 'sitemap_notifier_bing_access_token' );
+	delete_transient( 'sitemap_notifier_google_access_token' );
 	delete_transient( 'sitemap_notifier_submission' );
 	delete_transient( 'sitemap_notifier_submission_news' );
 

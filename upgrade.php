@@ -212,7 +212,13 @@ function xmlsf_upgrade( $db_version ) {
 		update_option( 'xmlsf_post_types', $post_types );
 	}
 
-	// Add missing new defaults.
+	$gsc_token = get_transient( 'sitemap_notifier_access_token' );
+	if ( false !== $gsc_token ) {
+		set_transient( 'sitemap_notifier_google_access_token', $gsc_token );
+		delete_transient( 'sitemap_notifier_access_token' );
+	}
+
+	// Add possible missing new defaults.
 	xmlsf_update_from_defaults( false );
 
 	do_action( 'xmlsf_upgrade', $db_version );
