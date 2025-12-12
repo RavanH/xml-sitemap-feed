@@ -19,21 +19,33 @@ class BWT_API_Handler {
 	/**
 	 * Remote request to submit the sitemap to Bing Webmaster Tools using an OAuth Access Token.
 	 *
-	 * @param string $api_endpoint The API endpoint to use.
+	 * @param string $sitemap      The sitemap URL.
 	 * @param string $access_token The OAuth 2.0 access token.
 	 *
 	 * @return array|WP_Error An array containing the sitemap data, WP_Error on failure.
 	 */
-	public static function get( $api_endpoint, $access_token ) {
-		$api_request_args = array(
-			'method'  => 'GET', // Request method uses GET.
-			'headers' => array(
-				'Authorization'  => 'Bearer ' . $access_token,
-				'Content-Length' => '0', // GET request with no body.
+	public static function get( $sitemap, $access_token ) {
+		$api_endpoint = \add_query_arg(
+			array(
+				'siteUrl' => \rawurlencode( \home_url() ),
+				'feedUrl' => \rawurlencode( $sitemap ),
 			),
-			'timeout' => 15, // Seconds.
+			'https://ssl.bing.com/webmaster/api.svc/json/GetFeedDetails'
 		);
 
+		$api_request_args = array(
+			'method'      => 'GET',
+			'headers'     => array(
+				'Authorization'  => 'Bearer ' . $access_token,
+				'Content-Type'  => 'application/json',
+				'Content-Length' => '0', // GET request with no body.
+			),
+			'timeout'     => 15,
+			'sslverify'   => false,
+			'httpversion' => '1.1',
+		);
+
+		// Send the request.
 		$api_response = \wp_remote_request( $api_endpoint, $api_request_args );
 
 		if ( \is_wp_error( $api_response ) ) {
@@ -61,23 +73,31 @@ class BWT_API_Handler {
 	/**
 	 * Remote request to submit the sitemap to Bing Webmaster Tools using an OAuth Access Token.
 	 *
-	 * @param string $sitemap The sitemap URL.
+	 * @param string $sitemap      The sitemap URL.
 	 * @param string $access_token The OAuth 2.0 access token.
 	 *
 	 * @return true|WP_Error True on success, WP_Error on failure.
 	 */
 	public static function submit( $sitemap, $access_token ) {
-		$api_endpoint     = 'https://www.bing.com/webmaster/api.svc/json/SubmitFeed';
-		$api_request_args = array(
-			'method'  => 'POST',
-			'headers' => array(
-				'Authorization'  => 'Bearer ' . $access_token,
-			),
-			'timeout' => 15,
-			'body'    => \json_encode( array(
+		$api_endpoint     = 'https://ssl.bing.com/webmaster/api.svc/json/SubmitFeed';
+		$body             = \wp_json_encode(
+			array(
 				'siteUrl' => \home_url(),
 				'feedUrl' => $sitemap,
-			) ),
+			)
+		);
+
+		$api_request_args = array(
+			'method'      => 'POST',
+			'headers'     => array(
+				'Authorization'  => 'Bearer ' . $access_token,
+				'Content-Type'  => 'application/json',
+			),
+			'timeout'     => 15,
+			'body'        => $body,
+   			'data_format' => 'body',
+			'sslverify'   => false,
+			'httpversion' => '1.1',
 		);
 
 		// Send the request.
@@ -117,8 +137,8 @@ class BWT_API_Handler {
 		$error_message = \__( 'Unknown API error.', 'sitemap-notifier' );
 		$response_data = \json_decode( $api_response_body, true );
 
-		if ( isset( $response_data['error']['message'] ) ) {
-			$error_message = $response_data['error']['message'];
+		if ( isset( $response_data['Message'] ) ) {
+			$error_message = $response_data['Message'];
 		} elseif ( ! empty( $api_response_body ) ) {
 			$error_message = \wp_strip_all_tags( $api_response_body );
 		}

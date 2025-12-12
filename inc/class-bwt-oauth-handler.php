@@ -27,7 +27,7 @@ class BWT_Oauth_Handler {
 	 *
 	 * @var string
 	 */
-	private static $token_endpoint = 'https://www.bing.com/webmasters/token';
+	private static $token_endpoint = 'https://www.bing.com/webmasters/oauth/token';
 
 	/**
 	 * Handle the OAuth callback request.
@@ -226,7 +226,6 @@ class BWT_Oauth_Handler {
 			// If refresh token is invalid/expired, remove it and suggest re-connecting.
 			if ( 'invalid_grant' === $error ) {
 				$options['bing_refresh_token'] = ''; // Clear the refresh token.
-				unset( $options['bing_client_secret'] ); // Prevent double encryption.
 				\update_option( 'xmlsf_bwt_connect', $options );
 
 				return new WP_Error(

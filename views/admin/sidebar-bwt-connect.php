@@ -12,7 +12,7 @@
 </h3>
 <?php
 $bwt_options = (array) get_option( 'xmlsf_bwt_connect', array() );
-if ( empty( $bwt_options['google_refresh_token'] ) ) {
+if ( empty( $bwt_options['bing_refresh_token'] ) ) {
 	// Initiate button.
 	?>
 	<p>
@@ -32,7 +32,7 @@ if ( empty( $bwt_options['google_refresh_token'] ) ) {
 <form action="" method="post">
 	<?php wp_nonce_field( XMLSF_BASENAME . '-bwt', '_xmlsf_bwt_nonce' ); ?>
 	<p>
-		<?php submit_button( sprintf( /* translators: %s: Google News Sitemap or XML Sitemap Index depending on admin page */ __( 'Submit your %s now', 'xml-sitemap-feed' ), $sitemap_desc ), 'primary', 'xmlsf_bwt_manual_submit', false ); ?>
+		<?php submit_button( sprintf( /* translators: %s: XML Sitemap Index */ __( 'Submit your %s now', 'xml-sitemap-feed' ), $sitemap_desc ), 'primary', 'xmlsf_bwt_manual_submit', false ); ?>
 	</p>
 	<p>
 		<?php esc_html_e( 'Your site is connected to Bing Webmaster Tools. You can disconnect and reconnect if you encounter submission errors or wish to reset or transfer site connection ownership.', 'xml-sitemap-feed' ); ?>

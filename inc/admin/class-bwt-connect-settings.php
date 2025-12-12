@@ -58,9 +58,6 @@ class BWT_Connect_Settings extends BWT_Connect {
 	 * Callback function for the Google Search Console OAuth Settings section header.
 	 */
 	public static function oauth_section_callback() {
-		// Set referrer transient to redirect to after connection.
-		isset( $_GET['ref'] ) && in_array( $_GET['ref'], array( 'xmlsf', 'xmlsf_news' ), true ) && \set_transient( 'bwt_connect_origin', \sanitize_key( $_GET['ref'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
 		// Prepare the option if it does not already exist. Sets it as non-autoloaded option.
 		\add_option( self::$option_group, '', '', false );
 
@@ -84,8 +81,8 @@ class BWT_Connect_Settings extends BWT_Connect {
 					'client_id'     => $options['bing_client_id'],
 					'redirect_uri'  => \rawurlencode( $redirect_uri ),
 					'scope'         => 'webmaster.manage',
-					//'access_type'   => 'offline', // Request a refresh token. DO WE NEED THIS FOR BING???
-					//'prompt'        => 'consent', // Ensure consent screen is shown. DO WE NEED THIS FOR BING???
+					'access_type'   => 'offline', // Request a refresh token. DO WE NEED THIS FOR BING???
+					'prompt'        => 'consent', // Ensure consent screen is shown. DO WE NEED THIS FOR BING???
 				),
 				'https://www.bing.com/webmasters/oauth/authorize'
 			);

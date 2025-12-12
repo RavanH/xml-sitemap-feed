@@ -54,7 +54,7 @@ $property        = XMLSF\Admin\GSC_Connect::get_property_url();
 $gsc_link        = add_query_arg(
 	array(
 		'resource_id'   => rawurlencode( $property ),
-		'sitemap_index' => rawurlencode( $sitemap ),
+		'sitemap_index' => rawurlencode( $data['path'] ),
 	),
 	'https://search.google.com/search-console/sitemaps/sitemap-index-drilldown'
 );
@@ -74,7 +74,7 @@ if ( isset( $data['contents'] ) && is_array( $data['contents'] ) ) {
 <table class="widefat">
 	<thead>
 		<tr>
-			<th><?php esc_html_e( 'XML Sitemap', 'xml-sitemap-feed' ); ?></th>
+			<th><?php esc_html_e( 'XML Sitemap Index', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Status', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Last submitted', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Last crawled', 'xml-sitemap-feedcomplet' ); ?></th>

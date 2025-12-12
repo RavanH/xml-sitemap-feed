@@ -226,7 +226,6 @@ class GSC_Oauth_Handler {
 			// If refresh token is invalid/expired, remove it and suggest re-connecting.
 			if ( 'invalid_grant' === $error ) {
 				$options['google_refresh_token'] = ''; // Clear the refresh token.
-				unset( $options['google_client_secret'] ); // Prevent double encryption.
 				\update_option( 'xmlsf_gsc_connect', $options );
 
 				return new WP_Error(

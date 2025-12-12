@@ -11,7 +11,7 @@ use WP_Error;
 
 /**
  * Helper class with public methods to set up a Bing Webmaster Tools connection.
- * 
+ *
  * @since 5.6
  */
 class BWT_Connect {
@@ -38,7 +38,7 @@ class BWT_Connect {
 		// Check if our custom query variable is set.
 		if ( isset( $wp->query_vars[ self::$query_var ] ) ) {
 			// Handle the OAuth callback.
-			$data = GSC_Oauth_Handler::callback_handler();
+			$data = BWT_Oauth_Handler::callback_handler();
 
 			$data['result']['setting'] = 'xmlsf_bwt_connect';
 
@@ -48,15 +48,10 @@ class BWT_Connect {
 				$slug         = self::$page_slug;
 				$redirect_url = \add_query_arg( 'settings-updated', 'true', \admin_url( 'admin.php?page=' . $slug ) );
 			} else {
-				$origin = \get_transient( 'bwt_connect_origin' );
-				$slug   = $origin ? $origin : ( sitemaps_enabled( 'sitemap' ) ? 'xmlsf' : ( sitemaps_enabled( 'sitemap-news' ) ? 'xmlsf_news' : false ) );
-
+				$slug         = sitemaps_enabled( 'sitemap' ) ? 'xmlsf' : false;
 				$redirect_url = $slug ? \add_query_arg( 'page', $slug, \admin_url( 'options-general.php' ) ) : \admin_url( 'options-reading.php#xmlsf_sitemaps' );
 				$redirect_url = \add_query_arg( 'settings-updated', 'true', $redirect_url );
-
-				\delete_transient( 'bwt_connect_origin' );
 			}
-
 
 			\wp_safe_redirect( $redirect_url );
 			exit;
@@ -102,7 +97,7 @@ class BWT_Connect {
 	/**
 	 * Submitter. Hooked on xmlsf_advanced_news_notifier event.
 	 *
-	 * @uses class GSC_API_Handler
+	 * @uses class BWT_API_Handler
 	 *
 	 * @param string $sitemap_url The sitemap URL.
 

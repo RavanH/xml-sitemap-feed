@@ -6,7 +6,7 @@
  */
 
 // Get connect data.
-$options = (array) get_option( 'xmlsf_gsc_connect', array() );
+$options = (array) get_option( 'xmlsf_bwt_connect', array() );
 if ( empty( $options['bing_refresh_token'] ) ) {
 	// Initiate button.
 	?>
@@ -14,7 +14,7 @@ if ( empty( $options['bing_refresh_token'] ) ) {
 		<?php printf( /* translators: %s: Bing Webmaster Tools */ esc_html_x( 'Connect to %s for sitemap data retrieval and sitemap submissions.', 'Bing Webmaster Tools connection', 'xml-sitemap-feed' ), esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) ); ?>
 	</p>
 	<p>
-		<a href="<?php echo esc_url( add_query_arg( 'ref', 'xmlsf', XMLSF\Admin\BWT_Connect::get_settings_url() ) ); ?>" class="button button-primary">
+		<a href="<?php echo esc_url( XMLSF\Admin\BWT_Connect::get_settings_url() ); ?>" class="button button-primary">
 			<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
 		</a>
 	</p>
@@ -43,54 +43,43 @@ if ( \is_wp_error( $data ) ) {
 
 	return;
 }
+$number = count( $data['d'] );
+$data   = $data['d'][0];
 
 $format          = get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' );
-$last_submitted  = isset( $data['lastSubmitted'] ) ? wp_date( $format, strtotime( $data['lastSubmitted'] ) ) : __( 'Unknown', 'xml-sitemap-feed' );
-$is_pending      = isset( $data['isPending'] ) ? $data['isPending'] : false;
-$last_downloaded = isset( $data['lastDownloaded'] ) ? wp_date( $format, strtotime( $data['lastDownloaded'] ) ) : __( 'Unknown', 'xml-sitemap-feed' );
-$_warnings       = isset( $data['warnings'] ) ? $data['warnings'] : 0;
-$_errors         = isset( $data['errors'] ) ? $data['errors'] : 0;
-$property        = XMLSF\Admin\BWT_Connect::get_property_url();
-$gsc_link        = add_query_arg(
+$last_submitted  = isset( $data['Submitted'] ) ? wp_date( $format, substr( $data['Submitted'], 6, 10 ) ) : __( 'Unknown', 'xml-sitemap-feed' );
+$status          = isset( $data['Status'] ) ? $data['Status'] : false;
+$last_downloaded = isset( $data['LastCrawled'] ) ? wp_date( $format, substr( $data['LastCrawled'], 6, 10 ) ) : __( 'Unknown', 'xml-sitemap-feed' );
+$links_submitted = isset( $data['UrlCount'] ) ? $data['UrlCount'] : 0;
+$bwt_link        = add_query_arg(
 	array(
-		'resource_id'   => rawurlencode( $property ),
-		'sitemap_index' => rawurlencode( $sitemap ),
+		'siteUrl'      => rawurlencode( \home_url() ),
+		'sitemapIndex' => rawurlencode( $data['Url'] ),
 	),
-	'https://search.google.com/search-console/sitemaps/sitemap-index-drilldown'
+	'https://www.bing.com/webmasters/sitemaps'
 );
-$links_submitted = 0;
-$links_indexed   = 0;
-if ( isset( $data['contents'] ) && is_array( $data['contents'] ) ) {
-	foreach ( $data['contents'] as $content ) {
-		if ( isset( $content['type'] ) && 'web' === $content['type'] ) {
-			$links_submitted = $content['submitted'];
-			$links_indexed   = $content['indexed'];
-			break;
-		}
-	}
-}
-
+//https://www.bing.com/webmasters/sitemaps?siteUrl=https%3A%2F%2Fdev.status301.com%2F&sitemapIndex=https%3A%2F%2Fdev.status301.com%2Fwp-sitemap.xml&activePivot=1
 ?>
 <table class="widefat">
 	<thead>
 		<tr>
-			<th><?php esc_html_e( 'XML Sitemap', 'xml-sitemap-feed' ); ?></th>
+			<th><?php esc_html_e( 'XML Sitemap Index', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Status', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Last submitted', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Last crawled', 'xml-sitemap-feedcomplet' ); ?></th>
 			<th><?php esc_html_e( 'URLs', 'xml-sitemap-feed' ); ?></th>
-			<th><?php esc_html_e( 'Issues', 'xml-sitemap-feed' ); ?></th>
+			<th><?php esc_html_e( 'Sitemaps', 'xml-sitemap-feed' ); ?></th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
 			<th>
-				<a href="<?php echo esc_url( $gsc_link ); ?>" target="_blank" title="<?php esc_html_e( 'View this sitemap in Bing Webmaster Tools', 'xml-sitemap-feed' ); ?>">
-					<?php echo esc_html( $data['path'] ); ?>
+				<a href="<?php echo esc_url( $bwt_link ); ?>" target="_blank" title="<?php esc_html_e( 'View this sitemap in Bing Webmaster Tools', 'xml-sitemap-feed' ); ?>">
+					<?php echo esc_html( $data['Url'] ); ?>
 					<span class="dashicons dashicons-external"></span>
 				</a>
 			</th>
-			<td><?php if ( $is_pending ) : ?>
+			<td><?php if ( 'Success' !== $status ) : ?>
 				<span class="dashicons dashicons-clock" style="color:#dba617" title="<?php esc_html_e( 'Pending', 'xml-sitemap-feed' ); ?>"></span>
 			<?php else : ?>
 				<span class="dashicons dashicons-yes-alt" style="color:#00a32a" title="<?php echo esc_html_e( 'Processed', 'xml-sitemap-feed' ); ?>"></span>
@@ -98,8 +87,8 @@ if ( isset( $data['contents'] ) && is_array( $data['contents'] ) ) {
 			</td>
 			<td><?php echo esc_html( $last_submitted ); ?></td>
 			<td><?php echo esc_html( $last_downloaded ); ?></td>
-			<td><?php echo esc_html__( 'Found:', 'xml-sitemap-feed' ) . ' ' . esc_html( $links_submitted ) . '<br>' . esc_html__( 'Indexed:', 'xml-sitemap-feed' ) . ' ' . esc_html( $links_indexed ); ?></td>
-			<td style="color:<?php echo $_errors ? '#d63638' : ( $_warnings ? '#dba617' : 'inherit' ); ?>"><?php echo esc_html__( 'Warnings:', 'xml-sitemap-feed' ) . ' ' . esc_html( $_warnings ) . '<br>' . esc_html__( 'Errors:', 'xml-sitemap-feed' ) . ' ' . esc_html( $_errors ); ?></td>
+			<td><?php echo esc_html__( 'Found:', 'xml-sitemap-feed' ) . ' ' . esc_html( $links_submitted ); ?></td>
+			<td><?php echo esc_html__( 'Found:', 'xml-sitemap-feed' ) . ' ' . esc_html( $number ); ?></td>
 		</tr>
 	</tbody>
 </table>

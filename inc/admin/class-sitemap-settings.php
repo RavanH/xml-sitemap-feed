@@ -18,6 +18,9 @@ class Sitemap_Settings {
 		// Run GSC actions.
 		self::gsc_actions();
 
+		// Run BWT actions.
+		self::bwt_actions();
+
 		// Run tools actions.
 		self::tools_actions();
 
@@ -83,7 +86,7 @@ class Sitemap_Settings {
 			return;
 		}
 
-		// Handle disconnection if requested. Runs before anything else.
+		// Handle GSC disconnection if requested. Runs before anything else.
 		if ( isset( $_POST['xmlsf_gsc_disconnect'] ) ) {
 			// Clear the refresh token and any related options.
 			GSC_Connect::disconnect();
@@ -98,12 +101,12 @@ class Sitemap_Settings {
 
 		// Handle manual submit to GSC.
 		if ( isset( $_POST['xmlsf_gsc_manual_submit'] ) ) {
-			// Skip submission if within the grace period for Google News sitemap.
-			if ( get_transient( 'sitemap_notifier_submission' ) ) {
-				$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_timeframe', 360 );
-				$message   = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$d: number of seconds */ \esc_html__( 'Your %1$s submission was skipped: Already sent within the last %2$d seconds.', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), $timeframe );
+			$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_timeframe', 360 );
 
-				do_action( 'sitemap_notifier_manual_submission', $message, 'warning' );
+			// Skip submission if within the grace period for Google News sitemap.
+			if ( get_transient( 'sitemap_notifier_google_submission' ) ) {
+				$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Google Search Console, %3$d: number of seconds */ \esc_html__( 'Your %1$s submission to %2$s was skipped: Already sent within the last %3$d seconds.', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ), $timeframe );
+				$status  = 'warning';
 
 				\add_settings_error(
 					'xmlsf_gsc_connect',
@@ -115,9 +118,8 @@ class Sitemap_Settings {
 				$sitemap = \xmlsf()->sitemap->get_sitemap_url();
 				$result  = \XMLSF\GSC_Connect::submit( $sitemap );
 				if ( \is_wp_error( $result ) ) {
-					$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Error message */ \esc_html__( 'Your %1$s submission failed: %2$s', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), $result->get_error_message() );
-
-					do_action( 'sitemap_notifier_manual_submission', $message, 'error' );
+					$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Google Search Console, %3$s: Error message */ \esc_html__( 'Your %1$s submission to %2$s failed: %3$s', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ), $result->get_error_message() );
+					$status  = 'error';
 
 					\add_settings_error(
 						'xmlsf_gsc_connect',
@@ -126,9 +128,8 @@ class Sitemap_Settings {
 						'error'
 					);
 				} else {
-					$message = \sprintf( /* translators: %s: XML Sitemap Index */ \esc_html__( 'Your %s was submitted successfully.', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ) );
-
-					do_action( 'sitemap_notifier_manual_submission', $message, 'success' );
+					$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Google Search Console */ \esc_html__( 'Your %1$s was submitted successfully to %2$s.', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) );
+					$status  = 'success';
 
 					\add_settings_error(
 						'xmlsf_gsc_connect',
@@ -137,20 +138,44 @@ class Sitemap_Settings {
 						'success'
 					);
 
-					$timeframe = \apply_filters( 'xmlsf_gsc_manual_submit_timeframe', 360 );
-					\set_transient( 'sitemap_notifier_submission', true, $timeframe );
+					\set_transient( 'sitemap_notifier_google_submission', true, $timeframe );
 				}
 			}
+
+			do_action( 'sitemap_notifier_manual_submission', $message, $status );
+		}
+	}
+
+	/**
+	 * Run admin actions.
+	 */
+	public static function bwt_actions() {
+		// Skip if doing ajax or no valid nonce.
+		if ( wp_doing_ajax() || ! isset( $_POST['_xmlsf_bwt_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_xmlsf_bwt_nonce'] ), XMLSF_BASENAME . '-bwt' ) ) {
+			return;
+		}
+
+		// Handle BWT disconnection if requested. Runs before anything else.
+		if ( isset( $_POST['xmlsf_bwt_disconnect'] ) ) {
+			// Clear the refresh token and any related options.
+			BWT_Connect::disconnect();
+
+			\add_settings_error(
+				'xmlsf_bwt_connect',
+				'bwt_disconnected',
+				__( 'Disconnected from Bing Webmaster Tools successfully.', 'xml-sitemap-feed' ),
+				'success'
+			);
 		}
 
 		// Handle manual submit to BWT.
 		if ( isset( $_POST['xmlsf_bwt_manual_submit'] ) ) {
-			// Skip submission if within the grace period for Google News sitemap.
-			if ( get_transient( 'sitemap_notifier_submission' ) ) {
-				$timeframe = (int) \apply_filters( 'xmlsf_bwt_manual_submit_timeframe', 360 );
-				$message   = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$d: number of seconds */ \esc_html__( 'Your %1$s submission was skipped: Already sent within the last %2$d seconds.', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), $timeframe );
+			$timeframe = (int) \apply_filters( 'xmlsf_bwt_manual_submit_timeframe', 360 );
 
-				do_action( 'sitemap_notifier_manual_submission', $message, 'warning' );
+			// Skip submission if within the grace period for Google News sitemap.
+			if ( get_transient( 'sitemap_notifier_bing_submission' ) ) {
+				$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Bing Webmaster Tools, %3$d: number of seconds */ \esc_html__( 'Your %1$s submission to %2$s was skipped: Already sent within the last %3$d seconds.', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), \esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ), $timeframe );
+				$status  = 'warning';
 
 				\add_settings_error(
 					'xmlsf_bwt_connect',
@@ -162,9 +187,8 @@ class Sitemap_Settings {
 				$sitemap = \xmlsf()->sitemap->get_sitemap_url();
 				$result  = \XMLSF\BWT_Connect::submit( $sitemap );
 				if ( \is_wp_error( $result ) ) {
-					$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Error message */ \esc_html__( 'Your %1$s submission failed: %2$s', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), $result->get_error_message() );
-
-					do_action( 'sitemap_notifier_manual_submission', $message, 'error' );
+					$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Bing Webmaster Tools, %3$s: Error message */ \esc_html__( 'Your %1$s submission to %2$s failed: %3$s', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), \esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ), $result->get_error_message() );
+					$status  = 'error';
 
 					\add_settings_error(
 						'xmlsf_bwt_connect',
@@ -173,9 +197,8 @@ class Sitemap_Settings {
 						'error'
 					);
 				} else {
-					$message = \sprintf( /* translators: %s: XML Sitemap Index */ \esc_html__( 'Your %s was submitted successfully.', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ) );
-
-					do_action( 'sitemap_notifier_manual_submission', $message, 'success' );
+					$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Bing Webmaster Tools */ \esc_html__( 'Your %1$s was submitted successfully to %2$s.', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), \esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) );
+					$status  = 'success';
 
 					\add_settings_error(
 						'xmlsf_bwt_connect',
@@ -184,9 +207,10 @@ class Sitemap_Settings {
 						'success'
 					);
 
-					$timeframe = \apply_filters( 'xmlsf_bwt_manual_submit_timeframe', 360 );
-					\set_transient( 'sitemap_notifier_submission', true, $timeframe );
+					\set_transient( 'sitemap_notifier_bing_submission', true, $timeframe );
 				}
+
+				do_action( 'sitemap_notifier_manual_submission', $message, $status );
 			}
 		}
 	}
@@ -347,7 +371,7 @@ class Sitemap_Settings {
 	 */
 	public static function admin_sidebar_bwt_connect() {
 		$sitemap_desc      = __( 'XML Sitemap Index', 'xml-sitemap-feed' );
-		$settings_page_url = add_query_arg( 'ref', 'xmlsf', BWT_Connect::get_settings_url() );
+		$settings_page_url = BWT_Connect::get_settings_url();
 
 		include XMLSF_DIR . '/views/admin/sidebar-bwt-connect.php';
 	}
@@ -540,9 +564,18 @@ class Sitemap_Settings {
 				// GSC Sitemap data.
 				\add_settings_section(
 					'xml_sitemap_gsc_data_section',
-					__( 'Google Search Console Report', 'xml-sitemap-feed' ),
+					__( 'Google Search Console', 'xml-sitemap-feed' ),
 					function () {
 						include XMLSF_DIR . '/views/admin/section-gsc-data.php';
+					},
+					'xmlsf_general'
+				);
+				// BWT Sitemap data.
+				\add_settings_section(
+					'xml_sitemap_bwt_data_section',
+					__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ),
+					function () {
+						include XMLSF_DIR . '/views/admin/section-bwt-data.php';
 					},
 					'xmlsf_general'
 				);

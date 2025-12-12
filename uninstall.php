@@ -95,6 +95,8 @@ function xmlsf_uninstall() {
 	delete_transient( 'sitemap_notifier_bing_access_token' );
 	delete_transient( 'sitemap_notifier_google_access_token' );
 	delete_transient( 'sitemap_notifier_submission' );
+	delete_transient( 'sitemap_notifier_bing_submission' );
+	delete_transient( 'sitemap_notifier_google_submission' );
 	delete_transient( 'sitemap_notifier_submission_news' );
 
 	// Flush rules.

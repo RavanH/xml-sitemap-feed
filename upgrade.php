@@ -217,6 +217,11 @@ function xmlsf_upgrade( $db_version ) {
 		set_transient( 'sitemap_notifier_google_access_token', $gsc_token );
 		delete_transient( 'sitemap_notifier_access_token' );
 	}
+	$gsc_submission = get_transient( 'sitemap_notifier_submission' );
+	if ( false !== $gsc_submission ) {
+		set_transient( 'sitemap_notifier_google_submission', $gsc_submission );
+		delete_transient( 'sitemap_notifier_submission' );
+	}
 
 	// Add possible missing new defaults.
 	xmlsf_update_from_defaults( false );

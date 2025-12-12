@@ -54,12 +54,12 @@ class Sitemap_News_Settings {
 
 		// Handle manual submit.
 		if ( isset( $_POST['xmlsf_gsc_manual_submit'] ) ) {
+			$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_news_timeframe', MINUTE_IN_SECONDS );
+
 			// Skip submission if within the grace period for Google News sitemap.
 			if ( \get_transient( 'sitemap_notifier_submission_news' ) ) {
-				$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_news_timeframe', MINUTE_IN_SECONDS );
-				$message   = \sprintf( /* translators: %1$s: Google News Sitemap, %2$d: number of seconds */ \esc_html__( 'Your %1$s submission was skipped: Already sent within the last %2$d seconds.', 'xml-sitemap-feed' ), \esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), $timeframe );
-
-				\do_action( 'sitemap_notifier_manual_submission_news', $message, 'warning' );
+				$message = \sprintf( /* translators: %1$s: Google News Sitemap, %2$s: Google Search Console, %3$d: number of seconds */ \esc_html__( 'Your %1$s submission to %2$s was skipped: Already sent within the last %3$d seconds.', 'xml-sitemap-feed' ), \esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ), $timeframe );
+				$status = 'warning';
 
 				\add_settings_error(
 					'xmlsf_gsc_connect',
@@ -71,9 +71,8 @@ class Sitemap_News_Settings {
 				$sitemap = \xmlsf()->sitemap_news->get_sitemap_url();
 				$result  = \XMLSF\GSC_Connect::submit( $sitemap );
 				if ( \is_wp_error( $result ) ) {
-					$message = \sprintf( /* translators: %1$s: Google News Sitemap, %2$s: Error message */ \esc_html__( 'Your %1$s submission failed: %2$s', 'xml-sitemap-feed' ), \esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), $result->get_error_message() );
-
-					\do_action( 'sitemap_notifier_manual_submission_news', $message, 'error' );
+					$message = \sprintf( /* translators: %1$s: Google News Sitemap, %2$s: Google Search Console, %3$s: Error message */ \esc_html__( 'Your %1$s submission to %2$s failed: %3$s', 'xml-sitemap-feed' ), \esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ), $result->get_error_message() );
+					$status = 'error';
 
 					\add_settings_error(
 						'xmlsf_gsc_connect',
@@ -82,9 +81,8 @@ class Sitemap_News_Settings {
 						'error'
 					);
 				} else {
-					$message = \sprintf( /* translators: %s: Google News Sitemap */ \esc_html__( 'Your %s was submitted successfully.', 'xml-sitemap-feed' ), \esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ) );
-
-					\do_action( 'sitemap_notifier_manual_submission_news', $message, 'success' );
+					$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Google Search Console */ \esc_html__( 'Your %1$s was submitted successfully to %2$s.', 'xml-sitemap-feed' ), \esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) );
+					$status = 'success';
 
 					\add_settings_error(
 						'xmlsf_gsc_connect',
@@ -93,10 +91,11 @@ class Sitemap_News_Settings {
 						'success'
 					);
 
-					$timeframe = \apply_filters( 'xmlsf_gsc_manual_submit_news_timeframe', 60 );
 					\set_transient( 'sitemap_notifier_submission_news', true, $timeframe );
 				}
 			}
+
+			do_action( 'sitemap_notifier_manual_submission_news', $message, $status );
 		}
 	}
 
@@ -346,7 +345,7 @@ class Sitemap_News_Settings {
 				// GSC Sitemap data.
 				\add_settings_section(
 					'news_sitemap_gsc_data_section',
-					__( 'Google Search Console Report', 'xml-sitemap-feed' ),
+					__( 'Google Search Console', 'xml-sitemap-feed' ),
 					function () {
 						include XMLSF_DIR . '/views/admin/section-gsc-data-news.php';
 					},
