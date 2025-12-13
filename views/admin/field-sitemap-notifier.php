@@ -5,16 +5,24 @@
  * @package XML Sitemap & Google News
  */
 
-$notifier = \get_option( 'xmlsf_sitemap_notifier' );
+$notifier = \get_option( 'xmlsf_sitemap_notifier');
 ?>
 <fieldset>
 	<legend class="screen-reader-text">
 		<?php esc_html_e( 'Sitemap notifier', 'xml-sitemap-feed' ); ?>
 	</legend>
-	<label>
-		<input type="checkbox" name="xmlsf_sitemap_notifier" id="xmlsf_sitemap_notifier" value="1"<?php checked( $notifier ); ?><?php disabled( apply_filters( 'xmlsf_advanced_enabled', false ), false ); ?> />
-		<?php esc_html_e( 'Enable automatic sitemap submission', 'xml-sitemap-feed' ); ?>
-	</label>
+	<p>
+		<label>
+			<input type="checkbox" name="xmlsf_sitemap_notifier[]" id="xmlsf_sitemap_notifier_google" value="google"<?php checked( in_array( 'google', (array) $notifier ) || '1' === $notifier ); ?><?php disabled( apply_filters( 'xmlsf_advanced_enabled', false ), false ); ?> />
+			<?php printf( /* translators: %s: Google Search Console */ esc_html__( 'Submit to %s', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) ); ?>
+		</label>
+	</p>
+	<p>
+		<label>
+			<input type="checkbox" name="xmlsf_sitemap_notifier[]" id="xmlsf_sitemap_notifier_bing" value="bing"<?php checked( in_array( 'bing', (array) $notifier ) ); ?><?php disabled( apply_filters( 'xmlsf_advanced_enabled', false ), false ); ?> />
+			<?php printf( /* translators: %s: Bing Webmaster Tools */ esc_html__( 'Submit to %s', 'xml-sitemap-feed' ), esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) ); ?>
+		</label>
+	</p>
 
 	<p class="description">
 		<?php esc_html_e( 'Notify search engines by automaticly resubmitting your sitemap index upon each new publication.', 'xml-sitemap-feed' ); ?>
