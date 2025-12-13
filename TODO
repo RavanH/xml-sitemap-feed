@@ -1,28 +1,22 @@
 = 5.6.99 =
 
 TODO
-* FIX BING OAUTH access token / refresh token updates
 
-* Add GSC Connect page help tab?
+* move sitemap reports to own tabs or one Reports tab for all sitemaps?
 
 = 5.7 =
 
 * Quick edit field for Google News exclude
 * Post list column for Google News exclude
 
-* integrate sitemap updates via Bing Webmaster tools API https://learn.microsoft.com/en-us/dotnet/api/microsoft.bing.webmaster.api.interfaces.iwebmasterapi.submitfeed?view=bing-webmaster-dotnet#microsoft-bing-webmaster-api-interfaces-iwebmasterapi-submitfeed(system-string-system-string)
-
-* rethink gsc onboarding: if multiple property candidates, manually choose between them before final redirect?
-
-Consider: Keep GSC Connect tools page permanently visible? Room for advanced promo? Allow other sitemap reports?
 
 * Reverse Disable sitemaps option in admin
-* Unite settings under one admin page "XML Sitemaps"
-* One Reports tab for all sitemaps in GSC Reports?
-* Sitemap index drilldown in GSC report
+
+
 
 = 5.8 =
-
+* Sitemap index drilldown in reports
+* rethink gsc onboarding: if multiple property candidates, manually choose between them before final redirect?
 * RSS feeds: detect excerpt setting with admin warning or auto-change setting (?), suggest advanced plugin for improved compatibility
 * lastmod for users
 
@@ -62,9 +56,9 @@ TEST
 * test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 
 ROADMAP
+* Unite settings under one admin page "XML Sitemaps"
 * move sitemap fields (back) to Sitemap class?
 * rethink xmlsf_post_types and optional xmlsf_post_type_settings
-* drop dynamic priority?
 
 DOCUMENT
 * Images in sitemaps, see https://wordpress.org/support/topic/how-to-include-featured-attached-images-in-xml-sitemap-not-one-or-the-other/

@@ -156,6 +156,12 @@ Code cleanup and 2 bugfixes.
 
 == Changelog ==
 
+= 5.7 =
+
+Date: 202512
+* Bing Webmaster Tools sitemap reports
+* Bing sitemap submission from admin
+
 = 5.6.3 =
 
 Date: 20251201
