@@ -40,12 +40,21 @@ if ( \is_wp_error( $data ) ) {
 		<a href="" class="button button-primary"><?php echo esc_html( translate( 'Retry' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
 	</p>
 	<?php
-
 	return;
 }
 $number = count( $data['d'] );
-$data   = $data['d'][0];
+if ( $number < 1 ) {
+	?>
+	<p style="color:#d63638">
+		<?php esc_html_e( 'There was an error requesting sitemap data from Bing Webmaster Tools.', 'xml-sitemap-feed' ); ?>
+		<br>
+		<?php printf( /* translators: %s: Bing Webmaster Tools */ esc_html__( 'Your sitemap was not found on %s. Maybe submit it first?', 'xml-sitemap-feed' ), esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) ); ?>
+	</p>
+	<?php
+	return;
+}
 
+$data            = $data['d'][0];
 $format          = get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' );
 $last_submitted  = isset( $data['Submitted'] ) ? wp_date( $format, substr( $data['Submitted'], 6, 10 ) ) : __( 'Unknown', 'xml-sitemap-feed' );
 $status          = isset( $data['Status'] ) ? $data['Status'] : false;
@@ -54,7 +63,7 @@ $links_submitted = isset( $data['UrlCount'] ) ? $data['UrlCount'] : 0;
 $bwt_link        = add_query_arg(
 	array(
 		'siteUrl'      => rawurlencode( \home_url() ),
-		'sitemapIndex' => rawurlencode( $data['Url'] ),
+		'sitemapIndex' => rawurlencode( $sitemap ),
 	),
 	'https://www.bing.com/webmasters/sitemaps'
 );
@@ -75,7 +84,7 @@ $bwt_link        = add_query_arg(
 		<tr>
 			<th>
 				<a href="<?php echo esc_url( $bwt_link ); ?>" target="_blank" title="<?php esc_html_e( 'View this sitemap in Bing Webmaster Tools', 'xml-sitemap-feed' ); ?>">
-					<?php echo esc_html( $data['Url'] ); ?>
+					<?php echo esc_html( $sitemap ); ?>
 					<span class="dashicons dashicons-external"></span>
 				</a>
 			</th>

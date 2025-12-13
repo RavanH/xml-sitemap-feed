@@ -29,12 +29,20 @@ $data    = XMLSF\GSC_Connect::get( $sitemap );
 <p><?php esc_html_e( 'Your sitemap data as reported by Google Search Console.', 'xml-sitemap-feed' ); ?></p>
 <?php
 if ( \is_wp_error( $data ) ) {
+	$error_message = $data->get_error_message();
+
 	// Display error message.
 	?>
 	<p style="color:#d63638">
 		<?php esc_html_e( 'There was an error requesting sitemap data from Google Search Console.', 'xml-sitemap-feed' ); ?>
 		<br>
-		<?php echo esc_html( $data->get_error_message() ); ?>
+		<?php
+		if ( str_contains( $error_message, 'is not a submitted or a known sitemap' ) ) {
+			printf( /* translators: %s: Google Search Console */ esc_html__( 'Your sitemap was not found on %s. Maybe submit it first?', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) );
+		} else {
+			echo esc_html( $data->get_error_message() );
+		}
+		?>
 	</p>
 	<p>
 		<a href="" class="button button-primary"><?php echo esc_html( translate( 'Retry' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
