@@ -59,8 +59,6 @@ function xmlsf_install() {
  * @since 5.1
  */
 function xmlsf_upgrade( $db_version ) {
-	global $wpdb;
-
 	if ( version_compare( '4.4', $db_version, '>' ) ) {
 		// Remove robots.txt rules blocking stylesheets.
 		$robot_rules = get_option( 'xmlsf_robots' );
