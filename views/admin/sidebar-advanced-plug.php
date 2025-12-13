@@ -10,7 +10,7 @@
 	<h3><span class="dashicons dashicons-yes-alt" style="color:#2a8c41"></span> <?php esc_html_e( 'Sitemap notifier	', 'xml-sitemap-feed' ); ?></h3>
 	<p>
 		<strong>
-			<?php esc_html_e( 'Notify search engines by automaticly resubmitting your sitemap index upon each new publication.', 'xml-sitemap-feed' ); ?>
+			<?php esc_html_e( 'Instantly notify search engines by automatically resubmitting your sitemap index upon each new publication.', 'xml-sitemap-feed' ); ?>
 			<?php
 			printf(
 				/* translators: %s: Advanced plugin name (linked to https://premium.status301.com/) */
