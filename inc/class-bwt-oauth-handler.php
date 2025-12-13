@@ -134,7 +134,7 @@ class BWT_Oauth_Handler {
 		}
 
 		$access_token = isset( $data->access_token ) ? \sanitize_text_field( $data->access_token ) : '';
-		$expires_in   = isset( $data->expires_in ) ? intval( $data->expires_in ) : 86400;
+		$expires_in   = isset( $data->expires_in ) ? intval( $data->expires_in ) : 3600;
 
 		if ( empty( $access_token ) ) {
 			return array(
@@ -191,10 +191,10 @@ class BWT_Oauth_Handler {
 		}
 
 		$body = array(
-			'grant_type'    => 'refresh_token',
-			'refresh_token' => $options['bing_refresh_token'],
 			'client_id'     => $options['bing_client_id'],
 			'client_secret' => $client_secret,
+			'refresh_token' => $options['bing_refresh_token'],
+			'grant_type'    => 'refresh_token',
 		);
 
 		// Remote post new access token request.
@@ -240,17 +240,17 @@ class BWT_Oauth_Handler {
 			);
 		}
 
-		// Successfully refreshed token. Store the new access token in the transient.
-		$new_access_token = \sanitize_text_field( $data['access_token'] );
-		$expires_in       = isset( $data['expires_in'] ) ? intval( $data['expires_in'] ) : 86400;
-
-		// Store the new access token as transient.
-		self::store_access_token( $new_access_token, $expires_in );
-
 		// Store the new refresh token if provided.
 		if ( ! empty( $data['refresh_token'] ) ) {
 			self::store_refresh_token( $data['refresh_token'] );
 		}
+
+		// Successfully refreshed token. Store the new access token in the transient.
+		$new_access_token = \sanitize_text_field( $data['access_token'] );
+		$expires_in       = isset( $data['expires_in'] ) ? intval( $data['expires_in'] ) : 3600;
+
+		// Store the new access token as transient.
+		self::store_access_token( $new_access_token, $expires_in );
 
 		return $new_access_token;
 	}
@@ -273,7 +273,7 @@ class BWT_Oauth_Handler {
 	 * @param string $token The valid access token.
 	 */
 	public static function store_refresh_token( $token ) {
-		$options                         = (array) \get_option( 'xmlsf_bwt_connect', array() );
+		$options                       = (array) \get_option( 'xmlsf_bwt_connect', array() );
 		$options['bing_refresh_token'] = \sanitize_text_field( $token );
 
 		\update_option( 'xmlsf_bwt_connect', $options );
