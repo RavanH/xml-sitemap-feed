@@ -17,7 +17,7 @@ $notifier = \get_option( 'xmlsf_sitemap_notifier' );
 	</label>
 
 	<p class="description">
-		<?php printf( /* translators: %s: XML Sitemap Index */ esc_html__( 'Notify Google by automaticly resubmitting your %s to Google Search Console upon each new publication.', 'xml-sitemap-feed' ), esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ) ); ?>
+		<?php esc_html_e( 'Notify search engines by automaticly resubmitting your sitemap index upon each new publication.', 'xml-sitemap-feed' ); ?>
 		<?php apply_filters( 'xmlsf_advanced_enabled', false ) || printf( /* Translators: %s: XML Sitemap Advanced (with link) */ esc_html__( 'Available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">' . esc_html__( 'XML Sitemap Advanced', 'xml-sitemap-feed' ) . '</a>' ); ?>
 		<?php
 		if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) {

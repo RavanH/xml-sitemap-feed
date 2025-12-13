@@ -195,7 +195,13 @@ class Sitemap_News_Settings {
 		);
 		// Advanced plugin plug.
 		if ( ! \is_plugin_active( 'xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php' ) || ( defined( 'XMLSF_NEWS_ADV_VERSION' ) && version_compare( XMLSF_NEWS_ADV_VERSION, '1.4', '<' ) ) ) {
-			\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_adv_plug' ), 6 );
+			\add_action(
+				'xmlsf_admin_sidebar',
+				function () {
+					include XMLSF_DIR . '/views/admin/sidebar-news-advanced-plug.php';
+				},
+				6
+			);
 			\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_priority_support' ), 11 );
 		}
 
@@ -220,17 +226,6 @@ class Sitemap_News_Settings {
 		$adv_plugin_url  = 'https://premium.status301.com/downloads/google-news-advanced/';
 
 		include XMLSF_DIR . '/views/admin/sidebar-priority-support.php';
-	}
-
-	/**
-	 * Admin sidebar Priority Support section
-	 */
-	public static function admin_sidebar_adv_plug() {
-		$adv_plugin_name = __( 'Google News Advanced', 'xml-sitemap-feed' );
-		$adv_plugin_url  = 'https://premium.status301.com/downloads/google-news-advanced/';
-		$sitemap_name    = __( 'Google News Sitemap', 'xml-sitemap-feed' );
-
-		include XMLSF_DIR . '/views/admin/sidebar-advanced-plug.php';
 	}
 
 	/**
