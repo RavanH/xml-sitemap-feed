@@ -3,6 +3,9 @@
 TODO
 
 * move sitemap reports to own tabs or one Reports tab for all sitemaps?
+* add fetch sitemap data twice daily (or one an hour?) and store
+* refetch after submit and store
+* refresh buttons for sitemap data
 
 = 5.7 =
 
