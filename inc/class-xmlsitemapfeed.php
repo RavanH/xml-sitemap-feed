@@ -191,6 +191,12 @@ class XMLSitemapFeed {
 			// Prepare onboarding admin pages.
 			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'add_tools_page' ) );
 			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'register_settings' ) );
+		} else {
+			// Schedule periodic token refresh.
+			\add_action( 'xmlsf_gsc_keep_alive', array( __NAMESPACE__ . '\GSC_Oauth_Handler', 'refresh_access_token' ) );
+			if ( ! \wp_next_scheduled( 'xmlsf_gsc_keep_alive' ) ) {
+				\wp_schedule_event( time(), 'weekly', 'xmlsf_gsc_keep_alive' );
+			}
 		}
 	}
 
@@ -209,6 +215,12 @@ class XMLSitemapFeed {
 			// Prepare onboarding admin pages.
 			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\BWT_Connect', 'add_tools_page' ) );
 			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\BWT_Connect', 'register_settings' ) );
+		} else {
+			// Schedule periodic token refresh.
+			\add_action( 'xmlsf_bwt_keep_alive', array( __NAMESPACE__ . '\BWT_Oauth_Handler', 'refresh_access_token' ) );
+			if ( ! \wp_next_scheduled( 'xmlsf_bwt_keep_alive' ) ) {
+				\wp_schedule_event( time(), 'weekly', 'xmlsf_bwt_keep_alive' );
+			}
 		}
 	}
 
