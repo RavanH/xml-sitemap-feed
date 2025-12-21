@@ -99,6 +99,10 @@ function xmlsf_uninstall() {
 	delete_transient( 'sitemap_notifier_google_submission' );
 	delete_transient( 'sitemap_notifier_submission_news' );
 
+	// Remove scheduled events.
+	wp_clear_scheduled_hook( 'xmlsf_gsc_keep_alive' );
+	wp_clear_scheduled_hook( 'xmlsf_bwt_keep_alive' );
+
 	// Flush rules.
 	flush_rewrite_rules( false );
 }
