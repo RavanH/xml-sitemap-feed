@@ -182,7 +182,7 @@ class XMLSitemapFeed {
 		// Prepare onboarding if not connected.
 		if ( empty( $options['google_refresh_token'] ) ) {
 			// Prepare onboarding.
-			add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'add_tools_page' ) );
+			add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'add_settings_page' ) );
 			add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'register_settings' ) );
 
 			// Prepare for OAuth callback.
