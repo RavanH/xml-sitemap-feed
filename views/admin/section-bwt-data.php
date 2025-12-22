@@ -75,7 +75,7 @@ $bwt_link        = add_query_arg(
 			<th><?php esc_html_e( 'XML Sitemap Index', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Status', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Last submitted', 'xml-sitemap-feed' ); ?></th>
-			<th><?php esc_html_e( 'Last crawled', 'xml-sitemap-feedcomplet' ); ?></th>
+			<th><?php esc_html_e( 'Last crawled', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'URLs', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Sitemaps', 'xml-sitemap-feed' ); ?></th>
 		</tr>
