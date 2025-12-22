@@ -112,7 +112,7 @@ class Sitemap_Settings {
 					'xmlsf_gsc_connect',
 					'gsc_manual_submit',
 					$message,
-					'error'
+					$status
 				);
 			} else {
 				$sitemap = \xmlsf()->sitemap->get_sitemap_url();
@@ -125,7 +125,7 @@ class Sitemap_Settings {
 						'xmlsf_gsc_connect',
 						'gsc_manual_submit',
 						$message,
-						'error'
+						$status
 					);
 				} else {
 					$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Google Search Console */ \esc_html__( 'Your %1$s was submitted successfully to %2$s.', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) );
@@ -135,7 +135,7 @@ class Sitemap_Settings {
 						'xmlsf_gsc_connect',
 						'gsc_manual_submit',
 						$message,
-						'success'
+						$status
 					);
 
 					\set_transient( 'sitemap_notifier_google_submission', true, $timeframe );
@@ -181,7 +181,7 @@ class Sitemap_Settings {
 					'xmlsf_bwt_connect',
 					'bwt_manual_submit',
 					$message,
-					'error'
+					$status
 				);
 			} else {
 				$sitemap = \xmlsf()->sitemap->get_sitemap_url();
@@ -194,7 +194,7 @@ class Sitemap_Settings {
 						'xmlsf_bwt_connect',
 						'bwt_manual_submit',
 						$message,
-						'error'
+						$status
 					);
 				} else {
 					$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Bing Webmaster Tools */ \esc_html__( 'Your %1$s was submitted successfully to %2$s.', 'xml-sitemap-feed' ), \esc_html__( 'XML Sitemap Index', 'xml-sitemap-feed' ), \esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) );
@@ -204,7 +204,7 @@ class Sitemap_Settings {
 						'xmlsf_bwt_connect',
 						'bwt_manual_submit',
 						$message,
-						'success'
+						$status
 					);
 
 					\set_transient( 'sitemap_notifier_bing_submission', true, $timeframe );
