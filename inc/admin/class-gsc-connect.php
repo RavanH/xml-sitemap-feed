@@ -40,7 +40,7 @@ class GSC_Connect {
 	/**
 	 * Register settings used by the plugin.
 	 */
-	public static function add_tools_page() {
+	public static function add_settings_page() {
 		\add_submenu_page(
 			'settings_page_xmlsf',
 			__( 'Google Search Console', 'xml-sitemap-feed' ),

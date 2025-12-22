@@ -189,7 +189,7 @@ class XMLSitemapFeed {
 			\add_action( 'parse_request', array( __NAMESPACE__ . '\GSC_Connect', 'parse_request' ) );
 
 			// Prepare onboarding admin pages.
-			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'add_tools_page' ) );
+			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'add_settings_page' ) );
 			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'register_settings' ) );
 		} else {
 			// Schedule periodic token refresh.
@@ -213,7 +213,7 @@ class XMLSitemapFeed {
 			\add_action( 'parse_request', array( __NAMESPACE__ . '\BWT_Connect', 'parse_request' ) );
 
 			// Prepare onboarding admin pages.
-			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\BWT_Connect', 'add_tools_page' ) );
+			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\BWT_Connect', 'add_settings_page' ) );
 			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\BWT_Connect', 'register_settings' ) );
 		} else {
 			// Schedule periodic token refresh.
