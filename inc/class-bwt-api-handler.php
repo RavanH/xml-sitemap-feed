@@ -116,7 +116,7 @@ class BWT_API_Handler {
 		} else {
 			// Handle API errors.
 			return new WP_Error(
-				'gsc_api_error',
+				'bwt_api_error',
 				self::handle_api_errors( $api_response_code, $api_response_body ),
 				array(
 					'status' => $api_response_code,
