@@ -709,9 +709,9 @@ class Sitemap_Core extends Sitemap {
 	 * @return string
 	 */
 	public function stylesheet_url( $url ) {
-		// TODO make this optional: get_option( 'xmlsf_core_sitemap_stylesheet' )
-		// TODO make these match sitemap type.
-		$url = namespace\get_stylesheet_url( 'posttype' );
+		// TODO make this optional: get_option( 'xmlsf_core_sitemap_stylesheet' ).
+		// TODO make these match sitemap type, maybe using $_SERVER['REQUEST_URI'] ?
+		$url = namespace\get_stylesheet_url( 'core' );
 
 		return $url;
 	}
