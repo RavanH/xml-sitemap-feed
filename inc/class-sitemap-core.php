@@ -408,13 +408,13 @@ class Sitemap_Core extends Sitemap {
 				}
 				break;
 
-			// $case 'user':
+			case 'user':
 				// TODO make this xmlsf_author_has_published_posts filter compatible.
-			// $lastmod = \get_lastpostdate( 'GMT', 'post' ); // Absolute last post date.
-			// if ( $lastmod ) {
-			// $entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
-			// }
-			// break;
+				$lastmod = \get_lastpostdate( 'GMT', 'post' ); // Absolute last post date.
+				if ( $lastmod ) {
+					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
+				}
+				break;
 
 			case 'news':
 				$options    = (array) \get_option( 'xmlsf_news_tags' );
@@ -547,7 +547,7 @@ class Sitemap_Core extends Sitemap {
 	public function posts_show_on_front_entry( $entry ) {
 		// Set front blog page lastmod to last published post.
 		if ( empty( $entry['lastmod'] ) ) {
-			$lastmod = \get_lastpostdate( 'gmt', 'post' );
+			$lastmod = \get_lastpostdate( 'GMT', 'post' );
 			if ( $lastmod ) {
 				$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 			}
