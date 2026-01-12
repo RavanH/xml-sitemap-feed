@@ -240,15 +240,14 @@ class BWT_Oauth_Handler {
 			);
 		}
 
-		// Store the new refresh token if provided.
-		if ( ! empty( $data['refresh_token'] ) ) {
-			/**
-			 * DO NOT STORE THE NEW REFRESH TOKEN. BING WEBMASTER TOOLS OAUTH IS NOT COMPLIANT WITH OAUTH2 STANDARDS IN THIS REGARD.
-			 * The old refresh token remains valid until revoked, so we can continue using it.
-			 * The new refresh token will cause an invalid_grant response when used.
-			 */
-			//self::store_refresh_token( $data['refresh_token'] );
-		}
+		/**
+		 * DO NOT STORE THE NEW REFRESH TOKEN. BING WEBMASTER TOOLS OAUTH IS NOT COMPLIANT WITH OAUTH2 STANDARDS IN THIS REGARD.
+		 * The original refresh token remains valid until revoked. We must continue using it.
+		 * The new refresh token will cause an invalid_grant response when used.
+		 */
+		// if ( ! empty( $data['refresh_token'] ) ) {
+		// self::store_refresh_token( $data['refresh_token'] );
+		// }.
 
 		// Successfully refreshed token. Store the new access token in the transient.
 		$new_access_token = \sanitize_text_field( $data['access_token'] );
