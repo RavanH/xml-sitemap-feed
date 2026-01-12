@@ -283,15 +283,11 @@ class XMLSitemapFeed {
 				'post_type_settings' => array(
 					'post'  => array(
 						'archive'          => 'yearly',
-						'priority'         => '',
-						'dynamic_priority' => '',
 						'tags'             => array(
 							'image' => 'attached',
 						),
 					),
 					'page'  => array(
-						'priority'         => '',
-						'dynamic_priority' => '',
 						'tags'             => array(
 							'image' => 'attached',
 						),
@@ -300,14 +296,11 @@ class XMLSitemapFeed {
 				),
 				'taxonomies'         => '',
 				'taxonomy_settings'  => array(
-					'priority'         => '',
-					'dynamic_priority' => '',
 					'include_empty'    => '',
 					'limit'            => '',
 				),
 				'authors'            => '',
 				'author_settings'    => array(
-					'priority' => '',
 					'limit'    => '',
 				),
 				'robots'             => '',

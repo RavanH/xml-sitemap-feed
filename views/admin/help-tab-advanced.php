@@ -15,7 +15,6 @@
 	<strong><?php esc_html_e( 'External web pages', 'xml-sitemap-feed' ); ?></strong>
 	<br />
 	<?php esc_html_e( 'Add the full URL, including protocol (http/https) and domain.', 'xml-sitemap-feed' ); ?>
-	<?php esc_html_e( 'Optionally add a priority value between 0 and 1, separated with a space after the URL.', 'xml-sitemap-feed' ); ?>
 	<?php esc_html_e( 'Start each URL on a new line.', 'xml-sitemap-feed' ); ?>
 </p>
 <p>

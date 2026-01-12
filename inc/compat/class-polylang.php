@@ -177,10 +177,6 @@ class Polylang {
 
 				echo '<url><loc>' . \esc_xml( \esc_url( $transl_url ) ) . '</loc>';
 
-				if ( ! empty( $data['priority'] ) ) {
-					echo '<priority>' . \esc_xml( $data['priority'] ) . '</priority>';
-				}
-
 				if ( ! empty( $data['lastmod'] ) ) {
 					echo '<lastmod>' . \esc_xml( \get_date_from_gmt( $data['lastmod'], DATE_W3C ) ) . '</lastmod>';
 				}

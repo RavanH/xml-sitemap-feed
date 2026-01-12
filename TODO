@@ -6,6 +6,7 @@ TODO
 * add fetch sitemap data twice daily (or one an hour?) and store
 * refetch after submit and store
 * refresh buttons for sitemap data
+* Drop priority
 
 = 5.7 =
 

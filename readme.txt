@@ -161,6 +161,7 @@ Code cleanup and 2 bugfixes.
 Date: 202512
 * Bing Webmaster Tools sitemap reports
 * Bing sitemap submission from admin
+* Priority tags dropped
 
 = 5.6.3 =
 

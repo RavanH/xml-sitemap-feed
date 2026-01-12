@@ -7,11 +7,6 @@
 
 ?>
 <p>
-	<strong><?php esc_html_e( 'Priority', 'xml-sitemap-feed' ); ?></strong>
-	<br />
-	<?php esc_html_e( 'Priority can be used to signal the importance of author archives relative to other content like posts, pages or taxonomy term archives.', 'xml-sitemap-feed' ); ?>
-</p>
-<p>
 	<strong><?php esc_html_e( 'Maximum authors per sitemap', 'xml-sitemap-feed' ); ?></strong>
 	<br />
 	<?php esc_html_e( 'The number of entries per sitemap is limited to 2000 by default, to prevent running into slow response times or server memory issues. You may try a higher value but if you experience errors or slow sitemaps, make sure to reduce this number.', 'xml-sitemap-feed' ); ?>

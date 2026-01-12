@@ -252,13 +252,6 @@ class Sitemap {
 			return;
 		}
 
-		// _xmlsf_priority
-		if ( empty( $_POST['xmlsf_priority'] ) || ! \is_numeric( $_POST['xmlsf_priority'] ) ) {
-			\delete_post_meta( $post_id, '_xmlsf_priority' );
-		} else {
-			\update_post_meta( $post_id, '_xmlsf_priority', \XMLSF\sanitize_number( sanitize_text_field( \wp_unslash( $_POST['xmlsf_priority'] ) ) ) );
-		}
-
 		// _xmlsf_exclude
 		if ( empty( $_POST['xmlsf_exclude'] ) ) {
 			\delete_post_meta( $post_id, '_xmlsf_exclude' );

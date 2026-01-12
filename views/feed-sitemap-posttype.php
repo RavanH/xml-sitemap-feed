@@ -53,11 +53,6 @@ if ( have_posts() ) :
 
 			echo '<url><loc>' . esc_url( $url ) . '</loc>';
 
-			$priority = xmlsf()->sitemap->get_home_priority();
-			if ( ! empty( $priority ) ) {
-				echo '<priority>' . esc_xml( $priority ) . '</priority>';
-			}
-
 			if ( ! empty( $data['lastmod'] ) ) {
 				echo '<lastmod>' . esc_xml( get_date_from_gmt( $data['lastmod'], DATE_W3C ) ) . '</lastmod>';
 			}
@@ -97,11 +92,6 @@ if ( have_posts() ) :
 		echo '<url>';
 		echo '<loc>' . esc_xml( esc_url( $url ) ) . '</loc>';
 
-		$priority = xmlsf()->sitemap->get_post_priority( $post );
-		if ( $priority ) {
-			echo '<priority>' . esc_xml( $priority ) . '</priority>';
-		}
-
 		$lastmod = xmlsf()->sitemap->get_post_modified( $post );
 		if ( $lastmod ) {
 			echo '<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';
@@ -122,7 +112,7 @@ endif;
 
 if ( empty( $did_posts ) ) {
 	// No posts done? Then do at least the homepage to prevent error message in GSC.
-	echo '<url><loc>' . esc_url( home_url() ) . '</loc><priority>1.0</priority></url>' . PHP_EOL;
+	echo '<url><loc>' . esc_url( home_url() ) . '</loc></url>' . PHP_EOL;
 }
 ?>
 </urlset>

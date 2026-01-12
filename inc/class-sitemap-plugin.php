@@ -228,18 +228,6 @@ class Sitemap_Plugin extends Sitemap {
 				// Try to raise memory limit, context added for filters.
 				\wp_raise_memory_limit( 'sitemap-posttype-' . $feed[2] );
 
-				// Prepare priority calculation.
-				if ( ! empty( $this->post_type_settings[ $feed[2] ] ) && ! empty( $this->post_type_settings[ $feed[2] ]['priority'] ) && ! empty( $this->post_type_settings[ $feed[2] ]['dynamic_priority'] ) ) {
-					// Last of this post type modified date in Unix seconds.
-					\xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $feed[2] ), 'U' );
-					// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
-					\xmlsf()->timespan = \xmlsf()->lastmodified - \get_date_from_gmt( get_firstpostdate( 'GMT', $feed[2] ), 'U' );
-					// Total post type comment count.
-					\xmlsf()->comment_count = \wp_count_comments()->approved;
-					// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
-					// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/.
-				}
-
 				// Setup filters.
 				\add_filter(
 					'post_limits',
@@ -259,7 +247,6 @@ class Sitemap_Plugin extends Sitemap {
 				// Make sure to update meta cache for:
 				// 1. excluded posts.
 				// 2. image data (if activated).
-				// 3. lasmod on comments (if activated).
 				$request['update_post_meta_cache'] = true;
 				break;
 
@@ -623,7 +610,7 @@ class Sitemap_Plugin extends Sitemap {
 			! empty( $settings['tags']['image'] ) &&
 			\is_string( $settings['tags']['image'] )
 		) {
-			$images = \get_post_meta( $post->ID, '_xmlsf_image_' . $settings['tags']['image'] );
+			$images = \get_post_meta( $post->ID, '_xmlsf_image_' . $settings['tags']['image'], false );
 			foreach ( $images as $img ) {
 				if ( empty( $img['loc'] ) ) {
 					continue;

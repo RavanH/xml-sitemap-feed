@@ -12,21 +12,6 @@
 	</legend>
 	<p>
 		<label>
-			<?php esc_html_e( 'Priority', 'xml-sitemap-feed' ); ?>
-			<input type="number" step="0.1" min="0.1" max="0.9" name="xmlsf_taxonomy_settings[priority]" id="xmlsf_taxonomy_priority" value="<?php echo ( isset( $taxonomy_settings['priority'] ) ? esc_attr( $taxonomy_settings['priority'] ) : '' ); ?>" class="small-text" />
-		</label>
-		<span class="description">
-			<?php esc_html_e( 'The default priority value must be between 0 and 1. To disable priority, leave this field empty.', 'xml-sitemap-feed' ); ?>
-		</span>
-	</p>
-	<p>
-		<label>
-			<input type="checkbox" name="xmlsf_taxonomy_settings[dynamic_priority]" id="xmlsf_taxonomy_dynamic_priority" value="1"<?php echo checked( ! empty( $taxonomy_settings['dynamic_priority'] ), true, false ); ?> />
-			<?php esc_html_e( 'Automatic Priority calculation.', 'xml-sitemap-feed' ); ?>
-		</label>
-	</p>
-	<p>
-		<label>
 			<input type="checkbox" name="xmlsf_taxonomy_settings[include_empty]" id="xmlsf_taxonomy_include_empty" value="1"<?php checked( ! empty( $taxonomy_settings['include_empty'] ), true ); ?><?php disabled( apply_filters( 'xmlsf_advanced_enabled', false ), false ); ?> />
 			<?php esc_html_e( 'Include empty term archives.', 'xml-sitemap-feed' ); ?>
 			<?php apply_filters( 'xmlsf_advanced_enabled', false ) || printf( /* Translators: %s: XML Sitemap Advanced (with link) */ esc_html__( 'Available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">' . esc_html__( 'XML Sitemap Advanced', 'xml-sitemap-feed' ) . '</a>' ); ?>

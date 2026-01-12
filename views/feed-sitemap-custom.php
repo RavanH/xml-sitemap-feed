@@ -28,10 +28,6 @@ if ( is_array( $custom_urls ) ) :
 
 		echo '<url><loc>' . esc_url( $data[0] ) . '</loc>';
 
-		if ( ! empty( $data[1] ) && is_numeric( $data[1] ) ) {
-			echo '<priority>' . esc_xml( $data[1] ) . '</priority>';
-		}
-
 		do_action( 'xmlsf_tags_after', 'custom', $data );
 
 		echo '</url>';

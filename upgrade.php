@@ -210,6 +210,7 @@ function xmlsf_upgrade( $db_version ) {
 		update_option( 'xmlsf_post_types', $post_types );
 	}
 
+	// Make existing notifier transients google specific.
 	$gsc_token = get_transient( 'sitemap_notifier_access_token' );
 	if ( false !== $gsc_token ) {
 		set_transient( 'sitemap_notifier_google_access_token', $gsc_token );
@@ -220,6 +221,9 @@ function xmlsf_upgrade( $db_version ) {
 		set_transient( 'sitemap_notifier_google_submission', $gsc_submission );
 		delete_transient( 'sitemap_notifier_submission' );
 	}
+
+	// Drop priority meta data.
+	delete_metadata( 'post', 0, '_xmlsf_priority', '', true );
 
 	// Add possible missing new defaults.
 	xmlsf_update_from_defaults( false );

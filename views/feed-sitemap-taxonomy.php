@@ -37,11 +37,6 @@ if ( is_array( $terms ) ) :
 
 		echo '<url><loc>' . esc_xml( $url ) . '</loc>';
 
-		$priority = xmlsf()->sitemap->get_term_priority( $tax_term );
-		if ( $priority ) {
-			echo '<priority>' . esc_xml( $priority ) . '</priority>';
-		}
-
 		$lastmod = xmlsf()->sitemap->get_term_modified( $tax_term );
 		if ( $lastmod ) {
 			echo '<lastmod>' . esc_xml( get_date_from_gmt( $lastmod, DATE_W3C ) ) . '</lastmod>';

@@ -63,7 +63,6 @@ function xmlsf_uninstall() {
 	delete_metadata( 'user', 0, 'user_modified', '', true );
 
 	// Remove post meta data.
-	delete_metadata( 'post', 0, '_xmlsf_priority', '', true );
 	delete_metadata( 'post', 0, '_xmlsf_exclude', '', true );
 	delete_metadata( 'post', 0, '_xmlsf_news_exclude', '', true );
 

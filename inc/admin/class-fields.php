@@ -179,10 +179,8 @@ class Fields {
 		$lines = array();
 
 		if ( \is_array( $urls ) && ! empty( $urls ) ) {
-			foreach ( $urls as $arr ) {
-				if ( \is_array( $arr ) ) {
-					$lines[] = \implode( ' ', $arr );
-				}
+			foreach ( $urls as $url ) {
+				$lines[] = ( \is_array( $url ) ) ? \implode( ' ', $url ) : $url;
 			}
 		}
 
