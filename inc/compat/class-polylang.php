@@ -140,7 +140,7 @@ class Polylang {
 				foreach ( $languages as $language ) {
 					$url          = \pll_home_url( $language );
 					$data[ $url ] = array(
-						'lastmod' => \get_lastpostdate( 'gmt', 'post' ), // TODO make lastmod date language specific.
+						'lastmod' => \get_lastpostdate( 'GMT', 'post' ), // TODO make lastmod date language specific.
 					);
 				}
 			}

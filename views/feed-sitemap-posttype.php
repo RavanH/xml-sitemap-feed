@@ -26,7 +26,7 @@ if ( have_posts() ) :
 	if ( 'page' === $post->post_type && 'posts' === get_option( 'show_on_front' ) ) {
 		$home_pages = array(
 			\trailingslashit( \home_url() ) => array(
-				'lastmod' => get_lastpostdate( 'gmt', 'post' ),
+				'lastmod' => get_lastpostdate( 'GMT', 'post' ),
 			),
 		);
 
