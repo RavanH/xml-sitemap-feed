@@ -282,13 +282,13 @@ class XMLSitemapFeed {
 				'post_types'         => array(),
 				'post_type_settings' => array(
 					'post'  => array(
-						'archive'          => 'yearly',
-						'tags'             => array(
+						'archive' => 'yearly',
+						'tags'    => array(
 							'image' => 'attached',
 						),
 					),
 					'page'  => array(
-						'tags'             => array(
+						'tags' => array(
 							'image' => 'attached',
 						),
 					),
@@ -296,12 +296,12 @@ class XMLSitemapFeed {
 				),
 				'taxonomies'         => '',
 				'taxonomy_settings'  => array(
-					'include_empty'    => '',
-					'limit'            => '',
+					'include_empty' => '',
+					'limit'         => '',
 				),
 				'authors'            => '',
 				'author_settings'    => array(
-					'limit'    => '',
+					'limit' => '',
 				),
 				'robots'             => '',
 				'urls'               => '',
