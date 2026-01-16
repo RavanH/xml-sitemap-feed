@@ -11,7 +11,7 @@ use WP_Error;
 
 /**
  * Helper class with public methods to set up a Google Search Console connection.
- * 
+ *
  * @since 5.6
  */
 class GSC_Connect {
@@ -57,7 +57,6 @@ class GSC_Connect {
 				\delete_transient( 'gsc_connect_origin' );
 			}
 
-
 			\wp_safe_redirect( $redirect_url );
 			exit;
 		}
@@ -92,6 +91,8 @@ class GSC_Connect {
 		$new_access_token = GSC_Oauth_Handler::refresh_access_token();
 
 		if ( \is_wp_error( $new_access_token ) ) {
+			do_action( 'sitemap_notifier_refresh_access_token', $new_access_token, 'error' );
+
 			return $new_access_token;
 		}
 

@@ -230,13 +230,13 @@ class GSC_Oauth_Handler {
 
 				return new WP_Error(
 					'sitemap_notifier_oauth_refresh_invalid_grant',
-					__( 'Google refresh token is invalid or expired. Please reconnect to Google Search Console.', 'xml-sitemap-feed' )
+					sprintf( /* translators: %s error message (untranslated) */ \__( 'Google refresh token is invalid or expired: %s. Please reconnect to Google Search Console.', 'xml-sitemap-feed' ), $error_message )
 				);
 			}
 
 			return new WP_Error(
 				'sitemap_notifier_oauth_refresh_failed',
-				sprintf( /* translators: %1$s error code, %2$s error message (untranslated) */ \esc_html__( 'Failed to refresh Google access token (HTTP %1$s): %2$s', 'xml-sitemap-feed' ), $response_code, $error_message )
+				sprintf( /* translators: %1$s error code, %2$s error message (untranslated) */ \__( 'Failed to refresh Google access token (HTTP %1$s): %2$s', 'xml-sitemap-feed' ), $response_code, $error_message )
 			);
 		}
 
