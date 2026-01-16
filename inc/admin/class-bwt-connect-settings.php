@@ -80,8 +80,7 @@ class BWT_Connect_Settings extends BWT_Connect {
 					'response_type' => 'code',
 					'client_id'     => $options['bing_client_id'],
 					'redirect_uri'  => \rawurlencode( $redirect_uri ),
-					'scope'         => 'webmaster.manage',
-					'access_type'   => 'offline', // Request a refresh token. DO WE NEED THIS FOR BING???
+					'scope'         => 'webmasters.manage',
 					'prompt'        => 'consent', // Ensure consent screen is shown. DO WE NEED THIS FOR BING???
 				),
 				'https://www.bing.com/webmasters/oauth/authorize'

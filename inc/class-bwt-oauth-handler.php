@@ -86,6 +86,7 @@ class BWT_Oauth_Handler {
 			'client_secret' => $client_secret,
 			'redirect_uri'  => \site_url( 'index.php?' . self::$query_var ),
 			'grant_type'    => 'authorization_code',
+			'scope'         => 'webmasters.anage',
 		);
 
 		// Make the POST request using wp_remote_post().
@@ -195,6 +196,7 @@ class BWT_Oauth_Handler {
 			'client_secret' => $client_secret,
 			'refresh_token' => $options['bing_refresh_token'],
 			'grant_type'    => 'refresh_token',
+			'scope'         => 'webmasters.manage',
 		);
 
 		// Remote post new access token request.
@@ -230,13 +232,13 @@ class BWT_Oauth_Handler {
 
 				return new WP_Error(
 					'sitemap_notifier_oauth_refresh_invalid_grant',
-					__( 'Bing refresh token is invalid or expired. Please reconnect to Bing Webmaster Tools.', 'xml-sitemap-feed' )
+					sprintf( /* translators: %s error message (untranslated) */ \__( 'Bing refresh token is invalid or expired: %s. Please reconnect to Bing Webmaster Tools.', 'xml-sitemap-feed' ), $error_message )
 				);
 			}
 
 			return new WP_Error(
 				'sitemap_notifier_oauth_refresh_failed',
-				sprintf( /* translators: %1$s error code, %2$s error message (untranslated) */ \esc_html__( 'Failed to refresh Bing access token (HTTP %1$s): %2$s', 'xml-sitemap-feed' ), $response_code, $error_message )
+				sprintf( /* translators: %1$s error code, %2$s error message (untranslated) */ \__( 'Failed to refresh Bing access token (HTTP %1$s): %2$s', 'xml-sitemap-feed' ), $response_code, $error_message )
 			);
 		}
 
