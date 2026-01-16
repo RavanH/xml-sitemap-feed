@@ -87,6 +87,8 @@ class BWT_Connect {
 		$new_access_token = BWT_Oauth_Handler::refresh_access_token();
 
 		if ( \is_wp_error( $new_access_token ) ) {
+			do_action( 'sitemap_notifier_refresh_access_token', $new_access_token, 'error' );
+
 			return $new_access_token;
 		}
 
