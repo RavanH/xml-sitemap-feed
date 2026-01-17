@@ -7,7 +7,7 @@
 
 // Get connect data.
 $options = (array) get_option( 'xmlsf_bwt_connect', array() );
-if ( empty( $options['bing_refresh_token'] ) ) {
+if ( empty( $options['bing_api_key'] ) ) {
 	// Initiate button.
 	?>
 	<p>
@@ -57,7 +57,6 @@ if ( $number < 1 ) {
 $data            = $data['d'][0];
 $format          = get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' );
 $last_submitted  = isset( $data['Submitted'] ) ? wp_date( $format, substr( $data['Submitted'], 6, 10 ) ) : __( 'Unknown', 'xml-sitemap-feed' );
-$status          = isset( $data['Status'] ) ? $data['Status'] : false;
 $last_downloaded = isset( $data['LastCrawled'] ) ? wp_date( $format, substr( $data['LastCrawled'], 6, 10 ) ) : __( 'Unknown', 'xml-sitemap-feed' );
 $links_submitted = isset( $data['UrlCount'] ) ? $data['UrlCount'] : 0;
 $bwt_link        = add_query_arg(
@@ -67,7 +66,7 @@ $bwt_link        = add_query_arg(
 	),
 	'https://www.bing.com/webmasters/sitemaps'
 );
-//https://www.bing.com/webmasters/sitemaps?siteUrl=https%3A%2F%2Fdev.status301.com%2F&sitemapIndex=https%3A%2F%2Fdev.status301.com%2Fwp-sitemap.xml&activePivot=1
+// https://www.bing.com/webmasters/sitemaps?siteUrl=https%3A%2F%2Fdev.status301.com%2F&sitemapIndex=https%3A%2F%2Fdev.status301.com%2Fwp-sitemap.xml&activePivot=1 .
 ?>
 <table class="widefat">
 	<thead>
@@ -88,7 +87,7 @@ $bwt_link        = add_query_arg(
 					<span class="dashicons dashicons-external"></span>
 				</a>
 			</th>
-			<td><?php if ( 'Success' !== $status ) : ?>
+			<td><?php if ( isset( $data['Status'] ) && 'Success' !== $data['Status'] ) : ?>
 				<span class="dashicons dashicons-clock" style="color:#dba617" title="<?php esc_html_e( 'Pending', 'xml-sitemap-feed' ); ?>"></span>
 			<?php else : ?>
 				<span class="dashicons dashicons-yes-alt" style="color:#00a32a" title="<?php echo esc_html_e( 'Processed', 'xml-sitemap-feed' ); ?>"></span>

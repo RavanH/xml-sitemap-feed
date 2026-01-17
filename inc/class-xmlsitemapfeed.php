@@ -207,20 +207,10 @@ class XMLSitemapFeed {
 		$options = (array) \get_option( 'xmlsf_bwt_connect', array() );
 
 		// Prepare onboarding if not connected.
-		if ( empty( $options['bing_refresh_token'] ) ) {
-			// Prepare for OAuth callback.
-			\add_filter( 'query_vars', array( __NAMESPACE__ . '\BWT_Connect', 'query_vars' ) );
-			\add_action( 'parse_request', array( __NAMESPACE__ . '\BWT_Connect', 'parse_request' ) );
-
+		if ( empty( $options['bing_api_key'] ) ) {
 			// Prepare onboarding admin pages.
 			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\BWT_Connect', 'add_settings_page' ) );
 			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\BWT_Connect', 'register_settings' ) );
-		} else {
-			// Schedule periodic token refresh.
-			\add_action( 'xmlsf_bwt_keep_alive', array( __NAMESPACE__ . '\BWT_Oauth_Handler', 'refresh_access_token' ) );
-			if ( ! \wp_next_scheduled( 'xmlsf_bwt_keep_alive' ) ) {
-				\wp_schedule_event( time(), 'weekly', 'xmlsf_bwt_keep_alive' );
-			}
 		}
 	}
 

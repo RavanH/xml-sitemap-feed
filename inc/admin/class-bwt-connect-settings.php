@@ -55,7 +55,7 @@ class BWT_Connect_Settings extends BWT_Connect {
 	}
 
 	/**
-	 * Callback function for the Google Search Console OAuth Settings section header.
+	 * Callback function for the Bing Settings section header.
 	 */
 	public static function oauth_section_callback() {
 		// Prepare the option if it does not already exist. Sets it as non-autoloaded option.
@@ -69,54 +69,21 @@ class BWT_Connect_Settings extends BWT_Connect {
 		// Intro.
 		include XMLSF_DIR . '/views/admin/section-bwt-oauth-intro.php';
 
-		// Check if the Google Client ID and Secret are set.
-		if ( empty( $options['bing_client_id'] ) || empty( $options['bing_client_secret'] ) ) {
-			// Stage 1.
-			include XMLSF_DIR . '/views/admin/section-bwt-oauth-stage-1.php';
-		} else {
-			$redirect_uri = \site_url( 'index.php?' . self::$query_var );
-			$oauth_url    = \add_query_arg(
-				array(
-					'response_type' => 'code',
-					'client_id'     => $options['bing_client_id'],
-					'redirect_uri'  => \rawurlencode( $redirect_uri ),
-					'scope'         => 'webmasters.manage',
-					'prompt'        => 'consent', // Ensure consent screen is shown. DO WE NEED THIS FOR BING???
-				),
-				'https://www.bing.com/webmasters/oauth/authorize'
-			);
-
-			// Stage 2.
-			include XMLSF_DIR . '/views/admin/section-bwt-oauth-stage-2.php';
-		}
+		// Fields.
+		include XMLSF_DIR . '/views/admin/section-bwt-oauth-stage-1.php';
 	}
 
 	/**
 	 * Render the text field for the Google Client ID.
 	 */
-	public static function bing_client_id_render() {
-		$options   = (array) \get_option( self::$option_group, array() );
-		$client_id = isset( $options['bing_client_id'] ) ? \sanitize_text_field( $options['bing_client_id'] ) : '';
+	public static function bing_api_key_render() {
+		$options = (array) \get_option( self::$option_group, array() );
+		$api_key = isset( $options['bing_api_key'] ) ? \sanitize_text_field( $options['bing_api_key'] ) : '';
 		?>
-		<input type="text" autocomplete="off" name="<?php echo \esc_attr( self::$option_group ); ?>[bing_client_id]" id="xmlsf_notifier_bing_client_id" value="<?php echo \esc_attr( $client_id ); ?>" class="regular-text">
+		<input type="text" autocomplete="off" name="<?php echo \esc_attr( self::$option_group ); ?>[bing_api_key]" id="xmlsf_notifier_bing_api_key" value="<?php echo \esc_attr( $api_key ); ?>" class="regular-text">
 		<p class="description">
-			<?php \esc_html_e( 'Enter your Bing Webmaster Tools Client ID.', 'xml-sitemap-feed' ); ?>
-			<?php \esc_html_e( 'You can find this in Bing Webmaster Tools under Settings > API Access > OAuth client.', 'xml-sitemap-feed' ); ?>
-		</p>
-		<?php
-	}
-
-	/**
-	 * Render the text field for the Google Client Secret.
-	 */
-	public static function bing_client_secret_render() {
-		$options       = (array) \get_option( self::$option_group, array() );
-		$client_secret = ! empty( $options['bing_client_secret'] ) ? self::$pw_placeholder : '';
-		?>
-		<input type="password" autocomplete="new-password" name="<?php echo \esc_attr( self::$option_group ); ?>[bing_client_secret]" id="xmlsf_notifier_bing_client_secret" value="<?php echo \esc_attr( $client_secret ); ?>" class="regular-text">
-		<p class="description">
-			<?php \esc_html_e( 'Enter your Bing Webmaster Tools Client Secret.', 'xml-sitemap-feed' ); ?>
-			<?php \esc_html_e( 'You can find this in Bing Webmaster Tools under Settings > API Access > OAuth client.', 'xml-sitemap-feed' ); ?>
+			<?php \esc_html_e( 'Enter your Bing Webmaster Tools API key.', 'xml-sitemap-feed' ); ?>
+			<?php \esc_html_e( 'You can find this in Bing Webmaster Tools under Settings > API Access > API Key.', 'xml-sitemap-feed' ); ?>
 		</p>
 		<?php
 	}
@@ -132,23 +99,11 @@ class BWT_Connect_Settings extends BWT_Connect {
 		$sanitized = array();
 		$options   = (array) \get_option( self::$option_group, array() ); // Not strictly needed if only sanitizing submitted input.
 
-		// Sanitize Google Client ID.
-		if ( isset( $input['bing_client_id'] ) ) {
-			$sanitized['bing_client_id'] = \sanitize_text_field( $input['bing_client_id'] );
-		} else {
-			$sanitized['bing_client_id'] = isset( $options['bing_client_id'] ) ? $options['bing_client_id'] : '';
-		}
-
 		// Sanitize Google Client Secret.
-		if ( isset( $input['bing_client_secret'] ) && self::$pw_placeholder !== $input['bing_client_secret'] ) {
-			$sanitized['bing_client_secret'] = ! empty( $input['bing_client_secret'] ) ? Secret::encrypt( \sanitize_text_field( $input['bing_client_secret'] ) ) : '';
+		if ( isset( $input['bing_api_key'] ) && self::$pw_placeholder !== $input['bing_api_key'] ) {
+			$sanitized['bing_api_key'] = ! empty( $input['bing_api_key'] ) ? Secret::encrypt( \sanitize_text_field( $input['bing_api_key'] ) ) : '';
 		} else {
-			$sanitized['bing_client_secret'] = isset( $options['bing_client_secret'] ) ? $options['bing_client_secret'] : '';
-		}
-
-		// Make sure to not loose existing refresh token, but only if client id is set and was not changed.
-		if ( ! empty( $options['bing_refresh_token'] ) && $sanitized['bing_client_id'] === $options['bing_client_id'] ) {
-			$sanitized['bing_refresh_token'] = $options['bing_refresh_token'];
+			$sanitized['bing_api_key'] = isset( $options['bing_api_key'] ) ? $options['bing_api_key'] : '';
 		}
 
 		return $sanitized;

@@ -15,89 +15,47 @@ use WP_Error;
  * @since 5.6
  */
 class BWT_Connect {
-	/**
-	 * The redirect path for the OAuth callback.
-	 *
-	 * @var string
-	 */
-	public static $query_var = 'xmlsf_notifier_bing_oauth';
 
 	/**
-	 * Redirection URL.
+	 * Retrieves the Bing API key.
 	 *
-	 * @var string
-	 */
-	public static $page_slug = 'bwt_connect';
-
-	/**
-	 * Handles the OAuth callback request.
-	 *
-	 * @param WP $wp The WP object.
-	 */
-	public static function parse_request( $wp ) {
-		// Check if our custom query variable is set.
-		if ( isset( $wp->query_vars[ self::$query_var ] ) ) {
-			// Handle the OAuth callback.
-			$data = BWT_Oauth_Handler::callback_handler();
-
-			$data['result']['setting'] = 'xmlsf_bwt_connect';
-
-			\set_transient( 'settings_errors', array( $data['result'] ), 30 ); // Store notices for the next page load.
-
-			if ( 'error' === $data['result']['type'] ) {
-				$slug         = self::$page_slug;
-				$redirect_url = \add_query_arg( 'settings-updated', 'true', \admin_url( 'admin.php?page=' . $slug ) );
-			} else {
-				$slug         = sitemaps_enabled( 'sitemap' ) ? 'xmlsf' : false;
-				$redirect_url = $slug ? \add_query_arg( 'page', $slug, \admin_url( 'options-general.php' ) ) : \admin_url( 'options-reading.php#xmlsf_sitemaps' );
-				$redirect_url = \add_query_arg( 'settings-updated', 'true', $redirect_url );
-			}
-
-			\wp_safe_redirect( $redirect_url );
-			exit;
-		}
-	}
-
-	/**
-	 * Define the query variable for the OAuth callback.
-	 *
-	 * @param array $vars The query variables.
-	 *
-	 * @return array The query variables.
-	 */
-	public static function query_vars( $vars ) {
-		$vars[] = self::$query_var;
-		return $vars;
-	}
-
-	/**
-	 * Retrieves a valid Google OAuth access token, refreshing it if necessary.
-	 *
-	 * @return string|WP_Error The valid access token or a WP_Error object on failure.
+	 * @return string|WP_Error The valid API key or a WP_Error object on failure.
 	 */
 	public static function get_access_token() {
 		// Try to get the access token from the transient first.
-		$access_token = \get_transient( 'sitemap_notifier_bing_access_token' );
+		$options = (array) \get_option( 'xmlsf_bwt_connect', array() );
 
 		// If access token was retrieved from transient, it's valid.
-		if ( false !== $access_token ) {
-			return $access_token;
+		if ( empty( $options['bing_api_key'] ) ) {
+			$error = \esc_html__( 'Bing API key is missing. Please reconnect to Bing Webmaster Tools.', 'xml-sitemap-feed' );
+
+			do_action( 'sitemap_notifier_refresh_access_token_error', $error, 'error' );
+
+			return new WP_Error(
+				'bwt_api_error',
+				$error
+			);
 		}
 
-		$new_access_token = BWT_Oauth_Handler::refresh_access_token();
+		$api_key = Secret::decrypt( $options['bing_api_key'] );
 
-		if ( \is_wp_error( $new_access_token ) ) {
-			do_action( 'sitemap_notifier_refresh_access_token_error', $new_access_token, 'error' );
+		if ( ! $api_key ) {
+			$error = \esc_html__( 'Bing API key decryption failed. Please reconnect to Bing Webmaster Tools.', 'xml-sitemap-feed' );
 
-			return $new_access_token;
+			do_action( 'sitemap_notifier_refresh_access_token_error', $error, 'error' );
+
+			return new WP_Error(
+				'bwt_api_error',
+				$error
+			);
 		}
 
 		// Return the new access token.
-		return $new_access_token;
+		return $api_key;
 	}
 
 	/**
-	 * Submitter. Hooked on xmlsf_advanced_news_notifier event.
+	 * Submitter.
 	 *
 	 * @uses class BWT_API_Handler
 	 *

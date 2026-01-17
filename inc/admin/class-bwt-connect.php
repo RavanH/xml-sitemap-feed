@@ -75,17 +75,9 @@ class BWT_Connect {
 
 		// Add new OAuth settings fields.
 		\add_settings_field(
-			'bing_client_id', // ID.
-			__( 'Client ID', 'xml-sitemap-feed' ), // Title.
-			array( __NAMESPACE__ . '\BWT_Connect_Settings', 'bing_client_id_render' ), // Callback function to render the field.
-			$page_slug, // Page slug where the field appears.
-			'sitemap_notifier_oauth_section' // Section the field belongs to.
-		);
-
-		\add_settings_field(
-			'bing_client_secret', // ID.
-			__( 'Client secret', 'xml-sitemap-feed' ), // Title.
-			array( __NAMESPACE__ . '\BWT_Connect_Settings', 'bing_client_secret_render' ), // Callback function to render the field.
+			'bing_api_key', // ID.
+			__( 'API Key', 'xml-sitemap-feed' ), // Title.
+			array( __NAMESPACE__ . '\BWT_Connect_Settings', 'bing_api_key_render' ), // Callback function to render the field.
 			$page_slug, // Page slug where the field appears.
 			'sitemap_notifier_oauth_section' // Section the field belongs to.
 		);
@@ -107,10 +99,7 @@ class BWT_Connect {
 		$options = (array) \get_option( self::$option_group, array() );
 
 		// Clear the refresh token.
-		unset( $options['bing_refresh_token'] );
+		unset( $options['bing_api_key'] );
 		\update_option( self::$option_group, $options );
-
-		// Delete access token.
-		\delete_transient( 'sitemap_notifier_bing_access_token' );
 	}
 }

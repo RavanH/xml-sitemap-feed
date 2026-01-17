@@ -29,6 +29,7 @@ class BWT_API_Handler {
 			array(
 				'siteUrl' => \rawurlencode( \home_url() ),
 				'feedUrl' => \rawurlencode( $sitemap ),
+				'apikey'  => $access_token,
 			),
 			'https://ssl.bing.com/webmaster/api.svc/json/GetFeedDetails'
 		);
@@ -36,8 +37,7 @@ class BWT_API_Handler {
 		$api_request_args = array(
 			'method'      => 'GET',
 			'headers'     => array(
-				'Authorization'  => 'Bearer ' . $access_token,
-				'Content-Type'  => 'application/json',
+				'Content-Type'   => 'application/json',
 				'Content-Length' => '0', // GET request with no body.
 			),
 			'timeout'     => 15,
@@ -79,8 +79,14 @@ class BWT_API_Handler {
 	 * @return true|WP_Error True on success, WP_Error on failure.
 	 */
 	public static function submit( $sitemap, $access_token ) {
-		$api_endpoint     = 'https://ssl.bing.com/webmaster/api.svc/json/SubmitFeed';
-		$body             = \wp_json_encode(
+		$api_endpoint = \add_query_arg(
+			array(
+				'apikey' => $access_token,
+			),
+			'https://ssl.bing.com/webmaster/api.svc/json/SubmitFeed',
+		);
+
+		$body = \wp_json_encode(
 			array(
 				'siteUrl' => \home_url(),
 				'feedUrl' => $sitemap,
@@ -90,12 +96,11 @@ class BWT_API_Handler {
 		$api_request_args = array(
 			'method'      => 'POST',
 			'headers'     => array(
-				'Authorization'  => 'Bearer ' . $access_token,
-				'Content-Type'  => 'application/json',
+				'Content-Type' => 'application/json',
 			),
 			'timeout'     => 15,
 			'body'        => $body,
-   			'data_format' => 'body',
+			'data_format' => 'body',
 			'sslverify'   => false,
 			'httpversion' => '1.1',
 		);
