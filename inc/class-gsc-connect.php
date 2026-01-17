@@ -7,8 +7,6 @@
 
 namespace XMLSF;
 
-use WP_Error;
-
 /**
  * Helper class with public methods to set up a Google Search Console connection.
  *
@@ -137,7 +135,7 @@ class GSC_Connect {
 	}
 
 	/**
-	 * Submitter. Hooked on xmlsf_advanced_news_notifier event.
+	 * Submitter.
 	 *
 	 * @uses class GSC_API_Handler
 	 *

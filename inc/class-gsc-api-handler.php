@@ -26,12 +26,12 @@ class GSC_API_Handler {
 	 */
 	public static function get( $api_endpoint, $access_token ) {
 		$api_request_args = array(
-			'method'  => 'GET',
-			'headers' => array(
+			'method'      => 'GET',
+			'headers'     => array(
 				'Authorization'  => 'Bearer ' . $access_token,
 				'Content-Length' => '0', // GET request with no body.
 			),
-			'timeout' => 15,
+			'timeout'     => 15,
 			'sslverify'   => false,
 			'httpversion' => '1.1',
 		);
@@ -72,12 +72,12 @@ class GSC_API_Handler {
 		// The API endpoint: https://www.googleapis.com/webmasters/v3/sites/siteUrl/sitemaps/feedPath.
 
 		$api_request_args = array(
-			'method'  => 'PUT',
-			'headers' => array(
+			'method'      => 'PUT',
+			'headers'     => array(
 				'Authorization'  => 'Bearer ' . $access_token,
 				'Content-Length' => '0', // PUT request with no body.
 			),
-			'timeout' => 15,
+			'timeout'     => 15,
 			'sslverify'   => false,
 			'httpversion' => '1.1',
 		);

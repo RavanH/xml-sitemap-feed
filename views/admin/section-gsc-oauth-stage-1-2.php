@@ -27,7 +27,10 @@
 		?>
 	</li>
 </ol>
-<p><?php esc_html_e( 'Follow the steps below to create a Google Cloud Console project and obtain your credentials.', 'xml-sitemap-feed' ); ?> <?php esc_html_e( 'Please use a Google account that has at least Full access to the site property in Google Search Console.', 'xml-sitemap-feed' ); ?></p>
+<p>
+	<?php esc_html_e( 'Follow the steps below to create a Google Cloud Console project and obtain your credentials.', 'xml-sitemap-feed' ); ?>
+	<?php esc_html_e( 'Please use a Google account that has at least Full access to the site property in Google Search Console.', 'xml-sitemap-feed' ); ?>
+</p>
 <h3><?php esc_html_e( 'Stage I. Create a Google Cloud Console project', 'xml-sitemap-feed' ); ?></h3>
 <ol>
 	<li>
@@ -53,7 +56,7 @@
 			<li>
 				<?php
 				printf(
-					/* translators: %1$s: Get started, %2$s: Create */
+					/* translators: %1$s: Get started, %2$s: Next */
 					esc_html__( 'Click the %1$s button, give your App a recognizable name, select a support e-mail address and hit %2$s.', 'xml-sitemap-feed' ),
 					'<strong>' . esc_html__( 'Get started', 'xml-sitemap-feed' ) . '</strong>',
 					'<strong>' . esc_html__( 'Next', 'xml-sitemap-feed' ) . '</strong>'
@@ -141,7 +144,12 @@
 		?>
 	</li>
 </ol>
-<p><strong><?php esc_html_e( 'Important:', 'xml-sitemap-feed' ); ?></strong> <?php esc_html_e( 'Ensure the Redirect URI is copied and pasted exactly as shown.', 'xml-sitemap-feed' ); ?></p>
+<p>
+	<strong>
+		<?php esc_html_e( 'Important:', 'xml-sitemap-feed' ); ?>
+	</strong>
+	<?php esc_html_e( 'Ensure the Redirect URI is copied and pasted exactly as shown.', 'xml-sitemap-feed' ); ?>
+</p>
 <p>
 	<?php
 	printf(
