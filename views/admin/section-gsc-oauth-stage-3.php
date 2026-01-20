@@ -13,7 +13,8 @@
 	</a>
 </p>
 <p class="description">
-	<?php esc_html_e( 'You will be redirected to Google to authorize your site.', 'xml-sitemap-feed' ); ?> <?php esc_html_e( 'Please use a Google account that has at least Full access to the site property in Google Search Console.', 'xml-sitemap-feed' ); ?>
+	<?php esc_html_e( 'You will be redirected to Google to authorize your site.', 'xml-sitemap-feed' ); ?>
+	<?php esc_html_e( 'Please use a Google account that has at least Full access to the site property in Google Search Console.', 'xml-sitemap-feed' ); ?>
 	<br>
 	<?php
 	printf(
