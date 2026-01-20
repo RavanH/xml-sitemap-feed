@@ -14,7 +14,7 @@ if ( empty( $options['google_refresh_token'] ) ) {
 		<?php printf( /* translators: %s: Google Search Console */ esc_html_x( 'Connect to %s for sitemap data retrieval and sitemap submissions.', 'Google Search Console connection', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) ); ?>
 	</p>
 	<p>
-		<a href="<?php echo esc_url( add_query_arg( 'ref', 'xmlsf', XMLSF\Admin\GSC_Connect::get_settings_url() ) ); ?>" class="button button-primary">
+		<a href="<?php echo esc_url( add_query_arg( 'ref', 'xmlsf', \XMLSF\Admin\GSC_Connect_Admin::get_settings_url() ) ); ?>" class="button button-primary">
 			<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
 		</a>
 	</p>
@@ -23,7 +23,7 @@ if ( empty( $options['google_refresh_token'] ) ) {
 }
 
 $sitemap = xmlsf()->sitemap->get_sitemap_url();
-$data    = XMLSF\GSC_Connect::get( $sitemap );
+$data    = \XMLSF\GSC_Connect::get( $sitemap );
 
 ?>
 <p><?php esc_html_e( 'Your sitemap data as reported by Google Search Console.', 'xml-sitemap-feed' ); ?></p>
@@ -58,7 +58,7 @@ $is_pending      = isset( $data['isPending'] ) ? $data['isPending'] : false;
 $last_downloaded = isset( $data['lastDownloaded'] ) ? wp_date( $format, strtotime( $data['lastDownloaded'] ) ) : __( 'Unknown', 'xml-sitemap-feed' );
 $_warnings       = isset( $data['warnings'] ) ? $data['warnings'] : 0;
 $_errors         = isset( $data['errors'] ) ? $data['errors'] : 0;
-$property        = XMLSF\Admin\GSC_Connect::get_property_url();
+$property        = \XMLSF\Admin\GSC_Connect_Admin::get_property_url();
 $gsc_link        = add_query_arg(
 	array(
 		'resource_id'   => rawurlencode( $property ),
