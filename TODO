@@ -1,9 +1,5 @@
 = 5.7 =
 
-* Solve "not allowed" problem after submitting bing api key: do fetch check and if okay, save connected status to db and redirect back to sitemap admin page.
-* Check BWT possible error texts
-* Finish KB page (possible errors)
-
 
 = 5.8 =
 * move sitemap reports to own tabs or one Reports tab for all sitemaps?
