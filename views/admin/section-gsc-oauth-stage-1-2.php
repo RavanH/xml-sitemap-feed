@@ -153,7 +153,7 @@
 <p>
 	<?php
 	printf(
-		/* translators: %s: Save Settings */
+		/* translators: %1$s: Save Changes, %2$s: Connect to Google Search Console */
 		esc_html__( 'After filling the fields below and clicking %1$s a button %2$s will allow you (or another site admin) to finalize the connection.', 'xml-sitemap-feed' ),
 		'<strong>' . esc_html( \translate( 'Save Changes' ) ) . '</strong>', // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
 		'<strong>' . esc_html__( 'Connect to Google Search Console', 'xml-sitemap-feed' ) . '</strong>'
