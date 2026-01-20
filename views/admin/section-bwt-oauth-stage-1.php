@@ -11,7 +11,16 @@
 	<li>
 		<?php
 		printf(
-			/* translators: %s: Link to Google Cloud Console */
+			/* translators: %s: Link to Bing Webmaster Tools */
+			esc_html__( 'You need an account on %s. In case you do not already have a Bing Webmaster account, sign up using any Microsoft, Google or Facebook ID.', 'xml-sitemap-feed' ),
+			'<a href="https://www.bing.com/webmasters/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) . '</a>'
+		);
+		?>
+	</li>
+	<li>
+		<?php
+		printf(
+			/* translators: %s: Link to https://www.bing.com/webmasters/help/add-and-verify-site-12184f8b */
 			esc_html__( 'Your site property needs to be set up in Bing Webmaster Tools. If you have not already done that, follow the instructions on %s.', 'xml-sitemap-feed' ),
 			'<a href="https://www.bing.com/webmasters/help/add-and-verify-site-12184f8b" target="_blank" rel="noopener noreferrer">https://www.bing.com/webmasters/help/add-and-verify-site-12184f8b</a>'
 		);
@@ -22,7 +31,7 @@
 	<?php esc_html_e( 'Follow the steps below to create a Bing Webmaster Tools API key.', 'xml-sitemap-feed' ); ?>
 	<?php esc_html_e( 'Please use a Microsoft account that has at least Read-write access to the site property in Bing Webmaster Tools.', 'xml-sitemap-feed' ); ?>
 </p>
-<h3><?php esc_html_e( 'Create an API key', 'xml-sitemap-feed' ); ?></h3>
+<h3><?php esc_html_e( 'Stage I. Create an API key', 'xml-sitemap-feed' ); ?></h3>
 <ol>
 	<li>
 		<?php
