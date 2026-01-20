@@ -14,7 +14,7 @@ if ( empty( $options['bing_api_key'] ) ) {
 		<?php printf( /* translators: %s: Bing Webmaster Tools */ esc_html_x( 'Connect to %s for sitemap data retrieval and sitemap submissions.', 'Bing Webmaster Tools connection', 'xml-sitemap-feed' ), esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) ); ?>
 	</p>
 	<p>
-		<a href="<?php echo esc_url( XMLSF\Admin\BWT_Connect::get_settings_url() ); ?>" class="button button-primary">
+		<a href="<?php echo esc_url( \XMLSF\Admin\BWT_Connect_Admin::get_settings_url() ); ?>" class="button button-primary">
 			<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
 		</a>
 	</p>
@@ -23,7 +23,7 @@ if ( empty( $options['bing_api_key'] ) ) {
 }
 
 $sitemap = xmlsf()->sitemap->get_sitemap_url();
-$data    = XMLSF\BWT_Connect::get( $sitemap );
+$data    = \XMLSF\BWT_Connect::get( $sitemap );
 
 ?>
 <p><?php esc_html_e( 'Your sitemap data as reported by Bing Webmaster Tools.', 'xml-sitemap-feed' ); ?></p>

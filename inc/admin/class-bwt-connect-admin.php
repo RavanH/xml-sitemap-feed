@@ -15,7 +15,7 @@ use WP_Error;
  * @author RavanH
  * @version 5.7
  */
-class BWT_Connect {
+class BWT_Connect_Admin {
 	/**
 	 * The redirect path for the OAuth callback.
 	 *

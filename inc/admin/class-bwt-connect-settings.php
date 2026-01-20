@@ -15,7 +15,7 @@ use XMLSF\Secret;
  * @author RavanH
  * @version 5.7
  */
-class BWT_Connect_Settings extends BWT_Connect {
+class BWT_Connect_Settings extends BWT_Connect_Admin {
 
 	/**
 	 * Placeholder for the saved password.
@@ -70,7 +70,12 @@ class BWT_Connect_Settings extends BWT_Connect {
 		include XMLSF_DIR . '/views/admin/section-bwt-oauth-intro.php';
 
 		// Fields.
-		include XMLSF_DIR . '/views/admin/section-bwt-oauth-stage-1.php';
+		if ( empty( $options['bing_api_key'] ) ) {
+			include XMLSF_DIR . '/views/admin/section-bwt-oauth-stage-1.php';
+		} else {
+			// Test connection and show result.
+			include XMLSF_DIR . '/views/admin/section-bwt-oauth-stage-2.php';
+		}
 	}
 
 	/**
@@ -78,9 +83,9 @@ class BWT_Connect_Settings extends BWT_Connect {
 	 */
 	public static function bing_api_key_render() {
 		$options = (array) \get_option( self::$option_group, array() );
-		$api_key = isset( $options['bing_api_key'] ) ? \sanitize_text_field( $options['bing_api_key'] ) : '';
+		$api_key = ! empty( $options['bing_api_key'] ) ? self::$pw_placeholder : '';
 		?>
-		<input type="text" autocomplete="off" name="<?php echo \esc_attr( self::$option_group ); ?>[bing_api_key]" id="xmlsf_notifier_bing_api_key" value="<?php echo \esc_attr( $api_key ); ?>" class="regular-text">
+		<input type="password" autocomplete="new-password" name="<?php echo \esc_attr( self::$option_group ); ?>[bing_api_key]" id="xmlsf_notifier_bing_api_key" value="<?php echo \esc_attr( $api_key ); ?>" class="regular-text">
 		<p class="description">
 			<?php \esc_html_e( 'Enter your Bing Webmaster Tools API key.', 'xml-sitemap-feed' ); ?>
 			<?php \esc_html_e( 'You can find this in Bing Webmaster Tools under Settings > API Access > API Key.', 'xml-sitemap-feed' ); ?>
@@ -97,14 +102,17 @@ class BWT_Connect_Settings extends BWT_Connect {
 	 */
 	public static function sanitize_settings( $input ) {
 		$sanitized = array();
-		$options   = (array) \get_option( self::$option_group, array() ); // Not strictly needed if only sanitizing submitted input.
 
 		// Sanitize Google Client Secret.
 		if ( isset( $input['bing_api_key'] ) && self::$pw_placeholder !== $input['bing_api_key'] ) {
 			$sanitized['bing_api_key'] = ! empty( $input['bing_api_key'] ) ? Secret::encrypt( \sanitize_text_field( $input['bing_api_key'] ) ) : '';
 		} else {
+			// Get saved API key.
+			$options                   = (array) \get_option( self::$option_group, array() );
 			$sanitized['bing_api_key'] = isset( $options['bing_api_key'] ) ? $options['bing_api_key'] : '';
 		}
+
+		$sanitized['status'] = isset( $input['status'] ) ? \sanitize_text_field( $input['status'] ) : '';
 
 		return $sanitized;
 	}

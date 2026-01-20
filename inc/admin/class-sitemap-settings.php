@@ -89,7 +89,7 @@ class Sitemap_Settings {
 		// Handle GSC disconnection if requested. Runs before anything else.
 		if ( isset( $_POST['xmlsf_gsc_disconnect'] ) ) {
 			// Clear the refresh token and any related options.
-			GSC_Connect::disconnect();
+			GSC_Connect_Admin::disconnect();
 
 			\add_settings_error(
 				'xmlsf_gsc_connect',
@@ -158,7 +158,7 @@ class Sitemap_Settings {
 		// Handle BWT disconnection if requested. Runs before anything else.
 		if ( isset( $_POST['xmlsf_bwt_disconnect'] ) ) {
 			// Clear the refresh token and any related options.
-			BWT_Connect::disconnect();
+			BWT_Connect_Admin::disconnect();
 
 			\add_settings_error(
 				'xmlsf_bwt_connect',
@@ -367,7 +367,7 @@ class Sitemap_Settings {
 	 */
 	public static function admin_sidebar_gsc_connect() {
 		$sitemap_desc      = __( 'XML Sitemap Index', 'xml-sitemap-feed' );
-		$settings_page_url = add_query_arg( 'ref', 'xmlsf', GSC_Connect::get_settings_url() );
+		$settings_page_url = add_query_arg( 'ref', 'xmlsf', GSC_Connect_Admin::get_settings_url() );
 
 		include XMLSF_DIR . '/views/admin/sidebar-gsc-connect.php';
 	}
@@ -377,7 +377,7 @@ class Sitemap_Settings {
 	 */
 	public static function admin_sidebar_bwt_connect() {
 		$sitemap_desc      = __( 'XML Sitemap Index', 'xml-sitemap-feed' );
-		$settings_page_url = BWT_Connect::get_settings_url();
+		$settings_page_url = BWT_Connect_Admin::get_settings_url();
 
 		include XMLSF_DIR . '/views/admin/sidebar-bwt-connect.php';
 	}
