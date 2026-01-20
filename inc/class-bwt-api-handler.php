@@ -157,11 +157,11 @@ class BWT_API_Handler {
 		);
 
 		if ( 401 === $api_response_code ) {
-			$detailed_error_message .= ' ' . \__( 'Authentication failed. The access token may be invalid or expired. Please try reconnecting to Bing Webmaster Tools.', 'xml-sitemap-feed' );
+			$detailed_error_message .= ' ' . \__( 'The API key is invalid or it was removed or replaced in your Bing Webmaster Tools account. Please try reconnecting to Bing Webmaster Tools.', 'xml-sitemap-feed' );
 		} elseif ( 403 === $api_response_code ) {
-			$detailed_error_message .= ' ' . \__( 'Please ensure the connected Microsoft account has full access to the Webmaster Tools property.', 'xml-sitemap-feed' );
+			$detailed_error_message .= ' ' . \__( 'Please ensure the connected Microsoft account has at least Read-Write access to the site property in Bing Webmaster Tools.', 'xml-sitemap-feed' );
 		} elseif ( 404 === $api_response_code ) {
-			$detailed_error_message .= ' ' . \__( 'This usually means the site property URL used in the API call was not found or does not match the property verified in Webmaster Tools.', 'xml-sitemap-feed' );
+			$detailed_error_message .= ' ' . \__( 'This usually means the site property URL used in the API call was not found or does not match the property verified in Bing Webmaster Tools.', 'xml-sitemap-feed' );
 		}
 
 		return $detailed_error_message;
