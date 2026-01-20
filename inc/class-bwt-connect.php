@@ -22,14 +22,14 @@ class BWT_Connect {
 	 * @return string|WP_Error The valid API key or a WP_Error object on failure.
 	 */
 	public static function get_access_token() {
-		// Try to get the access token from the transient first.
+		// Get the api key from DB.
 		$options = (array) \get_option( 'xmlsf_bwt_connect', array() );
 
-		// If access token was retrieved from transient, it's valid.
+		// If no api key found, return an error object.
 		if ( empty( $options['bing_api_key'] ) ) {
 			$error = \esc_html__( 'Bing API key is missing. Please reconnect to Bing Webmaster Tools.', 'xml-sitemap-feed' );
 
-			do_action( 'sitemap_notifier_refresh_access_token_error', $error, 'error' );
+			\do_action( 'sitemap_notifier_refresh_access_token_error', $error, 'error' );
 
 			return new WP_Error(
 				'bwt_api_error',
@@ -39,10 +39,11 @@ class BWT_Connect {
 
 		$api_key = Secret::decrypt( $options['bing_api_key'] );
 
+		// If api key decoding failed, return an error object.
 		if ( ! $api_key ) {
 			$error = \esc_html__( 'Bing API key decryption failed. Please reconnect to Bing Webmaster Tools.', 'xml-sitemap-feed' );
 
-			do_action( 'sitemap_notifier_refresh_access_token_error', $error, 'error' );
+			\do_action( 'sitemap_notifier_refresh_access_token_error', $error, 'error' );
 
 			return new WP_Error(
 				'bwt_api_error',
@@ -50,7 +51,7 @@ class BWT_Connect {
 			);
 		}
 
-		// Return the new access token.
+		// Return the api key.
 		return $api_key;
 	}
 
