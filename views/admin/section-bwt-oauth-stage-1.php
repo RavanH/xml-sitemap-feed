@@ -47,9 +47,17 @@
 		<?php
 		printf(
 			/* translators: %1$s: API Access, %2$s: API Key, %3$s: Generate API Key */
-			esc_html__( 'Select %1$s (read and accept the Terms and Conditions if displayed) and go to %2$s. If you do not already have an API key, click %3$s to create one.', 'xml-sitemap-feed' ),
+			esc_html__( 'Select %1$s (read and accept the Terms and Conditions if displayed) and go to %2$s.', 'xml-sitemap-feed' ),
 			'<strong>' . esc_html__( 'API Access', 'xml-sitemap-feed' ) . '</strong>',
-			'<strong>' . esc_html__( 'API Key', 'xml-sitemap-feed' ) . '</strong>',
+			'<strong>' . esc_html__( 'API Key', 'xml-sitemap-feed' ) . '</strong>'
+		);
+		?>
+	</li>
+	<li>
+		<?php
+		printf(
+			/* translators: %1$s: API Access, %2$s: API Key, %3$s: Generate API Key */
+			esc_html__( 'If you do not already have an API key, click %s to create one.', 'xml-sitemap-feed' ),
 			'<strong>' . esc_html__( 'Generate API Key', 'xml-sitemap-feed' ) . '</strong>'
 		);
 		?>
@@ -58,10 +66,19 @@
 		<?php
 		printf(
 			/* translators: %s: Copy (button) */
-			esc_html__( 'Click %s to copy the API key and paste it into the field below.', 'xml-sitemap-feed' ),
+			esc_html__( 'Click %s to copy the API key, then paste it into the field below.', 'xml-sitemap-feed' ),
 			'<strong>' . esc_html__( 'Copy', 'xml-sitemap-feed' ) . '</strong>',
 		);
 		?>
 	</li>
 </ol>
+<p>
+	<?php
+	printf(
+		/* translators: %s: Save Changes */
+		esc_html__( 'After clicking %s the API key will be tested. If successful, you will get redirected back to the plugin settings page. If an error is encountered, you will see the error message on the next page load.', 'xml-sitemap-feed' ),
+		'<strong>' . esc_html( \translate( 'Save Changes' ) ) . '</strong>' // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
+	);
+	?>
+</p>
 <hr>
