@@ -47,7 +47,7 @@
 defined( 'WPINC' ) || die;
 
 define( 'XMLSF_VERSION', '5.7' );
-define( 'XMLSF_ADV_MIN_VERSION', '1.1' );
+define( 'XMLSF_ADV_MIN_VERSION', '1.3' );
 define( 'XMLSF_NEWS_ADV_MIN_VERSION', '1.4.5' );
 define( 'XMLSF_DIR', __DIR__ );
 define( 'XMLSF_BASENAME', plugin_basename( __FILE__ ) );
