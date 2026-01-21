@@ -21,6 +21,9 @@ if ( \is_wp_error( $data ) ) {
 			<?php echo esc_html( $data->get_error_message() ); ?>
 		</a>
 	</p>
+	<p>
+		<?php printf( /* translators: %1$s API Key, %2$s Save Changes */ esc_html__( 'To restart the setup process, clear the %1$s field and %2$s.', 'xml-sitemap-feed' ), esc_html__( 'API Key', 'xml-sitemap-feed' ), esc_html( \translate( 'Save Changes' ) ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?>
+	</p>
 	<?php
 } else {
 	// Update option with 'connected' status.
@@ -40,10 +43,12 @@ if ( \is_wp_error( $data ) ) {
 		</a>
 	</p>
 	<meta http-equiv="refresh" content="3;url=<?php echo esc_url( $redirect_url ); ?>">
+	<style>
+		#submit {
+			display: none;
+		}
+	</style>
 	<?php
 }
 ?>
 <hr>
-<p>
-	<?php printf( /* translators: %1$s API Key, %2$s Save Changes */ esc_html__( 'To restart the setup process, clear the %1$s field and %2$s.', 'xml-sitemap-feed' ), esc_html__( 'API Key', 'xml-sitemap-feed' ), esc_html( \translate( 'Save Changes' ) ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?>
-</p>
