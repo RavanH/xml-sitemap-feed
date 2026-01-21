@@ -73,6 +73,7 @@ DOCUMENT
 * add inline comment blocks for hooks
 
 CONSIDER
+* Do we still need nginx fastcgi cache purge hooks with the new nocache headers?
 * featured + attached images option
 * Reset button per settings tab
 * compatibility with https://wordpress.org/plugins/page-links-to/ ? option to automatically exclude linked posts... but not by default?

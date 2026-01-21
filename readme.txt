@@ -158,7 +158,7 @@ Code cleanup and 2 bugfixes.
 
 = 5.7 =
 
-Date: 202512
+Date: 202621
 * Bing Webmaster Tools sitemap reports
 * Bing sitemap submission from admin
 * Priority tags dropped
