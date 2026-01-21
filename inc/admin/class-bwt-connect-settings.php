@@ -115,8 +115,6 @@ class BWT_Connect_Settings extends BWT_Connect {
 			$sanitized['bing_api_key'] = Secret::encrypt( \sanitize_text_field( $input['bing_api_key'] ) );
 		}
 
-		$sanitized['tested'] = isset( $input['tested'] ) ? true : false;
-
 		return $sanitized;
 	}
 }

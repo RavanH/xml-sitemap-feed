@@ -7,7 +7,7 @@
 
 // Get connect data.
 $bwt_options = (array) get_option( 'xmlsf_bwt_connect', array() );
-if ( empty( $bwt_options['bing_api_key'] ) || empty( $bwt_options['tested'] ) ) {
+if ( empty( $bwt_options['bing_api_key'] ) ) {
 	// Initiate button.
 	?>
 	<p>

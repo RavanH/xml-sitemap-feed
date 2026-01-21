@@ -31,12 +31,8 @@ if ( \is_wp_error( $data ) ) {
 	</p>
 	<?php
 } else {
-	// Update option with 'connected' status.
-	\update_option( self::$option_group, array( 'bing_api_key' => self::$pw_placeholder, 'tested' => true ) );
-
-	// Redirect.
+	// Display success message and redirect.
 	$redirect_url = \add_query_arg( array( 'page' => 'xmlsf', 'settings-updated' => 'true' ), \admin_url( 'options-general.php' ) );
-
 	?>
 	<p>
 		<strong style="color:#00a32a">
