@@ -15,7 +15,7 @@ use XMLSF\Secret;
  * @author RavanH
  * @version 5.6
  */
-class GSC_Connect_Settings extends GSC_Connect_Admin {
+class GSC_Connect_Settings extends GSC_Connect {
 
 	/**
 	 * Placeholder for the saved password.

@@ -114,7 +114,7 @@ class GSC_Connect {
 
 		if ( ! $property ) {
 			// Get our property via API.
-			$property = \XMLSF\Admin\GSC_Connect_Admin::get_property_url();
+			$property = \XMLSF\Admin\GSC_Connect::get_property_url();
 
 			if ( \is_wp_error( $property ) ) {
 				return $property;

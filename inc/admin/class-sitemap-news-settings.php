@@ -42,7 +42,7 @@ class Sitemap_News_Settings {
 		// Handle disconnection if requested. Runs before anything else.
 		if ( isset( $_POST['xmlsf_gsc_disconnect'] ) ) {
 			// Clear the refresh token and any related options.
-			GSC_Connect_Admin::disconnect();
+			GSC_Connect::disconnect();
 
 			\add_settings_error(
 				'xmlsf_gsc_connect',
@@ -213,7 +213,7 @@ class Sitemap_News_Settings {
 	 */
 	public static function admin_sidebar_gsc_connect() {
 		$sitemap_desc      = __( 'Google News Sitemap', 'xml-sitemap-feed' );
-		$settings_page_url = \add_query_arg( 'ref', 'xmlsf_news', GSC_Connect_Admin::get_settings_url() );
+		$settings_page_url = \add_query_arg( 'ref', 'xmlsf_news', GSC_Connect::get_settings_url() );
 
 		include XMLSF_DIR . '/views/admin/sidebar-gsc-connect.php';
 	}

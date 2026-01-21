@@ -15,7 +15,7 @@ use WP_Error;
  * @author RavanH
  * @version 5.6
  */
-class GSC_Connect_Admin {
+class GSC_Connect {
 	/**
 	 * The redirect path for the OAuth callback.
 	 *
