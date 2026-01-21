@@ -5,13 +5,14 @@
  * @package XML Sitemap & Google News
  */
 
+$options = (array) get_option( 'xmlsf_news_advanced', array() );
 ?>
 <fieldset>
 	<legend class="screen-reader-text">
 		<?php esc_html_e( 'Sitemap notifier', 'xml-sitemap-feed' ); ?>
 	</legend>
 	<label>
-		<input type="checkbox" name="" id="xmlsf_news_notifier" value="1"<?php disabled( ! apply_filters( 'xmlsf_news_advanced_enabled', false ) ); ?> />
+		<input type="checkbox" name="xmlsf_news_advanced[notifier]" id="xmlsf_news_notifier" value="1"<?php checked( ! empty( $options['notifier'] ) ); ?><?php disabled( ! apply_filters( 'xmlsf_news_advanced_enabled', false ) ); ?> />
 		<?php printf( /* translators: %s: Google Search Console */ esc_html__( 'Submit to %s', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) ); ?>
 	</label>
 
