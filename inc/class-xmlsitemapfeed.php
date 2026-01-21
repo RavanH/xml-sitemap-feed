@@ -180,23 +180,18 @@ class XMLSitemapFeed {
 	 * Prepare GSC Connector.
 	 */
 	public function gsc_connect() {
-		$options = (array) \get_option( 'xmlsf_gsc_connect', array() );
+		// Prepare for OAuth callback.
+		\add_filter( 'query_vars', array( __NAMESPACE__ . '\GSC_Connect', 'query_vars' ) );
+		\add_action( 'parse_request', array( __NAMESPACE__ . '\GSC_Connect', 'parse_request' ) );
 
-		// Prepare onboarding if not connected.
-		if ( empty( $options['google_refresh_token'] ) ) {
-			// Prepare for OAuth callback.
-			\add_filter( 'query_vars', array( __NAMESPACE__ . '\GSC_Connect', 'query_vars' ) );
-			\add_action( 'parse_request', array( __NAMESPACE__ . '\GSC_Connect', 'parse_request' ) );
+		// Prepare onboarding admin pages.
+		\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'add_settings_page' ) );
+		\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'register_settings' ) );
 
-			// Prepare onboarding admin pages.
-			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\GSC_Connect_Admin', 'add_settings_page' ) );
-			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\GSC_Connect_Admin', 'register_settings' ) );
-		} else {
-			// Schedule periodic token refresh.
-			\add_action( 'xmlsf_gsc_keep_alive', array( __NAMESPACE__ . '\GSC_Oauth_Handler', 'refresh_access_token' ) );
-			if ( ! \wp_next_scheduled( 'xmlsf_gsc_keep_alive' ) ) {
-				\wp_schedule_event( time(), 'weekly', 'xmlsf_gsc_keep_alive' );
-			}
+		// Schedule periodic token refresh.
+		\add_action( 'xmlsf_gsc_keep_alive', array( __NAMESPACE__ . '\GSC_Oauth_Handler', 'refresh_access_token' ) );
+		if ( ! \wp_next_scheduled( 'xmlsf_gsc_keep_alive' ) ) {
+			\wp_schedule_event( time(), 'weekly', 'xmlsf_gsc_keep_alive' );
 		}
 	}
 
@@ -204,14 +199,9 @@ class XMLSitemapFeed {
 	 * Prepare BWT Connector.
 	 */
 	public function bwt_connect() {
-		$options = (array) \get_option( 'xmlsf_bwt_connect', array() );
-
-		// Prepare onboarding if not connected.
-		if ( empty( $options['bing_api_key'] ) || empty( $options['status'] ) || 'connected' !== $options['status'] ) {
-			// Prepare onboarding admin pages.
-			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\BWT_Connect_Admin', 'add_settings_page' ) );
-			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\BWT_Connect_Admin', 'register_settings' ) );
-		}
+		// Prepare onboarding admin pages.
+		\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\BWT_Connect', 'add_settings_page' ) );
+		\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\BWT_Connect', 'register_settings' ) );
 	}
 
 	/**

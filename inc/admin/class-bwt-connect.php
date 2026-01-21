@@ -15,7 +15,7 @@ use WP_Error;
  * @author RavanH
  * @version 5.7
  */
-class BWT_Connect_Admin {
+class BWT_Connect {
 	/**
 	 * The redirect path for the OAuth callback.
 	 *
@@ -96,10 +96,6 @@ class BWT_Connect_Admin {
 	 * Discconnect from Bing Webmaster Tools.
 	 */
 	public static function disconnect() {
-		$options = (array) \get_option( self::$option_group, array() );
-
-		// Clear the refresh token.
-		unset( $options['bing_api_key'] );
-		\update_option( self::$option_group, $options );
+		\update_option( self::$option_group, '' );
 	}
 }

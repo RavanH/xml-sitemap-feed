@@ -15,7 +15,7 @@ use XMLSF\Secret;
  * @author RavanH
  * @version 5.7
  */
-class BWT_Connect_Settings extends BWT_Connect_Admin {
+class BWT_Connect_Settings extends BWT_Connect {
 
 	/**
 	 * Placeholder for the saved password.
@@ -96,23 +96,26 @@ class BWT_Connect_Settings extends BWT_Connect_Admin {
 	/**
 	 * Sanitize the plugin options before saving.
 	 *
-	 * @param array $input The options array submitted by the form.
+	 * @param mixed $input The options array submitted by the form.
 	 *
 	 * @return array The sanitized options array.
 	 */
 	public static function sanitize_settings( $input ) {
 		$sanitized = array();
+		$input     = (array) $input;
 
 		// Sanitize Google Client Secret.
-		if ( isset( $input['bing_api_key'] ) && self::$pw_placeholder !== $input['bing_api_key'] ) {
-			$sanitized['bing_api_key'] = ! empty( $input['bing_api_key'] ) ? Secret::encrypt( \sanitize_text_field( $input['bing_api_key'] ) ) : '';
-		} else {
+		if ( empty( $input['bing_api_key'] ) ) {
+			$sanitized['bing_api_key'] = '';
+		} elseif ( self::$pw_placeholder === $input['bing_api_key'] ) {
 			// Get saved API key.
 			$options                   = (array) \get_option( self::$option_group, array() );
-			$sanitized['bing_api_key'] = isset( $options['bing_api_key'] ) ? $options['bing_api_key'] : '';
+			$sanitized['bing_api_key'] = ! empty( $options['bing_api_key'] ) ? $options['bing_api_key'] : '';
+		} else {
+			$sanitized['bing_api_key'] = Secret::encrypt( \sanitize_text_field( $input['bing_api_key'] ) );
 		}
 
-		$sanitized['status'] = isset( $input['status'] ) ? \sanitize_text_field( $input['status'] ) : '';
+		$sanitized['tested'] = isset( $input['tested'] ) ? true : false;
 
 		return $sanitized;
 	}

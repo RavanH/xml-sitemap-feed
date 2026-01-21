@@ -6,15 +6,15 @@
  */
 
 // Get connect data.
-$options = (array) get_option( 'xmlsf_bwt_connect', array() );
-if ( empty( $options['bing_api_key'] ) ) {
+$bwt_options = (array) get_option( 'xmlsf_bwt_connect', array() );
+if ( empty( $bwt_options['bing_api_key'] ) || empty( $bwt_options['tested'] ) ) {
 	// Initiate button.
 	?>
 	<p>
 		<?php printf( /* translators: %s: Bing Webmaster Tools */ esc_html_x( 'Connect to %s for sitemap data retrieval and sitemap submissions.', 'Bing Webmaster Tools connection', 'xml-sitemap-feed' ), esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) ); ?>
 	</p>
 	<p>
-		<a href="<?php echo esc_url( \XMLSF\Admin\BWT_Connect_Admin::get_settings_url() ); ?>" class="button button-primary">
+		<a href="<?php echo esc_url( \XMLSF\Admin\BWT_Connect::get_settings_url() ); ?>" class="button button-primary">
 			<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
 		</a>
 	</p>
