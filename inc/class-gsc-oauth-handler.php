@@ -2,7 +2,7 @@
 /**
  * Status301 Premium Google Search Console Connection Oauth Handler
  *
- * @package Sitemap Notifier
+ * @package XML Sitemap & Google News
  */
 
 namespace XMLSF;
@@ -12,8 +12,7 @@ use WP_Error;
 /**
  * Helper class with public methods to set up a Google Search Console connection.
  *
- * @author RavanH
- * @version 1.0
+ * @since 5.6
  */
 class GSC_Oauth_Handler {
 	/**
@@ -32,8 +31,6 @@ class GSC_Oauth_Handler {
 
 	/**
 	 * Handle the OAuth callback request.
-	 *
-	 *  @since 5.6
 	 *
 	 * @return array
 	 */
@@ -70,7 +67,7 @@ class GSC_Oauth_Handler {
 		}
 
 		// Decrypt client secret.
-		$client_secret = self::decrypt( $options['google_client_secret'] );
+		$client_secret = Secret::decrypt( $options['google_client_secret'] );
 
 		if ( false === $client_secret ) {
 			return array(
@@ -137,7 +134,7 @@ class GSC_Oauth_Handler {
 		}
 
 		$access_token = isset( $data->access_token ) ? \sanitize_text_field( $data->access_token ) : '';
-		$expires_in   = isset( $data->expires_in ) ? intval( $data->expires_in ) : 86400;
+		$expires_in   = isset( $data->expires_in ) ? intval( $data->expires_in ) : 3600;
 
 		if ( empty( $access_token ) ) {
 			return array(
@@ -177,7 +174,7 @@ class GSC_Oauth_Handler {
 			);
 		}
 
-		$client_secret = self::decrypt( $options['google_client_secret'] );
+		$client_secret = Secret::decrypt( $options['google_client_secret'] );
 
 		if ( false === $client_secret ) {
 			return new WP_Error(
@@ -223,38 +220,37 @@ class GSC_Oauth_Handler {
 
 		// Check for errors in the refresh response.
 		if ( 200 !== \wp_remote_retrieve_response_code( $response ) || ! isset( $data['access_token'] ) ) {
-			$error         = isset( $data['error'] ) ? $data['error'] : 'Unknown refresh token error.';
+			$error         = isset( $data['error'] ) ? $data['error'] : __( 'Unknown refresh token error.', 'xml-sitemap-feed' );
 			$error_message = isset( $data['error_description'] ) ? $data['error_description'] : $error;
 
 			// If refresh token is invalid/expired, remove it and suggest re-connecting.
 			if ( 'invalid_grant' === $error ) {
 				$options['google_refresh_token'] = ''; // Clear the refresh token.
-				unset( $options['google_client_secret'] ); // Prevent double encryption.
 				\update_option( 'xmlsf_gsc_connect', $options );
 
 				return new WP_Error(
 					'sitemap_notifier_oauth_refresh_invalid_grant',
-					__( 'Google refresh token is invalid or expired. Please reconnect to Google Search Console.', 'xml-sitemap-feed' )
+					sprintf( /* translators: %s error message (untranslated) */ \__( 'Google refresh token is invalid or expired: %s. Please reconnect to Google Search Console.', 'xml-sitemap-feed' ), $error_message )
 				);
 			}
 
 			return new WP_Error(
 				'sitemap_notifier_oauth_refresh_failed',
-				sprintf( /* translators: %1$s error code, %2$s error message (untranslated) */ \esc_html__( 'Failed to refresh Google access token (HTTP %1$s): %2$s', 'xml-sitemap-feed' ), $response_code, $error_message )
+				sprintf( /* translators: %1$s error code, %2$s error message (untranslated) */ \__( 'Failed to refresh Google access token (HTTP %1$s): %2$s', 'xml-sitemap-feed' ), $response_code, $error_message )
 			);
 		}
-
-		// Successfully refreshed token. Store the new access token in the transient.
-		$new_access_token = \sanitize_text_field( $data['access_token'] );
-		$expires_in       = isset( $data['expires_in'] ) ? intval( $data['expires_in'] ) : 86400;
-
-		// Store the new access token as transient.
-		self::store_access_token( $new_access_token, $expires_in );
 
 		// Store the new refresh token if provided.
 		if ( ! empty( $data['refresh_token'] ) ) {
 			self::store_refresh_token( $data['refresh_token'] );
 		}
+
+		// Successfully refreshed token. Store the new access token in the transient.
+		$new_access_token = \sanitize_text_field( $data['access_token'] );
+		$expires_in       = isset( $data['expires_in'] ) ? intval( $data['expires_in'] ) : 3600;
+
+		// Store the new access token as transient.
+		self::store_access_token( $new_access_token, $expires_in );
 
 		return $new_access_token;
 	}
@@ -262,21 +258,17 @@ class GSC_Oauth_Handler {
 	/**
 	 * Stores the Google OAuth access token.
 	 *
-	 *  @since 5.6
-	 *
 	 * @param string $token The valid access token.
 	 * @param int    $expires_in The expiration time of the token in seconds.
 	 */
 	public static function store_access_token( $token, $expires_in ) {
 		if ( $expires_in > 60 ) {
-			\set_transient( 'sitemap_notifier_access_token', $token, $expires_in - 60 );
+			\set_transient( 'sitemap_notifier_google_access_token', $token, $expires_in - 60 );
 		}
 	}
 
 	/**
 	 * Stores the Google OAuth refresh token.
-	 *
-	 *  @since 5.6
 	 *
 	 * @param string $token The valid access token.
 	 */
@@ -285,76 +277,5 @@ class GSC_Oauth_Handler {
 		$options['google_refresh_token'] = \sanitize_text_field( $token );
 
 		\update_option( 'xmlsf_gsc_connect', $options );
-	}
-
-	/**
-	 * Encrypt the Google Client Secret using OpenSSL.
-	 *
-	 * @param string $value The value to encrypt.
-	 * @return string|false The encrypted value or false on failure.
-	 */
-	public static function encrypt( $value ) {
-		if ( ! \extension_loaded( 'openssl' ) ) {
-			\add_settings_error(
-				'sitemap_notifier_oauth_section',
-				'openssl_not_loaded',
-				__( 'The openssl extension appears to be missing. Your OAuth client secret was stored in the database without proper encryption. It is recommended to upgrade your server and resave the data.', 'xml-sitemap-feed' ),
-				'warning'
-			);
-			return $value;
-		}
-
-		$key  = \defined( 'LOGGED_IN_KEY' ) && '' !== LOGGED_IN_KEY ? LOGGED_IN_KEY : 'this-is-not-a-secret-key';
-		$salt = \defined( 'LOGGED_IN_SALT' ) && '' !== LOGGED_IN_SALT ? LOGGED_IN_SALT : 'this-is-not-a-secret-salt';
-
-		if ( 'this-is-not-a-secret-key' === $key || 'this-is-not-a-secret-salt' === $salt ) {
-			\add_settings_error(
-				'sitemap_notifier_oauth_section',
-				'no_salts_found',
-				sprintf( /* translators: %s: The respective field name (Google Client Secret) */ \__( 'The %s could not be securely encrypted. Please set your salts in wp-config.php.', 'xml-sitemap-feed' ), \__( 'Google Client Secret', 'xml-sitemap-feed' ) ),
-				'error'
-			);
-		}
-
-		$method = 'aes-256-ctr';
-		$ivlen  = \openssl_cipher_iv_length( $method );
-		$iv     = \openssl_random_pseudo_bytes( $ivlen );
-
-		$raw_value = \openssl_encrypt( $value . $salt, $method, $key, 0, $iv );
-		if ( ! $raw_value ) {
-			return false;
-		}
-
-		return \base64_encode( $iv . $raw_value ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
-	}
-
-	/**
-	 * Decrypt the Google Client Secret using OpenSSL.
-	 *
-	 * @param string $raw_value The value to encrypt.
-	 *
-	 * @return string|false The encrypted value or false on failure.
-	 */
-	public static function decrypt( $raw_value ) {
-		if ( ! \extension_loaded( 'openssl' ) ) {
-			return $raw_value;
-		}
-
-		$raw_value = \base64_decode( $raw_value, true ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
-
-		$key    = \defined( 'LOGGED_IN_KEY' ) && '' !== LOGGED_IN_KEY ? LOGGED_IN_KEY : 'this-is-not-a-secret-key';
-		$salt   = \defined( 'LOGGED_IN_SALT' ) && '' !== LOGGED_IN_SALT ? LOGGED_IN_SALT : 'this-is-not-a-secret-salt';
-		$method = 'aes-256-ctr';
-		$ivlen  = \openssl_cipher_iv_length( $method );
-		$iv     = substr( $raw_value, 0, $ivlen );
-
-		$raw_value = substr( $raw_value, $ivlen );
-
-		$value = \openssl_decrypt( $raw_value, $method, $key, 0, $iv );
-		if ( ! $value || substr( $value, - strlen( $salt ) ) !== $salt ) {
-			return false;
-		}
-
-		return substr( $value, 0, - strlen( $salt ) );
 	}
 }

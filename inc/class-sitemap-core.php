@@ -45,11 +45,11 @@ class Sitemap_Core extends Sitemap {
 
 		// Add lastmod to index.
 		\add_filter( 'wp_sitemaps_index_entry', array( $this, 'index_entry' ), 10, 4 );
-		// Add lastmod & priority to authors.
+		// Add lastmod to authors.
 		\add_filter( 'wp_sitemaps_users_entry', array( $this, 'users_entry' ), 10, 2 );
-		// Add lastmod & priority to terms.
+		// Add lastmod to terms.
 		\add_filter( 'wp_sitemaps_taxonomies_entry', array( $this, 'taxonomies_entry' ), 10, 4 );
-		// Add lastmod & priority to posts.
+		// Add lastmod to posts.
 		\add_filter( 'wp_sitemaps_posts_entry', array( $this, 'posts_entry' ), 10, 3 );
 		\add_filter( 'wp_sitemaps_posts_show_on_front_entry', array( $this, 'posts_show_on_front_entry' ) );
 
@@ -171,7 +171,7 @@ class Sitemap_Core extends Sitemap {
 	public function get_sitemap_url( $sitemap = 'index' ) {
 		$slug = $this->slug();
 
-		if ( 'index' === $sitemap && 'wp-sitemap' !== $slug && xmlsf()->using_permalinks() ) {
+		if ( 'index' === $sitemap && 'wp-sitemap' !== $slug && \xmlsf()->using_permalinks() ) {
 			$sitemap_url = \home_url( $slug . '.xml' );
 		} else {
 			$sitemap_url = \get_sitemap_url( $sitemap );
@@ -274,18 +274,6 @@ class Sitemap_Core extends Sitemap {
 			case 'posts':
 				// Try to raise memory limit, context added for filters.
 				\wp_raise_memory_limit( 'wp-sitemap-posts-' . $subtype );
-
-				// Prepare dynamic priority calculation.
-				if ( $subtype && ! empty( $this->post_type_settings[ $subtype ]['priority'] ) && ! empty( $this->post_type_settings[ $subtype ]['dynamic_priority'] ) ) {
-					// Last of this post type modified date in Unix seconds.
-					\xmlsf()->lastmodified = \get_date_from_gmt( \get_lastpostmodified( 'GMT', $subtype ), 'U' );
-					// Calculate time span, uses get_firstpostdate() function defined in xml-sitemap/inc/functions.php!
-					\xmlsf()->timespan = \xmlsf()->lastmodified - \get_date_from_gmt( \get_firstpostdate( 'GMT', $subtype ), 'U' );
-					// Total post type comment count.
-					\xmlsf()->comment_count = \wp_count_comments()->approved;
-					// TODO count comments per post type https://wordpress.stackexchange.com/questions/134338/count-all-comments-of-a-custom-post-type
-					// TODO cache this more persistently than wp_cache_set does in https://developer.wordpress.org/reference/functions/wp_count_comments/.
-				}
 				break;
 
 			case 'taxonomies':
@@ -420,13 +408,13 @@ class Sitemap_Core extends Sitemap {
 				}
 				break;
 
-			// $case 'user':
+			case 'user':
 				// TODO make this xmlsf_author_has_published_posts filter compatible.
-			// $lastmod = \get_lastpostdate( 'GMT', 'post' ); // Absolute last post date.
-			// if ( $lastmod ) {
-			// $entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
-			// }
-			// break;
+				$lastmod = \get_lastpostdate( 'GMT', 'post' ); // Absolute last post date.
+				if ( $lastmod ) {
+					$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
+				}
+				break;
 
 			case 'news':
 				$options    = (array) \get_option( 'xmlsf_news_tags' );
@@ -450,7 +438,7 @@ class Sitemap_Core extends Sitemap {
 	}
 
 	/**
-	 * Add priority and lastmod to author entries.
+	 * Add lastmod to author entries.
 	 * Hooked into wp_sitemaps_users_entry filter.
 	 *
 	 * @since 5.4
@@ -461,11 +449,6 @@ class Sitemap_Core extends Sitemap {
 	 * @return array  $entry
 	 */
 	public function users_entry( $entry, $user_object ) {
-		// Add priority.
-		$priority = $this->get_user_priority( $user_object );
-		if ( $priority ) {
-			$entry['priority'] = $priority;
-		}
 		// Add lastmod.
 		$lastmod = $this->get_user_modified( $user_object );
 		if ( $lastmod ) {
@@ -475,7 +458,7 @@ class Sitemap_Core extends Sitemap {
 	}
 
 	/**
-	 * Add priority and lastmod to taxonomy entries.
+	 * Add lastmod to taxonomy entries.
 	 * Hooked into wp_sitemaps_taxonomies_entry filter.
 	 *
 	 * @since 5.4
@@ -491,12 +474,6 @@ class Sitemap_Core extends Sitemap {
 		// Make sure we have a WP_Term object.
 		if ( null === $term_object ) {
 			$term_object = \get_term( $term );
-		}
-
-		// Add priority.
-		$priority = $this->get_term_priority( $term_object );
-		if ( $priority ) {
-			$entry['priority'] = $priority;
 		}
 
 		// Add lastmod.
@@ -534,7 +511,7 @@ class Sitemap_Core extends Sitemap {
 	}
 
 	/**
-	 * Add priority and lastmod to posts entries.
+	 * Add lastmod to posts entries.
 	 * Hooked into wp_sitemaps_posts_entry filter.
 	 *
 	 * @since 5.4
@@ -546,12 +523,6 @@ class Sitemap_Core extends Sitemap {
 	 * @return array
 	 */
 	public function posts_entry( $entry, $post_object, $post_type ) {
-		// Add priority.
-		$priority = $this->get_post_priority( $post_object );
-		if ( ! empty( $priority ) ) {
-			$entry['priority'] = $priority;
-		}
-
 		// Add lastmod.
 		if ( empty( $entry['lastmod'] ) ) {
 			$lastmod = $this->get_post_modified( $post_object );
@@ -564,7 +535,7 @@ class Sitemap_Core extends Sitemap {
 	}
 
 	/**
-	 * Add priority and lastmod to posts show on front entry.
+	 * Add lastmod to posts show on front entry.
 	 * Hooked into wp_sitemaps_posts_show_on_front_entry filter.
 	 *
 	 * @since 5.4
@@ -574,14 +545,9 @@ class Sitemap_Core extends Sitemap {
 	 * @return array
 	 */
 	public function posts_show_on_front_entry( $entry ) {
-		$priority = $this->get_home_priority();
-		if ( $priority ) {
-			$entry['priority'] = $priority;
-		}
-
 		// Set front blog page lastmod to last published post.
 		if ( empty( $entry['lastmod'] ) ) {
-			$lastmod = \get_lastpostdate( 'gmt', 'post' );
+			$lastmod = \get_lastpostdate( 'GMT', 'post' );
 			if ( $lastmod ) {
 				$entry['lastmod'] = \get_date_from_gmt( $lastmod, DATE_W3C );
 			}
@@ -693,7 +659,9 @@ class Sitemap_Core extends Sitemap {
 		),
 		);
 
-		// Update meta cache in one query instead of many, coming from get_post_meta() in $this->get_post_priority().
+		// Make sure to update meta cache for:
+		// 1. excluded posts.
+		// 2. image data (if activated).
 		$args['update_post_meta_cache'] = true;
 
 		return $args;
@@ -709,9 +677,9 @@ class Sitemap_Core extends Sitemap {
 	 * @return string
 	 */
 	public function stylesheet_url( $url ) {
-		// TODO make this optional: get_option( 'xmlsf_core_sitemap_stylesheet' )
-		// TODO make these match sitemap type.
-		$url = namespace\get_stylesheet_url( 'posttype' );
+		// TODO make this optional: get_option( 'xmlsf_core_sitemap_stylesheet' ).
+		// TODO make these match sitemap type, maybe using $_SERVER['REQUEST_URI'] ?
+		$url = namespace\get_stylesheet_url( 'core' );
 
 		return $url;
 	}

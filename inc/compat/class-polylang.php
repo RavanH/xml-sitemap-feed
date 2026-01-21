@@ -140,7 +140,7 @@ class Polylang {
 				foreach ( $languages as $language ) {
 					$url          = \pll_home_url( $language );
 					$data[ $url ] = array(
-						'lastmod' => \get_lastpostdate( 'gmt', 'post' ), // TODO make lastmod date language specific.
+						'lastmod' => \get_lastpostdate( 'GMT', 'post' ), // TODO make lastmod date language specific.
 					);
 				}
 			}
@@ -176,10 +176,6 @@ class Polylang {
 				}
 
 				echo '<url><loc>' . \esc_xml( \esc_url( $transl_url ) ) . '</loc>';
-
-				if ( ! empty( $data['priority'] ) ) {
-					echo '<priority>' . \esc_xml( $data['priority'] ) . '</priority>';
-				}
 
 				if ( ! empty( $data['lastmod'] ) ) {
 					echo '<lastmod>' . \esc_xml( \get_date_from_gmt( $data['lastmod'], DATE_W3C ) ) . '</lastmod>';

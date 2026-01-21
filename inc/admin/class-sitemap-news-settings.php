@@ -42,7 +42,7 @@ class Sitemap_News_Settings {
 		// Handle disconnection if requested. Runs before anything else.
 		if ( isset( $_POST['xmlsf_gsc_disconnect'] ) ) {
 			// Clear the refresh token and any related options.
-			GSC_Connect::disconnect();
+			GSC_Connect_Admin::disconnect();
 
 			\add_settings_error(
 				'xmlsf_gsc_connect',
@@ -54,12 +54,12 @@ class Sitemap_News_Settings {
 
 		// Handle manual submit.
 		if ( isset( $_POST['xmlsf_gsc_manual_submit'] ) ) {
+			$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_news_timeframe', MINUTE_IN_SECONDS );
+
 			// Skip submission if within the grace period for Google News sitemap.
 			if ( \get_transient( 'sitemap_notifier_submission_news' ) ) {
-				$timeframe = (int) \apply_filters( 'xmlsf_gsc_manual_submit_news_timeframe', MINUTE_IN_SECONDS );
-				$message   = \sprintf( /* translators: %1$s: Google News Sitemap, %2$d: number of seconds */ esc_html__( 'Your %1$s submission was skipped: Already sent within the last %2$d seconds.', 'xml-sitemap-feed' ), esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), $timeframe );
-
-				\do_action( 'sitemap_notifier_manual_submission_news', $message, 'warning' );
+				$message = \sprintf( /* translators: %1$s: Google News Sitemap, %2$s: Google Search Console, %3$d: number of seconds */ \esc_html__( 'Your %1$s submission to %2$s was skipped: Already sent within the last %3$d seconds.', 'xml-sitemap-feed' ), \esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ), $timeframe );
+				$status = 'warning';
 
 				\add_settings_error(
 					'xmlsf_gsc_connect',
@@ -68,12 +68,11 @@ class Sitemap_News_Settings {
 					'warning'
 				);
 			} else {
-				$sitemap = xmlsf()->sitemap_news->get_sitemap_url();
+				$sitemap = \xmlsf()->sitemap_news->get_sitemap_url();
 				$result  = \XMLSF\GSC_Connect::submit( $sitemap );
 				if ( \is_wp_error( $result ) ) {
-					$message = \sprintf( /* translators: %1$s: Google News Sitemap, %2$s: Error message */ esc_html__( 'Your %1$s submission failed: %2$s', 'xml-sitemap-feed' ), esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), $result->get_error_message() );
-
-					\do_action( 'sitemap_notifier_manual_submission_news', $message, 'error' );
+					$message = \sprintf( /* translators: %1$s: Google News Sitemap, %2$s: Google Search Console, %3$s: Error message */ \esc_html__( 'Your %1$s submission to %2$s failed: %3$s', 'xml-sitemap-feed' ), \esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ), $result->get_error_message() );
+					$status = 'error';
 
 					\add_settings_error(
 						'xmlsf_gsc_connect',
@@ -82,9 +81,8 @@ class Sitemap_News_Settings {
 						'error'
 					);
 				} else {
-					$message = \sprintf( /* translators: %s: Google News Sitemap */ esc_html__( 'Your %s was submitted successfully.', 'xml-sitemap-feed' ), esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ) );
-
-					\do_action( 'sitemap_notifier_manual_submission_news', $message, 'success' );
+					$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Google Search Console */ \esc_html__( 'Your %1$s was submitted successfully to %2$s.', 'xml-sitemap-feed' ), \esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) );
+					$status = 'success';
 
 					\add_settings_error(
 						'xmlsf_gsc_connect',
@@ -93,10 +91,11 @@ class Sitemap_News_Settings {
 						'success'
 					);
 
-					$timeframe = \apply_filters( 'xmlsf_gsc_manual_submit_news_timeframe', 60 );
 					\set_transient( 'sitemap_notifier_submission_news', true, $timeframe );
 				}
 			}
+
+			do_action( 'sitemap_notifier_manual_submission_news', $message, $status );
 		}
 	}
 
@@ -174,6 +173,7 @@ class Sitemap_News_Settings {
 	 */
 	public static function settings_page() {
 		$active_tab = isset( $_GET['tab'] ) ? \sanitize_key( $_GET['tab'] ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$active_tab = in_array( $active_tab, array( 'general', 'advanced', 'license' ), true ) ? $active_tab : 'general';
 
 		\do_action( 'xmlsf_news_add_settings', $active_tab );
 
@@ -195,7 +195,13 @@ class Sitemap_News_Settings {
 		);
 		// Advanced plugin plug.
 		if ( ! \is_plugin_active( 'xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php' ) || ( defined( 'XMLSF_NEWS_ADV_VERSION' ) && version_compare( XMLSF_NEWS_ADV_VERSION, '1.4', '<' ) ) ) {
-			\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_adv_plug' ), 6 );
+			\add_action(
+				'xmlsf_admin_sidebar',
+				function () {
+					include XMLSF_DIR . '/views/admin/sidebar-news-advanced-plug.php';
+				},
+				6
+			);
 			\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_priority_support' ), 11 );
 		}
 
@@ -207,7 +213,7 @@ class Sitemap_News_Settings {
 	 */
 	public static function admin_sidebar_gsc_connect() {
 		$sitemap_desc      = __( 'Google News Sitemap', 'xml-sitemap-feed' );
-		$settings_page_url = add_query_arg( 'ref', 'xmlsf_news', GSC_Connect::get_settings_url() );
+		$settings_page_url = \add_query_arg( 'ref', 'xmlsf_news', GSC_Connect_Admin::get_settings_url() );
 
 		include XMLSF_DIR . '/views/admin/sidebar-gsc-connect.php';
 	}
@@ -220,17 +226,6 @@ class Sitemap_News_Settings {
 		$adv_plugin_url  = 'https://premium.status301.com/downloads/google-news-advanced/';
 
 		include XMLSF_DIR . '/views/admin/sidebar-priority-support.php';
-	}
-
-	/**
-	 * Admin sidebar Priority Support section
-	 */
-	public static function admin_sidebar_adv_plug() {
-		$adv_plugin_name = __( 'Google News Advanced', 'xml-sitemap-feed' );
-		$adv_plugin_url  = 'https://premium.status301.com/downloads/google-news-advanced/';
-		$sitemap_name    = __( 'Google News Sitemap', 'xml-sitemap-feed' );
-
-		include XMLSF_DIR . '/views/admin/sidebar-advanced-plug.php';
 	}
 
 	/**
@@ -345,7 +340,7 @@ class Sitemap_News_Settings {
 				// GSC Sitemap data.
 				\add_settings_section(
 					'news_sitemap_gsc_data_section',
-					__( 'Google Search Console Report', 'xml-sitemap-feed' ),
+					__( 'Google Search Console', 'xml-sitemap-feed' ),
 					function () {
 						include XMLSF_DIR . '/views/admin/section-gsc-data-news.php';
 					},
@@ -360,7 +355,7 @@ class Sitemap_News_Settings {
 	 * @param string $active_tab Active tab.
 	 */
 	public static function section_advanced_intro( $active_tab = '' ) {
-		if ( 'advanced' === $active_tab && ! is_plugin_active( 'xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php' ) ) {
+		if ( 'advanced' === $active_tab && ! \is_plugin_active( 'xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php' ) ) {
 			include XMLSF_DIR . '/views/admin/section-advanced-intro.php';
 		}
 	}
@@ -370,7 +365,7 @@ class Sitemap_News_Settings {
 	 */
 	public static function help_tab() {
 		$screen     = \get_current_screen();
-		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$active_tab = isset( $_GET['tab'] ) ? \sanitize_key( $_GET['tab'] ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		\ob_start();
 		include XMLSF_DIR . '/views/admin/help-tab-news.php';
@@ -392,6 +387,7 @@ class Sitemap_News_Settings {
 				include XMLSF_DIR . '/views/admin/help-tab-news-name.php';
 				include XMLSF_DIR . '/views/admin/help-tab-support.php';
 				$content = \ob_get_clean();
+
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-news-name',
@@ -399,11 +395,13 @@ class Sitemap_News_Settings {
 						'content' => $content,
 					)
 				);
+
 				// Post types.
 				\ob_start();
 				include XMLSF_DIR . '/views/admin/help-tab-news-post-types.php';
 				include XMLSF_DIR . '/views/admin/help-tab-support.php';
 				$content = \ob_get_clean();
+
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-news-post-types',
@@ -411,11 +409,13 @@ class Sitemap_News_Settings {
 						'content' => $content,
 					)
 				);
+
 				// Categories.
 				\ob_start();
 				include XMLSF_DIR . '/views/admin/help-tab-news-categories.php';
 				include XMLSF_DIR . '/views/admin/help-tab-support.php';
 				$content = \ob_get_clean();
+
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-news-categories',
@@ -431,6 +431,7 @@ class Sitemap_News_Settings {
 				include XMLSF_DIR . '/views/admin/help-tab-news-hierarchical.php';
 				include XMLSF_DIR . '/views/admin/help-tab-support.php';
 				$content = \ob_get_clean();
+
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-news-post-types',
@@ -438,11 +439,13 @@ class Sitemap_News_Settings {
 						'content' => $content,
 					)
 				);
+
 				// Keywords.
 				\ob_start();
 				include XMLSF_DIR . '/views/admin/help-tab-news-keywords.php';
 				include XMLSF_DIR . '/views/admin/help-tab-support.php';
 				$content = \ob_get_clean();
+
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-news-keywords',
@@ -450,11 +453,13 @@ class Sitemap_News_Settings {
 						'content' => $content,
 					)
 				);
+
 				// Stock tickers.
 				\ob_start();
 				include XMLSF_DIR . '/views/admin/help-tab-news-stocktickers.php';
 				include XMLSF_DIR . '/views/admin/help-tab-support.php';
 				$content = \ob_get_clean();
+
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-news-stocktickers',
@@ -462,11 +467,13 @@ class Sitemap_News_Settings {
 						'content' => $content,
 					)
 				);
+
 				// Sitemap notifier.
 				\ob_start();
 				include XMLSF_DIR . '/views/admin/help-tab-news-notifier.php';
 				include XMLSF_DIR . '/views/admin/help-tab-support.php';
 				$content = \ob_get_clean();
+
 				$screen->add_help_tab(
 					array(
 						'id'      => 'sitemap-news-notifier',

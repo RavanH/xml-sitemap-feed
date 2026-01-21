@@ -1,30 +1,30 @@
-= 5.6.X =
-* Add GSC Connect page help tab?
-
 = 5.7 =
+
+
+= 5.8 =
+* move sitemap reports to own tabs or one Reports tab for all sitemaps?
+* add fetch sitemap data twice daily (or once an hour?) and store
+* refetch after submit and store
+* refresh buttons for sitemap data
+
 
 * Quick edit field for Google News exclude
 * Post list column for Google News exclude
 
-* integrate sitemap updates via Bing Webmaster tools API https://learn.microsoft.com/en-us/dotnet/api/microsoft.bing.webmaster.api.interfaces.iwebmasterapi.submitfeed?view=bing-webmaster-dotnet#microsoft-bing-webmaster-api-interfaces-iwebmasterapi-submitfeed(system-string-system-string)
-
-* rethink gsc onboarding: if multiple property candidates, manually choose between them before final redirect?
-
-Consider: Keep GSC Connect tools page permanently visible? Room for advanced promo? Allow other sitemap reports?
 
 * Reverse Disable sitemaps option in admin
-* Unite settings under one admin page "XML Sitemaps"
-* One Reports tab for all sitemaps in GSC Reports?
-* Sitemap index drildown in GSC report
+
+
 
 = 5.8 =
-
+* Sitemap index drilldown in reports
+* rethink gsc onboarding: if multiple property candidates, manually choose between them before final redirect?
 * RSS feeds: detect excerpt setting with admin warning or auto-change setting (?), suggest advanced plugin for improved compatibility
 * lastmod for users
 
 * include home page even if pages are excluded, but HOW ? back to root sitemap ???
 * dummy dynamic slug field for google news advanced
-* DROP automatic priority calculation
+
 * DROP theme template overrides
 * revisit Polylang compatibility
 * switch to Exclude post types
@@ -47,7 +47,6 @@ NEW
 * remove post types that are not activated from admin tab
 
 General settings for Home page:
-* get_home_priority() : allow editable priority >>> homepage priority
 * Consider: Option for lastmod date for (static) front and blog pages (PRO?):
 	- last publication date for post post type
 	- page modification date
@@ -58,9 +57,9 @@ TEST
 * test/fix outdated lastmod dates for post type sitemaps when Redis Cache is active
 
 ROADMAP
+* Unite settings under one admin page "XML Sitemaps"
 * move sitemap fields (back) to Sitemap class?
 * rethink xmlsf_post_types and optional xmlsf_post_type_settings
-* drop dynamic priority?
 
 DOCUMENT
 * Images in sitemaps, see https://wordpress.org/support/topic/how-to-include-featured-attached-images-in-xml-sitemap-not-one-or-the-other/
@@ -74,15 +73,15 @@ DOCUMENT
 * add inline comment blocks for hooks
 
 CONSIDER
+* Do we still need nginx fastcgi cache purge hooks with the new nocache headers?
 * featured + attached images option
 * Reset button per settings tab
 * compatibility with https://wordpress.org/plugins/page-links-to/ ? option to automatically exclude linked posts... but not by default?
 * make sitemaps_enabled use static value for faster repsonse
 * Get rid of the whole feed business...
 * Quick edit colums sortable
-* Move automatic priority calc + update lastmod on comments to General section or drop automatic priority?
+* Move update lastmod on comments to General section?
 * make prime meta caches (async crawler?)
-* Automatic priority calculation for authors or drop automatic priority?
 * drop all WP pre-5.5 and ClassicPress compatibility routines?
 * core sitemap stylesheets per sitemap type (is that possible?)
 * drop all publisher center links ? see https://support.google.com/news/publisher-center/answer/14859160

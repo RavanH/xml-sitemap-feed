@@ -63,7 +63,6 @@ function xmlsf_uninstall() {
 	delete_metadata( 'user', 0, 'user_modified', '', true );
 
 	// Remove post meta data.
-	delete_metadata( 'post', 0, '_xmlsf_priority', '', true );
 	delete_metadata( 'post', 0, '_xmlsf_exclude', '', true );
 	delete_metadata( 'post', 0, '_xmlsf_news_exclude', '', true );
 
@@ -92,8 +91,16 @@ function xmlsf_uninstall() {
 	delete_transient( 'xmlsf_static_files' );
 	delete_transient( 'gsc_connect_origin' );
 	delete_transient( 'sitemap_notifier_access_token' );
+	delete_transient( 'sitemap_notifier_bing_access_token' );
+	delete_transient( 'sitemap_notifier_google_access_token' );
 	delete_transient( 'sitemap_notifier_submission' );
+	delete_transient( 'sitemap_notifier_bing_submission' );
+	delete_transient( 'sitemap_notifier_google_submission' );
 	delete_transient( 'sitemap_notifier_submission_news' );
+
+	// Remove scheduled events.
+	wp_clear_scheduled_hook( 'xmlsf_gsc_keep_alive' );
+	wp_clear_scheduled_hook( 'xmlsf_bwt_keep_alive' );
 
 	// Flush rules.
 	flush_rewrite_rules( false );

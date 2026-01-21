@@ -129,10 +129,10 @@ class Sitemaps_Provider_News extends \WP_Sitemaps_Provider {
 	public function get_sitemap_url( $name, $page ) {
 		$slug = $this->slug();
 
-		if ( xmlsf()->using_permalinks() ) {
+		if ( \xmlsf()->using_permalinks() ) {
 			$basename = '/' . $slug . '.xml';
 		} else {
-			$basename = '/' . $index . '?feed=' . $slug;
+			$basename = '/?feed=' . $slug;
 		}
 
 		return \home_url( $basename );

@@ -71,20 +71,20 @@ class Sitemaps_Provider_Custom extends \WP_Sitemaps_Provider {
 
 		$url_list = array();
 
-		add_filter( 'http_request_host_is_external', '__return_true' ); // Allow external domains while validating URLs.
+		\add_filter( 'http_request_host_is_external', '__return_true' ); // Allow external domains while validating URLs.
 
 		foreach ( $urls as $url ) {
-			if ( ! \wp_http_validate_url( $url[0] ) ) {
+			if ( is_array( $url ) ) {
+				$url = $url[0];
+			}
+
+			if ( ! \wp_http_validate_url( $url ) ) {
 				continue;
 			}
 
 			$sitemap_entry = array(
-				'loc' => $url[0],
+				'loc' => $url,
 			);
-
-			if ( isset( $url[1] ) && \is_numeric( $url[1] ) ) {
-				$sitemap_entry['priority'] = namespace\sanitize_number( $url[1] );
-			}
 
 			/**
 			 * Filters the sitemap entry for an individual post.
@@ -98,7 +98,7 @@ class Sitemaps_Provider_Custom extends \WP_Sitemaps_Provider {
 			$url_list[]    = $sitemap_entry;
 		}
 
-		remove_filter( 'http_request_host_is_external', '__return_true' );
+		\remove_filter( 'http_request_host_is_external', '__return_true' );
 
 		return $url_list;
 	}

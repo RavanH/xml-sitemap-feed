@@ -142,20 +142,20 @@ class XMLSitemapFeed {
 	 */
 	public function __construct() {
 		// Upgrade/install, maybe...
-		$db_version = get_option( 'xmlsf_version', 0 );
-		if ( ! version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
+		$db_version = \get_option( 'xmlsf_version', 0 );
+		if ( ! \version_compare( XMLSF_VERSION, $db_version, '=' ) ) {
 			require_once XMLSF_DIR . '/upgrade.php';
 		}
 
 		// Load sitemap servers.
-		$sitemaps = (array) get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
+		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
 
 		// XML Sitemap?
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
 			$this->get_server( 'sitemap' );
 		} else {
 			// Disable core sitemap.
-			add_filter( 'wp_sitemaps_enabled', '__return_false' );
+			\add_filter( 'wp_sitemaps_enabled', '__return_false' );
 		}
 
 		// Google News sitemap?
@@ -164,30 +164,53 @@ class XMLSitemapFeed {
 		}
 
 		// Prepare GSC Connector.
-		add_action( 'init', array( $this, 'gsc_connect' ) );
+		\add_action( 'init', array( $this, 'gsc_connect' ) );
+
+		// Prepare BWT Connector.
+		\add_action( 'init', array( $this, 'bwt_connect' ) );
 
 		// Register rewrites.
-		add_action( 'init', array( $this, 'register_rewrites' ) );
+		\add_action( 'init', array( $this, 'register_rewrites' ) );
 
 		// Sitemap generator msg output.
-		add_action( 'xmlsf_generator', array( $this, 'generator' ) );
+		\add_action( 'xmlsf_generator', array( $this, 'generator' ) );
 	}
 
 	/**
 	 * Prepare GSC Connector.
 	 */
 	public function gsc_connect() {
-		$options = (array) get_option( 'xmlsf_gsc_connect', array() );
+		$options = (array) \get_option( 'xmlsf_gsc_connect', array() );
 
 		// Prepare onboarding if not connected.
 		if ( empty( $options['google_refresh_token'] ) ) {
-			// Prepare onboarding.
-			add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'add_settings_page' ) );
-			add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\GSC_Connect', 'register_settings' ) );
-
 			// Prepare for OAuth callback.
-			add_filter( 'query_vars', array( __NAMESPACE__ . '\GSC_Connect', 'query_vars' ) );
-			add_action( 'parse_request', array( __NAMESPACE__ . '\GSC_Connect', 'parse_request' ) );
+			\add_filter( 'query_vars', array( __NAMESPACE__ . '\GSC_Connect', 'query_vars' ) );
+			\add_action( 'parse_request', array( __NAMESPACE__ . '\GSC_Connect', 'parse_request' ) );
+
+			// Prepare onboarding admin pages.
+			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\GSC_Connect_Admin', 'add_settings_page' ) );
+			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\GSC_Connect_Admin', 'register_settings' ) );
+		} else {
+			// Schedule periodic token refresh.
+			\add_action( 'xmlsf_gsc_keep_alive', array( __NAMESPACE__ . '\GSC_Oauth_Handler', 'refresh_access_token' ) );
+			if ( ! \wp_next_scheduled( 'xmlsf_gsc_keep_alive' ) ) {
+				\wp_schedule_event( time(), 'weekly', 'xmlsf_gsc_keep_alive' );
+			}
+		}
+	}
+
+	/**
+	 * Prepare BWT Connector.
+	 */
+	public function bwt_connect() {
+		$options = (array) \get_option( 'xmlsf_bwt_connect', array() );
+
+		// Prepare onboarding if not connected.
+		if ( empty( $options['bing_api_key'] ) || empty( $options['status'] ) || 'connected' !== $options['status'] ) {
+			// Prepare onboarding admin pages.
+			\add_action( 'admin_menu', array( __NAMESPACE__ . '\Admin\BWT_Connect_Admin', 'add_settings_page' ) );
+			\add_action( 'admin_init', array( __NAMESPACE__ . '\Admin\BWT_Connect_Admin', 'register_settings' ) );
 		}
 	}
 
@@ -202,11 +225,11 @@ class XMLSitemapFeed {
 		}
 
 		if ( empty( $sitemap ) || 'sitemap' === $sitemap ) {
-			if ( function_exists( 'get_sitemap_url' ) && 'core' === get_option( 'xmlsf_server', $this->defaults( 'server' ) ) ) {
+			if ( \function_exists( 'get_sitemap_url' ) && 'core' === \get_option( 'xmlsf_server', $this->defaults( 'server' ) ) ) {
 				$this->sitemap = new Sitemap_Core();
 			} else {
 				// Replace core sitemap.
-				remove_action( 'init', 'wp_sitemaps_get_server' );
+				\remove_action( 'init', 'wp_sitemaps_get_server' );
 
 				$this->sitemap = new Sitemap_Plugin();
 			}
@@ -222,7 +245,7 @@ class XMLSitemapFeed {
 		if ( null === $this->using_permalinks ) {
 			global $wp_rewrite;
 
-			$index_php              = 0 === strpos( get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
+			$index_php              = 0 === strpos( \get_option( 'permalink_structure' ), '/index.php' ) ? 'index.php' : '';
 			$this->using_permalinks = $wp_rewrite->using_permalinks() && ! $index_php;
 		}
 
@@ -239,27 +262,23 @@ class XMLSitemapFeed {
 
 			// sitemaps.
 			$sitemaps = ( 1 !== (int) \get_option( 'blog_public' ) ) ? array() : array(
-				'sitemap' => class_exists( 'SimpleXMLElement' ) && function_exists( 'get_sitemap_url' ) ? 'wp-sitemap.xml' : 'sitemap.xml',
+				'sitemap' => \class_exists( 'SimpleXMLElement' ) && \function_exists( 'get_sitemap_url' ) ? 'wp-sitemap.xml' : 'sitemap.xml',
 			);
 
 			$this->defaults = array(
 				'sitemaps'           => $sitemaps,
-				'server'             => class_exists( 'SimpleXMLElement' ) && function_exists( 'get_sitemap_url' ) ? 'core' : 'plugin',
+				'server'             => \class_exists( 'SimpleXMLElement' ) && \function_exists( 'get_sitemap_url' ) ? 'core' : 'plugin',
 				'disabled_providers' => array(),
 				'post_types'         => array(),
 				'post_type_settings' => array(
 					'post'  => array(
-						'archive'          => 'yearly',
-						'priority'         => '',
-						'dynamic_priority' => '',
-						'tags'             => array(
+						'archive' => 'yearly',
+						'tags'    => array(
 							'image' => 'attached',
 						),
 					),
 					'page'  => array(
-						'priority'         => '',
-						'dynamic_priority' => '',
-						'tags'             => array(
+						'tags' => array(
 							'image' => 'attached',
 						),
 					),
@@ -267,15 +286,12 @@ class XMLSitemapFeed {
 				),
 				'taxonomies'         => '',
 				'taxonomy_settings'  => array(
-					'priority'         => '',
-					'dynamic_priority' => '',
-					'include_empty'    => '',
-					'limit'            => '',
+					'include_empty' => '',
+					'limit'         => '',
 				),
 				'authors'            => '',
 				'author_settings'    => array(
-					'priority' => '',
-					'limit'    => '',
+					'limit' => '',
 				),
 				'robots'             => '',
 				'urls'               => '',
@@ -296,7 +312,7 @@ class XMLSitemapFeed {
 	public function scheme() {
 		// Scheme to use.
 		if ( empty( $this->scheme ) ) {
-			$scheme       = wp_parse_url( home_url(), PHP_URL_SCHEME );
+			$scheme       = \wp_parse_url( home_url(), PHP_URL_SCHEME );
 			$this->scheme = $scheme ? $scheme : 'http';
 		}
 
@@ -309,7 +325,7 @@ class XMLSitemapFeed {
 	 * @return array
 	 */
 	public function disabled_taxonomies() {
-		return apply_filters( 'xmlsf_disabled_taxonomies', $this->disabled_taxonomies );
+		return \apply_filters( 'xmlsf_disabled_taxonomies', $this->disabled_taxonomies );
 	}
 
 	/**
@@ -318,7 +334,7 @@ class XMLSitemapFeed {
 	 * @return array
 	 */
 	public function disabled_post_types() {
-		return (array) apply_filters( 'xmlsf_disabled_post_types', $this->disabled_post_types );
+		return (array) \apply_filters( 'xmlsf_disabled_post_types', $this->disabled_post_types );
 	}
 
 	/**
@@ -367,9 +383,9 @@ class XMLSitemapFeed {
 	 * Generator info
 	 */
 	public function generator() {
-		echo '<!-- generated-on="' . esc_xml( gmdate( 'c' ) ) . '" -->' . PHP_EOL;
+		echo '<!-- generated-on="' . \esc_xml( gmdate( 'c' ) ) . '" -->' . PHP_EOL;
 		echo '<!-- generator="XML Sitemap & Google News for WordPress" -->' . PHP_EOL;
 		echo '<!-- generator-url="https://status301.net/wordpress-plugins/xml-sitemap-feed/" -->' . PHP_EOL;
-		echo '<!-- generator-version="' . esc_xml( XMLSF_VERSION ) . '" -->' . PHP_EOL;
+		echo '<!-- generator-version="' . \esc_xml( XMLSF_VERSION ) . '" -->' . PHP_EOL;
 	}
 }

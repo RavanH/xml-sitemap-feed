@@ -189,7 +189,7 @@ function robots_txt( $output ) {
  * @return array|string|bool|null
  */
 function get_default_settings( $key = false ) {
-	$defaults = xmlsf()->defaults();
+	$defaults = \xmlsf()->defaults();
 
 	if ( $key ) {
 		$return = ( isset( $defaults[ $key ] ) ) ? $defaults[ $key ] : null;

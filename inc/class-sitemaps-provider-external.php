@@ -36,12 +36,12 @@ class Sitemaps_Provider_External extends \WP_Sitemaps_Provider {
 		$this->object_type = 'url';
 
 		// Fetch external sitemap URLs.
-		add_filter( 'http_request_host_is_external', '__return_true' ); // Allow external domains while validating URLs.
+		\add_filter( 'http_request_host_is_external', '__return_true' ); // Allow external domains while validating URLs.
 
 		$urls       = (array) \apply_filters( 'xmlsf_custom_sitemaps', (array) \get_option( 'xmlsf_custom_sitemaps', array() ) );
 		$this->urls = \array_filter( $urls, 'wp_http_validate_url' );
 
-		remove_filter( 'http_request_host_is_external', '__return_true' );
+		\remove_filter( 'http_request_host_is_external', '__return_true' );
 	}
 
 	/**

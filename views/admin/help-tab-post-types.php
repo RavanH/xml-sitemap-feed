@@ -22,18 +22,6 @@ if ( 'plugin' === xmlsf()->sitemap->server_type ) :
 </p>
 <?php endif; ?>
 <p>
-	<strong><?php esc_html_e( 'Priority', 'xml-sitemap-feed' ); ?> [&hellip;]</strong>
-	<br />
-	<?php esc_html_e( 'Priority can be used to signal the relative importance of post types in general and individual posts in particular.', 'xml-sitemap-feed' ); ?>
-	<?php esc_html_e( 'Priority can be overridden on individual posts.', 'xml-sitemap-feed' ); ?>
-</p>
-<p>
-	<strong>[] <?php esc_html_e( 'Automatic Priority calculation.', 'xml-sitemap-feed' ); ?></strong>
-	<br />
-	<?php esc_html_e( 'Adjusts the Priority based on factors like age, comments, sticky post or blog page.', 'xml-sitemap-feed' ); ?>
-	<?php esc_html_e( 'Please note: this option can make sitemap generation slower and more resource intensive.', 'xml-sitemap-feed' ); ?>
-</p>
-<p>
 	<strong>[] <?php esc_html_e( 'Update the Last Modified date on each new comment.', 'xml-sitemap-feed' ); ?></strong>
 	<br />
 	<?php esc_html_e( 'The Last Modified timestamp will be updated whenever a comment is added. Useful for sites where user interaction like comments play a large role and give added content value. But otherwise this is not advised.', 'xml-sitemap-feed' ); ?>

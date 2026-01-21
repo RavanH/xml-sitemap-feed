@@ -3,5 +3,6 @@
         "/home/ravanhagen/Projects/git/WordPress"
     ],
     "IDX.aI.enableInlineCompletion": true,
-    "IDX.aI.enableCodebaseIndexing": true
+    "IDX.aI.enableCodebaseIndexing": true,
+    "git.autofetch": true
 }

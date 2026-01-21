@@ -20,7 +20,6 @@
 			<tr class="high">
 				<th>#</th>
 				<th>URL</th>
-				<th>Priority</th>
 			</tr>
 <xsl:variable name="lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
 <xsl:variable name="upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
@@ -28,7 +27,6 @@
 			<tr><xsl:if test="position() mod 2 != 1"><xsl:attribute  name="class">high</xsl:attribute></xsl:if>
 				<td><xsl:value-of select="position()"/></td>
 				<td><xsl:variable name="itemURL"><xsl:value-of select="sitemap:loc"/></xsl:variable><a href="{$itemURL}"><xsl:value-of select="sitemap:loc"/></a></td>
-				<td><xsl:if test="sitemap:priority"><xsl:value-of select="concat(sitemap:priority*100,'%')"/></xsl:if></td>
 			</tr>
 </xsl:for-each>
 		</table>

@@ -2,8 +2,8 @@
 /**
  * Google Search Console API Handler
  *
- * @package Sitemap Notifier
- **/
+ * @package XML Sitemap & Google News
+ */
 
 namespace XMLSF;
 
@@ -26,12 +26,14 @@ class GSC_API_Handler {
 	 */
 	public static function get( $api_endpoint, $access_token ) {
 		$api_request_args = array(
-			'method'  => 'GET', // Request method uses GET.
-			'headers' => array(
+			'method'      => 'GET',
+			'headers'     => array(
 				'Authorization'  => 'Bearer ' . $access_token,
 				'Content-Length' => '0', // GET request with no body.
 			),
-			'timeout' => 15, // Seconds.
+			'timeout'     => 15,
+			'sslverify'   => false,
+			'httpversion' => '1.1',
 		);
 
 		$api_response = \wp_remote_request( $api_endpoint, $api_request_args );
@@ -64,28 +66,26 @@ class GSC_API_Handler {
 	 * @param string $api_endpoint The API endpoint to use.
 	 * @param string $access_token The OAuth 2.0 access token.
 	 *
-	 * @return array An array containing the success status and a message.
+	 * @return true|WP_Error True on success, WP_Error on failure.
 	 */
 	public static function submit( $api_endpoint, $access_token ) {
 		// The API endpoint: https://www.googleapis.com/webmasters/v3/sites/siteUrl/sitemaps/feedPath.
 
 		$api_request_args = array(
-			'method'  => 'PUT', // Submit method uses PUT.
-			'headers' => array(
+			'method'      => 'PUT',
+			'headers'     => array(
 				'Authorization'  => 'Bearer ' . $access_token,
 				'Content-Length' => '0', // PUT request with no body.
 			),
-			'timeout' => 15, // Seconds.
+			'timeout'     => 15,
+			'sslverify'   => false,
+			'httpversion' => '1.1',
 		);
 
 		$api_response = \wp_remote_request( $api_endpoint, $api_request_args );
 
 		if ( \is_wp_error( $api_response ) ) {
-			$error_message = $api_response->get_error_message();
-			return array(
-				'success' => false,
-				'message' => \sprintf( /* translators: %s API error message (untranslated) */ \esc_html__( 'Error submitting sitemap: %s', 'xml-sitemap-feed' ), \esc_html( $error_message ) ),
-			);
+			return $api_response;
 		}
 
 		$api_response_code = \wp_remote_retrieve_response_code( $api_response );
@@ -93,15 +93,15 @@ class GSC_API_Handler {
 
 		// Google Search Console API returns 204 OK on successful submission request.
 		if ( 204 === $api_response_code ) {
-			return array(
-				'success' => true,
-				'message' => $api_response_body, // Empty.
-			);
+			return true;
 		} else {
-			// Handle API Errors.
-			return array(
-				'success' => false,
-				'message' => self::handle_api_errors( $api_response_code, $api_response_body ),
+			// Handle API errors.
+			return new WP_Error(
+				'gsc_api_error',
+				self::handle_api_errors( $api_response_code, $api_response_body ),
+				array(
+					'status' => $api_response_code,
+				)
 			);
 		}
 	}
@@ -139,7 +139,7 @@ class GSC_API_Handler {
 		} elseif ( 403 === $api_response_code ) {
 			$detailed_error_message .= ' ' . \__( 'Please ensure the connected Google account has full access to the Search Console property.', 'xml-sitemap-feed' );
 		} elseif ( 404 === $api_response_code ) {
-			$detailed_error_message .= ' ' . \__( 'This usually means the site property URL used in the API call was not found or does not match the property verified in Search Console. Ensure the property exists and the URL matches exactly (including www/non-www and http/https).', 'xml-sitemap-feed' );
+			$detailed_error_message .= ' ' . \__( 'This usually means the site property URL used in the API call was not found or does not match the property verified in Search Console.', 'xml-sitemap-feed' );
 		}
 
 		return $detailed_error_message;

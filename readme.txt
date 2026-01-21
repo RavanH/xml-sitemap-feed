@@ -156,6 +156,13 @@ Code cleanup and 2 bugfixes.
 
 == Changelog ==
 
+= 5.7 =
+
+Date: 202621
+* Bing Webmaster Tools sitemap reports
+* Bing sitemap submission from admin
+* Priority tags dropped
+
 = 5.6.3 =
 
 Date: 20251201
