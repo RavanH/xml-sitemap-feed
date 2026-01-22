@@ -142,7 +142,7 @@ class Sitemap_Settings {
 				}
 			}
 
-			do_action( 'sitemap_notifier_manual_submission', $message, $status );
+			\do_action( 'sitemap_notifier_manual_submission', $message, $status );
 		}
 	}
 
@@ -211,7 +211,7 @@ class Sitemap_Settings {
 				}
 			}
 
-			do_action( 'sitemap_notifier_manual_submission', $message, $status );
+			\do_action( 'sitemap_notifier_manual_submission', $message, $status );
 		}
 	}
 

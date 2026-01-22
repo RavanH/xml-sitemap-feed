@@ -95,7 +95,7 @@ class Sitemap_News_Settings {
 				}
 			}
 
-			do_action( 'sitemap_notifier_manual_submission_news', $message, $status );
+			\do_action( 'sitemap_notifier_manual_submission_news', $message, $status );
 		}
 	}
 
