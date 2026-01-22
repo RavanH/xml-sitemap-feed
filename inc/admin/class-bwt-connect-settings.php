@@ -104,7 +104,7 @@ class BWT_Connect_Settings extends BWT_Connect {
 		$sanitized = array();
 		$input     = (array) $input;
 
-		// Sanitize Google Client Secret.
+		// Sanitize API key.
 		if ( empty( $input['bing_api_key'] ) ) {
 			$sanitized['bing_api_key'] = '';
 		} elseif ( self::$pw_placeholder === $input['bing_api_key'] ) {
