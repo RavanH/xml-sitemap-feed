@@ -102,4 +102,10 @@ printf(
 	'<a href="https://premium.status301.com/account/support/" target="_blank">' . esc_html__( 'Support ticket', 'xml-sitemap-feed' ) . '</a>',
 	'<a href="https://premium.status301.com/email-support/" target="_blank">' . esc_html__( 'Contact us', 'xml-sitemap-feed' ) . '</a>'
 );
-esc_html_e( 'Connect to Google Search Console to allow sitemap notifications.', 'xml-sitemap-feed' );
+printf(
+	/* translators: %1$s: Sitemap notifier, %2$s: Google Search Console */
+	esc_html__( '%1$s needs a connection to %2$s for automatic sitemap notifications. Please use the %3$s button and follow the instructions.', 'xml-sitemap-feed' ),
+	'<strong>' . esc_html__( 'Sitemap notifier', 'xml-sitemap-feed' ) . '</strong>',
+	'<strong>' . esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) . '</strong>',
+	'<strong>' . esc_html__( 'Connect', 'xml-sitemap-feed' ) . '</strong>'
+);
