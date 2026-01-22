@@ -20,6 +20,10 @@ class Secret {
 	 * @return string|false The encrypted value or false on failure.
 	 */
 	public static function encrypt( $value ) {
+		if ( empty( $value ) ) {
+			return '';
+		}
+
 		if ( ! \extension_loaded( 'openssl' ) ) {
 			\add_settings_error(
 				'sitemap_notifier_oauth_section',
