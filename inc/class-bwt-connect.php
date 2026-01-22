@@ -15,6 +15,17 @@ use WP_Error;
  * @since 5.6
  */
 class BWT_Connect {
+	/**
+	 * The connection status.
+	 *
+	 * @return bool The connection status.
+	 */
+	public static function is_connected() {
+		// Get the api key from DB.
+		$options = (array) \get_option( 'xmlsf_bwt_connect', array() );
+
+		return ! empty( $options['bing_api_key'] );
+	}
 
 	/**
 	 * Retrieves the Bing API key.

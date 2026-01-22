@@ -11,8 +11,7 @@
 	<?php esc_html_e( 'Google Search Console', 'xml-sitemap-feed' ); ?>
 </h3>
 <?php
-$gsc_options = (array) get_option( 'xmlsf_gsc_connect', array() );
-if ( empty( $gsc_options['google_refresh_token'] ) ) {
+if ( ! \XMLSF\GSC_Connect::is_connected() ) {
 	// Initiate button.
 	?>
 	<p>

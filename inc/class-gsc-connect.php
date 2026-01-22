@@ -28,6 +28,18 @@ class GSC_Connect {
 	public static $page_slug = 'gsc_connect';
 
 	/**
+	 * The connection status.
+	 *
+	 * @return bool The connection status.
+	 */
+	public static function is_connected() {
+		// Get the api key from DB.
+		$options = (array) \get_option( 'xmlsf_gsc_connect', array() );
+
+		return ! empty( $options['google_refresh_token'] );
+	}
+
+	/**
 	 * Handles the OAuth callback request.
 	 *
 	 * @param WP $wp The WP object.
@@ -122,6 +134,11 @@ class GSC_Connect {
 
 			// Save property URL.
 			$options['property_url'] = $property;
+
+			// Unsetting these makes existing values be ported without double sanitization/encryption.
+			unset( $options['google_client_id'] );
+			unset( $options['google_client_secret'] );
+
 			\update_option( 'xmlsf_gsc_connect', $options, false );
 		}
 

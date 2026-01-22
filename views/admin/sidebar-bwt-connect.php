@@ -11,8 +11,7 @@
 	<?php esc_html_e( 'Bing Webmaster Tools', 'xml-sitemap-feed' ); ?>
 </h3>
 <?php
-$bwt_options = (array) get_option( 'xmlsf_bwt_connect', array() );
-if ( empty( $bwt_options['bing_api_key'] ) ) {
+if ( ! \XMLSF\BWT_Connect::is_connected() ) {
 	// Initiate button.
 	?>
 	<p>

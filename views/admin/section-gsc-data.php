@@ -5,9 +5,7 @@
  * @package XML Sitemap & Google News
  */
 
-// Get connect data.
-$gsc_options = (array) get_option( 'xmlsf_gsc_connect', array() );
-if ( empty( $gsc_options['google_refresh_token'] ) ) {
+if ( ! \XMLSF\GSC_Connect::is_connected() ) {
 	// Initiate button.
 	?>
 	<p>
@@ -22,6 +20,7 @@ if ( empty( $gsc_options['google_refresh_token'] ) ) {
 	return;
 }
 
+// Get connect data.
 $sitemap = xmlsf()->sitemap->get_sitemap_url();
 $data    = \XMLSF\GSC_Connect::get( $sitemap );
 

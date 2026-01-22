@@ -5,9 +5,7 @@
  * @package XML Sitemap & Google News
  */
 
-// Get connect data.
-$bwt_options = (array) get_option( 'xmlsf_bwt_connect', array() );
-if ( empty( $bwt_options['bing_api_key'] ) ) {
+if ( ! \XMLSF\BWT_Connect::is_connected() ) {
 	// Initiate button.
 	?>
 	<p>
@@ -22,6 +20,7 @@ if ( empty( $bwt_options['bing_api_key'] ) ) {
 	return;
 }
 
+// Get connect data.
 $sitemap = xmlsf()->sitemap->get_sitemap_url();
 $data    = \XMLSF\BWT_Connect::get( $sitemap );
 
