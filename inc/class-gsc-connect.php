@@ -141,11 +141,7 @@ class GSC_Connect {
 			// Save property URL.
 			$options['property_url'] = $property;
 
-			// Unsetting these makes existing values be ported without double sanitization/encryption.
-			unset( $options['google_client_id'] );
-			unset( $options['google_client_secret'] );
-
-			\update_option( 'xmlsf_gsc_connect', $options, false );
+			\update_option( 'xmlsf_gsc_connect', $options );
 		}
 
 		// The API endpoint: https://www.googleapis.com/webmasters/v3/sites/siteUrl/sitemaps/feedPath

@@ -225,8 +225,8 @@ class GSC_Oauth_Handler {
 
 			// If refresh token is invalid/expired, remove it and suggest re-connecting.
 			if ( 'invalid_grant' === $error ) {
-				$options['google_refresh_token'] = ''; // Clear the refresh token.
-				\update_option( 'xmlsf_gsc_connect', $options );
+				// Disconnect.
+				Admin\GSC_Connect::disconnect();
 
 				return new WP_Error(
 					'sitemap_notifier_oauth_refresh_invalid_grant',
@@ -274,7 +274,7 @@ class GSC_Oauth_Handler {
 	 */
 	public static function store_refresh_token( $token ) {
 		$options                         = (array) \get_option( 'xmlsf_gsc_connect', array() );
-		$options['google_refresh_token'] = \sanitize_text_field( $token );
+		$options['google_refresh_token'] = $token;
 
 		\update_option( 'xmlsf_gsc_connect', $options );
 	}

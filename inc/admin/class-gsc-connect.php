@@ -195,9 +195,11 @@ class GSC_Connect {
 	public static function disconnect() {
 		$options = (array) \get_option( self::$option_group, array() );
 
-		// Clear the refresh token.
-		unset( $options['google_refresh_token'] );
-		unset( $options['property_url'] );
+		// Clear the refresh token and property url.
+		$options['google_refresh_token'] = '';
+		$options['property_url']         = '';
+
+		// Update)
 		\update_option( self::$option_group, $options );
 
 		// Delete access token.

@@ -16,7 +16,6 @@ use XMLSF\Secret;
  * @version 5.6
  */
 class GSC_Connect_Settings extends GSC_Connect {
-
 	/**
 	 * Placeholder for the saved password.
 	 * This is used to avoid showing the actual password in the settings page.
@@ -132,6 +131,7 @@ class GSC_Connect_Settings extends GSC_Connect {
 	 */
 	public static function sanitize_settings( $input ) {
 		$sanitized = array();
+		$input     = (array) $input;
 		$options   = (array) \get_option( self::$option_group, array() ); // Not strictly needed if only sanitizing submitted input.
 
 		// Sanitize Google Client ID.
@@ -142,15 +142,23 @@ class GSC_Connect_Settings extends GSC_Connect {
 		}
 
 		// Sanitize Google Client Secret.
-		if ( isset( $input['google_client_secret'] ) && self::$pw_placeholder !== $input['google_client_secret'] ) {
-			$sanitized['google_client_secret'] = ! empty( $input['google_client_secret'] ) ? Secret::encrypt( \sanitize_text_field( $input['google_client_secret'] ) ) : '';
+		if ( isset( $input['google_client_secret'] ) && self::$pw_placeholder !== $input['google_client_secret'] && ( empty( $options['google_client_secret'] ) || $options['google_client_secret'] !== $input['google_client_secret'] ) ) {
+			$sanitized['google_client_secret'] = Secret::encrypt( \sanitize_text_field( $input['google_client_secret'] ) );
 		} else {
 			$sanitized['google_client_secret'] = isset( $options['google_client_secret'] ) ? $options['google_client_secret'] : '';
 		}
 
-		// Make sure to not loose existing refresh token, but only if client id is set and was not changed.
-		if ( ! empty( $options['google_refresh_token'] ) && $sanitized['google_client_id'] === $options['google_client_id'] ) {
-			$sanitized['google_refresh_token'] = $options['google_refresh_token'];
+		// Make sure to not loose existing refresh token, but only if client id was not changed. Allows clearing the token with an empty string.
+		if ( isset( $input['google_refresh_token'] ) ) {
+			$sanitized['google_refresh_token'] = \sanitize_text_field( $input['google_refresh_token'] );
+		} else {
+			$sanitized['google_refresh_token'] = isset( $options['google_refresh_token'] ) && ! empty( $options['google_client_id'] ) && $sanitized['google_client_id'] === $options['google_client_id'] ? $options['google_refresh_token'] : '';
+		}
+
+		if ( isset( $input['property_url'] ) ) {
+			$sanitized['property_url'] = \sanitize_text_field( $input['property_url'] );
+		} else {
+			$sanitized['property_url'] = isset( $options['property_url'] ) ? $options['property_url'] : '';
 		}
 
 		return $sanitized;
