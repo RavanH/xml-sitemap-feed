@@ -24,7 +24,7 @@ class BWT_Connect {
 		// Get the api key from DB.
 		$options = (array) \get_option( 'xmlsf_bwt_connect', array() );
 
-		return ! empty( $options['bing_api_key'] );
+		return ! empty( $options['bing_api_key'] ) && ! empty( $options['connected'] );
 	}
 
 	/**
