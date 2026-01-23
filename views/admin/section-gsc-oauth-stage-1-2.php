@@ -52,7 +52,7 @@
 			'<strong>' . esc_html__( 'OAuth consent screen', 'xml-sitemap-feed' ) . '</strong>'
 		);
 		?>
-		<ol>
+		<ul style="list-style: inside lower-alpha; ">
 			<li>
 				<?php
 				printf(
@@ -84,7 +84,7 @@
 				);
 				?>
 			</li>
-		</ol>
+		</ul>
 	</li>
 	<li>
 		<?php
