@@ -1,4 +1,4 @@
-= 5.7 =
+= 5.7.X =
 
 
 = 5.8 =
@@ -16,7 +16,7 @@
 
 
 
-= 5.8 =
+= 5.9 =
 * Sitemap index drilldown in reports
 * rethink gsc onboarding: if multiple property candidates, manually choose between them before final redirect?
 * RSS feeds: detect excerpt setting with admin warning or auto-change setting (?), suggest advanced plugin for improved compatibility

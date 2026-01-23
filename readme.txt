@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 6.9
-Stable tag: 5.7
+Stable tag: 5.7.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,15 +15,16 @@ Take control of your WordPress core XML Sitemap and add a Google News Sitemap.
 
 Take control of your WordPress core **XML Sitemap** and add a **Google News Sitemap**. Compatible with WordPress **Multisite**, **Polylang** and **WPML** and most caching plugins. There are no static files created.
 
-NEW: Connect your site to your Google Search Console property to keep an eye on sitemap performance and possible errors. **Submit your sitemaps** right from the WordPress admin.
+NEW: Connect your site to your **Google Search Console** and **Bing Webmaster Tools** to keep an eye on sitemap performance and possible errors.
+NEW: **Submit your sitemaps** right from the WordPress admin. Yes, you read that correctly: Sitemap Pings are back!
 
 = Features =
 
 * Control the WordPress core XML Sitemaps.
 * Add a Google News Sitemap.
-* Get sitemap reports from Google Search Console to keep an eye on sitemap performance and possible errors.
-* Submit sitemaps to Google Search Console to invite Google to revisit them.
-* Add new robots.txt rules.
+* Connect your site to Google Search Console and Bing Webmaster Tools to keep an eye on sitemap performance and possible errors.
+* Submit/ping sitemaps to Google Search Console and Bing Webmaster Tools for fast reindexation.
+* Add custom robots.txt rules.
 
 **XML Sitemap**
 
@@ -36,7 +37,6 @@ NEW: Connect your site to your Google Search Console property to keep an eye on 
 * Choose the sitemap server/generator: WordPress core or Plugin.
 * Plugin server: Include featured images or attached images with title.
 * Choose to update Last modification date only on post modification (default) or also on comments.
-* Set Priority per post type, per taxonomy and per individual post.
 * Sitemap stylesheet templates can be overridden by theme template files.
 
 **Google News Sitemap**
@@ -52,7 +52,7 @@ NEW: Connect your site to your Google Search Console property to keep an eye on 
 
 **[XML Sitemap Advanced](https://premium.status301.com/downloads/xml-sitemap-advanced/)**
 
-* Sitemap notifier: Automatic XML Sitemap Index update notification to Google Search Console. (Yes, Google Sitemap Ping is back!)
+* Sitemap notifier: Automatic XML Sitemap Index update notification to Google and Bing.
 * Sitemap notifier log
 * Set a custom sitemap URL (slug)
 * Exclude posts and pages in the Bulk Editor.
@@ -61,7 +61,7 @@ NEW: Connect your site to your Google Search Console property to keep an eye on 
 
 **[Google News Advanced](https://premium.status301.com/downloads/google-news-advanced/)**
 
-* Sitemap norifier: Automatic Google News Sitemap update notification to Google Search Console. (Yes, Google Sitemap Ping is back!)
+* Sitemap norifier: Automatic Google News Sitemap update notification to Google.
 * Sitemap notifier log
 * Multiple post types - Include more than one post type in the same News Sitemap.
 * Keywords - Add the keywords tag to your News Sitemap. Keywords can be created from Tags, Categories or a dedicated Keywords taxonomy.
@@ -150,11 +150,16 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.6.3 =
+= 5.7.1 =
 
-Code cleanup and 2 bugfixes.
+Fix Google Connect instructions text.
 
 == Changelog ==
+
+= 5.7.1 =
+
+Date: 202621
+* Fix Google Connect instructions text
 
 = 5.7 =
 
