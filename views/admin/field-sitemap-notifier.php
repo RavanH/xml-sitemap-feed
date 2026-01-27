@@ -14,13 +14,13 @@ $notifier = \get_option( 'xmlsf_sitemap_notifier');
 	<p>
 		<label>
 			<input type="checkbox" name="xmlsf_sitemap_notifier[]" id="xmlsf_sitemap_notifier_google" value="google"<?php checked( in_array( 'google', (array) $notifier ) || '1' === $notifier ); ?><?php disabled( ! apply_filters( 'xmlsf_advanced_enabled', false ) ); ?> />
-			<?php printf( /* translators: %s: Google Search Console */ esc_html__( 'Submit to %s', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) ); ?>
+			<?php printf( /* translators: %s: Google Search Console */ esc_html__( 'Ping %s', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) ); ?>
 		</label>
 	</p>
 	<p>
 		<label>
 			<input type="checkbox" name="xmlsf_sitemap_notifier[]" id="xmlsf_sitemap_notifier_bing" value="bing"<?php checked( in_array( 'bing', (array) $notifier ) ); ?><?php disabled( ! apply_filters( 'xmlsf_advanced_enabled', false ) ); ?> />
-			<?php printf( /* translators: %s: Bing Webmaster Tools */ esc_html__( 'Submit to %s', 'xml-sitemap-feed' ), esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) ); ?>
+			<?php printf( /* translators: %s: Bing Webmaster Tools */ esc_html__( 'Ping %s', 'xml-sitemap-feed' ), esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) ); ?>
 		</label>
 	</p>
 
