@@ -12,7 +12,7 @@ if ( ! \XMLSF\BWT_Connect::is_connected() ) {
 		<?php printf( /* translators: %s: Bing Webmaster Tools */ esc_html_x( 'Connect to %s for sitemap data retrieval and sitemap submissions.', 'Bing Webmaster Tools connection', 'xml-sitemap-feed' ), esc_html__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ) ); ?>
 	</p>
 	<p>
-		<a href="<?php echo esc_url( \XMLSF\Admin\BWT_Connect::get_settings_url() ); ?>" class="button button-primary">
+		<a href="<?php echo esc_url( \XMLSF\Admin\BWT_Connect::get_settings_url() ); ?>" class="button button-small">
 			<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
 		</a>
 	</p>
@@ -36,7 +36,7 @@ if ( \is_wp_error( $data ) ) {
 		<?php echo esc_html( $data->get_error_message() ); ?>
 	</p>
 	<p>
-		<a href="" class="button button-primary"><?php echo esc_html( translate( 'Retry' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
+		<a href="" class="button button-small"><?php echo esc_html( translate( 'Retry' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
 	</p>
 	<?php
 	return;

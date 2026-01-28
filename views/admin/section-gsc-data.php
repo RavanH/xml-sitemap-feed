@@ -12,7 +12,7 @@ if ( ! \XMLSF\GSC_Connect::is_connected() ) {
 		<?php printf( /* translators: %s: Google Search Console */ esc_html_x( 'Connect to %s for sitemap data retrieval and sitemap submissions.', 'Google Search Console connection', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) ); ?>
 	</p>
 	<p>
-		<a href="<?php echo esc_url( add_query_arg( 'ref', 'xmlsf', \XMLSF\Admin\GSC_Connect::get_settings_url() ) ); ?>" class="button button-primary">
+		<a href="<?php echo esc_url( add_query_arg( 'ref', 'xmlsf', \XMLSF\Admin\GSC_Connect::get_settings_url() ) ); ?>" class="button button-small">
 			<?php esc_html_e( 'Connect', 'xml-sitemap-feed' ); ?>
 		</a>
 	</p>
@@ -44,7 +44,7 @@ if ( \is_wp_error( $data ) ) {
 		?>
 	</p>
 	<p>
-		<a href="" class="button button-primary"><?php echo esc_html( translate( 'Retry' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
+		<a href="" class="button button-small"><?php echo esc_html( translate( 'Retry' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?></a>
 	</p>
 	<?php
 

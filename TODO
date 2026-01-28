@@ -1,6 +1,5 @@
 = 5.7.X =
 * Disconnect button when error on sitemap report
-* alt connect buttons on General tab
 * dummy ping log section (advanced tab)
 
 CONSIDER: log sitemap report fetch error and discconnect immediately?
