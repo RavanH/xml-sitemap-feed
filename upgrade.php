@@ -215,9 +215,8 @@ function xmlsf_upgrade( $db_version ) {
 		delete_metadata( 'post', 0, '_xmlsf_priority', '', true );
 		delete_transient( 'sitemap_notifier_access_token' );
 		delete_transient( 'sitemap_notifier_submission' );
-	}
-
-	if ( version_compare( '5.7.1', $db_version, '=' ) ) {
+	} elseif ( version_compare( '5.7.2', $db_version, '>' ) ) {
+		// Fix 5.7 and 5.7.1 broken transients upgrade routine.
 		delete_transient( 'sitemap_notifier_google_access_token' );
 		delete_transient( 'sitemap_notifier_google_submission' );
 	}
