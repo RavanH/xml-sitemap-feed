@@ -13,7 +13,7 @@ $options = (array) get_option( 'xmlsf_news_advanced', array() );
 	</legend>
 	<label>
 		<input type="checkbox" name="xmlsf_news_advanced[notifier]" id="xmlsf_news_notifier" value="1"<?php checked( ! empty( $options['notifier'] ) ); ?><?php disabled( ! apply_filters( 'xmlsf_news_advanced_enabled', false ) ); ?> />
-		<?php printf( /* translators: %s: Google Search Console */ esc_html__( 'Submit to %s', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) ); ?>
+		<?php printf( /* translators: %s: Google Search Console */ esc_html__( 'Ping %s', 'xml-sitemap-feed' ), esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) ); ?>
 	</label>
 
 	<p class="description">

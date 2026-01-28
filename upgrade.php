@@ -210,20 +210,16 @@ function xmlsf_upgrade( $db_version ) {
 		update_option( 'xmlsf_post_types', $post_types );
 	}
 
-	// Make existing notifier transients google specific.
-	$gsc_token = get_transient( 'sitemap_notifier_access_token' );
-	if ( false !== $gsc_token ) {
-		set_transient( 'sitemap_notifier_google_access_token', $gsc_token );
+	if ( version_compare( '5.7', $db_version, '>' ) ) {
+		// Drop priority meta data.
+		delete_metadata( 'post', 0, '_xmlsf_priority', '', true );
 		delete_transient( 'sitemap_notifier_access_token' );
-	}
-	$gsc_submission = get_transient( 'sitemap_notifier_submission' );
-	if ( false !== $gsc_submission ) {
-		set_transient( 'sitemap_notifier_google_submission', $gsc_submission );
 		delete_transient( 'sitemap_notifier_submission' );
+	} elseif ( version_compare( '5.7.2', $db_version, '>' ) ) {
+		// Fix 5.7 and 5.7.1 broken transients upgrade routine.
+		delete_transient( 'sitemap_notifier_google_access_token' );
+		delete_transient( 'sitemap_notifier_google_submission' );
 	}
-
-	// Drop priority meta data.
-	delete_metadata( 'post', 0, '_xmlsf_priority', '', true );
 
 	// Add possible missing new defaults.
 	xmlsf_update_from_defaults( false );
