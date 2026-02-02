@@ -58,12 +58,10 @@ $gsc_link        = add_query_arg(
 	'https://search.google.com/search-console/sitemaps/info-drilldown'
 );
 $links_submitted = 0;
-$links_indexed   = 0;
 if ( isset( $data['contents'] ) && is_array( $data['contents'] ) ) {
 	foreach ( $data['contents'] as $content ) {
 		if ( isset( $content['type'] ) && 'news' === $content['type'] ) {
 			$links_submitted = $content['submitted'];
-			$links_indexed   = $content['indexed'];
 			break;
 		}
 	}
@@ -97,7 +95,7 @@ if ( isset( $data['contents'] ) && is_array( $data['contents'] ) ) {
 			</td>
 			<td><?php echo esc_html( $last_submitted ); ?></td>
 			<td><?php echo esc_html( $last_downloaded ); ?></td>
-			<td><?php echo esc_html__( 'Found:', 'xml-sitemap-feed' ) . ' ' . esc_html( $links_submitted ) . '<br>' . esc_html__( 'Indexed:', 'xml-sitemap-feed' ) . ' ' . esc_html( $links_indexed ); ?></td>
+			<td><?php echo esc_html__( 'Found:', 'xml-sitemap-feed' ) . ' ' . esc_html( $links_submitted ); ?></td>
 			<td style="color:<?php echo $_errors ? '#d63638' : ( $_warnings ? '#dba617' : 'inherit' ); ?>"><?php echo esc_html__( 'Warnings:', 'xml-sitemap-feed' ) . ' ' . esc_html( $_warnings ) . '<br>' . esc_html__( 'Errors:', 'xml-sitemap-feed' ) . ' ' . esc_html( $_errors ); ?></td>
 		</tr>
 	</tbody>
