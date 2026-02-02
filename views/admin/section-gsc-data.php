@@ -21,8 +21,10 @@ if ( ! \XMLSF\GSC_Connect::is_connected() ) {
 }
 
 // Get connect data.
-$sitemap = xmlsf()->sitemap->get_sitemap_url();
-$data    = \XMLSF\GSC_Connect::get( $sitemap );
+$sitemap    = xmlsf()->sitemap->get_sitemap_url();
+$parsed_url = parse_url( $sitemap );
+$path       = $parsed_url['path'];
+$data       = \XMLSF\GSC_Connect::get( $sitemap );
 
 ?>
 <p><?php esc_html_e( 'Your sitemap data as reported by Google Search Console.', 'xml-sitemap-feed' ); ?></p>
@@ -93,7 +95,7 @@ if ( isset( $data['contents'] ) && is_array( $data['contents'] ) ) {
 		<tr>
 			<th>
 				<a href="<?php echo esc_url( $gsc_link ); ?>" target="_blank" title="<?php esc_html_e( 'View this sitemap in Google Search Console', 'xml-sitemap-feed' ); ?>">
-					<?php echo esc_html( $data['path'] ); ?>
+					<?php echo esc_html( $parsed_url['path'] ); ?>
 					<span class="dashicons dashicons-external"></span>
 				</a>
 			</th>

@@ -21,8 +21,10 @@ if ( ! \XMLSF\BWT_Connect::is_connected() ) {
 }
 
 // Get connect data.
-$sitemap = xmlsf()->sitemap->get_sitemap_url();
-$data    = \XMLSF\BWT_Connect::get( $sitemap );
+$sitemap    = xmlsf()->sitemap->get_sitemap_url();
+$parsed_url = parse_url( $sitemap );
+$path       = $parsed_url['path'];
+$data       = \XMLSF\BWT_Connect::get( $sitemap );
 
 ?>
 <p><?php esc_html_e( 'Your sitemap data as reported by Bing Webmaster Tools.', 'xml-sitemap-feed' ); ?></p>
@@ -82,7 +84,7 @@ $bwt_link        = add_query_arg(
 		<tr>
 			<th>
 				<a href="<?php echo esc_url( $bwt_link ); ?>" target="_blank" title="<?php esc_html_e( 'View this sitemap in Bing Webmaster Tools', 'xml-sitemap-feed' ); ?>">
-					<?php echo esc_html( $sitemap ); ?>
+					<?php echo esc_html( $parsed_url['path'] ); ?>
 					<span class="dashicons dashicons-external"></span>
 				</a>
 			</th>
