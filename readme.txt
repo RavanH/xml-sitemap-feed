@@ -4,8 +4,8 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=5UVXZVN5HDKBS
 Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
-Tested up to: 6.9
-Stable tag: 5.7.2
+Tested up to: 7.0
+Stable tag: 5.7.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -150,21 +150,27 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.7.2 =
+= 5.7.3 =
 
-Fix Google Connect instructions text and upgrade routine.
+Fix minssing leading zero in monthly sitemap urls.
 
 == Changelog ==
 
+= 5.7.3 =
+
+Date: 20260421
+* Fix LPAD months, thanks @midwestdev
+* Admin button styles
+
 = 5.7.2 =
 
-Date: 202629
+Date: 20260129
 * Fix Google Connect instructions text
 * Fix transients upgrade routine
 
 = 5.7 =
 
-Date: 202621
+Date: 20260121
 * Bing Webmaster Tools sitemap reports
 * Bing sitemap submission from admin
 * Priority tags dropped
