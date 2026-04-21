@@ -4,8 +4,8 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=5UVXZVN5HDKBS
 Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
-Tested up to: 6.9
-Stable tag: 5.7.2
+Tested up to: 7.0
+Stable tag: 5.7.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
