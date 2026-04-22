@@ -411,7 +411,7 @@ class Sitemap_Settings {
 				\add_settings_field(
 					'xmlsf_sitemap_post_types_limit',
 					\translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-					array( __NAMESPACE__ . '\Fields', 'post_types_general_fields' ),
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'post_types_general' ),
 					'xmlsf_post_types',
 					'xml_sitemap_post_types_section'
 				);
@@ -430,7 +430,7 @@ class Sitemap_Settings {
 						\add_settings_field(
 							'xmlsf_post_type_' . $obj->name,
 							$obj->label,
-							array( __NAMESPACE__ . '\Fields', 'post_type_fields' ),
+							array( __NAMESPACE__ . '\Sitemap_Fields', 'post_type' ),
 							'xmlsf_post_types',
 							'xml_sitemap_post_types_section',
 							$post_type
@@ -451,14 +451,14 @@ class Sitemap_Settings {
 				\add_settings_field(
 					'xmlsf_taxonomy_settings',
 					\translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-					array( __NAMESPACE__ . '\Fields', 'taxonomy_settings_field' ),
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'taxonomy_settings' ),
 					'xmlsf_taxonomies',
 					'xml_sitemap_taxonomies_section'
 				);
 				\add_settings_field(
 					'xmlsf_taxonomies',
-					__( 'Taxonomies', 'xml-sitemap-feed' ),
-					array( __NAMESPACE__ . '\Fields', 'taxonomies_field' ),
+					\__( 'Taxonomies', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'taxonomies' ),
 					'xmlsf_taxonomies',
 					'xml_sitemap_taxonomies_section'
 				);
@@ -475,14 +475,14 @@ class Sitemap_Settings {
 				\add_settings_field(
 					'xmlsf_author_settings',
 					\translate( 'General' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-					array( __NAMESPACE__ . '\Fields', 'author_settings_field' ),
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'author_settings' ),
 					'xmlsf_authors',
 					'xml_sitemap_authors_section'
 				);
 				\add_settings_field(
 					'xmlsf_authors',
-					__( 'Authors', 'xml-sitemap-feed' ),
-					array( __NAMESPACE__ . '\Fields', 'authors_field' ),
+					\__( 'Authors', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'authors' ),
 					'xmlsf_authors',
 					'xml_sitemap_authors_section'
 				);
@@ -499,34 +499,41 @@ class Sitemap_Settings {
 				// custom name.
 				\add_settings_field(
 					'xmlsf_sitemap_name',
-					'<label for="xmlsf_sitemap_name">' . __( 'XML Sitemap URL', 'xml-sitemap-feed' ) . '</label>',
-					array( __NAMESPACE__ . '\Fields', 'xmlsf_sitemap_slug_field' ),
+					'<label for="xmlsf_sitemap_name">' . \__( 'XML Sitemap URL', 'xml-sitemap-feed' ) . '</label>',
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'xmlsf_sitemap_slug' ),
 					'xmlsf_advanced',
 					'xml_sitemap_advanced_section'
 				);
 				// custom urls.
 				\add_settings_field(
 					'xmlsf_urls',
-					__( 'External web pages', 'xml-sitemap-feed' ),
-					array( __NAMESPACE__ . '\Fields', 'urls_settings_field' ),
+					\__( 'External web pages', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'urls_settings' ),
 					'xmlsf_advanced',
 					'xml_sitemap_advanced_section'
 				);
 				// custom sitemaps.
 				\add_settings_field(
 					'xmlsf_custom_sitemaps',
-					__( 'External XML Sitemaps', 'xml-sitemap-feed' ),
-					array( __NAMESPACE__ . '\Fields', 'custom_sitemaps_settings_field' ),
+					\__( 'External XML Sitemaps', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'custom_sitemaps_settings' ),
 					'xmlsf_advanced',
 					'xml_sitemap_advanced_section'
 				);
 				// Sitemap notifier.
 				\add_settings_field(
 					'xmlsf_sitemap_notifier',
-					__( 'Sitemap notifier', 'xml-sitemap-feed' ),
-					array( __NAMESPACE__ . '\Fields', 'sitemap_notifier_field' ),
+					\__( 'Sitemap notifier', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'sitemap_notifier' ),
 					'xmlsf_advanced',
 					'xml_sitemap_advanced_section'
+				);
+				// Sitemap notification log.
+				\add_settings_section(
+					'news_sitemap_gsc_log_section', // keep this wrong section name for backward compat, for now...
+					\__( 'Sitemap Notification Log', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'ping_log' ),
+					'xmlsf_advanced'
 				);
 				break;
 
@@ -544,14 +551,14 @@ class Sitemap_Settings {
 				\add_settings_field(
 					'server',
 					\translate( 'Server' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-					array( __NAMESPACE__ . '\Fields', 'server_field' ),
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'server' ),
 					'xmlsf_general',
 					'xml_sitemap_general_section'
 				);
 				\add_settings_field(
 					'disabled_providers',
 					\esc_html__( 'Disable sitemaps', 'xml-sitemap-feed' ),
-					array( __NAMESPACE__ . '\Fields', 'disable_fields' ),
+					array( __NAMESPACE__ . '\Sitemap_Fields', 'disable' ),
 					'xmlsf_general',
 					'xml_sitemap_general_section'
 				);
@@ -559,7 +566,7 @@ class Sitemap_Settings {
 				// GSC Sitemap data.
 				\add_settings_section(
 					'xml_sitemap_gsc_data_section',
-					__( 'Google Search Console', 'xml-sitemap-feed' ),
+					\__( 'Google Search Console', 'xml-sitemap-feed' ),
 					function () {
 						include XMLSF_DIR . '/views/admin/section-gsc-data.php';
 					},
@@ -568,7 +575,7 @@ class Sitemap_Settings {
 				// BWT Sitemap data.
 				\add_settings_section(
 					'xml_sitemap_bwt_data_section',
-					__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ),
+					\__( 'Bing Webmaster Tools', 'xml-sitemap-feed' ),
 					function () {
 						include XMLSF_DIR . '/views/admin/section-bwt-data.php';
 					},

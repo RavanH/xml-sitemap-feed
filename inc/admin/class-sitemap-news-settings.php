@@ -178,54 +178,36 @@ class Sitemap_News_Settings {
 		\do_action( 'xmlsf_news_add_settings', $active_tab );
 
 		// Sidebar actions.
-		\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_gsc_connect' ), 5 );
 		\add_action(
 			'xmlsf_admin_sidebar',
-			function () {
-				include XMLSF_DIR . '/views/admin/sidebar-news-tools.php';
-			},
+			array( __NAMESPACE__ . '\Sitemap_News_Fields', 'sidebar_gsc_connect' ),
+			5
+		);
+		\add_action(
+			'xmlsf_admin_sidebar',
+			array( __NAMESPACE__ . '\Sitemap_News_Fields', 'sidebar_tools' ),
 			9
 		);
 		\add_action(
 			'xmlsf_admin_sidebar',
-			function () {
-				include XMLSF_DIR . '/views/admin/sidebar-news-links.php';
-			},
+			array( __NAMESPACE__ . '\Sitemap_News_Fields', 'sidebar_links' ),
 			9
 		);
 		// Advanced plugin plug.
 		if ( ! \is_plugin_active( 'xml-sitemap-feed-advanced-news/xml-sitemap-advanced-news.php' ) || ( defined( 'XMLSF_NEWS_ADV_VERSION' ) && version_compare( XMLSF_NEWS_ADV_VERSION, '1.4', '<' ) ) ) {
 			\add_action(
 				'xmlsf_admin_sidebar',
-				function () {
-					include XMLSF_DIR . '/views/admin/sidebar-news-advanced-plug.php';
-				},
+				array( __NAMESPACE__ . '\Sitemap_News_Fields', 'advanced_plug' ),
 				6
 			);
-			\add_action( 'xmlsf_admin_sidebar', array( __CLASS__, 'admin_sidebar_priority_support' ), 11 );
+			\add_action(
+				'xmlsf_admin_sidebar',
+				array( __NAMESPACE__, 'Sitemap_News_Fields', 'sidebar_priority_support' ),
+				11
+			);
 		}
 
 		include XMLSF_DIR . '/views/admin/page-sitemap-news.php';
-	}
-
-	/**
-	 * Admin sidebar GSC section
-	 */
-	public static function admin_sidebar_gsc_connect() {
-		$sitemap_desc      = __( 'Google News Sitemap', 'xml-sitemap-feed' );
-		$settings_page_url = \add_query_arg( 'ref', 'xmlsf_news', GSC_Connect::get_settings_url() );
-
-		include XMLSF_DIR . '/views/admin/sidebar-gsc-connect.php';
-	}
-
-	/**
-	 * Admin sidebar Priority Support section
-	 */
-	public static function admin_sidebar_priority_support() {
-		$adv_plugin_name = __( 'Google News Advanced', 'xml-sitemap-feed' );
-		$adv_plugin_url  = 'https://premium.status301.com/downloads/google-news-advanced/';
-
-		include XMLSF_DIR . '/views/admin/sidebar-priority-support.php';
 	}
 
 	/**
@@ -247,9 +229,7 @@ class Sitemap_News_Settings {
 				\add_settings_field(
 					'xmlsf_news_hierarchical',
 					__( 'Hierarchical post types', 'xml-sitemap-feed' ),
-					function () {
-						include XMLSF_DIR . '/views/admin/field-news-hierarchical.php';
-					},
+					array( __NAMESPACE__ . '\Sitemap_News_Fields', 'post_types' ),
 					'xmlsf_news_advanced',
 					'news_sitemap_advanced_section'
 				);
@@ -257,9 +237,7 @@ class Sitemap_News_Settings {
 				\add_settings_field(
 					'xmlsf_news_keywords',
 					__( 'Keywords', 'xml-sitemap-feed' ),
-					function () {
-						include XMLSF_DIR . '/views/admin/field-news-keywords.php';
-					},
+					array( __NAMESPACE__ . '\Sitemap_News_Fields', 'keywords' ),
 					'xmlsf_news_advanced',
 					'news_sitemap_advanced_section'
 				);
@@ -267,9 +245,7 @@ class Sitemap_News_Settings {
 				\add_settings_field(
 					'xmlsf_news_stock_tickers',
 					__( 'Stock tickers', 'xml-sitemap-feed' ),
-					function () {
-						include XMLSF_DIR . '/views/admin/field-news-stocktickers.php';
-					},
+					array( __NAMESPACE__ . '\Sitemap_News_Fields', 'stock_tickers' ),
 					'xmlsf_news_advanced',
 					'news_sitemap_advanced_section'
 				);
@@ -277,11 +253,16 @@ class Sitemap_News_Settings {
 				\add_settings_field(
 					'xmlsf_news_sitemap_notifier',
 					__( 'Sitemap notifier', 'xml-sitemap-feed' ),
-					function () {
-						include XMLSF_DIR . '/views/admin/field-news-notifier.php';
-					},
+					array( __NAMESPACE__ . '\Sitemap_News_Fields', 'sitemap_notifier' ),
 					'xmlsf_news_advanced',
 					'news_sitemap_advanced_section'
+				);
+				// Sitemap notification log.
+				\add_settings_section(
+					'news_sitemap_gsc_log_section',
+					__( 'Sitemap Notification Log', 'xml-sitemap-feed' ),
+					array( __NAMESPACE__ . '\Sitemap_News_Fields', 'sitemap_notifier_log' ),
+					'xmlsf_news_advanced'
 				);
 				\add_action( 'xmlsf_news_settings_before', array( __CLASS__, 'section_advanced_intro' ) );
 				break;
@@ -300,18 +281,14 @@ class Sitemap_News_Settings {
 				\add_settings_field(
 					'xmlsf_news_name',
 					'<label for="xmlsf_news_name">' . \__( 'Publication name', 'xml-sitemap-feed' ) . '</label>',
-					function () {
-						include XMLSF_DIR . '/views/admin/field-news-name.php';
-					},
+					array( __NAMESPACE__ . '\Sitemap_News_Fields', 'name' ),
 					'xmlsf_news_general',
 					'news_sitemap_general_section'
 				);
 				\add_settings_field(
 					'xmlsf_news_post_type',
 					__( 'Post types', 'xml-sitemap-feed' ),
-					function () {
-						include XMLSF_DIR . '/views/admin/field-news-post-type.php';
-					},
+					array( __NAMESPACE__ . '\Sitemap_News_Fields', 'post_type' ),
 					'xmlsf_news_general',
 					'news_sitemap_general_section'
 				);
@@ -327,9 +304,7 @@ class Sitemap_News_Settings {
 						\add_settings_field(
 							'xmlsf_news_categories',
 							\translate( 'Categories' ), // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction
-							function () {
-								include XMLSF_DIR . '/views/admin/field-news-categories.php';
-							},
+							array( __NAMESPACE__ . '\Sitemap_News_Fields', 'categories' ),
 							'xmlsf_news_general',
 							'news_sitemap_general_section'
 						);
@@ -341,9 +316,7 @@ class Sitemap_News_Settings {
 				\add_settings_section(
 					'news_sitemap_gsc_data_section',
 					__( 'Google Search Console', 'xml-sitemap-feed' ),
-					function () {
-						include XMLSF_DIR . '/views/admin/section-gsc-data-news.php';
-					},
+					array( __NAMESPACE__ . '\Sitemap_News_Fields', 'gsc_data' ),
 					'xmlsf_news_general'
 				);
 		}
