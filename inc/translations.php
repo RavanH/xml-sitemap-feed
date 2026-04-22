@@ -91,10 +91,6 @@ printf( /* Translators: Plugin name, correct this issue (linked) */
 	'<a href="' . esc_url( admin_url( 'options-general.php' ) ) . '?page=xmlsf_news&tab=license">' . esc_html__( 'correct this issue', 'xml-sitemap-feed' ) . '</a>'
 );
 
-esc_html_e( 'No log entries found.', 'xml-sitemap-feed' );
-esc_html_e( 'The 20 most recent sitemap notification request and related messages are logged here.', 'xml-sitemap-feed' );
-esc_html_e( 'Message', 'xml-sitemap-feed' );
-__( 'Sitemap Notification Log', 'xml-sitemap-feed' );
 esc_html_e( 'Warning: The sitemap notifier depends on internal WordPress events but you seem to have WP Cron disabled. Make sure that you are using a reliable alternative to WP Cron, like a server cron job, to trigger events and that this is done on fairly short interval, e.g. once every minute. If the interval is longer, automatic notifications will suffer longer delays.', 'xml-sitemap-feed' );
 printf(
 	/* translators: %1$s: Support ticket (linked to https://premium.status301.com/account/support/), %2$s: Contact us (linked to https://premium.status301.com/email-support/) */
