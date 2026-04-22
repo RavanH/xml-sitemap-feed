@@ -22,15 +22,15 @@ class Sitemap {
 		\add_action( 'save_post', array( '\XMLSF\Admin\Sitemap', 'save_metadata' ) );
 
 		// Placeholders for advanced options.
-		\add_action( 'xmlsf_posttype_archive_field_options', array( '\XMLSF\Admin\Fields', 'advanced_archive_field_options' ) );
+		\add_action( 'xmlsf_posttype_archive_field_options', array( '\XMLSF\Admin\Sitemap_Fields', 'advanced_archive_options' ) );
 
 		// QUICK EDIT.
 		self::add_columns();
-		\add_action( 'quick_edit_custom_box', array( '\XMLSF\Admin\Fields', 'quick_edit_fields' ) );
+		\add_action( 'quick_edit_custom_box', array( '\XMLSF\Admin\Sitemap_Fields', 'quick_edit' ) );
 		\add_action( 'save_post', array( '\XMLSF\Admin\Sitemap', 'quick_edit_save' ) );
 		\add_action( 'admin_head', array( '\XMLSF\Admin\Sitemap', 'quick_edit_script' ), 99 );
 		// BULK EDIT.
-		\add_action( 'bulk_edit_custom_box', array( '\XMLSF\Admin\Fields', 'bulk_edit_fields' ), 0 );
+		\add_action( 'bulk_edit_custom_box', array( '\XMLSF\Admin\Sitemap_Fields', 'bulk_edit' ), 0 );
 	}
 
 	/**

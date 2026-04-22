@@ -1,8 +1,8 @@
 = 5.7.X =
-* Disconnect button when error on sitemap report
-* dummy ping log section (advanced tab)
+* Disconnect/reconnect button when error on sitemap reported
+* Clear log button
 
-CONSIDER: log sitemap report fetch error and discconnect immediately?
+CONSIDER: log sitemap report fetch error and discconnect immediately? admin message?
 
 
 = 5.8 =

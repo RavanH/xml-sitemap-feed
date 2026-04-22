@@ -10,12 +10,12 @@ namespace XMLSF\Admin;
 /**
  * Admin Sitemap Class
  */
-class Fields {
+class Sitemap_Fields {
 
 	/**
 	 * Server field
 	 */
-	public static function server_field() {
+	public static function server() {
 		$server       = \get_option( 'xmlsf_server' );
 		$server       = ! \in_array( $server, array( 'core', 'plugin' ), true ) ? \XMLSF\get_default_settings( 'server' ) : $server;
 		$nosimplexml  = ! \class_exists( 'SimpleXMLElement' );
@@ -28,7 +28,7 @@ class Fields {
 	/**
 	 * Deactivate fields
 	 */
-	public static function disable_fields() {
+	public static function disable() {
 		$post_types = \get_post_types( array( 'public' => true ) );
 		// We're not supporting sitemaps for author pages for attachments and pages.
 		unset( $post_types['attachment'] );
@@ -60,7 +60,7 @@ class Fields {
 	/**
 	 * Limit field
 	 */
-	public static function post_types_general_fields() {
+	public static function post_types_general() {
 		$defaults   = \XMLSF\get_default_settings();
 		$post_types = (array) \get_option( 'xmlsf_post_types', $defaults['post_types'] );
 		$settings   = (array) \get_option( 'xmlsf_post_type_settings', $defaults['post_type_settings'] );
@@ -76,7 +76,7 @@ class Fields {
 	 *
 	 * @param string $post_type Post type.
 	 */
-	public static function post_type_fields( $post_type ) {
+	public static function post_type( $post_type ) {
 		// post type slug passed as section name.
 		$obj     = \get_post_type_object( $post_type );
 		$count   = wp_count_posts( $obj->name );
@@ -89,7 +89,7 @@ class Fields {
 	/**
 	 * Taxonomy settings field
 	 */
-	public static function taxonomy_settings_field() {
+	public static function taxonomy_settings() {
 		$taxonomy_settings = (array) \get_option( 'xmlsf_taxonomy_settings', array() );
 
 		// The actual fields for data entry.
@@ -99,7 +99,7 @@ class Fields {
 	/**
 	 * Taxonomies field
 	 */
-	public static function taxonomies_field() {
+	public static function taxonomies() {
 		$taxonomies = (array) \get_option( 'xmlsf_taxonomies', array() );
 		$public_tax = (array) \get_taxonomies( array( 'publicly_queryable' => true ), 'objects' );
 
@@ -110,7 +110,7 @@ class Fields {
 	/**
 	 * Author settings field
 	 */
-	public static function author_settings_field() {
+	public static function author_settings() {
 		$author_settings = (array) \get_option( 'xmlsf_author_settings', array() );
 
 		// The actual fields for data entry.
@@ -120,7 +120,7 @@ class Fields {
 	/**
 	 * Authors field
 	 */
-	public static function authors_field() {
+	public static function authors() {
 		$post_types = \get_post_types( array( 'public' => true ) );
 		// We're not supporting sitemaps for author pages for attachments and pages.
 		unset( $post_types['attachment'] );
@@ -151,7 +151,7 @@ class Fields {
 	/**
 	 * Sitemap slug field
 	 */
-	public static function xmlsf_sitemap_slug_field() {
+	public static function xmlsf_sitemap_slug() {
 		$sitemaps    = (array) \get_option( 'xmlsf_sitemaps', array() );
 		$placeholder = \is_object( \xmlsf()->sitemap ) && 'core' === \xmlsf()->sitemap->server_type ? 'wp-sitemap' : 'sitemap';
 		$slug        = \get_option( 'xmlsf_sitemap_name', '' );
@@ -163,7 +163,7 @@ class Fields {
 	/**
 	 * Custom sitemap field
 	 */
-	public static function custom_sitemaps_settings_field() {
+	public static function custom_sitemaps_settings() {
 		$custom_sitemaps = \get_option( 'xmlsf_custom_sitemaps' );
 		$lines           = \is_array( $custom_sitemaps ) ? \implode( PHP_EOL, $custom_sitemaps ) : $custom_sitemaps;
 
@@ -174,7 +174,7 @@ class Fields {
 	/**
 	 * Custom URLs field
 	 */
-	public static function urls_settings_field() {
+	public static function urls_settings() {
 		$urls  = \get_option( 'xmlsf_urls' );
 		$lines = array();
 
@@ -191,7 +191,7 @@ class Fields {
 	/**
 	 * Advanced archive field option
 	 */
-	public static function advanced_archive_field_options() {
+	public static function advanced_archive_options() {
 		?>
 		<option value="" disabled="disabled">
 			<?php \esc_html_e( 'Week', 'xml-sitemap-feed' ); ?>
@@ -206,7 +206,7 @@ class Fields {
 	 *
 	 * @param string $column_name Column name.
 	 */
-	public static function quick_edit_fields( $column_name ) {
+	public static function quick_edit( $column_name ) {
 		if ( 'xmlsf_exclude' === $column_name ) {
 			// The actual fields for data entry.
 			include XMLSF_DIR . '/views/admin/field-quick-edit.php';
@@ -220,7 +220,7 @@ class Fields {
 	 *
 	 * @param string $column_name Column name.
 	 */
-	public static function bulk_edit_fields( $column_name ) {
+	public static function bulk_edit( $column_name ) {
 		if ( 'xmlsf_exclude' === $column_name ) {
 			$disabled = ! \apply_filters( 'xmlsf_advanced_enabled', false );
 			// The actual fields for data entry.
@@ -233,8 +233,20 @@ class Fields {
 	 *
 	 * @since 5.6
 	 */
-	public static function sitemap_notifier_field() {
+	public static function sitemap_notifier() {
 		// The actual fields for data entry.
 		include XMLSF_DIR . '/views/admin/field-sitemap-notifier.php';
+	}
+
+	/**
+	 * GSC log section
+	 *
+	 * @since 5.7
+	 */
+	public static function ping_log () {
+		$log = (array) get_option( 'xmlsf_notifier_log', array() );
+		$advanced = apply_filters( 'xmlsf_advanced_enabled', false ) ? '' : sprintf( /* Translators: %s: XML Sitemap Advanced (with link) */ esc_html__( 'Available in %s.', 'xml-sitemap-feed' ), '<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">' . esc_html__( 'XML Sitemap Advanced', 'xml-sitemap-feed' ) . '</a>' );
+
+		include XMLSF_DIR . '/views/admin/section-ping-log.php';
 	}
 }
