@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 7.0
-Stable tag: 5.7.3
+Stable tag: 5.7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -150,16 +150,17 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.7.3 =
+= 5.7.4 =
 
-Fix minssing leading zero in monthly sitemap urls.
+Fix minssing leading zero in monthly sitemap urls + news settings fields.
 
 == Changelog ==
 
-= 5.7.3 =
+= 5.7.4 =
 
-Date: 20260421
+Date: 20260430
 * Fix LPAD months, thanks @midwestdev
+* Fix settings fields: news notifier and stock tickers
 * Admin button styles
 
 = 5.7.2 =

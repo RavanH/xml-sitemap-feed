@@ -65,7 +65,7 @@ class Sitemap_News_Settings {
 					'xmlsf_gsc_connect',
 					'gsc_manual_submit_news',
 					$message,
-					'warning'
+					$status
 				);
 			} else {
 				$sitemap = \xmlsf()->sitemap_news->get_sitemap_url();
@@ -78,7 +78,7 @@ class Sitemap_News_Settings {
 						'xmlsf_gsc_connect',
 						'gsc_manual_submit_news',
 						$message,
-						'error'
+						$status
 					);
 				} else {
 					$message = \sprintf( /* translators: %1$s: XML Sitemap Index, %2$s: Google Search Console */ \esc_html__( 'Your %1$s was submitted successfully to %2$s.', 'xml-sitemap-feed' ), \esc_html__( 'Google News Sitemap', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) );
@@ -88,7 +88,7 @@ class Sitemap_News_Settings {
 						'xmlsf_gsc_connect',
 						'gsc_manual_submit_news',
 						$message,
-						'success'
+						$status
 					);
 
 					\set_transient( 'sitemap_notifier_submission_news', true, $timeframe );

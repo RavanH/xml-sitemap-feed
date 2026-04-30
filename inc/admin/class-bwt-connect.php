@@ -97,5 +97,8 @@ class BWT_Connect {
 	 */
 	public static function disconnect() {
 		\update_option( self::$option_group, '' );
+
+		// Delete transients.
+		\delete_transient( 'sitemap_notifier_bing_submission' );
 	}
 }

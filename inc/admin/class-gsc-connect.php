@@ -122,7 +122,7 @@ class GSC_Connect {
 
 		// Return WP_Error if no host found.
 		if ( ! $parsed_url || empty( $parsed_url['host'] ) ) {
-			return new WP_Error(
+			return new \WP_Error(
 				'invalid-site-url',
 				__( 'Could not determine a candidate property URL from the site URL.', 'xml-sitemap-feed' )
 			);
@@ -169,7 +169,7 @@ class GSC_Connect {
 		);
 
 		if ( empty( $properties ) ) {
-			return new WP_Error(
+			return new \WP_Error(
 				'no-valid-site-url',
 				\__( 'Could not get a valid property from Google Search Console. The connected user account may not have the correct permissions.', 'xml-sitemap-feed' )
 			);
@@ -199,10 +199,11 @@ class GSC_Connect {
 		$options['google_refresh_token'] = '';
 		$options['property_url']         = '';
 
-		// Update)
+		// Update.
 		\update_option( self::$option_group, $options );
 
-		// Delete access token.
+		// Delete transients.
 		\delete_transient( 'sitemap_notifier_google_access_token' );
+		\delete_transient( 'sitemap_notifier_google_submission' );
 	}
 }

@@ -29,14 +29,14 @@ class Sitemap_News_Fields {
 	 * Stock tickers field
 	 */
 	public static function stock_tickers() {
-		include XMLSF_DIR . '/views/admin/field-news-stock-tickers.php';
+		include XMLSF_DIR . '/views/admin/field-news-stocktickers.php';
 	}
 
 	/**
 	 * Sitemap notifier field
 	 */
 	public static function sitemap_notifier() {
-		include XMLSF_DIR . '/views/admin/field-sitemap-notifier.php';
+		include XMLSF_DIR . '/views/admin/field-news-notifier.php';
 	}
 
 	/**

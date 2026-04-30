@@ -117,43 +117,6 @@ class GSC_Connect {
 	}
 
 	/**
-	 * Remote request to submit the sitemap to Google Search Console using an OAuth Access Token.
-	 *
-	 * @uses class GSC_API_Handler
-	 *
-	 * @param string $sitemap_url The sitemap URL.
-	 *
-	 * @return string|WP_Error The API endpoint or WP Error.
-	 */
-	public static function get_api_endpoint( $sitemap_url ) {
-		// Get the property URL from settings.
-		$options  = (array) \get_option( 'xmlsf_gsc_connect', array() );
-		$property = ! empty( $options['property_url'] ) ? $options['property_url'] : false;
-
-		if ( ! $property ) {
-			// Get our property via API.
-			$property = \XMLSF\Admin\GSC_Connect::get_property_url();
-
-			if ( \is_wp_error( $property ) ) {
-				return $property;
-			}
-
-			// Save property URL.
-			$options['property_url'] = $property;
-
-			\update_option( 'xmlsf_gsc_connect', $options );
-		}
-
-		// The API endpoint: https://www.googleapis.com/webmasters/v3/sites/siteUrl/sitemaps/feedPath
-		// siteUrl needs to be URL-encoded. feedPath (sitemap_url) also needs to be URL-encoded.
-		return \sprintf(
-			'https://www.googleapis.com/webmasters/v3/sites/%s/sitemaps/%s',
-			\rawurlencode( $property ),
-			\rawurlencode( $sitemap_url ) // Submit the full sitemap URL.
-		);
-	}
-
-	/**
 	 * Submitter.
 	 *
 	 * @uses class GSC_API_Handler
@@ -170,15 +133,8 @@ class GSC_Connect {
 			return $access_token;
 		}
 
-		// Get API Endpoint.
-		$api_endpoint = self::get_api_endpoint( $sitemap_url );
-
-		if ( \is_wp_error( $api_endpoint ) ) {
-			return $api_endpoint;
-		}
-
 		// Submit sitemap URL using the OAuth access token.
-		return GSC_API_Handler::submit( $api_endpoint, $access_token );
+		return GSC_API_Handler::submit( $sitemap_url, $access_token );
 	}
 
 	/**
@@ -196,13 +152,6 @@ class GSC_Connect {
 			return $access_token;
 		}
 
-		// Get API Endpoint.
-		$api_endpoint = self::get_api_endpoint( $sitemap_url );
-
-		if ( \is_wp_error( $api_endpoint ) ) {
-			return $api_endpoint;
-		}
-
-		return GSC_API_Handler::get( $api_endpoint, $access_token );
+		return GSC_API_Handler::get( $sitemap_url, $access_token );
 	}
 }

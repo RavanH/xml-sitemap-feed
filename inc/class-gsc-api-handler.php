@@ -19,12 +19,19 @@ class GSC_API_Handler {
 	/**
 	 * Remote request to submit the sitemap to Google Search Console using an OAuth Access Token.
 	 *
-	 * @param string $api_endpoint The API endpoint to use.
+	 * @param string $sitemap_url  Sitemap URL.
 	 * @param string $access_token The OAuth 2.0 access token.
 	 *
 	 * @return array|WP_Error An array containing the sitemap data, WP_Error on failure.
 	 */
-	public static function get( $api_endpoint, $access_token ) {
+	public static function get( $sitemap_url, $access_token ) {
+		// The API endpoint: https://www.googleapis.com/webmasters/v3/sites/siteUrl/sitemaps/feedPath.
+		$api_endpoint = self::get_api_endpoint( $sitemap_url );
+
+		if ( \is_wp_error( $api_endpoint ) ) {
+			return $api_endpoint;
+		}
+
 		$api_request_args = array(
 			'method'      => 'GET',
 			'headers'     => array(
@@ -63,13 +70,18 @@ class GSC_API_Handler {
 	/**
 	 * Remote request to submit the sitemap to Google Search Console using an OAuth Access Token.
 	 *
-	 * @param string $api_endpoint The API endpoint to use.
+	 * @param string $sitemap_url  Sitemap URL.
 	 * @param string $access_token The OAuth 2.0 access token.
 	 *
 	 * @return true|WP_Error True on success, WP_Error on failure.
 	 */
-	public static function submit( $api_endpoint, $access_token ) {
+	public static function submit( $sitemap_url, $access_token ) {
 		// The API endpoint: https://www.googleapis.com/webmasters/v3/sites/siteUrl/sitemaps/feedPath.
+		$api_endpoint = self::get_api_endpoint( $sitemap_url );
+
+		if ( \is_wp_error( $api_endpoint ) ) {
+			return $api_endpoint;
+		}
 
 		$api_request_args = array(
 			'method'      => 'PUT',
@@ -107,6 +119,43 @@ class GSC_API_Handler {
 	}
 
 	/**
+	 * Remote request to submit the sitemap to Google Search Console using an OAuth Access Token.
+	 *
+	 * @uses class GSC_API_Handler
+	 *
+	 * @param string $sitemap_url The sitemap URL.
+	 *
+	 * @return string|WP_Error The API endpoint or WP Error.
+	 */
+	public static function get_api_endpoint( $sitemap_url ) {
+		// Get the property URL from settings.
+		$options  = (array) \get_option( 'xmlsf_gsc_connect', array() );
+		$property = ! empty( $options['property_url'] ) ? $options['property_url'] : false;
+
+		if ( ! $property ) {
+			// Get our property via API.
+			$property = \XMLSF\Admin\GSC_Connect::get_property_url();
+
+			if ( \is_wp_error( $property ) ) {
+				return $property;
+			}
+
+			// Save property URL.
+			$options['property_url'] = $property;
+
+			\update_option( 'xmlsf_gsc_connect', $options );
+		}
+
+		// The API endpoint: https://www.googleapis.com/webmasters/v3/sites/siteUrl/sitemaps/feedPath
+		// siteUrl needs to be URL-encoded. feedPath (sitemap_url) also needs to be URL-encoded.
+		return \sprintf(
+			'https://www.googleapis.com/webmasters/v3/sites/%s/sitemaps/%s',
+			\rawurlencode( $property ),
+			\rawurlencode( $sitemap_url ) // Submit the full sitemap URL.
+		);
+	}
+
+	/**
 	 * Handle API Errors
 	 *
 	 *  @since 5.6
@@ -135,7 +184,7 @@ class GSC_API_Handler {
 		);
 
 		if ( 401 === $api_response_code ) {
-			$detailed_error_message .= ' ' . \__( 'Authentication failed. The access token may be invalid or expired. Please try reconnecting to Google Search Console.', 'xml-sitemap-feed' );
+			$detailed_error_message .= ' ' . \__( 'Authentication failed. The access token may be invalid or expired.', 'xml-sitemap-feed' ) . ' ' . \sprintf( /* translators: %s: Google Search Console */ __( 'Please try reconnecting to %s.', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) );
 		} elseif ( 403 === $api_response_code ) {
 			$detailed_error_message .= ' ' . \__( 'Please ensure the connected Google account has full access to the Search Console property.', 'xml-sitemap-feed' );
 		} elseif ( 404 === $api_response_code ) {
