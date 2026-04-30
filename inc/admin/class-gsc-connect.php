@@ -202,7 +202,8 @@ class GSC_Connect {
 		// Update.
 		\update_option( self::$option_group, $options );
 
-		// Delete access token.
+		// Delete transients.
 		\delete_transient( 'sitemap_notifier_google_access_token' );
+		\delete_transient( 'sitemap_notifier_google_submission' );
 	}
 }
