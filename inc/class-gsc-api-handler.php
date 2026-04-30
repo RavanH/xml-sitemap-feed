@@ -184,7 +184,7 @@ class GSC_API_Handler {
 		);
 
 		if ( 401 === $api_response_code ) {
-			$detailed_error_message .= ' ' . \__( 'Authentication failed. The access token may be invalid or expired. Please try reconnecting to Google Search Console.', 'xml-sitemap-feed' );
+			$detailed_error_message .= ' ' . \__( 'Authentication failed. The access token may be invalid or expired.', 'xml-sitemap-feed' ) . ' ' . \sprintf( /* translators: %s: Google Search Console */ __( 'Please try reconnecting to %s.', 'xml-sitemap-feed' ), \esc_html__( 'Google Search Console', 'xml-sitemap-feed' ) );
 		} elseif ( 403 === $api_response_code ) {
 			$detailed_error_message .= ' ' . \__( 'Please ensure the connected Google account has full access to the Search Console property.', 'xml-sitemap-feed' );
 		} elseif ( 404 === $api_response_code ) {
