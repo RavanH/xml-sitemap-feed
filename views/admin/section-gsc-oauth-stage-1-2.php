@@ -82,18 +82,18 @@
 				);
 				?>
 			</li>
-			<li>
-				<?php
-				printf(
-					/* translators: %1$s: External, %2$s: Audience, %3$s: Publish app */
-					esc_html__( 'If you chose %1$s above, then navigate to %2$s and click %3$s.', 'xml-sitemap-feed' ),
-					'<em>' . esc_html__( 'External', 'xml-sitemap-feed' ) . '</em>',
-					'<strong>' . esc_html__( 'Audience', 'xml-sitemap-feed' ) . '</strong>',
-					'<strong>' . esc_html__( 'Publish app', 'xml-sitemap-feed' ) . '</strong>'
-				);
-				?>
-			</li>
 		</ul>
+	</li>
+	<li>
+		<?php
+		printf(
+			/* translators: %1$s: External, %2$s: Audience, %3$s: Publish app */
+			esc_html__( 'If you chose %1$s above, then navigate to %2$s and click %3$s.', 'xml-sitemap-feed' ),
+			'<em>' . esc_html__( 'External', 'xml-sitemap-feed' ) . '</em>',
+			'<strong>' . esc_html__( 'Audience', 'xml-sitemap-feed' ) . '</strong>',
+			'<strong>' . esc_html__( 'Publish app', 'xml-sitemap-feed' ) . '</strong>'
+		);
+		?>
 	</li>
 	<li>
 		<?php
