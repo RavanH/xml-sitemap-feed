@@ -72,6 +72,15 @@
 					'<strong>' . esc_html__( 'External', 'xml-sitemap-feed' ) . '</strong>'
 				);
 				?>
+				<?php
+				printf(
+					/* translators: %1$s: Internal, %2$s: External */
+					esc_html__( 'Enter at least one email address under %1$s, then agree to the %2$s and hit %3$s.', 'xml-sitemap-feed' ),
+					'<strong>' . esc_html__( 'Contact Information', 'xml-sitemap-feed' ) . '</strong>',
+					'<strong>' . esc_html__( 'Google API Services User Data Policy', 'xml-sitemap-feed' ) . '</strong>',
+					'<strong>' . esc_html__( 'Create', 'xml-sitemap-feed' ) . '</strong>'
+				);
+				?>
 			</li>
 			<li>
 				<?php
