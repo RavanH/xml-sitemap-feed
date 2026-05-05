@@ -102,7 +102,7 @@ if ( isset( $data['contents'] ) && is_array( $data['contents'] ) ) {
 			<td><?php if ( $is_pending ) : ?>
 				<span class="dashicons dashicons-clock" style="color:#dba617" title="<?php esc_html_e( 'Pending', 'xml-sitemap-feed' ); ?>"></span>
 			<?php else : ?>
-				<span class="dashicons dashicons-yes-alt" style="color:#00a32a" title="<?php echo esc_html_e( 'Processed', 'xml-sitemap-feed' ); ?>"></span>
+				<span class="dashicons dashicons-yes-alt" style="color:#00a32a" title="<?php esc_html_e( 'Processed', 'xml-sitemap-feed' ); ?>"></span>
 			<?php endif; ?>
 			</td>
 			<td><?php echo esc_html( $last_submitted ); ?></td>

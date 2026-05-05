@@ -156,6 +156,11 @@ Fix minssing leading zero in monthly sitemap urls + news settings fields.
 
 == Changelog ==
 
+= 5.7.5 =
+
+Date:
+* Fix: Bing report only returns sitemap number
+
 = 5.7.4 =
 
 Date: 20260430
