@@ -1,7 +1,7 @@
-= 5.7.X =
-
+= 5.7.x =
 
 = 5.8 =
+* plugin sitemap index cache
 * move sitemap reports to own tabs or one Reports tab for all sitemaps?
 * add fetch sitemap data twice daily (or once an hour?) and store
 * refetch after submit and store
