@@ -188,7 +188,7 @@ function robots_txt( $output ) {
 /**
  * Default options
  *
- * @param bool $key Which key to get.
+ * @param string $key Which key to get.
  *
  * @return array|string|bool|null
  */

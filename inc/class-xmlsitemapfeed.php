@@ -15,14 +15,14 @@ class XMLSitemapFeed {
 	/**
 	 * Sitemap object
 	 *
-	 * @var null|obj
+	 * @var null|object
 	 */
 	public $sitemap = null;
 
 	/**
 	 * News sitemap object
 	 *
-	 * @var null|obj
+	 * @var null|object
 	 */
 	public $sitemap_news = null;
 
@@ -32,18 +32,6 @@ class XMLSitemapFeed {
 	 * @var array
 	 */
 	private $defaults = array();
-
-	/**
-	 * News defaults
-	 * Keep for backward compatibility with XMLSF Advanced News 1.3.5 and earlier.
-	 *
-	 * @var array
-	 */
-	public $default_news_tags = array(
-		'name'       => '',
-		'post_type'  => array( 'post' ),
-		'categories' => '',
-	);
 
 	/**
 	 * Signifies whether the request has been filtered.
@@ -76,7 +64,7 @@ class XMLSitemapFeed {
 	/**
 	 * Site public scheme
 	 *
-	 * @var string $domain
+	 * @var string
 	 */
 	private $scheme;
 
@@ -148,7 +136,7 @@ class XMLSitemapFeed {
 		}
 
 		// Load sitemap servers.
-		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
+		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', get_default_settings( 'sitemaps' ) );
 
 		// XML Sitemap?
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
@@ -215,7 +203,7 @@ class XMLSitemapFeed {
 		}
 
 		if ( empty( $sitemap ) || 'sitemap' === $sitemap ) {
-			if ( \function_exists( 'get_sitemap_url' ) && 'core' === \get_option( 'xmlsf_server', $this->defaults( 'server' ) ) ) {
+			if ( \function_exists( 'get_sitemap_url' ) && 'core' === \get_option( 'xmlsf_server', get_default_settings( 'server' ) ) ) {
 				$this->sitemap = new Sitemap_Core();
 			} else {
 				// Replace core sitemap.
@@ -286,7 +274,11 @@ class XMLSitemapFeed {
 				'robots'             => '',
 				'urls'               => '',
 				'custom_sitemaps'    => '',
-				'news_tags'          => $this->default_news_tags,
+				'news_tags'          => array(
+					'name'       => '',
+					'post_type'  => array( 'post' ),
+					'categories' => '',
+				),
 			);
 
 		endif;
