@@ -13,7 +13,7 @@
 
 	<?php
 	if ( empty( $obj->hierarchical ) && 'plugin' === \xmlsf()->sitemap->server_type ) {
-		$archive = isset( $options[ $obj->name ]['archive'] ) ? $options[ $obj->name ]['archive'] : 'yearly';
+		$archive = isset( $options[ $obj->name ]['archive'] ) ? $options[ $obj->name ]['archive'] :( $obj->hierarchical ? 'yearly' : '' );
 		?>
 	<p>
 		<label><?php esc_html_e( 'Split by', 'xml-sitemap-feed' ); ?>

@@ -679,7 +679,7 @@ class Sitemap_Plugin extends Sitemap {
 			$post_types = $this->get_post_types();
 			foreach ( $post_types as $post_type ) :
 				$settings     = $this->post_type_settings( $post_type );
-				$archive      = isset( $settings['archive'] ) ? $settings['archive'] : '';
+				$archive      = isset( $settings['archive'] ) ? $settings['archive'] : ( $post_type->hierarchical ? 'yearly' : '' ) ;
 				$archive_data = \apply_filters( 'xmlsf_index_archive_data', array(), $post_type, $archive );
 
 				foreach ( $archive_data as $url => $lastmod ) {
