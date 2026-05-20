@@ -136,7 +136,7 @@ class XMLSitemapFeed {
 		}
 
 		// Load sitemap servers.
-		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', get_default_settings( 'sitemaps' ) );
+		$sitemaps = (array) \get_option( 'xmlsf_sitemaps', $this->defaults( 'sitemaps' ) );
 
 		// XML Sitemap?
 		if ( ! empty( $sitemaps['sitemap'] ) ) {
@@ -203,7 +203,7 @@ class XMLSitemapFeed {
 		}
 
 		if ( empty( $sitemap ) || 'sitemap' === $sitemap ) {
-			if ( \function_exists( 'get_sitemap_url' ) && 'core' === \get_option( 'xmlsf_server', get_default_settings( 'server' ) ) ) {
+			if ( \function_exists( 'get_sitemap_url' ) && 'core' === \get_option( 'xmlsf_server', $this->defaults( 'server' ) ) ) {
 				$this->sitemap = new Sitemap_Core();
 			} else {
 				// Replace core sitemap.
@@ -233,9 +233,11 @@ class XMLSitemapFeed {
 	/**
 	 * Default options
 	 *
+	 * @param string $key Which key to get.
+	 *
 	 * @return array
 	 */
-	public function defaults() {
+	public function defaults( $key = false ) {
 		if ( empty( $this->defaults ) ) :
 
 			// sitemaps.
@@ -283,7 +285,7 @@ class XMLSitemapFeed {
 
 		endif;
 
-		return $this->defaults;
+		return $key && isset( $this->defaults[ $key ] ) ? $this->defaults[ $key ] : $this->defaults;
 	}
 
 	/**
