@@ -211,7 +211,7 @@ abstract class Sitemap {
 
 		foreach ( $this->post_type_settings() as $type => $settings ) {
 
-			if ( $this->active_post_type( $type ) && is_array( $settings ) && ! empty( $settings['archive'] ) ) {
+			if ( $this->active_post_type( $type ) && is_array( $settings ) && ( ! empty( $settings['archive'] ) || ( ! isset( $settings['archive'] ) && \is_post_type_hierarchical( $type ) ) ) ) {
 				return true;
 			}
 		}

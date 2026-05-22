@@ -131,8 +131,12 @@ function headers( $headers ) {
 	// Force content type.
 	$headers['Content-Type'] = 'application/xml; charset=' . \get_bloginfo( 'charset' );
 
-	// And return, merged with nocache headers.
-	return \array_merge( $headers, \wp_get_nocache_headers() );
+	// And merge with nocache headers if... TODO option to avoid cache for regular sitemaps.
+	if ( \xmlsf()->is_news ) {
+		$headers = \array_merge( $headers, \wp_get_nocache_headers() );
+	}
+
+	return $headers;
 }
 
 /**
@@ -184,7 +188,7 @@ function robots_txt( $output ) {
 /**
  * Default options
  *
- * @param bool $key Which key to get.
+ * @param string $key Which key to get.
  *
  * @return array|string|bool|null
  */

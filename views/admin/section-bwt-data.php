@@ -43,8 +43,8 @@ if ( \is_wp_error( $data ) ) {
 	<?php
 	return;
 }
-$number = count( $data['d'] );
-if ( $number < 1 ) {
+
+if ( count( $data['d'] ) < 1 ) {
 	?>
 	<p style="color:#d63638">
 		<?php esc_html_e( 'There was an error requesting sitemap data from Bing Webmaster Tools.', 'xml-sitemap-feed' ); ?>
@@ -76,7 +76,6 @@ $bwt_link        = add_query_arg(
 			<th><?php esc_html_e( 'Status', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Last submitted', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Last crawled', 'xml-sitemap-feed' ); ?></th>
-			<th><?php esc_html_e( 'URLs', 'xml-sitemap-feed' ); ?></th>
 			<th><?php esc_html_e( 'Sitemaps', 'xml-sitemap-feed' ); ?></th>
 		</tr>
 	</thead>
@@ -91,13 +90,12 @@ $bwt_link        = add_query_arg(
 			<td><?php if ( isset( $data['Status'] ) && 'Success' !== $data['Status'] ) : ?>
 				<span class="dashicons dashicons-clock" style="color:#dba617" title="<?php esc_html_e( 'Pending', 'xml-sitemap-feed' ); ?>"></span>
 			<?php else : ?>
-				<span class="dashicons dashicons-yes-alt" style="color:#00a32a" title="<?php echo esc_html_e( 'Processed', 'xml-sitemap-feed' ); ?>"></span>
+				<span class="dashicons dashicons-yes-alt" style="color:#00a32a" title="<?php esc_html_e( 'Processed', 'xml-sitemap-feed' ); ?>"></span>
 			<?php endif; ?>
 			</td>
 			<td><?php echo esc_html( $last_submitted ); ?></td>
 			<td><?php echo esc_html( $last_downloaded ); ?></td>
 			<td><?php echo esc_html__( 'Found:', 'xml-sitemap-feed' ) . ' ' . esc_html( $links_submitted ); ?></td>
-			<td><?php echo esc_html__( 'Found:', 'xml-sitemap-feed' ) . ' ' . esc_html( $number ); ?></td>
 		</tr>
 	</tbody>
 </table>

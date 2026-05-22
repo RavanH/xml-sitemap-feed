@@ -72,19 +72,28 @@
 					'<strong>' . esc_html__( 'External', 'xml-sitemap-feed' ) . '</strong>'
 				);
 				?>
-			</li>
-			<li>
 				<?php
 				printf(
-					/* translators: %1$s: External, %2$s: Audience, %3$s: Publish app */
-					esc_html__( 'If you chose %1$s above, then navigate to %2$s and click %3$s.', 'xml-sitemap-feed' ),
-					'<em>' . esc_html__( 'External', 'xml-sitemap-feed' ) . '</em>',
-					'<strong>' . esc_html__( 'Audience', 'xml-sitemap-feed' ) . '</strong>',
-					'<strong>' . esc_html__( 'Publish app', 'xml-sitemap-feed' ) . '</strong>'
+					/* translators: %1$s: Internal, %2$s: External */
+					esc_html__( 'Enter at least one email address under %1$s, then agree to the %2$s and hit %3$s.', 'xml-sitemap-feed' ),
+					'<strong>' . esc_html__( 'Contact Information', 'xml-sitemap-feed' ) . '</strong>',
+					'<strong>' . esc_html__( 'Google API Services User Data Policy', 'xml-sitemap-feed' ) . '</strong>',
+					'<strong>' . esc_html__( 'Create', 'xml-sitemap-feed' ) . '</strong>'
 				);
 				?>
 			</li>
 		</ul>
+	</li>
+	<li>
+		<?php
+		printf(
+			/* translators: %1$s: External, %2$s: Audience, %3$s: Publish app */
+			esc_html__( 'If you chose %1$s above, then navigate to %2$s and click %3$s.', 'xml-sitemap-feed' ),
+			'<em>' . esc_html__( 'External', 'xml-sitemap-feed' ) . '</em>',
+			'<strong>' . esc_html__( 'Audience', 'xml-sitemap-feed' ) . '</strong>',
+			'<strong>' . esc_html__( 'Publish app', 'xml-sitemap-feed' ) . '</strong>'
+		);
+		?>
 	</li>
 	<li>
 		<?php

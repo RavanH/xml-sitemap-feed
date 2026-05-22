@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 7.0
-Stable tag: 5.7.4
+Stable tag: 5.7.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -150,11 +150,18 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.7.4 =
+= 5.7.5 =
 
-Fix minssing leading zero in monthly sitemap urls + news settings fields.
+Bugfixes: split by year default and bing report issue.
 
 == Changelog ==
+
+= 5.7.5 =
+
+Date: 20260519
+* Fix: Bing report only returns sitemap number
+* Fix: Split by year no longer default after swichting server
+* Drop additional no-store for news sitemap nocache headers
 
 = 5.7.4 =
 

@@ -16,13 +16,12 @@ echo '<?xml-stylesheet type="text/xsl" href="' . esc_url( wp_make_link_relative(
 <?php
 do_action( 'xmlsf_sitemap_index' );
 
-$disabled = get_option( 'xmlsf_disabled_providers', XMLSF\get_default_settings( 'disabled_providers' ) );
-
-// Public post types.
 $post_types = xmlsf()->sitemap->get_post_types();
+
+// Post types.
 foreach ( $post_types as $the_post_type ) :
 	$settings     = xmlsf()->sitemap->post_type_settings( $the_post_type );
-	$archive_type = isset( $settings['archive'] ) ? $settings['archive'] : '';
+	$archive_type = isset( $settings['archive'] ) ? $settings['archive'] : ( is_post_type_hierarchical( $the_post_type ) ? '' : 'yearly' );
 	$archive_data = apply_filters( 'xmlsf_index_archive_data', array(), $the_post_type, $archive_type );
 
 	foreach ( $archive_data as $url => $lastmod ) {
@@ -33,6 +32,8 @@ foreach ( $post_types as $the_post_type ) :
 		echo '</sitemap>' . PHP_EOL;
 	}
 endforeach;
+
+$disabled = get_option( 'xmlsf_disabled_providers', XMLSF\get_default_settings( 'disabled_providers' ) );
 
 // Public taxonomies.
 if ( empty( $disabled ) || ! in_array( 'taxonomies', (array) $disabled, true ) ) {

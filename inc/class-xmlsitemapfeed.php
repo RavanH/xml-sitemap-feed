@@ -15,14 +15,14 @@ class XMLSitemapFeed {
 	/**
 	 * Sitemap object
 	 *
-	 * @var null|obj
+	 * @var null|object
 	 */
 	public $sitemap = null;
 
 	/**
 	 * News sitemap object
 	 *
-	 * @var null|obj
+	 * @var null|object
 	 */
 	public $sitemap_news = null;
 
@@ -32,18 +32,6 @@ class XMLSitemapFeed {
 	 * @var array
 	 */
 	private $defaults = array();
-
-	/**
-	 * News defaults
-	 * Keep for backward compatibility with XMLSF Advanced News 1.3.5 and earlier.
-	 *
-	 * @var array
-	 */
-	public $default_news_tags = array(
-		'name'       => '',
-		'post_type'  => array( 'post' ),
-		'categories' => '',
-	);
 
 	/**
 	 * Signifies whether the request has been filtered.
@@ -76,7 +64,7 @@ class XMLSitemapFeed {
 	/**
 	 * Site public scheme
 	 *
-	 * @var string $domain
+	 * @var string
 	 */
 	private $scheme;
 
@@ -245,9 +233,11 @@ class XMLSitemapFeed {
 	/**
 	 * Default options
 	 *
+	 * @param string $key Which key to get.
+	 *
 	 * @return array
 	 */
-	public function defaults() {
+	public function defaults( $key = false ) {
 		if ( empty( $this->defaults ) ) :
 
 			// sitemaps.
@@ -286,12 +276,16 @@ class XMLSitemapFeed {
 				'robots'             => '',
 				'urls'               => '',
 				'custom_sitemaps'    => '',
-				'news_tags'          => $this->default_news_tags,
+				'news_tags'          => array(
+					'name'       => '',
+					'post_type'  => array( 'post' ),
+					'categories' => '',
+				),
 			);
 
 		endif;
 
-		return $this->defaults;
+		return $key && isset( $this->defaults[ $key ] ) ? $this->defaults[ $key ] : $this->defaults;
 	}
 
 	/**

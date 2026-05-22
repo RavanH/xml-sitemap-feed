@@ -36,8 +36,6 @@ class Sitemap_News {
 		\add_filter( 'xmlsf_sitemap_index_after', array( $this, 'news_in_plugin_index' ) );
 		\add_action( 'wp_sitemaps_init', array( $this, 'news_in_core_index' ), 11 );
 
-		\add_filter( 'nocache_headers', array( $this, 'news_nocache_headers' ) );
-
 		\add_filter( 'xmlsf_news_language', array( $this, 'parse_language_string' ), 99 );
 
 		// Add sitemap in Robots TXT.
@@ -276,22 +274,6 @@ class Sitemap_News {
 				\load_template( $file );
 			}
 		}
-	}
-
-
-	/**
-	 * Response headers filter
-	 * Does not check if we are really in a sitemap feed.
-	 *
-	 * @param array $headers The headers array.
-	 *
-	 * @return array
-	 */
-	public function news_nocache_headers( $headers ) {
-		// Prevent proxy caches serving a cached news sitemap.
-		$headers['Cache-Control'] .= ', no-store';
-
-		return $headers;
 	}
 
 	/**
