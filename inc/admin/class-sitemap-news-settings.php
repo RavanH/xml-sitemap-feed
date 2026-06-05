@@ -202,7 +202,7 @@ class Sitemap_News_Settings {
 			);
 			\add_action(
 				'xmlsf_admin_sidebar',
-				array( __NAMESPACE__, 'Sitemap_News_Fields', 'sidebar_priority_support' ),
+				array( __NAMESPACE__. '\Sitemap_News_Fields', 'sidebar_priority_support' ),
 				11
 			);
 		}
