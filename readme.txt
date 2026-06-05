@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 7.0
-Stable tag: 5.7.5
+Stable tag: 5.7.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -150,11 +150,16 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.7.5 =
+= 5.7.6 =
 
-Bugfixes: split by year default and bing report issue.
+Bugfix: error on news sitemap admin page.
 
 == Changelog ==
+
+= 5.7.6 =
+
+Date: 20260605
+* Fix: invalid callback on news settings page
 
 = 5.7.5 =
 
