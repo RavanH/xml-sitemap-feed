@@ -5,7 +5,7 @@ Tags: sitemap, xml, news, robots, Google News
 Requires at least: 4.6
 Requires PHP: 5.6
 Tested up to: 7.0
-Stable tag: 5.7.6
+Stable tag: 5.7.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -150,11 +150,16 @@ Please read more on [FAQ's and Troubleshooting](https://premium.status301.com/kn
 
 == Upgrade Notice ==
 
-= 5.7.6 =
+= 5.7.7 =
 
-Bugfix: error on news sitemap admin page.
+Bugfix: SEO plugin sitemap admin warning.
 
 == Changelog ==
+
+= 5.7.7 =
+
+Date: 20260610
+* FIX Rank Math admin warning
 
 = 5.7.6 =
 
