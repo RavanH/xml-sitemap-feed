@@ -22,7 +22,6 @@ class Rank_Math {
 		// check date archive redirection.
 		$rankmath_titles = \get_option( 'rank-math-options-titles' );
 
-		echo \xmlsf()->sitemap->uses_date_archives() ? 'uses date archive' : 'does not use date archive';
 		if ( ! empty( $rankmath_titles['disable_date_archives'] ) && 'on' === $rankmath_titles['disable_date_archives'] && \xmlsf()->sitemap->uses_date_archives() ) {
 			?>
 			<div class="notice notice-error fade is-dismissible">
