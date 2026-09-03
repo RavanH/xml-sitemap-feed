@@ -117,6 +117,10 @@ Follow these steps:
 
 2. Upload the zip file via the Plugins > Add New > Upload page &hellip; OR &hellip; unpack and upload with your favourite FTP client to the /plugins/ folder.
 
+https://www.youtube.com/watch?v=WooNmrNKmcM
+
+from [Choosing and installing a plugin](https://learn.wordpress.org/lesson/choosing-and-installing-a-plugin/)
+
 **III.** Activate the plugin on the Plugins page.
 
 Done! Check your sparkling new XML Sitemap by visiting yourblogurl.tld/sitemap.xml (adapted to your domain name of course) with a browser or any online XML Sitemap validator. You might also want to check if the sitemap is listed in your yourblogurl.tld/robots.txt file.
