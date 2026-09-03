@@ -11,8 +11,8 @@
 	<?php
 	if ( current_user_can( 'update_plugins' ) ) {
 		?>
-	<a href="https://premium.status301.com/account/downloads/" target="_blank">
-		<?php esc_html_e( 'Please download and install the latest version.', 'xml-sitemap-feed' ); ?>
+	<a href="https://premium.status301.com/downloads/xml-sitemap-advanced/" target="_blank">
+		<?php printf( /* Translators: Advanced plugin version number */ __( 'Please download and install version %s or later.', 'xml-sitemap-feed' ), XMLSF_ADV_MIN_VERSION ); ?>
 	</a>
 		<?php
 	} else {
