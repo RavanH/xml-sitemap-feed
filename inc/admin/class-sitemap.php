@@ -363,7 +363,7 @@ class Sitemap {
 	 *
 	 * @since 5.7
 	 *
-	 * @param string $column_array Column array.
+	 * @param array $column_array Column array.
 	 */
 	public static function quick_edit_columns( $column_array ) {
 		$title = __( 'XML Sitemap', 'xml-sitemap-feed' );
