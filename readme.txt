@@ -107,10 +107,6 @@ XML Sitemap Feed was originally based on the discontinued plugin Standard XML Si
 
 **II.** Install plugin by:
 
-Quick installation via **[Covered Web Services](http://coveredwebservices.com/wp-plugin-install/?plugin=xml-sitemap-feed)** !
-
- &hellip; OR &hellip;
-
 Search for "xml sitemap feed" and install with that slick **Plugins > Add New** admin page.
 
  &hellip; OR &hellip;
