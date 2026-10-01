@@ -17,9 +17,9 @@
 		<?php // TODO add button(s) to prime medadata. ?>
 		<input type="submit" name="xmlsf-clear-post-meta" class="button button-small" value="<?php esc_attr_e( 'Clear post cache', 'xml-sitemap-feed' ); ?>" />
 		<input type="submit" name="xmlsf-clear-term-meta" class="button button-small" value="<?php esc_attr_e( 'Clear term cache', 'xml-sitemap-feed' ); ?>" />
-		<input type="submit" name="xmlsf-clear-user-meta" class="button button-small" value="<?php esc_attr_e( 'Clear user cache', 'xml-sitemap-feed' ); ?>" />
+		<input type="submit" name="xmlsf-clear-user-meta" class="components-button is-small is-secondary" value="<?php esc_attr_e( 'Clear user cache', 'xml-sitemap-feed' ); ?>" />
 	</p>
 	<p>
-		<input type="submit" name="xmlsf-clear-settings" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm('<?php echo esc_js( __( 'You are about to RESET ALL sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?>')" />
+		<input type="submit" name="xmlsf-clear-settings" class="components-button is-small is-secondary is-destructive" value="<?php esc_attr_e( 'Reset settings', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm('<?php echo esc_js( __( 'You are about to RESET ALL sitemap settings to the plugin defaults.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?>')" />
 	</p>
 </form>

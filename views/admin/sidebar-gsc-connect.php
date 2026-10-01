@@ -37,6 +37,6 @@ if ( ! \XMLSF\GSC_Connect::is_connected() ) {
 		<?php esc_html_e( 'Your site is connected to Google Search Console. You can disconnect and reconnect if you encounter submission errors or wish to reset or transfer site connection ownership.', 'xml-sitemap-feed' ); ?>
 	</p>
 	<p>
-		<input type="submit" name="xmlsf_gsc_disconnect" class="button button-small button-link-delete" value="<?php esc_attr_e( 'Disconnect', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm( '<?php echo esc_js( __( 'You are about to DISCONNECT this site from Google Search Console.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?>' )" />
+		<input type="submit" name="xmlsf_gsc_disconnect" class="components-button is-small is-secondary is-destructive" value="<?php esc_attr_e( 'Disconnect', 'xml-sitemap-feed' ); ?>" onclick="javascript:return confirm( '<?php echo esc_js( __( 'You are about to DISCONNECT this site from Google Search Console.', 'xml-sitemap-feed' ) ); ?>\n\n<?php echo esc_js( translate( 'Are you sure you want to do this?' ) ); // phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction ?>' )" />
 	</p>
 </form>
