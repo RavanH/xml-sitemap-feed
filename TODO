@@ -1,6 +1,7 @@
 = 5.7.x =
 
 = 5.8 =
+* add links to KB pages like https://premium.status301.com/knowledge-base/xml-sitemap-google-news/ or https://premium.status301.com/knowledge-base/xml-sitemap-google-news/google-search-console-connection-errors/
 * plugin sitemap index cache
 * move sitemap reports to own tabs or one Reports tab for all sitemaps?
 * add fetch sitemap data twice daily (or once an hour?) and store
