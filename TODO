@@ -1,4 +1,5 @@
 = 5.7.x =
+* restitution of xmlsf_ping action hook?
 
 = 5.8 =
 * add links to KB pages like https://premium.status301.com/knowledge-base/xml-sitemap-google-news/ or https://premium.status301.com/knowledge-base/xml-sitemap-google-news/google-search-console-connection-errors/
