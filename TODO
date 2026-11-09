@@ -1,5 +1,6 @@
 = 5.7.x =
 * restitution of xmlsf_ping action hook?
+* FIX issue : disable Social also disables others like Newsletter !!!!!
 
 = 5.8 =
 * add links to KB pages like https://premium.status301.com/knowledge-base/xml-sitemap-google-news/ or https://premium.status301.com/knowledge-base/xml-sitemap-google-news/google-search-console-connection-errors/
